@@ -1,3 +1,9 @@
 .idea/
 studassweb/db.sqlite3
-studassweb/studassweb/__pycache__/
+
+### Django ###
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
