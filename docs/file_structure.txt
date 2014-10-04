@@ -1,0 +1,37 @@
+======== File structure ========
+
+bin: scripts and other executables
+
+studassweb: django source files
+|
+|-- association: data models related to the association
+|
+|-- base: the wrapper containing the header, footer, main menu, etc
+|
+|-- contact: contact form
+|
+|-- events: event and signup system
+|
+|-- example: an example page, use it as reference if you're unsure how to make your module work
+|
+|-- exams: archive of old exams
+|
+|-- frontpage: the front page, including latest news and events in some form
+|
+|-- gallery: photos
+|
+|-- info: information pages (wiki/cms)
+|
+|-- links: link collection
+|
+|-- members: user data models
+|
+|-- news: news module
+|
+|-- polls: polls / voting system
+|
+|-- studassweb: "project folder"
+|
+|-- theme: theme managing module
+
+docs: documents

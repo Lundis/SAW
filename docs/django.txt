@@ -1,0 +1,13 @@
+===== Statement of Purpose =====
+
+This document describes various scenarios that you may run into when working with Django, and how to deal with them.
+If you encounter a new problem, please add it here (with a solution if you have one).
+
+
+===== How to create/init the database file =====
+> python manage.py syncdb
+
+* If it fails, you will probably need to delete the database file (db.sqlite3) and rerun syncdb
+* it will ask you to create a superuser, enter anything you want for username/password. The database is local so it doesn't matter
+* TODO: create a script that wipes the database, creates it anew, and inserts test data into the DB
+

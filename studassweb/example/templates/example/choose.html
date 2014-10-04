@@ -1,0 +1,14 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+Example
+{%  endblock %}
+
+{% block content %}
+<div>
+	<p>Who is the most awesome team member?</p>
+	{% for member in members %}
+		<a href="{{ forloop.counter0 }}">{{ member }}</a>
+	{% endfor %}
+</div>
+{% endblock %}
