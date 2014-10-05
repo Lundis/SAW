@@ -1,0 +1,13 @@
+===== Statement of Purpose =====
+
+	This document describes how the URL structure work in this project
+
+===== Top dispatcher =====
+	At the top of the URL dispatcher chain is studassweb/urls.py. It delegates HTTP requests to the right module.
+	At this moment the modules are hardcoded, but in the future a dynamic loader system will be responsible of
+	generating the list of modules.
+
+===== App urls.py ======
+
+	Each app that has something to show should have an urls.py file describing what urls it accepts and which view
+	handles it. For examples, check the example module.

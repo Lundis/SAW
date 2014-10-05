@@ -1,4 +1,4 @@
-======== File structure ========
+===== General File structure =====
 
 bin: scripts and other executables
 
@@ -35,3 +35,12 @@ studassweb: django source files
 |-- theme: theme managing module
 
 docs: documents
+
+===== Inside an app =====
+
+templates/APPNAME/ contains all app-specific templates
+static/APPNAME/ contains all app-specific static files (css etc)
+
+===== On the deployment server =====
+
+* All static files will be moved from the app-local static directories to a single directory that is served directly by

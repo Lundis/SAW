@@ -1,0 +1,25 @@
+===== Statement of purpose =====
+
+	This document describes the template structure of this project
+
+===== Base Template =====
+
+	The template "base/base.html" contains a header (including menu), a footer and the following blocks:
+		* title: the title of the HTML page
+		* content: the content of the current page
+
+
+===== Module templates =====
+
+	All modules should extend the base template, which is done by writing {% extends "base/base.html" %} at the
+	beginning of the file.
+
+	They need to implement the blocks provided by the base template:
+
+	{% block title%}
+	Page title
+	{% endblock %}
+
+	{% block content %}
+	<h1>Hello World!</h1>
+	{% endblock %}

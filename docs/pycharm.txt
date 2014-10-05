@@ -1,0 +1,15 @@
+===== Statement of Purpose =====
+
+This document describes how you should config PyCharm for this project.
+
+1. Enable Django support
+
+    File -> Settings... -> Project Settings -> Django
+    * Django folder should be the folder containing manage.py (GITROOT/studassweb)
+    * The settings.py file is in the studassweb folder inside the Django folder.
+    * manage.py is in GITROOT/studassweb/manage.py
+
+2. Change indentation to tabs
+
+	File -> Settings... -> Project Settings -> Code Style
+	*Enable "use tab character" for at least General, Python, HTML, CSS, javascript
