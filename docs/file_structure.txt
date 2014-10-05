@@ -6,7 +6,7 @@ studassweb: django source files
 |
 |-- association: data models related to the association
 |
-|-- base: the wrapper containing the header, footer, main menu, etc
+|-- base: the wrapper containing the header, footer, main menu, etc. It also contains Bootstrap 3.2.0
 |
 |-- contact: contact form
 |
@@ -39,7 +39,9 @@ docs: documents
 ===== Inside an app =====
 
 templates/APPNAME/ contains all app-specific templates
-static/APPNAME/ contains all app-specific static files (css etc)
+static/APPNAME/ contains all app-specific static files
+static/APPNAME/css contains all app-specific CSS files
+static/APPNAME/js contains all app-specific javascript files
 
 ===== On the deployment server =====
 
