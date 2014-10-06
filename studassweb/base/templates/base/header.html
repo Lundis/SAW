@@ -1,8 +1,9 @@
+{% load i18n %}
 <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 	<div class="container">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
-				<span class="sr-only">Toggle navigation</span>
+				<span class="sr-only">{% trans "Toggle navigation" %}</span>
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
@@ -11,13 +12,13 @@
 		</div>
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
-				<li class="active"><a href="/">Home</a></li>
-				<li><a href="/gallery">Gallery</a></li>
-				<li><a href="/info">Info</a></li>
-				<li><a href="/example">Example</a></li>
-				<li><a href="/events">Events</a></li>
-				<li><a href="/links">Links</a></li>
-				<li><a href="/news">News</a></li>
+				<li class="active"><a href="/">{% trans "Home" %}</a></li>
+				<li><a href="/gallery">{% trans "Gallery" %}</a></li>
+				<li><a href="/info">{% trans "Info" %}</a></li>
+				<li><a href="/example">{% trans "Example" %}</a></li>
+				<li><a href="/events">{% trans "Events" %}</a></li>
+				<li><a href="/links">{% trans "Links" %}</a></li>
+				<li><a href="/news">{% trans "News" %}</a></li>
 			</ul>
 		</div><!--/.nav-collapse -->
 	</div>
