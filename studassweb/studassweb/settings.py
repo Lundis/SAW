@@ -28,7 +28,7 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
+#TODO: load these automatically somehow
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
