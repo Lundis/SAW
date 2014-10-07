@@ -26,6 +26,8 @@ studassweb: django source files
 |
 |-- members: user data models
 |
+|-- menu: Contains the menu and possibly a menu editor
+|
 |-- news: news module
 |
 |-- polls: polls / voting system

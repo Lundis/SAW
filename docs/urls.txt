@@ -4,7 +4,7 @@
 
 ===== Top dispatcher =====
 	At the top of the URL dispatcher chain is studassweb/urls.py. It delegates HTTP requests to the right module.
-	At this moment the modules are hardcoded, but in the future a dynamic loader system will be responsible of
+	At this moment the modules are hardcoded, but in the future a dynamic loader system will be responsible for
 	generating the list of modules.
 
 ===== App urls.py ======

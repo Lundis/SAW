@@ -48,6 +48,7 @@ INSTALLED_APPS = (
     'info',
     'links',
     'members',
+    'menu',
     'news',
     'polls',
     'theme',
