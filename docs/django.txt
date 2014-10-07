@@ -5,9 +5,9 @@ If you encounter a new problem, please add it here (with a solution if you have 
 
 
 ===== How to create/init the database file =====
-> python manage.py syncdb
+> python manage.py migrate
 
-* If it fails, you will probably need to delete the database file (db.sqlite3) and rerun syncdb
+* If it fails, you will probably need to delete the database file (db.sqlite3) and rerun migrate
 * it will ask you to create a superuser, enter anything you want for username/password. The database is local so it doesn't matter
 * TODO: create a script that wipes the database, creates it anew, and inserts test data into the DB
 
