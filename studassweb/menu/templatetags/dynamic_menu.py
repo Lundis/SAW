@@ -5,21 +5,25 @@ register = template.Library()
 @register.tag()
 def display_menu(parser, token):
     try:
-        tag_name, active_tab = token.split_contents()
+        # token.split_contents() takes into account quotes
+        tag_name, menu, active_tab = token.split_contents()
     except:
-        raise template.TemplateSyntaxError("%r tag requires a single argument" % token.contents.split()[0])
-    if not (active_tab[0] == active_tab[-1] and active_tab[0] in ('"', "'")):
-        raise template.TemplateSyntaxError("%r tag's argument should be in quotes" % tag_name)
+        raise template.TemplateSyntaxError("%r tag requires two arguments: menu name and active item" % token.contents.split()[0])
+    if not (is_in_quotes(menu) and is_in_quotes(active_tab)):
+        raise template.TemplateSyntaxError("%r tag's arguments should be in quotes" % tag_name)
 
-    return DynamicMenu(active_tab)
+    return DynamicMenu(menu, active_tab)
 
+def is_in_quotes(s):
+    return s[0] == s[-1] and s[0] in ('"', "'")
 
 class DynamicMenu(template.Node):
-    def __init__(self, active):
+    def __init__(self, menu, active):
         """
         :param active: the name of the active "tab"
         :return:
         """
+        self.menu = menu
         self.active = active
 
     def render(self, context):
