@@ -28,7 +28,6 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-#TODO: load these automatically somehow
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -37,22 +36,21 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'association',
     'base',
-    'contact',
-    'events',
-    'example',
-    'exams',
-    'frontpage',
-    'gallery',
-    'info',
-    'links',
     'members',
-    'menu',
-    'news',
-    'polls',
     'theme',
 )
+# Load non-critical modules dynamically
+# http://stackoverflow.com/questions/24027901/dynamically-loading-django-apps-at-runtime
+for app_name in os.listdir(BASE_DIR):
+    # for all directories in BASE_DIR:
+    if os.path.isdir(os.path.join(BASE_DIR, app_name)):
+        # make sure that it's a python package
+        if os.path.isfile(os.path.join(app_name, "__init__.py")):
+            if app_name not in INSTALLED_APPS:
+                # make sure we don't load this package as an app
+                if app_name != __package__:
+                    INSTALLED_APPS += (app_name, )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
