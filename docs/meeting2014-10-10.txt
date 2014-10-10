@@ -1,0 +1,16 @@
+Meeting 9.00
+- looked at oscar's prototype
+- looked at J's schedule
+
+
+Meeting 11.30
+- Discussed the schedule
+- Discussed database models
+- Functional Prototype
+ * Add search
+- Assigned work, check Trello
+- Decided on the coding convention
+-
+
+ 
+I probably forgot something.
