@@ -9,7 +9,5 @@ This document describes how you should config PyCharm for this project.
     * The settings.py file is in the studassweb folder inside the Django folder.
     * manage.py is in GITROOT/studassweb/manage.py
 
-2. Change indentation to tabs
-
-	File -> Settings... -> Project Settings -> Code Style
-	*Enable "use tab character" for at least General, Python, HTML, CSS, javascript
+    If Django doesn't show up in project settings, it probably means that you have the community edition of pyCharm.
+    Get the professional one.
