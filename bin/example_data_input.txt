@@ -1,0 +1,71 @@
+Requirement ID
+REQ-F-MENU-1
+Requirement Description
+The system should have an easily accessible menu that links to various parts of the site
+Requirement Priority
+1
+Requirement Dependencies
+depends on 		REQ-F-MENU-1
+specializes 		oogah
+specialized by         chaaka        
+Input
+The user visits the site
+Output
+The user sees the menu
+Actors using the requirement
+All
+
+
+Requirement ID
+REQ-F-MENU-2
+Requirement Description
+The user should be able to create, remove and reorder menu items
+Requirement Priority
+2
+Requirement Dependencies
+depends on 		REQ-F-MENU-1
+specializes 	i_cant	
+specialized by       stop_this_feeling          
+Input
+The user wants to reorder the menu
+Output
+The user is able to reorder the menu
+Actors using the requirement
+Webmaster, Board Member
+
+
+
+Requirement ID
+REQ-F-MENU-3
+Requirement Description
+The main menu should find possible menu items automatically.
+Requirement Priority
+3
+Requirement Dependencies
+depends on 		REQ-F-MENU-2
+specializes 		REQ-F-MENU-2
+specialized by                 
+Input
+The user wants to add a new menu item
+Output
+The site presents possible menu items to the user
+Actors using the requirement
+Webmaster, Board Member
+
+
+Requirement ID
+REQ-F-MENU-4
+Requirement Description
+menu functionality in the same editable and dynamic manner as the main menu
+Requirement Priority
+4
+Requirement Dependencies
+depends on 		REQ-F-MENU-2
+specializes 		
+specialized by                 
+Input
+The user needs a menu on some other part of the site
+Output
+The user added a new menu to some part of the site.
+Actors using the requirement
+Webmaster, Board Member, Developer
