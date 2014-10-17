@@ -9,15 +9,20 @@ It outputs a .dot file for graphviz
 import re
 import sys
 
-#Read data from file
-#TODO input & output filenames from arguments
-with open ("example_data_input.txt", "r") as myfile:
+if len(sys.argv) < 3:
+	print "Usage: " + sys.argv[0] + " <input_file.txt> <output_file.dot>"
+	sys.exit()
+
+print "Opening input file"	
+with open (sys.argv[1], "r") as myfile:
 	data=myfile.read()
 
 #Sanity checking input
 #Each requiements card should have the same amount of delimiters
+print "Beginning sanity checking of input file"
 #TODO fix useful error messages. don't judge me I need coffee
 tmpcnt = data.count("Requirement ID")
+print "Found " + str(tmpcnt) + " requirement cards"
 if tmpcnt != data.count("Requirement Description"):
 	print "error! Requirement Description"
 	sys.exit()
@@ -43,7 +48,7 @@ if tmpcnt != data.count("Actors using the requirement"):
 	print "error! Actors using the requirement"
 	sys.exit()
 	
-#Input seems sane
+print "Input seems sane"
 
 #Set up header
 output = ""
@@ -51,53 +56,54 @@ nodes = ""
 edges = ""
 
 output = "digraph techdef {\n"
+
 #Splitting input into different cards
 cards = data.split("Requirement ID")
 
-#TODO fix the ugly regular expressions
-#TODO check with multiple lines in the result we want, e.g. multiple depends_on
+print "Beginning to process the cards"
 for card in cards:
 	if card.split("Requirement Description")[0].strip() != "":
-		#print card.split("Requirement Description")[0].strip() 
 		card_id = card.split("Requirement Description")[0].strip()
 		
-		matchObj = re.search( r'Requirement Priority(\s*)\n([0-9]*)(\s*)\nRequirement Dependencies', card)
+		matchObj = re.search( r'Requirement Priority\s*\n([0-9]*)\s*\nRequirement Dependencies', card)
 		if matchObj:
-			card_priority = matchObj.group(2)
+			card_priority = matchObj.group(1)
 		else:
 			print "Error close to card " + card_id + " (card_priority)"
 			sys.exit()
 		
-		
-		matchObj = re.search( r'depends on(\s)*(.*)\nspecializes', card)
+		matchObj = re.search( r'depends on\s*((.|\n)*)\nspecializes', card)
 		if matchObj:
-			card_depends_on = matchObj.group(2).strip()
+			card_depends_on = re.split('\s*|\n*',matchObj.group(1).strip())
+			card_depends_on = filter(None, card_depends_on)#removes empty strings
 		else:
 			print "Error close to card " + card_id + " (card_depends_on)"
 			sys.exit()
 			
-		matchObj = re.search( r'specializes(\s)*(.*)\nspecialized by', card)
+		matchObj = re.search( r'specializes\s*((.|\n)*)\nspecialized by', card)
 		if matchObj:
-			card_specializes = matchObj.group(2).strip()
+			card_specializes = re.split('\s*|\n*',matchObj.group(1).strip())
+			card_specializes = filter(None, card_specializes)
 		else:
 			print "Error close to card " + card_id + " (card_specializes)"
 			sys.exit()
 			
-		matchObj = re.search( r'specialized by(\s)*(.*)\nInput', card)
+		matchObj = re.search( r'specialized by\s*((.|\n)*)\nInput', card)
 		if matchObj:
-			card_specialized_by = matchObj.group(2).strip()
+			card_specialized_by = re.split('\s*|\n*',matchObj.group(1).strip())
+			card_specialized_by = filter(None, card_specialized_by)
 		else:
 			print "Error close to card " + card_id + " (card_specialized_by)"
 			sys.exit()
 			
-		matchObj = re.search( r'Input\s*\n(.*)\nOutput', card)
+		matchObj = re.search( r'Input\s*((.|\n)*)\nOutput', card)
 		if matchObj:
 			card_input = matchObj.group(1).strip()
 		else:
 			print "Error close to card " + card_id + " (card_input)"
 			sys.exit()
 
-		matchObj = re.search( r'Output\s*\n(.*)\nActors using the requirement', card)
+		matchObj = re.search( r'Output\s*((.|\n)*)\nActors using the requirement', card)
 		if matchObj:
 			card_output = matchObj.group(1).strip()
 		else:
@@ -113,26 +119,67 @@ for card in cards:
 		
 		
 		#debugging purposes
+		"""
 		print "card_id: " + card_id
 		print "card_priority: " + card_priority
-		print "card_depends_on: " + card_depends_on
-		print "card_specializes: " + card_specializes
-		print "card_specialized_by: " + card_specialized_by
+		print "card_depends_on: " + str(card_depends_on)
+		print "card_specializes: " + str(card_specializes)
+		print "card_specialized_by: " + str(card_specialized_by)
 		print "card_input: " + card_input
 		print "card_output: " + card_output
 		print "card_actors: " + card_actors
 		print "\n" 
-	
+		"""
 		
+		#Pick out module from card_id and specify color
+		if(card_id.startswith("REQ-F-")):
+			card_module = card_id.split("-")[2];
+			if card_module == "MENU":
+				node_color = "color = darkolivegreen4,"
+			elif card_module == "POLL":
+				node_color = "color = lightsteelblue1,"
+			elif card_module == "NEWS":
+				node_color = "color = gold1,"
+			elif card_module == "LINKS":
+				node_color = "color = burlywood2,"
+			elif card_module == "MEMBER_REGISTRY":
+				node_color = "color = greenyellow,"
+			elif card_module == "USERS":
+				node_color = "color = turquoise3,"
+			elif card_module == "CONTACT":
+				node_color = "color = darkseagreen,"
+			elif card_module == "EVENTS":
+				node_color = "color = deepskyblue,"
+			elif card_module == "SETTINGS":
+				node_color = "color = salmon2,"
+			elif card_module == "EXAMARCHIVE":
+				node_color = "color = firebrick,"
+			elif card_module == "GALLERY":
+				node_color = "color = chartreuse4,"
+			elif card_module == "INFO":
+				node_color = "color = darkorange1,"
+			else:
+				node_color = "color = black,"
+		else:
+			node_color = ""
 		
-		#TODO Start adding to "nodes" variable 
+		#Start adding to "nodes" variable 
+		nodes += "\"" + card_id + "\"" + "[shape = polygon, sides = " + str(3*int(card_priority)) + ", " + node_color +"];\n"
 		
-		#nodes += "\"" + card_id + "\""
-		
-		#TODO Start adding to "edges" variable
-		
+		#Start adding to "edges" variable
+		for perjantai in card_depends_on:
+			edges += "\"" + card_id + "\" -> \"" + perjantai + "\" [color=blue];\n"
+			
+		for perjantai in card_specializes:
+			edges += "\"" + card_id + "\" -> \"" + perjantai + "\" [color=red];\n"
+			
+		for perjantai in card_specialized_by:
+			edges += "\"" + card_id + "\" -> \"" + perjantai + "\" [color=green];\n"
 
-#TODO Add "nodes" and "edges" to "output"
-
+print "Done processing cards"			
+output += nodes + edges
 output += "}\n"
-#TODO Write output to file
+
+print "Writing output to file"
+f_out = open(sys.argv[2], 'w')
+f_out.write(output)

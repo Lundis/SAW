@@ -42,7 +42,8 @@ The main menu should find possible menu items automatically.
 Requirement Priority
 3
 Requirement Dependencies
-depends on 		REQ-F-MENU-2
+depends on 	REQ-F-MENU-4
+		REQ-F-SETTINGS-1
 specializes 		REQ-F-MENU-2
 specialized by                 
 Input
@@ -69,3 +70,49 @@ Output
 The user added a new menu to some part of the site.
 Actors using the requirement
 Webmaster, Board Member, Developer
+
+
+Requirement ID
+REQ-F-MEMBER_REGISTRY-1
+Requirement Description
+Board members should be able to get a listing of all members of the association, when TODO
+Requirement Priority
+1
+Requirement Dependencies
+depends on 	REQ-F-USERS-2
+specializes 	
+specialized by   
+Input
+User checks the member registry
+Output
+A list of:
+user
+enrollment year
+graduation year
+
+Actors using the requirement
+Board Members
+
+Requirement ID
+REQ-F-USERS-2
+Requirement Description
+Users should be able to create accounts
+Requirement Priority
+1
+Requirement Dependencies
+depends on 		
+specializes 		
+specialized by                 
+Input
+login name
+Full name
+password
+member of association? then:
+enrollment year
+graduation year
+link to personal homepage
+
+Output
+An account is created for the user
+Actors using the requirement
+Guest
