@@ -56,6 +56,12 @@ nodes = ""
 edges = ""
 
 output = "digraph techdef {\n"
+#Preserves the overall geometric relationships in the layout, can require high scale factors
+output += "overlap=scale\n"
+#Magic bounded Voronoi diagram voodoo
+#output += "overlap=false\n"
+#no overlapping edges (EXPENSIVE!)
+#output += "splines=true\n"
 
 #Splitting input into different cards
 cards = data.split("Requirement ID")
@@ -65,9 +71,16 @@ for card in cards:
 	if card.split("Requirement Description")[0].strip() != "":
 		card_id = card.split("Requirement Description")[0].strip()
 		
+		matchObj = re.search( r'Requirement Description\s*((.|\n)*)\nRequirement Priority', card)
+		if matchObj:
+			card_description = matchObj.group(1).strip()
+		else:
+			print "Error close to card " + card_id + " (card_depends_on)"
+			sys.exit()
+			
 		matchObj = re.search( r'Requirement Priority\s*\n([0-9]*)\s*\nRequirement Dependencies', card)
 		if matchObj:
-			card_priority = matchObj.group(1)
+			card_priority = int(matchObj.group(1).strip())
 		else:
 			print "Error close to card " + card_id + " (card_priority)"
 			sys.exit()
@@ -131,40 +144,27 @@ for card in cards:
 		print "\n" 
 		"""
 		
+		
 		#Pick out module from card_id and specify color
-		if(card_id.startswith("REQ-F-")):
-			card_module = card_id.split("-")[2];
-			if card_module == "MENU":
-				node_color = "color = darkolivegreen4,"
-			elif card_module == "POLL":
-				node_color = "color = lightsteelblue1,"
-			elif card_module == "NEWS":
-				node_color = "color = gold1,"
-			elif card_module == "LINKS":
-				node_color = "color = burlywood2,"
-			elif card_module == "MEMBER_REGISTRY":
-				node_color = "color = greenyellow,"
-			elif card_module == "USERS":
-				node_color = "color = turquoise3,"
-			elif card_module == "CONTACT":
-				node_color = "color = darkseagreen,"
-			elif card_module == "EVENTS":
-				node_color = "color = deepskyblue,"
-			elif card_module == "SETTINGS":
-				node_color = "color = salmon2,"
-			elif card_module == "EXAMARCHIVE":
-				node_color = "color = firebrick,"
-			elif card_module == "GALLERY":
-				node_color = "color = chartreuse4,"
-			elif card_module == "INFO":
-				node_color = "color = darkorange1,"
-			else:
-				node_color = "color = black,"
+		if card_priority == 1:
+			node_color = "color = crimson,"
+		elif card_priority == 2:
+			node_color = "color = darkmagenta,"
+		elif card_priority == 3:
+			node_color = "color = dodgerblue,"
+		elif card_priority == 4:
+			node_color = "color = gold,"
+		elif card_priority == 5:
+			node_color = "color = khaki,"
+		elif card_priority > 5:
+			node_color = "color = white,"
 		else:
-			node_color = ""
+			node_color = "color = black,"
+
+		node_tooltip = "tooltip=\""+card_description.replace('\n', '').replace('\r', '').replace('"','')+"\","
 		
 		#Start adding to "nodes" variable 
-		nodes += "\"" + card_id + "\"" + "[shape = polygon, sides = " + str(3*int(card_priority)) + ", " + node_color +"];\n"
+		nodes += "\"" + card_id + "\"" + "[style=filled, " + node_color + node_tooltip +"];\n"
 		
 		#Start adding to "edges" variable
 		for perjantai in card_depends_on:
