@@ -63,8 +63,12 @@ output += "overlap=scale\n"
 #no overlapping edges (EXPENSIVE!)
 #output += "splines=true\n"
 
+#TODO create a legend, maybe just a box with fixed size fixed location (pixelwise)
+
 #Splitting input into different cards
 cards = data.split("Requirement ID")
+specializes_checklist = {}
+specialized_by_checklist = {}
 
 print "Beginning to process the cards"
 for card in cards:
@@ -134,16 +138,37 @@ for card in cards:
 		#debugging purposes
 		"""
 		print "card_id: " + card_id
-		print "card_priority: " + card_priority
+		print "card_priority: " + str(card_priority)
 		print "card_depends_on: " + str(card_depends_on)
 		print "card_specializes: " + str(card_specializes)
 		print "card_specialized_by: " + str(card_specialized_by)
 		print "card_input: " + card_input
 		print "card_output: " + card_output
 		print "card_actors: " + card_actors
-		print "\n" 
+		#print "\n" 
 		"""
 		
+		if card_id in card_depends_on:
+			print "INCONSISTENCY: " + card_id + " is dependent on itself!\n"
+		if card_id in card_specializes:
+			print "INCONSISTENCY: " + card_id + " specializes itself!\n"
+		if card_id in card_specialized_by:
+			print "INCONSISTENCY: " + card_id + " is specialized by itself!\n"
+			
+		#Checking if "specialized" requirements are "specialized by" back, and vice versa
+		specializes_checklist[card_id] = card_specializes
+		specialized_by_checklist[card_id] = card_specialized_by
+		
+		for special_kid in card_specializes:
+			if special_kid in specialized_by_checklist.keys():
+				if card_id not in specialized_by_checklist[special_kid]:
+					print "INCONSISTENCY: Add specialized by " + card_id + " to " + special_kid + " !"
+		
+		for special_kid in card_specialized_by:
+			if special_kid in specializes_checklist.keys():
+				if card_id not in specializes_checklist[special_kid]:
+					print "INCONSISTENCY: Add specializes " + card_id + " to " + special_kid + " !"
+			
 		
 		#Pick out module from card_id and specify color
 		if card_priority == 1:
