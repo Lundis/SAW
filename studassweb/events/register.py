@@ -1,2 +1,2 @@
-def registerMenuItem():
+def getMenuItems():
     pass

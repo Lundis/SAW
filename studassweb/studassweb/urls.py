@@ -18,4 +18,5 @@ urlpatterns = patterns('',
     url(r'^links/', include('exams.urls')),
     url(r'^news/', include('news.urls')),
     url(r'^polls/', include('polls.urls')),
+    url(r'^settings/', include('settings.urls')),
 )
