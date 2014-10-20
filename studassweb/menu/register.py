@@ -1,1 +1,4 @@
-__author__ = 'Lundis'
+from settings import register
+
+def registerSettings():
+    pass
