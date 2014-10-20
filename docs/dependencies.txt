@@ -1,0 +1,6 @@
+StudAssWeb depends on the following modules:
+
+===== django-solo =====
+    url: https://github.com/lazybird/django-solo
+    install instructions:
+        > pip install django-solo

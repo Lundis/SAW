@@ -22,6 +22,8 @@ studassweb: django source files
 |
 |-- info: information pages (wiki/cms)
 |
+|-- install: an easy-to-use installation wizard
+|
 |-- links: link collection
 |
 |-- members: user data models
@@ -31,6 +33,8 @@ studassweb: django source files
 |-- news: news module
 |
 |-- polls: polls / voting system
+|
+|-- settings: responsible for rendering the settings page.
 |
 |-- studassweb: "project folder"
 |
