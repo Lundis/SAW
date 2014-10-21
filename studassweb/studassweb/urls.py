@@ -19,4 +19,8 @@ urlpatterns = patterns('',
     url(r'^news/', include('news.urls')),
     url(r'^polls/', include('polls.urls')),
     url(r'^settings/', include('settings.urls')),
+    url(r'^install/', include('install.urls')),
+    url(r'^login/', include('login.urls')),
 )
+
+# TODO: make this dynamic somehow. through register.py? yes
