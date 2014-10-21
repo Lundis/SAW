@@ -11,3 +11,8 @@ This document describes how you should config PyCharm for this project.
 
     If Django doesn't show up in project settings, it probably means that you have the community edition of pyCharm.
     Get the professional one.
+
+2. Get rid of false "undefined reference" errors when importing files from modules in the project
+
+    * Right-click the folder with manage.py.
+    * Mark Directory As -> Sources Root
