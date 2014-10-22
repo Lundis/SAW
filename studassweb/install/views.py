@@ -28,6 +28,8 @@ def welcome(request):
         if login_form.is_valid():
             login_form.login_user(request)
             return HttpResponseRedirect('modules')
+        else:
+            context['form'] = login_form
 
 
     return render(request, 'install/base.html', context)

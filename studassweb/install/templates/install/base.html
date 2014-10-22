@@ -34,8 +34,19 @@
 
     <div class="install-content">
         {% if current_stage.0 == 'welcome' %}
-            <h2>{% trans 'Welcome to the StudAssWeb Installation Wizard' %}!</h2>
-            <a href="association">Get Started</a>
+            {% if form %}
+                <form action="{{ current_url }}" method="post">
+                {% csrf_token %}
+                <div class="input-group">
+                    {{ form }}
+                </div>
+                <input type="submit" value="Submit" />
+            </form>
+            {% else %}
+                <h2>{% trans 'Welcome to the StudAssWeb Installation Wizard' %}!</h2>
+                <a href="association">Get Started</a>
+            {% endif %}
+
         {% elif current_stage.0 == 'finished' %}
             <h1>{% trans 'Congratulations!' %}</h1>
             <p> {% trans 'You have successfully set up your own website.' %}!</p>
