@@ -26,6 +26,7 @@ def welcome(request):
     if not request.user.is_authenticated():
         login_form = LoginForm(request or None)
         if login_form.is_valid():
+            login_form.login_user(request)
             return HttpResponseRedirect('modules')
 
 
@@ -35,7 +36,7 @@ def welcome(request):
 def association(request):
     form = AssociationForm(request.POST or None)
     if form.is_valid():
-        #TODO: Save to database
+        form.Apply()
         return HttpResponseRedirect('modules')
 
     context = {'previous': 'welcome',
@@ -49,7 +50,7 @@ def association(request):
 def modules(request):
     form = ModulesForm(request.POST or None, modules=settings.OPTIONAL_APPS)
     if form.is_valid():
-        #TODO: save to database
+        form.Apply()
         return HttpResponseRedirect('menu')
 
     context = {'previous': 'association',

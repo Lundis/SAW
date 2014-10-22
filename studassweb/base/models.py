@@ -24,14 +24,21 @@ class DisabledModule(models.Model):
 
     @classmethod
     def disable(cls, name):
-        mod = cls.objects.get(app_name=name)
-        if mod != None:
+        try:
+            mod = cls.objects.get(app_name=name)
+            # if it exists do nothing
+        except cls.DoesNotExist:
+            # if it doesn't, add it
             mod = DisabledModule(app_name=name)
             mod.save()
 
     @classmethod
     def enable(cls, name):
-        mod = cls.objects.get(app_name=name)
-        if mod != None:
+        try:
+            mod = cls.objects.get(app_name=name)
             mod.delete()
+        except cls.DoesNotExist:
+            # Nothing to be done
+            pass
+
 
