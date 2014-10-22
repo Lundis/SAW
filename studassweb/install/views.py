@@ -16,6 +16,7 @@ stages = [[s, _(first_letter_to_upper(s))] for s in ["welcome", "association", "
 
 @login_required
 def welcome(request):
+    #TODO: put a login form here
     context = {'current_url': request.get_full_path(),
                'stages': stages,
                'current_stage_index': 0,
