@@ -1,13 +1,18 @@
 from django.db import models
 
 # Create your models here.
-class Poll_question(models.Model):
-    question_text= models.CharField(max_length=300)
-    publication_date = models.DateTimeField('Date published')
+class Poll(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(max_length=300)
+    publication = models.DateTimeField('Date published')
+    expiration = models.DateTimeField('Poll closes')
     # expiration date
 
-class User_choice(models.Model):
-    question = models.ForeignKey(Poll_question)
-    choice_text = models.CharField(max_length=300)
-    vote_amount = models.IntegerField(default=0)
+class Choice(models.Model):
+    name = models.CharField(max_length=200)
+    id_to_poll = models.ForeignKey(Poll)
+
+class Votes(models.Model):
+    choice_id = models.ForeignKey(Choice)
+    #User?
 
