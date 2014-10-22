@@ -2,7 +2,9 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
-from install.forms import AssociationForm
+from django.conf import settings
+from install.forms import AssociationForm, ModulesForm, MenuForm
+from login.forms import LoginForm
 
 
 def first_letter_to_upper(str):
@@ -12,28 +14,29 @@ def first_letter_to_upper(str):
     """
     return str[0].upper() + str[1:]
 
+# make an array of arrays, where each entry represents [stage_name, user_friendly_name]
 stages = [[s, _(first_letter_to_upper(s))] for s in ["welcome", "association", "modules", "menu", "finished"]]
 
-@login_required
 def welcome(request):
-    #TODO: put a login form here
     context = {'current_url': request.get_full_path(),
+
                'stages': stages,
                'current_stage_index': 0,
                'current_stage': stages[0]}
+    if not request.user.is_authenticated():
+        login_form = LoginForm(request or None)
+        if login_form.is_valid():
+            return HttpResponseRedirect('modules')
+
+
     return render(request, 'install/base.html', context)
 
 @login_required
 def association(request):
-    if request.method == 'POST':
-        form = AssociationForm(request.POST)
-        if form.is_valid():
-            #TODO: Save to database
-            return HttpResponseRedirect('modules')
-    else:
-        # create a new form
-        form = AssociationForm()
-
+    form = AssociationForm(request.POST or None)
+    if form.is_valid():
+        #TODO: Save to database
+        return HttpResponseRedirect('modules')
 
     context = {'previous': 'welcome',
                'form': form,
@@ -44,8 +47,13 @@ def association(request):
 
 @login_required
 def modules(request):
-    #TODO: get all available modules and list them and let the user choose which he wants
+    form = ModulesForm(request.POST or None, modules=settings.OPTIONAL_APPS)
+    if form.is_valid():
+        #TODO: save to database
+        return HttpResponseRedirect('menu')
+
     context = {'previous': 'association',
+               'form': form,
                'stages': stages,
                'current_stage_index': 2,
                'current_stage': stages[2]}
@@ -53,8 +61,13 @@ def modules(request):
 
 @login_required
 def menu(request):
+    form = MenuForm(request.POST or None)
+    if form.is_valid():
+        #TODO: save to database
+        return HttpResponseRedirect('finished')
     # TODO: get all available menu items and let the user choose which he wants, and in which order.
     context = {'previous': 'modules',
+               'form': form,
                'stages': stages,
                'current_stage_index': 3,
                'current_stage': stages[3]}

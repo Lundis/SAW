@@ -6,5 +6,32 @@ class SiteConfiguration(SingletonModel):
     association_name = models.CharField(max_length=100, default='Site name')
     main_menu = models.ForeignKey(Menu, blank=True, null=True)
 
-class disabled_module(models.Model):
-    app_name = models.CharField(max_length=50)
+    @classmethod
+    def instance(cls):
+        return cls.objects.get()
+
+
+class DisabledModule(models.Model):
+    app_name = models.CharField(max_length=50, unique=True)
+
+    @classmethod
+    def is_disabled(cls, name):
+        return cls.objects.filter(app_name=name).count() == 1
+
+    @classmethod
+    def is_enabled(cls, name):
+        return not cls.is_disabled(name)
+
+    @classmethod
+    def disable(cls, name):
+        mod = cls.objects.get(app_name=name)
+        if mod != None:
+            mod = DisabledModule(app_name=name)
+            mod.save()
+
+    @classmethod
+    def enable(cls, name):
+        mod = cls.objects.get(app_name=name)
+        if mod != None:
+            mod.delete()
+
