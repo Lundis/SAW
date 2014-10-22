@@ -7,53 +7,54 @@
     <title>{%  trans 'Installation Wizard' %}</title>
     <!-- viewport for Bootstrap -->
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="{% static "css/base/base.css" %}" />
+	<link type="text/css" href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
+	<link type="text/css" href="{% static "css/base/base.css" %}" rel="stylesheet" />
+    <link type="text/css" href="{% static "css/install/install.css" %}" rel="stylesheet">
 </head>
 <body>
 
+<div class="panel panel-default install-panel install-center">
+<div class="container text-center">
+    <div class="install-header">
+        <h2>{% trans 'StudAssWeb Installation Wizard' %}</h2>
+        <ul class="nav nav-pills nav-justified">
+            {% for stage in stages %}
+                <li {% if forloop.counter0 == current_stage_index %} class="active" {% endif %}>
+                    <a>
+                        {{ stage.1 }}
+                        {% if forloop.counter0 < current_stage_index %}
+                            <span class="glyphicon glyphicon-ok"></span>
+                        {% endif %}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+    </div>
+</div>
+
 <div class="container">
-    <div class="masthead">
-        <h3>{% trans 'StudAssWeb Installation Wizard' %}</h3>
-        <div class="nav navbar">
-          <div class="navbar-inner">
-              <ul class="nav">
-                <li><a>{% trans 'Welcome' %}</a></li>
-                <li><a>{% trans 'Association' %}</a></li>
-                <li><a>{% trans 'Modules' %}</a></li>
-                <li><a>{% trans 'Menu' %}</a></li>
-                <li><a>{% trans 'Finished' %}!</a></li>
-              </ul>
-          </div>
-        </div>
-    </div>
-
-    <div>
-        {% if current == 'welcome' %}
-            <h1>{% trans 'Welcome to the StudAssWeb Installation Wizard' %}!</h1>
-            <a href="association">Get Started</a>
-        {% elif current == 'finished' %}
-            <h1>{% trans 'Congratulations!' %}</h1>
-            <p> {% trans 'You have successfully set up your own website.' %}!</p>
-            <a href="/"><p>{% trans 'Click here to check it out!' %}</p></a>
-        {% else %}
-            <form action="{{ current_url }}" method="post">
-                {% csrf_token %}
-                <div class="input-group">
-                   {{ form }}
-                </div>
-                <input type="submit" value="Submit" />
-            </form>
-        {% endif %}
-
-        <ul class="pager">
-            {% if previous %}
-                <li><a href="{{ previous }}">Previous</a></li>
-            {% endif %}
-
+    {% if current_stage.0 == 'welcome' %}
+        <h1>{% trans 'Welcome to the StudAssWeb Installation Wizard' %}!</h1>
+        <a href="association">Get Started</a>
+    {% elif current_stage.0 == 'finished' %}
+        <h1>{% trans 'Congratulations!' %}</h1>
+        <p> {% trans 'You have successfully set up your own website.' %}!</p>
+        <a href="/"><p>{% trans 'Click here to check it out!' %}</p></a>
+    {% else %}
+        <form action="{{ current_url }}" method="post">
+            {% csrf_token %}
+            <div class="input-group">
+               {{ form }}
+            </div>
+            <input type="submit" value="Submit" />
+        </form>
+    {% endif %}
+    {% if previous %}
+        <ul class="pager left">
+            <li><a href="{{ previous }}">{% trans "Previous" %}</a></li>
         </ul>
-    </div>
-
+    {% endif %}
+</div>
 
 </div>
 
