@@ -3,6 +3,7 @@ from solo.models import SingletonModel
 from menu.models import Menu
 from django.contrib.auth.models import User
 
+
 class SiteConfiguration(SingletonModel):
     association_name = models.CharField(max_length=100, default='Site name')
     main_menu = models.ForeignKey(Menu, blank=True, null=True)
@@ -43,6 +44,11 @@ class DisabledModule(models.Model):
             pass
 
 
+class LdapLink(models.Model):
+    user = models.ForeignKey(User)
+    hostname = models.CharField(max_length=200)
+    username = models.CharField(max_length=50)
+
 class Comment(models.Model):
     comment_text = models.TextField(max_length=400)
     comment_created = models.DateTimeField('Date created')
@@ -54,8 +60,5 @@ class UserExtension(models.Model):
     enrollment_year = models.IntegerField() #does this need a default value?
     graduated_year = models.IntegerField(default=0)# 0 if not graduated?
 
-class LdapLink(models.Model):
-    user = models.ForeignKey(User)
-    hostname = models.CharField(max_length=200)
-    username = models.CharField(max_length=50)
+
 

@@ -7,11 +7,12 @@ from django.contrib.auth.models import User
 class Board(models.Model):
     year = models.IntegerField()
     photo = models.ForeignKey(Photo)
-    role = models.CharField(max_length=300)
+    # the board or committee name
+    name = models.CharField(max_length=300)
 
 
 class Role(models.Model):
-    name = models.CharField()
+    name = models.CharField(max_length=100)
     board = models.ForeignKey(Board)
 
 class BoardMember(models.Model):

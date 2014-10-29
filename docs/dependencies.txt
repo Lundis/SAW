@@ -1,6 +1,13 @@
 StudAssWeb depends on the following modules:
 
 ===== django-solo =====
+    This is for singleton models.
     url: https://github.com/lazybird/django-solo
     install instructions:
         > pip install django-solo
+
+===== pillow =====
+    This is for ImageField.
+    url: ??
+    install instructions:
+        > pip install pipllow
