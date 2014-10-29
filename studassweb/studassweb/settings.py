@@ -8,8 +8,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from base.utils import get_all_modules
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -26,8 +28,32 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
+EXTERNAL_APPS = (
+    'solo', # singleton models. pip install django-solo
+)
 
-# Application definition
+NON_OPTIONAL_APPS = (
+    'base',
+    'members',
+    'theme',
+    'menu',
+    'install',
+    'login',
+    'settings',
+)
+
+OPTIONAL_APPS = ()
+
+# Load non-critical modules dynamically
+# http://stackoverflow.com/questions/24027901/dynamically-loading-django-apps-at-runtime
+
+for app in get_all_modules():
+    if app not in NON_OPTIONAL_APPS:
+        # make sure we don't load this (studassweb) module as an app
+        if app != __package__:
+            OPTIONAL_APPS += (app, )
+
+# Application definition, list all built-in apps here
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -35,22 +61,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'solo',
-    'base',
-    'members',
-    'theme',
-)
-# Load non-critical modules dynamically
-# http://stackoverflow.com/questions/24027901/dynamically-loading-django-apps-at-runtime
-for app_name in os.listdir(BASE_DIR):
-    # for all directories in BASE_DIR:
-    if os.path.isdir(os.path.join(BASE_DIR, app_name)):
-        # make sure that it's a python package
-        if os.path.isfile(os.path.join(app_name, "__init__.py")):
-            if app_name not in INSTALLED_APPS:
-                # make sure we don't load this package as an app
-                if app_name != __package__:
-                    INSTALLED_APPS += (app_name, )
+) + EXTERNAL_APPS + NON_OPTIONAL_APPS + OPTIONAL_APPS
+
+
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
