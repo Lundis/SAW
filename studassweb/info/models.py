@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 # Create your models here.
 class InfoPage(models.Model):
     title = models.CharField(max_length=50)
@@ -7,6 +7,6 @@ class InfoPage(models.Model):
 
 class InfoPageEdit(models.Model):
     page = models.ForeignKey(InfoPage)
-    #author is user but unsure from where?
+    author = models.ForeignKey(User)
     date = models.DateTimeField('Date edited')
 

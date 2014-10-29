@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 # Create your models here.
 
 class News(models.Model):
@@ -8,7 +8,7 @@ class News(models.Model):
     text = models.TextField(max_length=2000)
     publication_date = models.DateTimeField()
     picture = models.ImageField()
-    #User from member base again?
+    author = models.ForeignKey(User)
 
 class Category(models.Model):
     category_id = models.IntegerField()

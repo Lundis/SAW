@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 # Create your models here.
 class Poll(models.Model):
     name = models.CharField(max_length=100)
@@ -14,5 +14,5 @@ class Choice(models.Model):
 
 class Votes(models.Model):
     choice_id = models.ForeignKey(Choice)
-    #User?
+    members_choice = models.ForeignKey(User)
 

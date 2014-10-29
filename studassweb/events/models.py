@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 # Create your models here.
 
 class Event(models.Model):
@@ -7,12 +7,12 @@ class Event(models.Model):
     text = models.TextField(max_length=500)
     start = models.DateTimeField()
     stop = models.DateTimeField()
-    #User?
+    author = models.ForeignKey(User)
     signup_deadline = models.DateTimeField()
 
 class EventSignup(models.Model):
     event = models.ForeignKey(Event)
-    #User?
+    user = models.ForeignKey(User)
     name = models.CharField(max_length=100)
     email = models.EmailField()
     matricle = models.CharField(max_length=20)
