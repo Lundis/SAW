@@ -14,6 +14,7 @@ class LoginForm(forms.Form):
 
 
     def clean(self):
+        cleaned_data = super(LoginForm, self).clean()
         # https://docs.djangoproject.com/en/1.7/topics/auth/default/#auth-web-requests
         user = authenticate(username=self.cleaned_data['user_name'], password=self.cleaned_data['password'])
         if user == None:

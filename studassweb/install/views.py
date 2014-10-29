@@ -24,10 +24,9 @@ def welcome(request):
                'current_stage_index': 0,
                'current_stage': stages[0]}
     if not request.user.is_authenticated():
-        login_form = LoginForm(request or None)
+        login_form = LoginForm(request.POST or None)
         if login_form.is_valid():
             login_form.login_user(request)
-            return HttpResponseRedirect('modules')
         else:
             context['form'] = login_form
 
