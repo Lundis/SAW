@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-def home(request):
+def view_gallery(request):
     """
     Renders the albums in the order defined by a GET variable
     :param request:
