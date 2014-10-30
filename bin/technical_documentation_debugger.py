@@ -72,16 +72,32 @@ if args.inputvisual!=None:
 	visdata=args.inputvisual.read()
 		
 	dprint("Beginning sanity checking of visual requirements input file",1)
-	tmpcnt = visdata.count("Id:")
+	tmpcnt = visdata.count("Id")
 	dprint("Found " + str(tmpcnt) + " visual definitions/pages",1)
-	tmpstr = "Fulfills:"
+	tmpstr = "Description"
 	if tmpcnt != visdata.count(tmpstr):
 		print "Error! Found "+str(funcdata.count(tmpstr))+" of string \""+tmpstr+"\""
 		sys.exit(1)
-	tmpstr = "Image:"
+	tmpstr = "Fulfills requirements"
 	if tmpcnt != visdata.count(tmpstr):
 		print "Error! Found "+str(funcdata.count(tmpstr))+" of string \""+tmpstr+"\""
 		sys.exit(1)	
+	tmpstr = "URL"
+	if tmpcnt != visdata.count(tmpstr):
+		print "Error! Found "+str(funcdata.count(tmpstr))+" of string \""+tmpstr+"\""
+		sys.exit(1)	
+	tmpstr = "Views"
+	if tmpcnt != visdata.count(tmpstr):
+		print "Error! Found "+str(funcdata.count(tmpstr))+" of string \""+tmpstr+"\""
+		sys.exit(1)	
+	tmpstr = "Parameters"
+	if tmpcnt != visdata.count(tmpstr):
+		print "Error! Found "+str(funcdata.count(tmpstr))+" of string \""+tmpstr+"\""
+		sys.exit(1)	
+	tmpstr = "Forms"
+	if tmpcnt != visdata.count(tmpstr):
+		print "Error! Found "+str(funcdata.count(tmpstr))+" of string \""+tmpstr+"\""
+		sys.exit(1)		
 	dprint("Visual requirements input seems sane",1)
 
 	
@@ -246,14 +262,16 @@ dprint("Done processing cards",1)
 if args.inputvisual!=None:
 	fulfilled_functional_requirements = []
 	dprint("Beginning to process the visual requirements",1)
-	cards = visdata.split("Id:")
+	cards = visdata.split("Id")
 	for card in cards:
-		matchObj = re.search( r'([A-Z]+-[A-Z0-9]+-[A-Z0-9]+)', card)
-		if matchObj:
-			card_id = matchObj.group(1).strip()
+		#matchObj = re.search( r'([A-Z]+-[A-Z0-9]+-[A-Z0-9]+)', card)
+		#if matchObj:
+		#	card_id = matchObj.group(1).strip()
 			
-			#fuck this regexp in particular
-			matchObj = re.search( r'Fulfills:\s*((\w*|\s*|(,?)|(-?)|([()]?))*)\n', card)
+		if "Fulfills requirements" in card and card.split("Description")[0].strip() != "":
+			card_id = card.split("Description")[0].strip()	
+			
+			matchObj = re.search( r'Fulfills requirements\s*((.|\n)*)\nURL', card)
 			if matchObj:
 				card_fulfills = matchObj.group(1).strip().split(',')
 				card_fulfills = map(str.strip, card_fulfills)
