@@ -16,11 +16,17 @@ class LoginForm(forms.Form):
     def clean(self):
         cleaned_data = super(LoginForm, self).clean()
         # https://docs.djangoproject.com/en/1.7/topics/auth/default/#auth-web-requests
-        user = authenticate(username=self.cleaned_data['user_name'], password=self.cleaned_data['password'])
-        if user == None:
-            self.add_error(None, "Wrong username/password")
-        elif not user.is_active:
-            self.add_error(None, "Your account is disabled")
+
+        # if username or password is missing, there's already an error, so just skip trying to log in.
+        if 'user_name' in self.cleaned_data and 'password' in self.cleaned_data:
+            username = self.cleaned_data['user_name']
+            pw = self.cleaned_data['password']
+            if username and pw:
+                user = authenticate(username=username, password=pw)
+            if not user:
+                self.add_error(None, _("Wrong username/password"))
+            elif not user.is_active:
+                self.add_error(None, _("Your account is disabled"))
 
 
     def login_user(self, request):

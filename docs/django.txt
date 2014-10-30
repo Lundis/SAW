@@ -11,3 +11,6 @@ If you encounter a new problem, please add it here (with a solution if you have 
 * it will ask you to create a superuser, enter anything you want for username/password. The database is local so it doesn't matter
 * TODO: create a script that wipes the database, creates it anew, and inserts test data into the DB
 
+===== Creating a superuser =====
+
+> python manage.py createsuperuser
