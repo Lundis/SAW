@@ -30,6 +30,7 @@ ALLOWED_HOSTS = []
 
 EXTERNAL_APPS = (
     'solo', # singleton models. pip install django-solo
+    'bootstrap3', # bootstrap templates
 )
 
 NON_OPTIONAL_APPS = (

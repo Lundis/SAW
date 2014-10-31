@@ -12,16 +12,15 @@ class AssociationForm(forms.Form):
         super(AssociationForm, self).__init__(*args, **kwargs)
         self.fields['name'].initial = SiteConfiguration.instance().association_name
 
-    def Apply(self):
-        """
-        Apply settings
-        :return:
-        """
     def clean(self):
         #TODO: check that the name is short enough
         pass
 
     def Apply(self):
+        """
+        Saves the changes to the database.
+        :return:
+        """
         site_config = SiteConfiguration.instance()
         site_config.association_name = self.cleaned_data['name']
         site_config.save()
@@ -31,14 +30,22 @@ class AssociationForm(forms.Form):
 class ModulesForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
+        """
+        Creates checkboxes for all labels in the keyword argument modules
+        :param args:
+        :param kwargs: modules: list of modules
+        :return:
+        """
         modules = kwargs.pop('modules')
         super(ModulesForm, self).__init__(*args, **kwargs)
         for module in modules:
             self.fields[module] = forms.BooleanField(label=module, initial=DisabledModule.is_enabled(module), required=False)
-            self.fields[module].widget = forms.CheckboxInput(attrs={'class': 'checkbox'})
 
     def Apply(self):
-        print(self.cleaned_data)
+        """
+        Saves the changes to the database.
+        :return:
+        """
         for module, enabled in self.cleaned_data.items():
             if module in settings.OPTIONAL_APPS:
                 if enabled:

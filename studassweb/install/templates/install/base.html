@@ -1,5 +1,7 @@
 {% load i18n %}
 {% load static %}
+{% load bootstrap3 %}
+
 <!DOCTYPE html>
 <html>
 <head lang="en">
@@ -35,13 +37,15 @@
     <div class="install-content">
         {% if current_stage.0 == 'welcome' %}
             {% if form %}
-                <form action="{{ current_url }}" method="post">
+                <form action="{{ current_url }}" method="post" class=form">
                 {% csrf_token %}
-                <div class="input-group">
-                    {{ form }}
-                </div>
-                <input type="submit" value="Submit" />
-            </form>
+                {% bootstrap_form form %}
+                {% buttons %}
+                    <button type="submit" class="btn btn-primary">
+                        Next
+                    </button>
+                {% endbuttons %}
+                </form>
             {% else %}
                 <h2>{% trans 'Welcome to the StudAssWeb Installation Wizard' %}!</h2>
                 <a href="association">Get Started</a>
@@ -52,11 +56,9 @@
             <p> {% trans 'You have successfully set up your own website.' %}!</p>
             <a href="/"><p>{% trans 'Click here to check it out!' %}</p></a>
         {% else %}
-            <form action="{{ current_url }}" method="post">
+            <form action="{{ current_url }}" method="post" class=form">
                 {% csrf_token %}
-                <div class="input-group">
-                    {{ form }}
-                </div>
+                {% bootstrap_form form %}
                 <input type="submit" value="Submit" />
             </form>
         {% endif %}

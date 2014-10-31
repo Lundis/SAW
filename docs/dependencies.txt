@@ -6,8 +6,16 @@ StudAssWeb depends on the following modules:
     install instructions:
         > pip install django-solo
 
+
 ===== pillow =====
     This is for ImageField.
-    url: ??
+    url: https://pillow.readthedocs.org/
     install instructions:
-        > pip install pipllow
+        > pip install pillow
+
+
+===== django-bootstrap3 =====
+    This is for bootstrap forms.
+    url: https://github.com/dyve/django-bootstrap3
+    install instructions:
+        > pip install django-bootstrap3
