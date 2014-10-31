@@ -1,0 +1,42 @@
+{% extends "install/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load bootstrap3 %}
+
+
+{% block progress_bar %}
+    {% for stage in stages %}
+        <li {% if forloop.counter0 == current_stage_index %} class="active" {% endif %}>
+            <a>
+                {{ stage.1 }}
+                {% if forloop.counter0 < current_stage_index %}
+                    <span class="glyphicon glyphicon-ok"></span>
+                {% endif %}
+            </a>
+        </li>
+    {% endfor %}
+{% endblock %}
+
+{% block content %}
+    <div class="install-content">
+    {% if form %}
+        <p>Please log on to use this feature.</p>
+        <form action="welcome" method="post" class=form">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">
+                    Login
+                </button>
+            {% endbuttons %}
+        </form>
+    {% else %}
+        <h2>{% trans 'Welcome to the StudAssWeb Installation Wizard' %}!</h2>
+        <a href="association">
+            <button type="button" class="btn btn-primary" >
+                {% trans 'Get Started' %}
+            </button>
+        </a>
+    {% endif %}
+    </div>
+{% endblock %}

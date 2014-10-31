@@ -1,0 +1,37 @@
+{% extends "install/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load bootstrap3 %}
+
+
+{% block progress_bar %}
+    {% for stage in stages %}
+        <li {% if forloop.counter0 == current_stage_index %} class="active" {% endif %}>
+            <a>
+                {{ stage.1 }}
+                {% if forloop.counter0 < current_stage_index %}
+                    <span class="glyphicon glyphicon-ok"></span>
+                {% endif %}
+            </a>
+        </li>
+    {% endfor %}
+{% endblock %}
+
+{% block content %}
+    <div class="install-content">
+
+        <form action="association" method="post" class=form">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <a href="welcome"><button type="button" class="btn btn-primary">
+                Previous
+            </button></a>
+            <button type="submit" value="Submit" class="btn btn-primary" >
+                Next
+            </button>
+        </form>
+        <ul class="pager left">
+            <li><a href="welcome">{% trans "Previous" %}</a></li>
+        </ul>
+    </div>
+{% endblock %}

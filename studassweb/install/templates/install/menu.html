@@ -1,0 +1,81 @@
+{% extends "install/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load bootstrap3 %}
+
+{% block progress_bar %}
+    {% for stage in stages %}
+        <li {% if forloop.counter0 == current_stage_index %} class="active" {% endif %}>
+            <a>
+                {{ stage.1 }}
+                {% if forloop.counter0 < current_stage_index %}
+                    <span class="glyphicon glyphicon-ok"></span>
+                {% endif %}
+            </a>
+        </li>
+    {% endfor %}
+{% endblock %}
+
+{% block content %}
+    <div class="install-content">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">Drag menu items here to add them!</div>
+            <div class="panel-body">
+                <span id="install-menu-container"></span>
+                <button type="button"
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">Available menu items</div>
+            <div id="install-menu-items-container" class="panel-body">
+
+            </div>
+        </div>
+
+        <form id="install-menu-form" action="menu" method="post" class=form">
+            {% csrf_token %}
+
+            <a href="modules"><button type="button" class="btn btn-primary">
+                Previous
+            </button></a>
+            <button type="submit" value="Submit" class="btn btn-primary">
+                Next
+            </button>
+        </form>
+    </div>
+
+<script>
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+function drag(ev) {
+    ev.dataTransfer.setData("menu_id", ev.target.id);
+}
+
+function drop(ev) {
+    ev.preventDefault();
+    var menu_id = ev.dataTransfer.getData("menu_id");
+    if (ev.target.id === "menu_container") {
+
+    } else {
+
+    }
+    ev.target.appendChild(document.getElementById("menu_container"));
+    // TODO: update hidden fields in the form
+}
+
+function remove_hidden_node(menu_id) {
+
+}
+
+function add_hidden_input(menu_id, order) {
+    var input_field = document.createElement("input");
+    input_field.setIdAttribute(menu_id);
+    input_field.setAttribute("type", "hidden");
+}
+</script>
+{% endblock %}
+

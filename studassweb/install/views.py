@@ -31,7 +31,7 @@ def welcome(request):
             context['form'] = login_form
 
 
-    return render(request, 'install/base.html', context)
+    return render(request, 'install/welcome.html', context)
 
 @login_required
 def association(request):
@@ -45,7 +45,7 @@ def association(request):
                'stages': stages,
                'current_stage_index': 1,
                'current_stage': stages[1]}
-    return render(request, 'install/base.html', context)
+    return render(request, 'install/assoc.html', context)
 
 @login_required
 def modules(request):
@@ -59,7 +59,7 @@ def modules(request):
                'stages': stages,
                'current_stage_index': 2,
                'current_stage': stages[2]}
-    return render(request, 'install/base.html', context)
+    return render(request, 'install/modules.html', context)
 
 @login_required
 def menu(request):
@@ -73,7 +73,7 @@ def menu(request):
                'stages': stages,
                'current_stage_index': 3,
                'current_stage': stages[3]}
-    return render(request, 'install/base.html', context)
+    return render(request, 'install/menu.html', context)
 
 @login_required
 def finished(request):
@@ -81,4 +81,4 @@ def finished(request):
                'stages': stages,
                'current_stage_index': 4,
                'current_stage': stages[4]}
-    return render(request, 'install/base.html', context)
+    return render(request, 'install/finished.html', context)

@@ -1,0 +1,31 @@
+{% extends "install/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load bootstrap3 %}
+
+
+{% block progress_bar %}
+    {% for stage in stages %}
+        <li {% if forloop.counter0 == current_stage_index %} class="active" {% endif %}>
+            <a>
+                {{ stage.1 }}
+                {% if forloop.counter0 < current_stage_index %}
+                    <span class="glyphicon glyphicon-ok"></span>
+                {% endif %}
+            </a>
+        </li>
+    {% endfor %}
+{% endblock %}
+
+{% block content %}
+    <div class="install-content">
+
+        <h1>{% trans 'Congratulations!' %}</h1>
+        <p> {% trans 'You have successfully set up your own website.' %}!</p>
+        <a href="/"><p>{% trans 'Click here to check it out!' %}</p></a>
+
+        <a href="menu"><button type="button" class="btn btn-primary">
+            Previous
+        </button></a>
+    </div>
+{% endblock %}

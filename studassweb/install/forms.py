@@ -54,4 +54,12 @@ class ModulesForm(forms.Form):
                     DisabledModule.disable(module)
 
 class MenuForm(forms.Form):
-    pass
+    def __init__(self, *args, **kwargs):
+        """
+        Creates hidden input fields for all available menu items
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        super(MenuForm, self).__init__(*args, **kwargs)
+
