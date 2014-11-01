@@ -5,6 +5,7 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 from install.forms import AssociationForm, ModulesForm, MenuForm
 from login.forms import LoginForm
+from menu.logic import get_all_menu_items
 
 
 def first_letter_to_upper(str):
@@ -18,9 +19,7 @@ def first_letter_to_upper(str):
 stages = [[s, _(first_letter_to_upper(s))] for s in ["welcome", "association", "modules", "menu", "finished"]]
 
 def welcome(request):
-    context = {'current_url': request.get_full_path(),
-
-               'stages': stages,
+    context = {'stages': stages,
                'current_stage_index': 0,
                'current_stage': stages[0]}
     if not request.user.is_authenticated():
@@ -39,9 +38,7 @@ def association(request):
     if form.is_valid():
         form.Apply()
         return HttpResponseRedirect('modules')
-
-    context = {'previous': 'welcome',
-               'form': form,
+    context = {'form': form,
                'stages': stages,
                'current_stage_index': 1,
                'current_stage': stages[1]}
@@ -54,8 +51,7 @@ def modules(request):
         form.Apply()
         return HttpResponseRedirect('menu')
 
-    context = {'previous': 'association',
-               'form': form,
+    context = {'form': form,
                'stages': stages,
                'current_stage_index': 2,
                'current_stage': stages[2]}
@@ -68,7 +64,9 @@ def menu(request):
         #TODO: save to database
         return HttpResponseRedirect('finished')
     # TODO: get all available menu items and let the user choose which he wants, and in which order.
-    context = {'previous': 'modules',
+    menu_items = get_all_menu_items()
+    print(menu_items)
+    context = {'menu_items': menu_items,
                'form': form,
                'stages': stages,
                'current_stage_index': 3,
@@ -77,8 +75,7 @@ def menu(request):
 
 @login_required
 def finished(request):
-    context = {'previous': 'menu',
-               'stages': stages,
+    context = {'stages': stages,
                'current_stage_index': 4,
                'current_stage': stages[4]}
     return render(request, 'install/finished.html', context)

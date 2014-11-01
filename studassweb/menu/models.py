@@ -40,7 +40,7 @@ class MenuItem(models.Model):
         Shortcut function for MenuItem.objects.get_or_create
         """
         item, created = cls.objects.get_or_create(display_name=display_name, url=url)
-
+        return item
 
 
 class ItemInMenu(models.Model):
