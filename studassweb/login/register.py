@@ -1,7 +1,7 @@
 from menu.models import MenuItem
 
 def get_menu_items():
-    return [MenuItem.get_or_create("login", "Logout", "/logout/")]
+    return [MenuItem.get_or_create("login", "Logout", "/logout/", MenuItem.LOGIN_MENU)]
 
 
 def get_urls():
