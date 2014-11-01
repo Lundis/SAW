@@ -1,5 +1,7 @@
 {% load i18n %}
 {% load static %}
+{% load solo_tags %}
+{% get_solo 'base.SiteConfiguration' as site_config %}
 <!DOCTYPE html >
 <html lang="en">
 <head>
@@ -11,18 +13,23 @@
 </head>
 
 <body>
+{% block content %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "" %}
+{% endblock content %}
 
-<div id="header">{% include 'base/header.html' %}</div>
-<div class="container" id="content">{% block content %}{% endblock %}</div>
-<div id="footer">{% include 'base/footer.html' %}</div>
+
+<div class="container footer"><span class="glyphicon glyphicon-copyright-mark"></span> {% now "Y" %} {{ site_config.association_name }} </div>
+
 
 <!-- Placed last to improve loading times -->
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="{% static "js/bootstrap.min.js" %}"></script>
+{% block scripts %}{% endblock %}
 </body>
 
-{% block scripts %}{% endblock %}
+
 
 </html>

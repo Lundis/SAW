@@ -5,7 +5,8 @@ class MenuTemplate(models.Model):
 
     @classmethod
     def default(cls):
-        return cls.objects.get_or_create(path__exact="menu/menu.html")
+        obj, created = cls.objects.get_or_create(path="menu/menu.html")
+        return obj
 
 
 class Menu(models.Model):
@@ -33,6 +34,9 @@ class Menu(models.Model):
         """
         items = ItemInMenu.objects.filter(menu=self)
         items.delete()
+
+    def items(self):
+        return [item.item for item in ItemInMenu.objects.filter(menu=self)]
 
 
 class MenuItem(models.Model):

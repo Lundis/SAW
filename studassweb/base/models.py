@@ -8,7 +8,8 @@ class SiteConfiguration(SingletonModel):
 
     @classmethod
     def instance(cls):
-        return cls.objects.get()
+        obj, created = cls.objects.get_or_create()
+        return obj
 
 
 class DisabledModule(models.Model):
