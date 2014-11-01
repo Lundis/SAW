@@ -1,5 +1,7 @@
+from menu.models import MenuItem
+
 def get_menu_items():
-    pass
+    return [MenuItem.get_or_create("Exams", "/exams/")]
 
 def get_urls():
     """

@@ -1,8 +1,7 @@
+from menu.models import MenuItem
+
 def get_menu_items():
-    """
-    :return: a list of menu.models.MenuItem
-    """
-    pass
+    return [MenuItem.get_or_create("Example", "/example/")]
 
 def get_urls():
     """
