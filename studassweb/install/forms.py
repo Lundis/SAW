@@ -56,7 +56,8 @@ class ModulesForm(forms.Form):
 class MenuForm(forms.Form):
     def __init__(self, *args, **kwargs):
         """
-        Creates hidden input fields for all available menu items
+        Parses all hidden menu items.
+        Their name attributes should start with "menu-item-" and their value should be the position of the menu item.
         :param args:
         :param kwargs:
         :return:
