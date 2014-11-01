@@ -1,7 +1,7 @@
 from menu.models import MenuItem
 
 def get_menu_items():
-    return [MenuItem.get_or_create("Settings", "/settings/")]
+    return [MenuItem.get_or_create("settings", "Settings", "/settings/")]
 
 def get_urls():
     """

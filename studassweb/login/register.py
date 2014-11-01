@@ -1,11 +1,11 @@
 from menu.models import MenuItem
 
 def get_menu_items():
-    return [MenuItem.get_or_create("members", "Member Registry", "/members/")]
+    return [MenuItem.get_or_create("login", "Logout", "/logout/")]
 
 
 def get_urls():
     """
     :returns: A tuple of regexes describing what URLs the top-level URL dispatcher should associate with this module
     """
-    return (r"^members/",)
+    return (r"^logout/",)

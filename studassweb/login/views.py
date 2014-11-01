@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from login.forms import LoginForm
 from django.http import HttpResponseRedirect
+from django.contrib.auth import logout
 from django.utils.translation import ugettext as _
 
 def login_view(request):
@@ -24,3 +25,8 @@ def login_view(request):
     else:
         form = LoginForm()
     return render(request, 'login/login.html', {'form': form})
+
+def logout_view(request):
+    if request.user.is_authenticated():
+        logout(request)
+    return HttpResponseRedirect('/')

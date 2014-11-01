@@ -36,7 +36,7 @@ def welcome(request):
 def association(request):
     form = AssociationForm(request.POST or None)
     if form.is_valid():
-        form.Apply()
+        form.apply()
         return HttpResponseRedirect('modules')
     context = {'form': form,
                'stages': stages,
@@ -48,7 +48,7 @@ def association(request):
 def modules(request):
     form = ModulesForm(request.POST or None, modules=settings.OPTIONAL_APPS)
     if form.is_valid():
-        form.Apply()
+        form.apply()
         return HttpResponseRedirect('menu')
 
     context = {'form': form,
@@ -61,11 +61,9 @@ def modules(request):
 def menu(request):
     form = MenuForm(request.POST or None)
     if form.is_valid():
-        #TODO: save to database
+        form.apply()
         return HttpResponseRedirect('finished')
-    # TODO: get all available menu items and let the user choose which he wants, and in which order.
     menu_items = get_all_menu_items()
-    print(menu_items)
     context = {'menu_items': menu_items,
                'form': form,
                'stages': stages,

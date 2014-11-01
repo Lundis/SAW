@@ -1,7 +1,7 @@
 from menu.models import MenuItem
 
 def get_menu_items():
-    return [MenuItem.get_or_create("Home", "/")]
+    return [MenuItem.get_or_create("frontpage", "Home", "/")]
 
 def get_urls():
     """
