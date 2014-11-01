@@ -1,3 +1,5 @@
 from django.shortcuts import render
 
-# Create your views here.
+#TODO: make sure that user has access
+def view_members():
+    pass

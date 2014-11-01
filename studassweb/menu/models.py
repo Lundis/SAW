@@ -26,12 +26,21 @@ class Menu(models.Model):
 
 
 class MenuItem(models.Model):
-    app_name = models.CharField(max_length=30)
     display_name = models.CharField(max_length=30)
-    url = models.CharField(max_length=100)
+    # TODO: should url be unique?
+    url = models.URLField()
 
     class Meta:
-        unique_together = ('app_name', 'display_name', 'url')
+        # Don't allow duplicates
+        unique_together = ('display_name', 'url')
+
+    @classmethod
+    def get_or_create(cls, display_name, url):
+        """
+        Shortcut function for MenuItem.objects.get_or_create
+        """
+        item, created = cls.objects.get_or_create(display_name=display_name, url=url)
+
 
 
 class ItemInMenu(models.Model):

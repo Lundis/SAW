@@ -85,7 +85,6 @@ $(function() {
 
 function updateHiddenFormFields() {
     var old_fields = document.getElementsByClassName("install-hidden-field");
-    alert(old_fields);
     for (field in old_fields) {
         field.parentNode.removeChild(field);
     }
