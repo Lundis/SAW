@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from login.forms import LoginForm
+from .forms import LoginForm
 from django.http import HttpResponseRedirect
 from django.contrib.auth import logout
 from django.utils.translation import ugettext as _

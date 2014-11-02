@@ -69,8 +69,10 @@ class MenuItem(models.Model):
         """
         item, created = cls.objects.get_or_create(app_name=app_name,
                                                   display_name=display_name,
-                                                  url=url,
-                                                  default_menu=default_menu)
+                                                  url=url)
+        if default_menu and item.default_menu == cls.NONE:
+            item.default_menu = default_menu
+            item.save()
         return item
 
 

@@ -39,7 +39,7 @@ NON_OPTIONAL_APPS = (
     'theme',
     'menu',
     'install',
-    'login',
+    'users',
     'settings',
 )
 
@@ -110,4 +110,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-LOGIN_URL = '/login/'
+LOGIN_URL = '/users/login/'

@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from install.forms import AssociationForm, ModulesForm, MenuForm
-from login.forms import LoginForm
+from users.forms import LoginForm
 from menu.logic import get_all_menu_items
 
 
