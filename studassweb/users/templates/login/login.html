@@ -11,11 +11,15 @@
     {% load dynamic_menu %}
     {% display_menu "main_menu" "Login" %}
     <div class="container">
+        {% if not user.is_authenticated %}
         <form action="/users/login/" method="post">
             {% csrf_token %}
             {{ form }}
             <input type="submit" value="Submit" />
 
         </form>
+    {% else %}
+        <p>You are already logged on!</p>
+    {% endif %}
     </div>
 {% endblock %}

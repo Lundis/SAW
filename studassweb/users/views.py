@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.template import RequestContext
 from .forms import LoginForm
 from django.http import HttpResponseRedirect
 from django.contrib.auth import logout

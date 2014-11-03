@@ -1,17 +1,36 @@
-from django.template import Context, Template, Library, TemplateSyntaxError, Node
+from django.template import RequestContext, Library
 from django.template.loader import get_template
 from menu.models import MenuTemplate, Menu
 
 register = Library()
 
-@register.simple_tag
-def display_menu(menu_name, active_tab):
+@register.inclusion_tag('menu/menu_placeholder.html', takes_context=True)
+def display_menu(context, menu_name, active_tab):
+    print("display_menu called")
+    menu = render_menu(menu_name, active_tab, context)
+    return {'menu': menu}
+
+def render_menu(menu_name, active_tab, http_context):
     menu = Menu.objects.get(menu_name=menu_name)
-    context = Context({'menuitems': menu.items(),
-                       'active_tab': active_tab})
-    template_path = MenuTemplate.default().path
+    context = {'menuitems': menu.items(), 'active_tab': active_tab}
+
+    if menu_name == "main_menu":
+        context['login_menu'] = Menu.objects.get(menu_name="login_menu")
+
+
     if menu.template and menu.template.path != "":
         template_path = menu.template.path
+    else:
+        template_path = MenuTemplate.default().path
+
     template = get_template(template_path)
-    result = template.render(context)
+    request_context = RequestContext(http_context, context)
+    request_context['user'] = http_context['user']
+    result = template.render(request_context)
     return result
+
+
+@register.inclusion_tag('menu/login_menu.html', takes_context=True)
+def display_login_button(context):
+    items = Menu.objects.get(menu_name="login_menu").items()
+    return {'menuitems': items, 'user': context['user']}
