@@ -38,6 +38,16 @@ class Menu(models.Model):
     def items(self):
         return [item.item for item in ItemInMenu.objects.filter(menu=self)]
 
+    @classmethod
+    def get_or_none(cls, name):
+        """
+        Returns the menu if it exists, otherwise None
+        """
+        try:
+            return cls.objects.get(menu_name=name)
+        except cls.DoesNotExist:
+            return None
+
 
 class MenuItem(models.Model):
 
@@ -70,10 +80,20 @@ class MenuItem(models.Model):
         item, created = cls.objects.get_or_create(app_name=app_name,
                                                   display_name=display_name,
                                                   url=url)
-        if default_menu and item.default_menu == cls.NONE:
+        if created:
             item.default_menu = default_menu
             item.save()
         return item
+
+    @classmethod
+    def get_defaults(cls, menu_id):
+        """
+        The main and login menus can have default items assigned to them.
+        :param cls:
+        :param menu_id: MAIN_MENU, LOGIN_MENU or NONE
+        :return: A QuerySet of the default menu items.
+        """
+        return cls.objects.filter(default_menu=menu_id)
 
 
 class ItemInMenu(models.Model):
