@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('',
-    url(r'^$', 'login.views.login_view', name='login'),
+    url(r'^$', 'members.views.view_members', name='view_members'),
 )

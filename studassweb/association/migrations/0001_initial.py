@@ -8,15 +8,15 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
+        ('gallery', '__first__'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('gallery', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
             name='Board',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
+                ('id', models.AutoField(primary_key=True, auto_created=True, serialize=False, verbose_name='ID')),
                 ('year', models.IntegerField()),
                 ('name', models.CharField(max_length=300)),
                 ('photo', models.ForeignKey(to='gallery.Photo')),
@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='BoardMember',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
+                ('id', models.AutoField(primary_key=True, auto_created=True, serialize=False, verbose_name='ID')),
                 ('board', models.ForeignKey(to='association.Board')),
                 ('person_id', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
                 ('photo', models.ForeignKey(to='gallery.Photo')),
@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Payment',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
+                ('id', models.AutoField(primary_key=True, auto_created=True, serialize=False, verbose_name='ID')),
                 ('purpose', models.CharField(max_length=200)),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Role',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
+                ('id', models.AutoField(primary_key=True, auto_created=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100)),
                 ('board', models.ForeignKey(to='association.Board')),
             ],

@@ -1,16 +1,15 @@
 from django.db import models
 from solo.models import SingletonModel
-from menu.models import Menu
 from django.contrib.auth.models import User
 
 
 class SiteConfiguration(SingletonModel):
     association_name = models.CharField(max_length=100, default='Site name')
-    main_menu = models.ForeignKey(Menu, blank=True, null=True)
 
     @classmethod
     def instance(cls):
-        return cls.objects.get()
+        obj, created = cls.objects.get_or_create()
+        return obj
 
 
 class DisabledModule(models.Model):

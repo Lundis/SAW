@@ -39,7 +39,7 @@ NON_OPTIONAL_APPS = (
     'theme',
     'menu',
     'install',
-    'login',
+    'users',
     'settings',
 )
 
@@ -76,6 +76,10 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+)
+
 ROOT_URLCONF = 'studassweb.urls'
 
 WSGI_APPLICATION = 'studassweb.wsgi.application'
@@ -110,4 +114,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-LOGIN_URL = '/login/'
+LOGIN_URL = '/users/login/'

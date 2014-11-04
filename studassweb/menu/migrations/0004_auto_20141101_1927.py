@@ -7,13 +7,12 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0003_auto_20141022_1338'),
+        ('menu', '0003_auto_20141101_1902'),
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='disabledmodule',
-            name='app_name',
-            field=models.CharField(unique=True, max_length=50),
+        migrations.AlterUniqueTogether(
+            name='iteminmenu',
+            unique_together=set([('menu', 'item')]),
         ),
     ]

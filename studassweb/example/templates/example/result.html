@@ -1,10 +1,7 @@
-{% extends 'base/base.html' %}
+{% extends "example/base.html" %}
+
 {% load i18n %}
 
-{% block title %}
-{% trans "Example" %}
-{% endblock %}
-
-{% block content %}
+{% block inner_content %}
 <p>{{ winner }} {% trans "is the most awesome team member" %}!</p>
 {% endblock %}

@@ -1,5 +1,7 @@
+from menu.models import MenuItem
+
 def get_menu_items():
-    pass
+    return [MenuItem.get_or_create("settings", "Settings", "/settings/", MenuItem.LOGIN_MENU)]
 
 def get_urls():
     """

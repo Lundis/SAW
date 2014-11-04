@@ -5,5 +5,7 @@
 {% endblock %}
 
 {% block content %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Home" %}
 	<h1>Welcome!</h1>
 {% endblock %}

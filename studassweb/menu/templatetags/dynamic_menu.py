@@ -1,40 +1,36 @@
-from django import template
+from django.template import RequestContext, Library
+from django.template.loader import get_template
+from menu.models import MenuTemplate, Menu
 
-register = template.Library()
+register = Library()
 
-@register.tag()
-def display_menu(parser, token):
-    try:
-        # token.split_contents() takes into account quotes
-        tag_name, menu, active_tab = token.split_contents()
-    except:
-        raise template.TemplateSyntaxError("%r tag requires two arguments: menu name and active item" % token.contents.split()[0])
-    if not (is_in_quotes(menu) and is_in_quotes(active_tab)):
-        raise template.TemplateSyntaxError("%r tag's arguments should be in quotes" % tag_name)
+@register.inclusion_tag('menu/menu_placeholder.html', takes_context=True)
+def display_menu(context, menu_name, active_tab):
+    print("display_menu called")
+    menu = render_menu(menu_name, active_tab, context)
+    return {'menu': menu}
 
-    return DynamicMenu(menu, active_tab)
+def render_menu(menu_name, active_tab, http_context):
+    menu = Menu.objects.get(menu_name=menu_name)
+    context = {'menuitems': menu.items(), 'active_tab': active_tab}
 
-def is_in_quotes(s):
-    return s[0] == s[-1] and s[0] in ('"', "'")
+    if menu_name == "main_menu":
+        context['login_menu'] = Menu.objects.get(menu_name="login_menu")
 
-class DynamicMenu(template.Node):
-    def __init__(self, menu, active):
-        """
-        :param active: the name of the active "tab"
-        :return:
-        """
-        self.menu = menu
-        self.active = active
 
-    def render(self, context):
-        """
-        :param context:
-        :return: a string containing the entire menu HTML
-        """
-        # TODO: add the active tab to context
-        context['active_tab'] = self.active
-        # load template file
-        template_text = template.get_template("menu/menu.html")
-        # create a template
-        menu_template = template.Template(template_text)
-        return menu_template.render(context)
+    if menu.template and menu.template.path != "":
+        template_path = menu.template.path
+    else:
+        template_path = MenuTemplate.default().path
+
+    template = get_template(template_path)
+    request_context = RequestContext(http_context, context)
+    request_context['user'] = http_context['user']
+    result = template.render(request_context)
+    return result
+
+
+@register.inclusion_tag('menu/login_menu.html', takes_context=True)
+def display_login_button(context):
+    items = Menu.objects.get(menu_name="login_menu").items()
+    return {'menuitems': items, 'user': context['user']}

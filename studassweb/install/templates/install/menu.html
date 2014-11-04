@@ -22,12 +22,10 @@
     <div class="install-content">
 
         <div class="panel panel-default">
-            <div class="panel-heading">{% trans "Drag menu items here to add them" %}!</div>
+            <div class="panel-heading">{% trans "Main Menu" %}!</div>
             <div class="panel-body">
                 <div class="btn-toolbar">
-                    <div id="install-menu-container" class="btn-group connected-sort">
-                        <div id="menu-item-test1" class="btn btn-primary install-menu-item">Test</div>
-                    </div>
+                    <div id="install-menu-container" class="btn-group connected-sort"></div>
 
                     <div class="btn-group">
                         <div class="btn btn-primary disabled">
@@ -39,13 +37,22 @@
         </div>
 
         <div class="panel panel-default">
+            <div class="panel-heading">{% trans "Login menu items. These will be visible in a dropdown menu after the user has logged on." %}</div>
+            <div class="panel-body">
+                <div class="btn-toolbar">
+                    <div id="install-login-container" class="btn-group connected-sort"></div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
             <div class="panel-heading">
-                {% trans "Available menu items" %}
+                {% trans "Available menu items. Click or drag them above to add them to the menu." %}
             </div>
             <div class="panel-body">
 
                 <ul id="install-available-container" class="btn-group connected-sort">
-                    <li id="menu-item-test2" class="btn btn-primary install-menu-item">Test2</li>
                     {% for menu_item in menu_items %}
                         <li id="menu-item-{{ menu_item.id }}" class="btn btn-primary install-menu-item">
                             {{ menu_item.display_name }}
@@ -76,24 +83,26 @@
 <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
 <script>
 
-$(function() {
-    $('#install-menu-form').submit(function() {
+$('#install-menu-form').submit(function() {
         updateHiddenFormFields();
         return true; // return false to cancel form action
-    });
 });
 
 function updateHiddenFormFields() {
     var old_fields = document.getElementsByClassName("install-hidden-field");
-    alert(old_fields);
-    for (field in old_fields) {
-        field.parentNode.removeChild(field);
+    for (i = 0; i < old_fields.length; i++) {
+        old_fields[i].parentNode.removeChild(old_fields[i]);
     }
     new_menu_items = document.getElementById("install-menu-container").childNodes;
-    var i = 0;
-    for (menu_item in new_menu_items) {
-        add_hidden_input(menu_item.innerHTML, i);
-        i++;
+    for (i = 0; i < new_menu_items.length; i++) {
+        menu_id = "main-" + new_menu_items[i].getAttribute("id");
+        add_hidden_input(menu_id, i);
+    }
+
+    new_login_items = document.getElementById("install-login-container").childNodes;
+    for (i = 0; i < new_login_items.length; i++) {
+        menu_id  = "login-" + new_login_items[i].getAttribute("id");
+        add_hidden_input(menu_id, i);
     }
 }
 
@@ -108,18 +117,26 @@ function add_hidden_input(menu_id, order) {
 }
 
 $(function() {
-    $( "#install-menu-container, #install-available-container" ).sortable({
+    $( "#install-menu-container, #install-available-container, #install-login-container" ).sortable({
         connectWith: ".connected-sort"
     }).disableSelection();
 });
 
 $(".install-menu-item").click(function(event) {
     if (event.target.parentNode.id == "install-menu-container") {
+
         document.getElementById("install-menu-container").removeChild(event.target);
+        document.getElementById("install-login-container").appendChild(event.target);
+
+    } else if (event.target.parentNode.id == "install-login-container"){
+
+        document.getElementById("install-login-container").removeChild(event.target);
         document.getElementById("install-available-container").appendChild(event.target);
+
     } else {
-        document.getElementById("install-menu-container").appendChild(event.target);
+
         document.getElementById("install-available-container").removeChild(event.target);
+        document.getElementById("install-menu-container").appendChild(event.target);
     }
 });
 
