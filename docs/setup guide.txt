@@ -4,6 +4,36 @@ Windows: Make sure that you select "set path variables" when you select the modu
 
 If you're running Windows 7 or earlier, you need to restart the computer now.
 
+Other OSs: pip might not be installed along with Python. You then need to install it manually using some OS-specific method
+
+
+===== Install Django 1.7 =====
+
+After installing python 3.4 and pip (comes bundled with it on windows):
+    > pip install django==1.7
+
+===== Install Dependencies =====
+
+* django-solo
+    * This is for singleton models.
+    * url: https://github.com/lazybird/django-solo
+    * install instructions:
+        > pip install django-solo
+
+
+* pillow
+    * This is for ImageField.
+    * url: https://pillow.readthedocs.org/
+    * install instructions:
+        > pip install pillow
+
+
+* django-bootstrap3
+    * This is for bootstrap forms.
+    * url: https://github.com/dyve/django-bootstrap3
+    * install instructions:
+        > pip install django-bootstrap3
+
 
 ===== Install Pycharm pro edition =====
 
@@ -35,28 +65,6 @@ Then download it at http://www.jetbrains.com/pycharm/
     * click the line with git in the table and click the delete button
 
 
-===== Install Dependencies =====
-
-* django-solo
-    * This is for singleton models.
-    * url: https://github.com/lazybird/django-solo
-    * install instructions:
-        > pip install django-solo
-
-
-* pillow
-    * This is for ImageField.
-    * url: https://pillow.readthedocs.org/
-    * install instructions:
-        > pip install pillow
-
-
-* django-bootstrap3
-    * This is for bootstrap forms.
-    * url: https://github.com/dyve/django-bootstrap3
-    * install instructions:
-        > pip install django-bootstrap3
-
 
 ===== Setting up the database and superuser =====
 
@@ -71,3 +79,6 @@ Then download it at http://www.jetbrains.com/pycharm/
     2. > python manage.py createsuperuser
         * You will be asked for a username, email (optional) and password
         * enter something simple. for instance "lundis", no email, password "a"
+
+
+REMEMBER TO VISIT LOCALHOST:8000/install to set up the menu.
