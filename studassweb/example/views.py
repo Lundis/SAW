@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.utils.translation import ugettext as _
+from django.template.context import RequestContext
 
 team_members = ['Lundis', 'Magnus', 'Johnny', 'Oscar', 'J', 'Asis']
 # Create your views here.
