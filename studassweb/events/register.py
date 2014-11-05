@@ -1,7 +1,12 @@
 from menu.models import MenuItem
+from users.models import SAWPermission
 
 def get_menu_items():
-    return [MenuItem.get_or_create("events", "Events", "/events/", MenuItem.MAIN_MENU)]
+    return [MenuItem.get_or_create("events",
+                                   "Events",
+                                   "/events/",
+                                   MenuItem.MAIN_MENU,
+                                   SAWPermission("can_view_events"))]
 
 def get_urls():
     """

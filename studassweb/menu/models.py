@@ -1,4 +1,5 @@
 from django.db import models
+from users.models import SAWPermission
 
 class MenuTemplate(models.Model):
     path = models.CharField(max_length=100, unique=True)
@@ -54,7 +55,6 @@ class MenuItem(models.Model):
     #app_name is used for checking if it belongs to a disabled module
     app_name = models.CharField(max_length=50, null=True, blank=True)
     display_name = models.CharField(max_length=30)
-    # TODO: should url be unique?
     url = models.URLField()
     # Does the item by default belong to a menu?
     # This is used to improve the usability of the installation wizard.
@@ -67,21 +67,29 @@ class MenuItem(models.Model):
         (NONE, "No menu"),
     )
     default_menu = models.CharField(max_length=2, choices=MENU_CHOICES)
+    view_permission = models.ForeignKey(SAWPermission, null=True, blank=True)
 
     class Meta:
         # Don't allow duplicates
         unique_together = ('display_name', 'url')
 
     @classmethod
-    def get_or_create(cls, app_name, display_name, url, default_menu=NONE):
+    def get_or_create(cls, app_name, display_name, url, default_menu=NONE, permission=None):
         """
         Shortcut function for MenuItem.objects.get_or_create
+        :param app_name: Which app created this item (if any)
+        :param display_name:  The string that is shown to the user
+        :param url: URL
+        :param default_menu: The default menu this item belongs to
+        :param default_permission: The permission required to view this item. if None, anyone can view it
+        :return:
         """
         item, created = cls.objects.get_or_create(app_name=app_name,
                                                   display_name=display_name,
                                                   url=url)
         if created:
             item.default_menu = default_menu
+            item.view_permission = permission
             item.save()
         return item
 
@@ -94,6 +102,9 @@ class MenuItem(models.Model):
         :return: A QuerySet of the default menu items.
         """
         return cls.objects.filter(default_menu=menu_id)
+
+    def can_view(self, user):
+        return not self.view_permission or self.view_permission.has_user_perm(user)
 
 
 class ItemInMenu(models.Model):

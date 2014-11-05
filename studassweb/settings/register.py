@@ -1,7 +1,12 @@
 from menu.models import MenuItem
+from users.models import SAWPermission
 
 def get_menu_items():
-    return [MenuItem.get_or_create("settings", "Settings", "/settings/", MenuItem.LOGIN_MENU)]
+    return [MenuItem.get_or_create("settings",
+                                   "Settings",
+                                   "/settings/",
+                                   MenuItem.LOGIN_MENU,
+                                   SAWPermission("can_view_settings"))]
 
 def get_urls():
     """

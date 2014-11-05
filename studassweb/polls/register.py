@@ -1,7 +1,12 @@
 from menu.models import MenuItem
+from users.models import SAWPermission
 
 def get_menu_items():
-    return [MenuItem.get_or_create("polls", "Polls", "/polls/", MenuItem.NONE)]
+    return [MenuItem.get_or_create("polls",
+                                   "Polls",
+                                   "/polls/",
+                                   MenuItem.NONE,
+                                   SAWPermission("can_view_polls"))]
 
 def get_urls():
     """
