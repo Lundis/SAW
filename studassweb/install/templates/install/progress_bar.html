@@ -1,0 +1,53 @@
+
+<li {% if active_tab == "Welcome" %} class="active" {% endif %}>
+    <a>
+        Welcome
+        {% if user.is_authenticated %}
+            <span class="glyphicon glyphicon-ok"></span>
+        {% else %}
+            <span class="glyphicon glyphicon-remove"></span>
+        {% endif %}
+    </a>
+</li>
+
+<li {% if active_tab == "Association" %} class="active" {% endif %}>
+    <a>
+        Association
+        {% if progress.site_name_ok %}
+            <span class="glyphicon glyphicon-ok"></span>
+        {% else %}
+            <span class="glyphicon glyphicon-remove"></span>
+        {% endif %}
+    </a>
+</li>
+
+<li {% if active_tab == "Modules" %} class="active" {% endif %}>
+    <a>
+        Modules
+        {% if progress.modules_ok %}
+            <span class="glyphicon glyphicon-ok"></span>
+        {% else %}
+            <span class="glyphicon glyphicon-remove"></span>
+        {% endif %}
+    </a>
+</li>
+<li {% if active_tab == "Menu" %} class="active" {% endif %}>
+    <a>
+        Menu
+        {% if progress.menu_ok %}
+            <span class="glyphicon glyphicon-ok"></span>
+        {% else %}
+            <span class="glyphicon glyphicon-remove"></span>
+        {% endif %}
+    </a>
+</li>
+<li {% if active_tab == "Finished" %} class="active" {% endif %}>
+    <a>
+        Finished
+        {% if progress.is_finished %}
+            <span class="glyphicon glyphicon-ok"></span>
+        {% else %}
+            <span class="glyphicon glyphicon-remove"></span>
+        {% endif %}
+    </a>
+</li>

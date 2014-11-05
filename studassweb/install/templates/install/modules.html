@@ -5,16 +5,8 @@
 
 
 {% block progress_bar %}
-    {% for stage in stages %}
-        <li {% if forloop.counter0 == current_stage_index %} class="active" {% endif %}>
-            <a>
-                {{ stage.1 }}
-                {% if forloop.counter0 < current_stage_index %}
-                    <span class="glyphicon glyphicon-ok"></span>
-                {% endif %}
-            </a>
-        </li>
-    {% endfor %}
+    {% load install_progress_bar %}
+    {% display_progress_bar "Modules" %}
 {% endblock %}
 
 {% block content %}
