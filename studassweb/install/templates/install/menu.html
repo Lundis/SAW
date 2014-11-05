@@ -141,8 +141,14 @@ $(function() {
     }).disableSelection();
 });
 
-$(".install-menu-item").click(function(event) {
-    if (event.target.parentNode.id == "install-menu-container") {
+$(".install-menu-item").click(click_handler);
+
+function click_handler(event) {
+    // workaround for firefox's double-event firing
+    var is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+    if (is_firefox) {
+        // do nothing
+    } else if (event.target.parentNode.id == "install-menu-container") {
 
         document.getElementById("install-menu-container").removeChild(event.target);
         document.getElementById("install-login-container").appendChild(event.target);
@@ -157,7 +163,7 @@ $(".install-menu-item").click(function(event) {
         document.getElementById("install-available-container").removeChild(event.target);
         document.getElementById("install-menu-container").appendChild(event.target);
     }
-});
+}
 
 </script>
 {% endblock %}
