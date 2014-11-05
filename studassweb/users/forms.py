@@ -32,3 +32,6 @@ class LoginForm(forms.Form):
     def login_user(self, request):
         user = authenticate(username=self.cleaned_data['user_name'], password=self.cleaned_data['password'])
         login(request, user)
+
+class RegisterForm(forms.Form):
+    pass

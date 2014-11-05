@@ -31,3 +31,11 @@ def logout_view(request):
     if request.user.is_authenticated():
         logout(request)
     return HttpResponseRedirect('/')
+
+def register(request):
+    """
+    Renders a register form.
+    :param request:
+    :return:
+    """
+    return render(request, 'login/register.html')
