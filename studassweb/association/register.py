@@ -6,7 +6,7 @@ def get_menu_items():
                                    "Association",
                                    "/association/",
                                    MenuItem.MAIN_MENU,
-                                   SAWPermission("can_view_association"))]
+                                   SAWPermission.get_or_create("can_view_association"))]
 
 
 def get_urls():

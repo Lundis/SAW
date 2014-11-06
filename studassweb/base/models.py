@@ -5,11 +5,20 @@ from django.contrib.auth.models import User
 
 class SiteConfiguration(SingletonModel):
     association_name = models.CharField(max_length=100, default='Site name')
+    association_founded = models.IntegerField(default=1900)
 
     @classmethod
     def instance(cls):
         obj, created = cls.objects.get_or_create()
         return obj
+
+    @classmethod
+    def founded(cls):
+        """
+
+        :return: The year this association was founded
+        """
+        return cls.instance().association_founded
 
 
 class DisabledModule(models.Model):

@@ -1,6 +1,5 @@
 from django.shortcuts import render
-from django.template import RequestContext
-from .forms import LoginForm
+from .forms import LoginForm, RegisterForm
 from django.http import HttpResponseRedirect
 from django.contrib.auth import logout
 from django.utils.translation import ugettext as _
@@ -13,18 +12,15 @@ def login_view(request):
     :param request:
     :return:
     """
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            form.login_user(request)
-            next = request.GET.get('next', None)
-            if next is not None:
-                return HttpResponseRedirect(next)
-            else:
-                # go to the front page if nothing is specified
-                return HttpResponseRedirect("/")
-    else:
-        form = LoginForm()
+    form = LoginForm(request.POST or None)
+    if form.is_valid():
+        form.login_user(request)
+        next = request.GET.get('next', None)
+        if next is not None:
+            return HttpResponseRedirect(next)
+        else:
+            # go to the front page if nothing is specified
+            return HttpResponseRedirect("/")
     return render(request, 'login/login.html', {'form': form})
 
 def logout_view(request):
@@ -38,4 +34,7 @@ def register(request):
     :param request:
     :return:
     """
-    return render(request, 'login/register.html')
+    form = RegisterForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+    return render(request, 'login/register.html', {'form': form})

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User, Permission, ContentType
-
+from solo.models import SingletonModel
 
 class UserExtension(models.Model):
     user = models.ForeignKey(User)
@@ -53,12 +53,10 @@ class SAWPermission(models.Model):
         return sawp.has_user_perm(perm_name)
 
 
-class DummyPermissionBase(models.Model):
+class DummyPermissionBase(SingletonModel):
     """
     This is used as base for our custom permissions
     """
-    def __init__(self, *args, **kwargs):
-        raise Exception("DummyModel cannot be instantiated")
 
     @classmethod
     def get_content_type(cls):
