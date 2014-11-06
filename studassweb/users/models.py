@@ -28,8 +28,8 @@ class SAWPermission(models.Model):
         :return: The requested SAWPermission
         """
         permission, created = Permission.objects.get_or_create(name=perm_name,
-                                                                    code_name=perm_name,
-                                                                    content_type=DummyPermissionBase)
+                                                                    codename=perm_name,
+                                                                    content_type=DummyPermissionBase.get_content_type())
         saw_permission, created = cls.objects.get_or_create(permission=permission)
         if description and (created or not saw_permission.description):
             saw_permission.description = description
@@ -60,4 +60,4 @@ class DummyPermissionBase(SingletonModel):
 
     @classmethod
     def get_content_type(cls):
-        return ContentType.get_for_model(cls)
+        return ContentType.objects.get(app_label="users", model="dummypermissionbase")
