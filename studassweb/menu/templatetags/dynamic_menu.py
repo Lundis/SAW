@@ -14,10 +14,6 @@ def render_menu(menu_name, active_tab, http_context):
     menu = Menu.objects.get(menu_name=menu_name)
     context = {'menuitems': menu.items(http_context['user']), 'active_tab': active_tab}
 
-    if menu_name == "main_menu":
-        context['login_menu'] = Menu.objects.get(menu_name="login_menu")
-
-
     if menu.template and menu.template.path != "":
         template_path = menu.template.path
     else:
