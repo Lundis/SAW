@@ -12,7 +12,7 @@ def display_menu(context, menu_name, active_tab):
 
 def render_menu(menu_name, active_tab, http_context):
     menu = Menu.objects.get(menu_name=menu_name)
-    context = {'menuitems': menu.items(), 'active_tab': active_tab}
+    context = {'menuitems': menu.items(http_context['user']), 'active_tab': active_tab}
 
     if menu_name == "main_menu":
         context['login_menu'] = Menu.objects.get(menu_name="login_menu")
@@ -32,5 +32,5 @@ def render_menu(menu_name, active_tab, http_context):
 
 @register.inclusion_tag('menu/login_menu.html', takes_context=True)
 def display_login_button(context):
-    items = Menu.objects.get(menu_name="login_menu").items()
+    items = Menu.objects.get(menu_name="login_menu").items(context['user'])
     return {'menuitems': items, 'user': context['user']}

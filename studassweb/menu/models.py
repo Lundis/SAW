@@ -36,8 +36,11 @@ class Menu(models.Model):
         items = ItemInMenu.objects.filter(menu=self)
         items.delete()
 
-    def items(self):
-        return [item.item for item in ItemInMenu.objects.filter(menu=self)]
+    def items(self, user=None):
+        return [item_in_menu.item for
+                item_in_menu in
+                ItemInMenu.objects.filter(menu=self)
+                if not user or item_in_menu.item.can_user_view(user)]
 
     @classmethod
     def get_or_none(cls, name):
@@ -103,7 +106,7 @@ class MenuItem(models.Model):
         """
         return cls.objects.filter(default_menu=menu_id)
 
-    def can_view(self, user):
+    def can_user_view(self, user):
         return not self.view_permission or self.view_permission.has_user_perm(user)
 
 
