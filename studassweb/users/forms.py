@@ -34,4 +34,10 @@ class LoginForm(forms.Form):
         login(request, user)
 
 class RegisterForm(forms.Form):
-    pass
+    user_name = forms.CharField(min_length=6, max_length=20)
+    first_name = forms.CharField(max_length=50)
+    last_name = forms.CharField(max_length=50)
+    email = forms.EmailField()
+    member = forms.CheckboxInput()
+    enrollment_year = forms.IntegerField()
+    graduation_year = forms.IntegerField()
