@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth import logout
 from django.utils.translation import ugettext as _
 
+
 def login_view(request):
     """
     Renders a login form.
@@ -23,10 +24,12 @@ def login_view(request):
             return HttpResponseRedirect("/")
     return render(request, 'login/login.html', {'form': form})
 
+
 def logout_view(request):
     if request.user.is_authenticated():
         logout(request)
     return HttpResponseRedirect('/')
+
 
 def register(request):
     """

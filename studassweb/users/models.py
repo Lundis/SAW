@@ -53,6 +53,7 @@ class SAWPermission(models.Model):
                                                                     codename=perm_name,
                                                                     content_type=DummyPermissionBase.get_content_type())
         saw_permission, created = cls.objects.get_or_create(permission=permission)
+        # if the description is empty of the object was created, add the description
         if description and (created or not saw_permission.description):
             saw_permission.description = description
             saw_permission.save()
@@ -60,7 +61,6 @@ class SAWPermission(models.Model):
 
     def _has_user_perm(self, user):
         """
-
         :return: True if the user has this permission
         """
         return user.is_superuser or \
@@ -84,8 +84,3 @@ class DummyPermissionBase(SingletonModel):
     @classmethod
     def get_content_type(cls):
         return ContentType.objects.get(app_label="users", model="dummypermissionbase")
-
-
-def has_permission(function, ):
-    def wrap(request, *args, **kwargs):
-        user = request['user']
