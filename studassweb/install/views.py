@@ -7,6 +7,7 @@ from users.forms import LoginForm
 from menu.logic import get_all_menu_items
 from menu.models import Menu, MenuItem
 from .models import InstallProgress
+from users.decorators import has_permission
 
 
 def welcome(request):
@@ -21,7 +22,7 @@ def welcome(request):
 
     return render(request, 'install/welcome.html', context)
 
-@login_required
+@has_permission("can_install")
 def association(request):
     form = AssociationForm(request.POST or None)
     if form.is_valid():
@@ -31,7 +32,7 @@ def association(request):
     context = {'form': form}
     return render(request, 'install/assoc.html', context)
 
-@login_required
+@has_permission("can_install")
 def modules(request):
     form = ModulesForm(request.POST or None, modules=settings.OPTIONAL_APPS)
     if form.is_valid():
@@ -42,7 +43,7 @@ def modules(request):
     context = {'form': form}
     return render(request, 'install/modules.html', context)
 
-@login_required
+@has_permission("can_install")
 def menu(request):
     form = MenuForm(request.POST or None)
     if form.is_valid():
@@ -92,7 +93,7 @@ def get_login_menu_items():
         print("login defaults: ", MenuItem.get_defaults(MenuItem.LOGIN_MENU))
         return MenuItem.get_defaults(MenuItem.LOGIN_MENU)
 
-@login_required
+@has_permission("can_install")
 def finished(request):
     InstallProgress.finish()
     context = {}

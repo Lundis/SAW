@@ -1,12 +1,34 @@
 from django.db import models
 from django.contrib.auth.models import User, Permission, ContentType
 from solo.models import SingletonModel
+from members.models import Member
 
 class UserExtension(models.Model):
     user = models.ForeignKey(User)
     # A field where the user can write a short text about themselves
-    description = models.TextField(max_length=1000)
-    link_to_homepage = models.CharField(max_length=400)
+    description = models.TextField(max_length=1000, blank=True, default="")
+    link_to_homepage = models.URLField(blank=True, default="")
+    member = models.ForeignKey(Member, null=True, blank=True, unique=True)
+
+    @classmethod
+    def create_user(cls, username, password, first_name, last_name, email,
+                    member=False, enrollment_year=None, graduation_year=None):
+        """
+        :return:
+        """
+        user = User.objects.create_user(username, email, password)
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
+        user_ext = UserExtension(user=user)
+        if member:
+            _member = Member(enrollment_year=enrollment_year, graduation_year=graduation_year)
+            _member.save()
+            user_ext.member = _member
+        user_ext.save()
+        return user_ext
+
+
 
 
 class LdapLink(models.Model):
@@ -36,21 +58,22 @@ class SAWPermission(models.Model):
             saw_permission.save()
         return saw_permission
 
-    def has_user_perm(self, user):
+    def _has_user_perm(self, user):
         """
 
         :return: True if the user has this permission
         """
-        return user.has_perm(self.permission.content_type.app_label + "." + self.permission.code_name)
+        return user.is_superuser or \
+               user.has_perm(self.permission.content_type.app_label + "." + self.permission.codename)
 
     @classmethod
     def has_user_perm(cls, user, perm_name):
         """
         :param user: User object
-        :param perm_name: Permission string
+        :param perm_name: permission string
         """
         sawp = cls.get_or_create(perm_name)
-        return sawp.has_user_perm(perm_name)
+        return sawp._has_user_perm(user)
 
 
 class DummyPermissionBase(SingletonModel):
@@ -61,3 +84,8 @@ class DummyPermissionBase(SingletonModel):
     @classmethod
     def get_content_type(cls):
         return ContentType.objects.get(app_label="users", model="dummypermissionbase")
+
+
+def has_permission(function, ):
+    def wrap(request, *args, **kwargs):
+        user = request['user']

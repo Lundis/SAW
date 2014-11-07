@@ -1,6 +1,7 @@
 {% extends 'base/base.html' %}
 {% load i18n %}
 
+
 {% block title %}
 {% trans "Register" %}
 {%  endblock %}
@@ -9,8 +10,18 @@
 
 {% block content %}
     {% load dynamic_menu %}
-    {% display_menu "main_menu" "" %}
+    {% display_menu "main_menu" "Register" %}
     <div class="container">
-        <p>A form for registering goes here!</p>
+    {% if form %}
+        <form action="/users/register/" method="post">
+            {% csrf_token %}
+            {% load bootstrap3 %}
+            {% bootstrap_form form %}
+            <input type="submit" value="Submit" />
+        </form>
+    {% else %}
+        {% trans "Thanks for registering" %}! <a href="/users/login/">{% trans "Log in here" %}.</a>
+    {% endif %}
+
     </div>
 {% endblock %}

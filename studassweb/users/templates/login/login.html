@@ -14,11 +14,12 @@
         {% if not user.is_authenticated %}
             <form action="/users/login/" method="post">
                 {% csrf_token %}
-                {{ form }}
+                {% load bootstrap3 %}
+                {% bootstrap_form form %}
                 <input type="submit" value="Submit" />
 
             </form>
-            <p>{% trans "Don't have an account? Register"%} <a href="register">{% trans "here" %}</a></p>
+            <p>{% trans "Don't have an account? Register"%} <a href="/users/register/">{% trans "here" %}</a></p>
         {% else %}
             <p>You are already logged on!</p>
         {% endif %}
