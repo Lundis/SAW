@@ -5,11 +5,20 @@ from django.contrib.auth.models import User
 
 class SiteConfiguration(SingletonModel):
     association_name = models.CharField(max_length=100, default='Site name')
+    association_founded = models.IntegerField(default=1900)
 
     @classmethod
     def instance(cls):
         obj, created = cls.objects.get_or_create()
         return obj
+
+    @classmethod
+    def founded(cls):
+        """
+
+        :return: The year this association was founded
+        """
+        return cls.instance().association_founded
 
 
 class DisabledModule(models.Model):
@@ -43,21 +52,7 @@ class DisabledModule(models.Model):
             pass
 
 
-class LdapLink(models.Model):
-    user = models.ForeignKey(User)
-    hostname = models.CharField(max_length=200)
-    username = models.CharField(max_length=50)
-
 class Comment(models.Model):
-    comment_text = models.TextField(max_length=400)
-    comment_created = models.DateTimeField('Date created')
-    comment_by_user = models.ForeignKey(LdapLink)
-
-class UserExtension(models.Model):
-    user = models.ForeignKey(User)
-    link_to_homepage = models.CharField(max_length=400)
-    enrollment_year = models.IntegerField() #does this need a default value?
-    graduated_year = models.IntegerField(default=0)# 0 if not graduated?
-
-
-
+    text = models.TextField(max_length=400)
+    created = models.DateTimeField('Date created')
+    author = models.ForeignKey(User)

@@ -7,16 +7,14 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0001_initial'),
+        ('base', '0003_delete_dummypermissionbase'),
     ]
 
     operations = [
-        migrations.RemoveField(
+        migrations.AddField(
             model_name='siteconfiguration',
-            name='login_menu',
-        ),
-        migrations.RemoveField(
-            model_name='siteconfiguration',
-            name='main_menu',
+            name='association_founded',
+            field=models.IntegerField(default=1900),
+            preserve_default=True,
         ),
     ]

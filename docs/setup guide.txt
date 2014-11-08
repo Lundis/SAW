@@ -1,0 +1,84 @@
+===== Install Python 3.4 =====
+
+Windows: Make sure that you select "set path variables" when you select the modules to be installed. It is disabled by default.
+
+If you're running Windows 7 or earlier, you need to restart the computer now.
+
+Other OSs: pip might not be installed along with Python. You then need to install it manually using some OS-specific method
+
+
+===== Install Django 1.7 =====
+
+After installing python 3.4 and pip (comes bundled with it on windows):
+    > pip install django==1.7
+
+===== Install Dependencies =====
+
+* django-solo
+    * This is for singleton models.
+    * url: https://github.com/lazybird/django-solo
+    * install instructions:
+        > pip install django-solo
+
+
+* pillow
+    * This is for ImageField.
+    * url: https://pillow.readthedocs.org/
+    * install instructions:
+        > pip install pillow
+
+
+* django-bootstrap3
+    * This is for bootstrap forms.
+    * url: https://github.com/dyve/django-bootstrap3
+    * install instructions:
+        > pip install django-bootstrap3
+
+
+===== Install Pycharm pro edition =====
+
+Students can get it for free by applying at http://www.jetbrains.com/student/
+
+Then download it at http://www.jetbrains.com/pycharm/
+
+
+===== Configure Pycharm =====
+
+1. Enable Django support
+
+    File -> Settings... -> Project Settings -> Django
+    * Django folder should be the folder containing manage.py (GITROOT/studassweb)
+    * The settings.py file is in the studassweb folder inside the Django folder.
+    * manage.py is in GITROOT/studassweb/manage.py
+
+    If Django doesn't show up in project settings, it probably means that you have the community edition of pyCharm.
+    Get the professional one.
+
+2. Get rid of false "undefined reference" errors when importing files from modules in the project
+
+    * Right-click the folder with manage.py.
+    * Mark Directory As -> Sources Root
+
+3. If you want to, you can remove the built-in git support
+
+    * File -> Settings -> Version Control
+    * click the line with git in the table and click the delete button
+
+
+
+===== Setting up the database and superuser =====
+
+* initiating/updating the database
+    1. Open your shell (windows: powershell) and go to the directory where your manage.py is. (or use pycharm's built-in command run features)
+    2. > python manage.py migrate
+
+        * If it fails, you will probably need to delete the database file (db.sqlite3) and rerun migrate
+
+* Creating a superuser
+    1. Open your shell and go to the manage.py directory
+    2. > python manage.py createsuperuser
+        * You will be asked for a username, email (optional) and password
+        * enter something simple. for instance "lundis", no email, password "a"
+
+
+REMEMBER TO VISIT LOCALHOST:8000/install to set up the menu.

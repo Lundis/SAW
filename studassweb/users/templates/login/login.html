@@ -12,14 +12,16 @@
     {% display_menu "main_menu" "Login" %}
     <div class="container">
         {% if not user.is_authenticated %}
-        <form action="/users/login/" method="post">
-            {% csrf_token %}
-            {{ form }}
-            <input type="submit" value="Submit" />
+            <form action="/users/login/" method="post">
+                {% csrf_token %}
+                {% load bootstrap3 %}
+                {% bootstrap_form form %}
+                <input type="submit" value="Submit" />
 
-        </form>
-    {% else %}
-        <p>You are already logged on!</p>
-    {% endif %}
+            </form>
+            <p>{% trans "Don't have an account? Register"%} <a href="/users/register/">{% trans "here" %}</a></p>
+        {% else %}
+            <p>You are already logged on!</p>
+        {% endif %}
     </div>
 {% endblock %}
