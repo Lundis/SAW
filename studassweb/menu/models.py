@@ -9,10 +9,16 @@ class MenuTemplate(models.Model):
         obj, created = cls.objects.get_or_create(path="menu/menu.html")
         return obj
 
+    def __str__(self):
+        return self.path
+
 
 class Menu(models.Model):
     menu_name = models.CharField(max_length=30, unique=True)
     template = models.ForeignKey(MenuTemplate, blank=True, null=True)
+
+    def __str__(self):
+        return self.menu_name
 
     def add_item(self, menu_item, index):
         """
@@ -76,6 +82,9 @@ class MenuItem(models.Model):
         # Don't allow duplicates
         unique_together = ('display_name', 'url')
 
+    def __str__(self):
+        return self.display_name + ": " + self.url
+
     @classmethod
     def get_or_create(cls, app_name, display_name, url, default_menu=NONE, permission=None):
         """
@@ -84,7 +93,7 @@ class MenuItem(models.Model):
         :param display_name:  The string that is shown to the user
         :param url: URL
         :param default_menu: The default menu this item belongs to
-        :param default_permission: The permission required to view this item. if None, anyone can view it
+        :param permission: The permission required to view this item. if None, anyone can view it
         :return:
         """
         item, created = cls.objects.get_or_create(app_name=app_name,
@@ -107,7 +116,7 @@ class MenuItem(models.Model):
         return cls.objects.filter(default_menu=menu_id)
 
     def can_user_view(self, user):
-        return not self.view_permission or self.view_permission.has_user_perm(user)
+        return not self.view_permission or self.view_permission._has_user_perm(user)
 
 
 class ItemInMenu(models.Model):
@@ -121,3 +130,6 @@ class ItemInMenu(models.Model):
     class Meta:
         unique_together = ('menu', 'item')
         ordering = ['menu', 'display_order']
+
+    def __str__(self):
+        return self.item + " in " + self.menu

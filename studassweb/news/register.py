@@ -6,7 +6,7 @@ def get_menu_items():
                                    "News",
                                    "/news/",
                                    MenuItem.MAIN_MENU,
-                                   SAWPermission("can_view_public_news"))]
+                                   SAWPermission.get_or_create("can_view_public_news"))]
 
 
 def get_urls():

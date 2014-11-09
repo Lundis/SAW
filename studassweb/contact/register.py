@@ -6,7 +6,7 @@ def get_menu_items():
                                    "Contact",
                                    "/contact/",
                                    MenuItem.MAIN_MENU,
-                                   SAWPermission("can_view_contact_form"))]
+                                   SAWPermission.get_or_create("can_view_contact_form"))]
 
 def get_urls():
     """

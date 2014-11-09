@@ -6,7 +6,7 @@ def get_menu_items():
                                    "Member Registry",
                                    "/members/",
                                    MenuItem.LOGIN_MENU,
-                                   SAWPermission("can_view_member_registry"))]
+                                   SAWPermission.get_or_create("can_view_member_registry"))]
 
 
 def get_urls():

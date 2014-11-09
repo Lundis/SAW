@@ -6,7 +6,7 @@ def get_menu_items():
                                    "Settings",
                                    "/settings/",
                                    MenuItem.LOGIN_MENU,
-                                   SAWPermission("can_view_settings"))]
+                                   SAWPermission.get_or_create("can_view_settings"))]
 
 def get_urls():
     """

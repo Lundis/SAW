@@ -6,7 +6,7 @@ def get_menu_items():
                                    "Home",
                                    "/",
                                    MenuItem.MAIN_MENU,
-                                   SAWPermission("can_view_frontpage"))]
+                                   SAWPermission.get_or_create("can_view_frontpage"))]
 
 def get_urls():
     """

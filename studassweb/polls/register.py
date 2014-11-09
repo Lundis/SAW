@@ -6,7 +6,7 @@ def get_menu_items():
                                    "Polls",
                                    "/polls/",
                                    MenuItem.NONE,
-                                   SAWPermission("can_view_polls"))]
+                                   SAWPermission.get_or_create("can_view_polls"))]
 
 def get_urls():
     """
