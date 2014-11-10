@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ContactForm',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', serialize=False, auto_created=True)),
+                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
                 ('title', models.CharField(max_length=100)),
                 ('message', models.TextField(max_length=500)),
                 ('from_email', models.EmailField(max_length=75)),
