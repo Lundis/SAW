@@ -3,10 +3,10 @@
 {% load i18n %}
 
 {% block inner_content %}
-<p>{% trans "Photo id: " %}{{ exam.photo_id }}></p>
-<p>{% trans "Course name: " %}<a href="/exams/course/"{{ exam.course_id }}>TODO course name</a> </p>
-<p>{% trans "Exam date: " %}{{ exam.exam_date }}</p>
-<p>{% trans "Examinator: " %}{{ exam.examinator }}</p>
-<p>{% trans "OCR: " %}{{ exam.ocr }}</p>
+<p>{% trans "Photo id: " %}{{ photo_id }}</p>
+<p>{% trans "Course name: " %}<a href="/exams/course/{{ course_id_id }}">{{ course_id_name }}</a> </p>
+<p>{% trans "Exam date: " %}{{ exam_date }}</p>
+<p>{% trans "Examinator: " %}<a href="/exams/examinator/{{ examinator_id }}">{{ examinator_name }}</a></p>
+<p>{% trans "OCR: " %}{{ ocr }}</p>
 
 {% endblock %}

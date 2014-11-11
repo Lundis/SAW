@@ -12,7 +12,7 @@ class ExamForm(forms.ModelForm):
 
     class Meta:
         model = SingleExam
-        fields = ('photo_id', 'course_id', 'ocr', 'exam_date', 'examinator')
+        fields = ('course_id', 'ocr', 'exam_date', 'examinator')
 
 
 class ExaminatorForm(forms.ModelForm):
@@ -27,3 +27,11 @@ class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = ('name',)
+
+#This should be in gallery
+from gallery.models import Photo
+class ImageForm(forms.ModelForm):
+
+    class Meta:
+        model = Photo
+        fields = ('image',)
