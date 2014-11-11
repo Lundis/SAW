@@ -14,3 +14,16 @@ def get_urls():
     :returns: A tuple of regexes describing what URLs the top-level URL dispatcher should associate with this module
     """
     return (r"^news/",)
+
+from users.groups import GUEST, MEMBER, BOARD_MEMBER
+
+def get_permissions():
+    """
+    :return: a list of tuples containing the permissions of this module and their default group
+    """
+    return (
+        ("can_view_public_news", GUEST),
+        ("can_view_member_news", MEMBER),
+        ("can_create_news", BOARD_MEMBER),
+        ("can_create_member_news", BOARD_MEMBER),
+    )

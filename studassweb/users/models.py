@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User, Permission, ContentType
+from django.contrib.auth.models import User, Permission, ContentType, Group
 from solo.models import SingletonModel
 from members.models import Member
 
@@ -62,7 +62,7 @@ class SAWPermission(models.Model):
                                                                     codename=perm_name,
                                                                     content_type=DummyPermissionBase.get_content_type())
         saw_permission, created = cls.objects.get_or_create(permission=permission)
-        # if the description is empty of the object was created, add the description
+        # if the description isn't "" and the object was created or it doesn't have a description, add the description
         if description and (created or not saw_permission.description):
             saw_permission.description = description
             saw_permission.save()
@@ -72,8 +72,11 @@ class SAWPermission(models.Model):
         """
         :return: True if the user has this permission
         """
-        return user.is_superuser or \
+        guest_group, created = Group.objects.get_or_create(name="Guest")
+        is_guest_permission = guest_group.permissions.filter(pk=self.permission.pk)
+        return user.is_superuser or is_guest_permission or \
                user.has_perm(self.permission.content_type.app_label + "." + self.permission.codename)
+
 
     @classmethod
     def has_user_perm(cls, user, perm_name):
@@ -83,6 +86,21 @@ class SAWPermission(models.Model):
         """
         sawp = cls.get_or_create(perm_name)
         return sawp._has_user_perm(user)
+
+    @classmethod
+    def add_perm_to_group(cls, perm, group):
+        """
+        Adds a permission to a group and at the same time creates a SAWPermission if it doesn't exist.
+        :param perm:
+        :param group: Either an Actual Group object or a string
+        """
+        if isinstance(group, Group):
+            group_instance = group
+        else:
+            group_instance = Group.objects.get(name=group)
+
+        sawp = SAWPermission.get_or_create(perm)
+        group_instance.permissions.add(sawp.permission)
 
 
 class DummyPermissionBase(SingletonModel):

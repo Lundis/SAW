@@ -1,6 +1,7 @@
 from .models import SAWPermission
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
+from users.groups import GUEST
 
 # http://stackoverflow.com/questions/9030255/django-add-optional-arguments-to-decorator
 def has_permission(permission):

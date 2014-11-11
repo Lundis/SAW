@@ -8,6 +8,7 @@ from menu.logic import get_all_menu_items
 from menu.models import Menu, MenuItem
 from .models import InstallProgress
 from users.decorators import has_permission
+from users.groups import setup_default_groups
 
 
 def welcome(request):
@@ -95,6 +96,7 @@ def get_login_menu_items():
 
 @has_permission("can_install")
 def finished(request):
+    setup_default_groups()
     InstallProgress.finish()
     context = {}
     return render(request, 'install/finished.html', context)

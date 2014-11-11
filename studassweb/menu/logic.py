@@ -7,9 +7,8 @@ def get_all_menu_items():
     """
     modules = get_modules_with("register", "get_menu_items")
     items = []
-    for module in modules:
+    for module, menu_items_func in modules:
         if DisabledModule.is_enabled(module):
-            menu_items_func = get_function_from_module(module, "register", "get_menu_items")
             menu_items = menu_items_func()
             if menu_items:
                 items += menu_items
