@@ -6,7 +6,7 @@ def get_menu_items():
                                    "Info",
                                    "/info/",
                                    MenuItem.MAIN_MENU,
-                                   SAWPermission("can_view_public_info_pages"))]
+                                   SAWPermission.get_or_create("can_view_public_info_pages"))]
 
 def get_urls():
     """

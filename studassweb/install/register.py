@@ -6,7 +6,7 @@ def get_menu_items():
                                    "Install",
                                    "/install/",
                                    MenuItem.LOGIN_MENU,
-                                   SAWPermission("can_install"))]
+                                   SAWPermission.get_or_create("can_install"))]
 
 def get_urls():
     """

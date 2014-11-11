@@ -10,6 +10,9 @@ class UserExtension(models.Model):
     link_to_homepage = models.URLField(blank=True, default="")
     member = models.ForeignKey(Member, null=True, blank=True, unique=True)
 
+    def __str__(self):
+        return self.user.username
+
     @classmethod
     def create_user(cls, username, password, first_name, last_name, email,
                     member=False, enrollment_year=None, graduation_year=None):
@@ -36,6 +39,9 @@ class LdapLink(models.Model):
     hostname = models.CharField(max_length=200)
     username = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.user.username + ": " + self.username + "@" + self.hostname
+
 
 class SAWPermission(models.Model):
     """
@@ -43,6 +49,9 @@ class SAWPermission(models.Model):
     """
     permission = models.ForeignKey(Permission, primary_key=True)
     description = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.permission.codename
 
     @classmethod
     def get_or_create(cls, perm_name, description=None):

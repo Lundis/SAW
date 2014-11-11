@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Comment',
             fields=[
-                ('id', models.AutoField(auto_created=True, verbose_name='ID', serialize=False, primary_key=True)),
+                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
                 ('text', models.TextField(max_length=400)),
                 ('created', models.DateTimeField(verbose_name='Date created')),
                 ('author', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='DisabledModule',
             fields=[
-                ('id', models.AutoField(auto_created=True, verbose_name='ID', serialize=False, primary_key=True)),
+                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
                 ('app_name', models.CharField(max_length=50, unique=True)),
             ],
             options={
@@ -37,8 +37,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='SiteConfiguration',
             fields=[
-                ('id', models.AutoField(auto_created=True, verbose_name='ID', serialize=False, primary_key=True)),
+                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
                 ('association_name', models.CharField(max_length=100, default='Site name')),
+                ('association_founded', models.IntegerField(default=1900)),
             ],
             options={
                 'abstract': False,
