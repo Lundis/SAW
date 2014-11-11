@@ -1,0 +1,14 @@
+{% extends 'base/base.html' %}
+{% load i18n %}
+
+{% block title %}
+{% trans "Polls" %}
+{%  endblock %}
+
+{% block content %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Polls" %}
+    <div class="container">
+        {% block inner_content %}{% endblock %}
+    </div>
+{% endblock %}
