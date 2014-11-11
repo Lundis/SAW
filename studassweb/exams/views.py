@@ -11,7 +11,10 @@ Don't use this as an example.
 """
 
 def main(request):
-    return HttpResponseNotFound('main(): function not implemented')
+    exams = SingleExam.objects.filter()
+    return render(request, 'view_main.html',
+                  {'exams': exams},)
+
 
 
 def view_exam(request,exam_id):
