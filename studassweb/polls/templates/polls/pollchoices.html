@@ -4,8 +4,8 @@
 
 {% block inner_content %}
 <div>
-	<p>{% trans "Poll question" %}?</p> #Merge this to pollquestion somehow
-	{% for choice in choices %} #use choices here
+	<p>{% trans "Poll question" %}?</p>
+	{% for choice in choices %}
 		<a href="{{ forloop.counter0 }}">{{ choice }}</a>
 	{% endfor %}
 </div>
