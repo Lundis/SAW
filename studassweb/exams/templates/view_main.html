@@ -1,0 +1,14 @@
+{% extends "example/base.html" %}
+
+{% load i18n %}
+
+{% block inner_content %}
+    {% for exam in exams %}
+		<p><a href="/exams/exam/{{ exam.id }}">{{ exam.course_id.name }}:{{ exam.id }}</a></p>
+	{% endfor %}
+
+
+    <p><a href="/exams/add_exam/">{% trans "Add new exam" %}</a> |
+    <a href="/exams/add_course/">{% trans "Add new course" %}</a> |
+    <a href="/exams/add_examinator/">{% trans "Add new examinator" %}</a></p>
+{% endblock %}

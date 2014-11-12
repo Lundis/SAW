@@ -5,23 +5,16 @@
 
 
 {% block progress_bar %}
-    {% for stage in stages %}
-        <li {% if forloop.counter0 == current_stage_index %} class="active" {% endif %}>
-            <a>
-                {{ stage.1 }}
-                {% if forloop.counter0 < current_stage_index %}
-                    <span class="glyphicon glyphicon-ok"></span>
-                {% endif %}
-            </a>
-        </li>
-    {% endfor %}
+    {% load install_progress_bar %}
+    {% display_progress_bar "Finished" %}
 {% endblock %}
 
 {% block content %}
     <div class="install-content">
 
         <h1>{% trans 'Congratulations!' %}</h1>
-        <p> {% trans 'You have successfully set up your own website.' %}!</p>
+        <p> {% trans 'You have successfully set up your own website' %}!</p>
+        <p> {% trans 'Please restart the server if you made any changes to the modules' %}!</p>
         <a href="/"><p>{% trans 'Click here to check it out!' %}</p></a>
 
         <a href="menu"><button type="button" class="btn btn-primary">

@@ -1,0 +1,14 @@
+{% extends 'base/base.html' %}
+{% load i18n %}
+
+{% block title %}
+{% trans "Exams" %}
+{%  endblock %}
+
+{% block content %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Exams" %}
+    <div class="container">
+        {% block inner_content %}{% endblock %}
+    </div>
+{% endblock %}

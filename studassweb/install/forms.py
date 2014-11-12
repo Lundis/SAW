@@ -2,7 +2,8 @@ from django import forms
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from base.models import SiteConfiguration, DisabledModule
-from menu.models import MenuItem, Menu, MenuTemplate
+from menu.models import MenuItem, Menu
+import datetime
 
 import re
 
@@ -10,13 +11,16 @@ import re
 
 class AssociationForm(forms.Form):
     name = forms.CharField(label=_('Association name'))
+    founded = forms.IntegerField(label=_('Founded year'), min_value=0, max_value=datetime.datetime.now().year)
 
     def __init__(self, *args, **kwargs):
         super(AssociationForm, self).__init__(*args, **kwargs)
         self.fields['name'].initial = SiteConfiguration.instance().association_name
+        self.fields['founded'].initial = SiteConfiguration.founded()
 
     def clean(self):
         #TODO: check that the name is short enough
+        #TODO: check that the year makes sense
         pass
 
     def apply(self):
@@ -26,6 +30,7 @@ class AssociationForm(forms.Form):
         """
         site_config = SiteConfiguration.instance()
         site_config.association_name = self.cleaned_data['name']
+        site_config.association_founded = self.cleaned_data['founded']
         site_config.save()
 
 

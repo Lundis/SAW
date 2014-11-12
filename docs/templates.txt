@@ -1,6 +1,6 @@
 ===== Statement of purpose =====
 
-	This document describes the template structure of this project
+	This document describes the template structure of this project. THIS IS OUTDATED!!
 
 ===== Base Template =====
 

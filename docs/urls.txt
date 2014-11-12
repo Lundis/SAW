@@ -1,6 +1,6 @@
 ===== Statement of Purpose =====
 
-	This document describes how the URL structure work in this project
+	This document describes how the URL structure work in this project. TODO: describe registering for the top dispatcher.
 
 ===== Top dispatcher =====
 	At the top of the URL dispatcher chain is studassweb/urls.py. It delegates HTTP requests to the right module.

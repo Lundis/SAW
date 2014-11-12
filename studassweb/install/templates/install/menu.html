@@ -5,16 +5,8 @@
 
 
 {% block progress_bar %}
-    {% for stage in stages %}
-        <li {% if forloop.counter0 == current_stage_index %} class="active" {% endif %}>
-            <a>
-                {{ stage.1 }}
-                {% if forloop.counter0 < current_stage_index %}
-                    <span class="glyphicon glyphicon-ok"></span>
-                {% endif %}
-            </a>
-        </li>
-    {% endfor %}
+    {% load install_progress_bar %}
+    {% display_progress_bar "Menu" %}
 {% endblock %}
 
 
@@ -25,8 +17,13 @@
             <div class="panel-heading">{% trans "Main Menu" %}!</div>
             <div class="panel-body">
                 <div class="btn-toolbar">
-                    <div id="install-menu-container" class="btn-group connected-sort"></div>
-
+                    <div id="install-menu-container" class="btn-group connected-sort">
+                        {% for menu_item in menu_items %}
+                            <li id="menu-item-{{ menu_item.id }}" class="btn btn-primary install-menu-item">
+                                {{ menu_item.display_name }}
+                            </li>
+                        {% endfor %}
+                    </div>
                     <div class="btn-group">
                         <div class="btn btn-primary disabled">
                             Login
@@ -40,8 +37,13 @@
             <div class="panel-heading">{% trans "Login menu items. These will be visible in a dropdown menu after the user has logged on." %}</div>
             <div class="panel-body">
                 <div class="btn-toolbar">
-                    <div id="install-login-container" class="btn-group connected-sort"></div>
-
+                    <div id="install-login-container" class="btn-group connected-sort">
+                        {% for menu_item in login_items %}
+                            <li id="menu-item-{{ menu_item.id }}" class="btn btn-primary install-menu-item">
+                                {{ menu_item.display_name }}
+                            </li>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -53,7 +55,7 @@
             <div class="panel-body">
 
                 <ul id="install-available-container" class="btn-group connected-sort">
-                    {% for menu_item in menu_items %}
+                    {% for menu_item in available_items %}
                         <li id="menu-item-{{ menu_item.id }}" class="btn btn-primary install-menu-item">
                             {{ menu_item.display_name }}
                         </li>
@@ -95,14 +97,23 @@ function updateHiddenFormFields() {
     }
     new_menu_items = document.getElementById("install-menu-container").childNodes;
     for (i = 0; i < new_menu_items.length; i++) {
-        menu_id = "main-" + new_menu_items[i].getAttribute("id");
-        add_hidden_input(menu_id, i);
+        try {
+            menu_id = "main-" + new_menu_items[i].getAttribute("id");
+            add_hidden_input(menu_id, i);
+        } catch(e) {
+            // ignore error because it is weird and sucks and shouldn't exist
+        }
+
     }
 
     new_login_items = document.getElementById("install-login-container").childNodes;
     for (i = 0; i < new_login_items.length; i++) {
-        menu_id  = "login-" + new_login_items[i].getAttribute("id");
-        add_hidden_input(menu_id, i);
+        try {
+            menu_id  = "login-" + new_login_items[i].getAttribute("id");
+            add_hidden_input(menu_id, i);
+        } catch(e) {
+            // ignore error because it is weird and sucks and shouldn't exist
+        }
     }
 }
 
@@ -122,8 +133,14 @@ $(function() {
     }).disableSelection();
 });
 
-$(".install-menu-item").click(function(event) {
-    if (event.target.parentNode.id == "install-menu-container") {
+$(".install-menu-item").click(click_handler);
+
+function click_handler(event) {
+    // workaround for firefox's double-event firing
+    var is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+    if (is_firefox) {
+        // do nothing
+    } else if (event.target.parentNode.id == "install-menu-container") {
 
         document.getElementById("install-menu-container").removeChild(event.target);
         document.getElementById("install-login-container").appendChild(event.target);
@@ -138,7 +155,7 @@ $(".install-menu-item").click(function(event) {
         document.getElementById("install-available-container").removeChild(event.target);
         document.getElementById("install-menu-container").appendChild(event.target);
     }
-});
+}
 
 </script>
 {% endblock %}

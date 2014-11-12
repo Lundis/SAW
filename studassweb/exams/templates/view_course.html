@@ -1,0 +1,8 @@
+{% extends "example/base.html" %}
+
+{% load i18n %}
+
+{% block inner_content %}
+<p>{% trans "Course name: " %}{{ name }}</p>
+
+{% endblock %}
