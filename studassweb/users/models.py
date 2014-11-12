@@ -4,6 +4,7 @@ from solo.models import SingletonModel
 from members.models import Member
 from base.utils import IllegalArgumentException
 
+
 class UserExtension(models.Model):
     user = models.ForeignKey(User)
     # A field where the user can write a short text about themselves
@@ -83,15 +84,18 @@ class SAWPermission(models.Model):
                user.has_perm(self.permission.content_type.app_label + "." + self.permission.codename)
 
 
+    #TODO: move this out of the class
     @classmethod
     def has_user_perm(cls, user, perm_name):
         """
         :param user: User object
         :param perm_name: permission string
         """
+        # TODO: dont create
         sawp = cls.get_or_create(perm_name)
         return sawp._has_user_perm(user)
 
+    # TODO: move this out of the class
     @classmethod
     def add_perm_to_group(cls, perm, group):
         """
