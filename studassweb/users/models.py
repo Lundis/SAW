@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User, Permission, ContentType, Group
 from solo.models import SingletonModel
 from members.models import Member
+from base.utils import IllegalArgumentException
 
 class UserExtension(models.Model):
     user = models.ForeignKey(User)
@@ -15,7 +16,7 @@ class UserExtension(models.Model):
 
     @classmethod
     def create_user(cls, username, password, first_name, last_name, email,
-                    member=False, enrollment_year=None, graduation_year=None):
+                    member=False, enrollment_year=None, graduation_year=0):
         """
         :return:
         """
@@ -25,6 +26,10 @@ class UserExtension(models.Model):
         user.save()
         user_ext = UserExtension(user=user)
         if member:
+            if not enrollment_year:
+                raise IllegalArgumentException("if the user is a member, enrollment year must be specified")
+            if not graduation_year:
+                graduation_year = 0
             _member = Member(enrollment_year=enrollment_year, graduation_year=graduation_year)
             _member.save()
             user_ext.member = _member
