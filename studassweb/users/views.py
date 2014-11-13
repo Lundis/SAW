@@ -22,7 +22,7 @@ def login_view(request):
         else:
             # go to the front page if nothing is specified
             return HttpResponseRedirect("/")
-    return render(request, 'login/login.html', {'form': form})
+    return render(request, 'users/login.html', {'form': form})
 
 
 def logout_view(request):
@@ -40,5 +40,5 @@ def register(request):
     form = RegisterForm(request.POST or None)
     if form.is_valid():
         form.save()
-        return render(request, 'login/register.html')
-    return render(request, 'login/register.html', {'form': form})
+        return render(request, 'users/register.html')
+    return render(request, 'users/register.html', {'form': form})
