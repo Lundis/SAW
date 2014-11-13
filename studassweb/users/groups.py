@@ -1,6 +1,6 @@
 from django.contrib.auth.models import Group
 from base.utils import IllegalArgumentException, get_modules_with
-from users.models import SAWPermission
+from users.permissions import add_perm_to_group
 
 GUEST = "Guest"
 LOGGED_ON = "Logged On"
@@ -32,7 +32,7 @@ def setup_default_groups():
                                      "\" wants to join a non-existing default group \"" +
                                      group + "\"")
                 if group_index != -1:
-                    SAWPermission.add_perm_to_group(perm, groups[group_index])
+                    add_perm_to_group(perm, groups[group_index])
 
 
 def is_perm_in_groups(perm, groups):

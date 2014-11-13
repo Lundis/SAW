@@ -74,7 +74,7 @@ class SAWPermission(models.Model):
             saw_permission.save()
         return saw_permission
 
-    def _has_user_perm(self, user):
+    def has_user_perm(self, user):
         """
         :return: True if the user has this permission
         """
@@ -82,34 +82,6 @@ class SAWPermission(models.Model):
         is_guest_permission = guest_group.permissions.filter(pk=self.permission.pk)
         return user.is_superuser or is_guest_permission or \
                user.has_perm(self.permission.content_type.app_label + "." + self.permission.codename)
-
-
-    #TODO: move this out of the class
-    @classmethod
-    def has_user_perm(cls, user, perm_name):
-        """
-        :param user: User object
-        :param perm_name: permission string
-        """
-        # TODO: dont create
-        sawp = cls.get_or_create(perm_name)
-        return sawp._has_user_perm(user)
-
-    # TODO: move this out of the class
-    @classmethod
-    def add_perm_to_group(cls, perm, group):
-        """
-        Adds a permission to a group and at the same time creates a SAWPermission if it doesn't exist.
-        :param perm:
-        :param group: Either an Actual Group object or a string
-        """
-        if isinstance(group, Group):
-            group_instance = group
-        else:
-            group_instance = Group.objects.get(name=group)
-
-        sawp = SAWPermission.get_or_create(perm)
-        group_instance.permissions.add(sawp.permission)
 
 
 class DummyPermissionBase(SingletonModel):

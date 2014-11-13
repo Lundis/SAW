@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from install.forms import AssociationForm, ModulesForm, MenuForm
 from users.forms import LoginForm
+from users.models import SAWPermission
 from menu.logic import get_all_menu_items
 from menu.models import Menu, MenuItem
 from .models import InstallProgress
@@ -12,6 +12,8 @@ from users.groups import setup_default_groups
 
 
 def welcome(request):
+    # create the can_install permission if it doesn't exist
+    SAWPermission.get_or_create("can_install", "Allows you to use the installation wizard")
     context = {}
     if not request.user.is_authenticated():
         login_form = LoginForm(request.POST or None)

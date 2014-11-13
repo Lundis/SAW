@@ -116,7 +116,10 @@ class MenuItem(models.Model):
         return cls.objects.filter(default_menu=menu_id)
 
     def can_user_view(self, user):
-        return not self.view_permission or self.view_permission._has_user_perm(user)
+        """
+        :return: True if this item has no associated permission or if the user has the permission
+        """
+        return not self.view_permission or self.view_permission.has_user_perm(user)
 
 
 class ItemInMenu(models.Model):
