@@ -1,0 +1,8 @@
+{% load i18n %}
+<ul class="nav nav-pills nav-stacked" id="settings-menu">
+    {% for item in menuitems %}
+        <li {% if item.display_name == active_tab %} class="active" {% endif %}>
+            <a href="{{ item.url }}">{% trans item.display_name %}</a>
+        </li>
+    {% endfor %}
+</ul>

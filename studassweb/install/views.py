@@ -9,6 +9,7 @@ from menu.models import Menu, MenuItem
 from .models import InstallProgress
 from users.decorators import has_permission
 from users.groups import setup_default_groups
+from settings.setup import setup_settings
 
 
 def welcome(request):
@@ -41,6 +42,8 @@ def modules(request):
     if form.is_valid():
         form.apply()
         InstallProgress.modules_set()
+        # create settings menu
+        setup_settings()
         return HttpResponseRedirect('menu')
 
     context = {'form': form}
@@ -85,7 +88,7 @@ def get_main_menu_items():
 
 def get_login_menu_items():
     """
-    :return: a list of menu items that represents either the curren login menu or the default login menu
+    :return: a list of menu items that represents either the current login menu or the default login menu
     """
     login_menu = Menu.get_or_none("login_menu")
     if login_menu:

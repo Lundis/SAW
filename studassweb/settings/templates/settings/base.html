@@ -6,7 +6,22 @@
 {% endblock %}
 
 {% block content %}
-<div>
-	<p>{% trans "Settings will come here." %}</p>
-</div>
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Login" %}
+    <div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-2" style="border-right: 1px solid rgb(150, 150, 150);">
+                    {% block settings_menu %}
+                        {% display_menu "settings_menu" "" %}
+                    {% endblock %}
+                </div>
+                <div class="col-md-8">
+                    {% block inner_content %}
+                        <h1>Welcome to the settings page.</h1>
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
