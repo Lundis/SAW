@@ -1,12 +1,9 @@
 from django.shortcuts import render
 
+
 def view_gallery(request):
-    """
-    Renders the albums in the order defined by a GET variable
-    :param request:
-    :return:
-    """
-    pass
+    return render(request, 'gallery/view_gallery.html')
+
 
 def view_album(request, id):
     """
