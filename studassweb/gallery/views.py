@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+from gallery.forms import *
 
 def view_gallery(request):
     return render(request, 'gallery/view_gallery.html')
@@ -21,13 +21,13 @@ def edit_album(request, id):
     """
     pass
 
-def create_album(request):
-    """
-    Renders the album form and verifies the form on submit
-    :param request:
-    :return:
-    """
-    pass
+def create_album(request, id=-1):
+    form = AlbumForm
+
+    context = {'form': form}
+    return render(request, 'gallery/create_album.html', context)
+
+
 
 def view_picture(request, id):
     """
