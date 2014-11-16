@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block inner_content %}
-<p>{% trans "Photo id: " %}{{ photo_id }}</p>
+<p>{% trans "Image: " %}<img src="{{ image.url }}"></p>
 <p>{% trans "Course name: " %}<a href="/exams/course/{{ course_id_id }}">{{ course_id_name }}</a> </p>
 <p>{% trans "Exam date: " %}{{ exam_date }}</p>
 <p>{% trans "Examinator: " %}<a href="/exams/examinator/{{ examinator_id }}">{{ examinator_name }}</a></p>

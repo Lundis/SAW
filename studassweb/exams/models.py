@@ -12,7 +12,7 @@ class Examinator(models.Model):
 
 
 class SingleExam(models.Model):
-    photo_id = models.ForeignKey(Photo)
+    image = models.ImageField(upload_to='exams_files')
     course_id = models.ForeignKey(Course)
     ocr = models.TextField()
     exam_date = models.DateTimeField()

@@ -3,11 +3,13 @@ from django.contrib import admin
 from base.utils import get_modules_with
 from base.models import DisabledModule
 from install.models import InstallProgress
-
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
-)
+)\
++ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) #development!
 
 if not InstallProgress.is_finished():
     urlpatterns += (
