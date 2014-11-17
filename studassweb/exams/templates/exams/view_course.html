@@ -3,6 +3,10 @@
 {% load i18n %}
 
 {% block inner_content %}
-<p>{% trans "Course name: " %}{{ name }}</p>
-
+    <h1>{{ name }}</h1>
+    {% for exam in exams %}
+		<p><a href="/exams/exam/{{ exam.id }}">{{ exam.exam_date|date:"Y-m-d" }} : {{ exam.examinator.name }}</a></p>
+    {% empty %}
+        <p>No courses found!</p>
+    {% endfor %}
 {% endblock %}

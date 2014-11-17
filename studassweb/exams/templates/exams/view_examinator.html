@@ -3,8 +3,10 @@
 {% load i18n %}
 
 {% block inner_content %}
-<p><h1>{{ name }}</h1></p>
- {% for exam in exams %}
-		<p><a href="/exams/exam/{{ exam.id }}">{{ exam.course_id.name }} : {{ exam.exam_date|date:"Y-m-d" }}</a></p>
-	{% endfor %}
+    <h1>{{ name }}</h1>
+    {% for exam in exams %}
+		<p><a href="/exams/exam/{{ exam.id }}">{{ exam.exam_date|date:"Y-m-d" }} : {{ exam.course_id.name }}</a></p>
+	{% empty %}
+        <p>No courses found!</p>
+    {% endfor %}
 {% endblock %}
