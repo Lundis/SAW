@@ -48,14 +48,13 @@ def view_course(request, course_id):
 def add_edit_exam(request, exam_id=-1):
     form = ExamForm()
     examfile_factory = inlineformset_factory(SingleExam, ExamFile)
-    exam = SingleExam
     try:
         exam = SingleExam.objects.get(id=exam_id)
         form = ExamForm(instance=exam)
         fileformset = examfile_factory(instance=exam)
     except SingleExam.DoesNotExist:
         fileformset = examfile_factory()
-        pass
+        exam = None
 
     if request.method == 'POST':
         form = ExamForm(request.POST, instance=exam)
@@ -78,30 +77,34 @@ def add_edit_exam(request, exam_id=-1):
 
 
 def add_edit_examinator(request, examinator_id=-1):
-    form = ExaminatorForm(request.POST or None)
-    if form.is_valid():
-        tmp = form.save()
-        return HttpResponseRedirect('/exams/examinator/' + str(tmp.id))
     try:
         examinator = Examinator.objects.get(id=examinator_id)
-        form = ExaminatorForm(examinator)
     except Examinator.DoesNotExist:
-        pass
+        examinator = None
+    form = ExaminatorForm(instance=examinator)
+
+    if request.method == 'POST':
+        form = ExaminatorForm(request.POST, instance=examinator)
+        if form.is_valid():
+            tmp = form.save()
+            return HttpResponseRedirect('/exams/examinator/' + str(tmp.id))
 
     context = {'form': form}
     return render(request, 'exams/add_edit_examinator.html', context)
 
 
 def add_edit_course(request, course_id=-1):
-    form = CourseForm(request.POST or None)
-    if form.is_valid():
-        tmp = form.save()
-        return HttpResponseRedirect('/exams/course/' + str(tmp.id))
     try:
-        course = Examinator.objects.get(id=course_id)
-        form = CourseForm(course)
-    except Examinator.DoesNotExist:
-        pass
+        course = Course.objects.get(id=course_id)
+    except Course.DoesNotExist:
+        course = None
+    form = CourseForm(instance=course)
+
+    if request.method == 'POST':
+        form = CourseForm(request.POST, instance=course)
+        if form.is_valid():
+            tmp = form.save()
+            return HttpResponseRedirect('/exams/course/' + str(tmp.id))
 
     context = {'form': form}
     return render(request, 'exams/add_edit_course.html', context)
