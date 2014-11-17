@@ -5,6 +5,7 @@ from gallery.models import *
 from exams.forms import *
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from datetime import datetime
+from django.forms.models import inlineformset_factory
 """
 Note that this class is completely untested and might contain horribly wrong code.
 Don't use this as an example.
@@ -20,19 +21,21 @@ def main(request):
 def view_exam(request,exam_id):
     try:
         exam = SingleExam.objects.get(id=exam_id)
+        images = ExamFile.objects.filter(exam_id=exam_id)
+
         return render(request, 'exams/view_exam.html',
-            {'id': exam.id, 'image': exam.image, 'course_id_id': exam.course_id.id,'course_id_name': exam.course_id.name,
+            {'id': exam.id, 'images': images, 'course_id_id': exam.course_id.id,'course_id_name': exam.course_id.name,
             'ocr': exam.ocr, 'exam_date': exam.exam_date, 'examinator_id': exam.examinator.id, 'examinator_name': exam.examinator.name},)
     except SingleExam.DoesNotExist:
         return HttpResponseNotFound('No exam with that id found')
 
 
 def view_examinator(request,examinator_id):
-    #TODO show all exams by examinator
     try:
         examinator = Examinator.objects.get(id=examinator_id)
+        exams = SingleExam.objects.filter(examinator=examinator_id)
         return render(request, 'exams/view_examinator.html',
-            {'id': examinator.id, 'name': examinator.name},)
+            {'id': examinator.id, 'name': examinator.name, 'exams': exams},)
     except Examinator.DoesNotExist:
         return HttpResponseNotFound('No examinator with that id found')
 
@@ -48,22 +51,34 @@ def view_course(request,course_id):
 
 
 def add_edit_exam(request, exam_id=-1):
-    print("in add_edit_exam")
-    form = ExamForm
-    if request.method == 'POST':
-        form = ExamForm(request.POST, request.FILES)
-        if form.is_valid():
-            print("valid shit")
-            tmp_exam = form.save()
-            return HttpResponseRedirect('/exams/exam/' + str(tmp_exam.id))
+    form = ExamForm()
+    examfile_factory = inlineformset_factory(SingleExam, ExamFile)
+
     try:
         exam = SingleExam.objects.get(id=exam_id)
         form = ExamForm(exam)
+        fileformset = examfile_factory(instance=exam)
     except SingleExam.DoesNotExist:
-        print("SingleExam DoesNotExist")
+        fileformset = examfile_factory()
         pass
 
-    context = {'form': form}
+    if request.method == 'POST':
+        form = ExamForm(request.POST)
+
+        fileFormSet = examfile_factory(request.POST, request.FILES)
+        if form.is_valid() and fileFormSet.is_valid():
+            tmpexam = form.save()
+
+            for f in fileFormSet.save(commit=False):
+                f.exam_id = tmpexam
+                f.save()
+
+
+            return HttpResponseRedirect('/exams/exam/' + str(tmpexam.id))
+
+
+
+    context = {'form': form, 'filesformset': fileformset}
     return render(request, 'exams/add_edit_exam.html', context)
 
 

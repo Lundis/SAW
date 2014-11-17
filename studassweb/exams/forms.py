@@ -12,7 +12,7 @@ class ExamForm(forms.ModelForm):
 
     class Meta:
         model = SingleExam
-        fields = ('course_id', 'examinator', 'ocr', 'exam_date', 'image')
+        fields = ('course_id', 'examinator', 'exam_date')
 
 
 class ExaminatorForm(forms.ModelForm):
@@ -27,3 +27,10 @@ class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = ('name',)
+
+
+class ExamFileForm(forms.ModelForm):
+
+    class Meta:
+        model = ExamFile
+        fields = ('image',)

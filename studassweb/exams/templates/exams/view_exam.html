@@ -3,9 +3,13 @@
 {% load i18n %}
 
 {% block inner_content %}
-<p>{% trans "Image: " %}<img src="{{ image.url }}"></p>
+<p>{% trans "Images: " %}
+    {% for examfile in images %}
+        <img src="{{ examfile.image.url }}">
+    {% endfor %}
+</p>
 <p>{% trans "Course name: " %}<a href="/exams/course/{{ course_id_id }}">{{ course_id_name }}</a> </p>
-<p>{% trans "Exam date: " %}{{ exam_date }}</p>
+<p>{% trans "Exam date: " %}{{ exam_date|date:"Y-m-d" }}</p>
 <p>{% trans "Examinator: " %}<a href="/exams/examinator/{{ examinator_id }}">{{ examinator_name }}</a></p>
 <p>{% trans "OCR: " %}{{ ocr }}</p>
 
