@@ -47,27 +47,27 @@ def view_course(request, course_id):
 
 def add_edit_exam(request, exam_id=-1):
     form = ExamForm()
-    examfile_factory = inlineformset_factory(SingleExam, ExamFile)
+    examfile_factory = inlineformset_factory(SingleExam, ExamFile, fields=('id', 'image',), extra=1, can_delete=True)
     try:
         exam = SingleExam.objects.get(id=exam_id)
         form = ExamForm(instance=exam)
-        fileformset = examfile_factory(instance=exam)
+        fileformset = examfile_factory(instance=exam, prefix='dynamix')
     except SingleExam.DoesNotExist:
-        fileformset = examfile_factory()
+        fileformset = examfile_factory(prefix='dynamix')
         exam = None
 
     if request.method == 'POST':
         form = ExamForm(request.POST, instance=exam)
 
-        fileFormSet = examfile_factory(request.POST, request.FILES, instance=exam)
-        if form.is_valid() and fileFormSet.is_valid():
+        fileformset = examfile_factory(request.POST, request.FILES, instance=exam, prefix='dynamix')
+        if form.is_valid() and fileformset.is_valid():
             tmpexam = form.save()
 
-            for obj in fileFormSet.save(commit=False):
+            for obj in fileformset.save(commit=False):
                 obj.exam_id = tmpexam
                 obj.save()
 
-            for obj in fileFormSet.deleted_objects:
+            for obj in fileformset.deleted_objects:
                 obj.delete()
 
             return HttpResponseRedirect('/exams/exam/' + str(tmpexam.id))

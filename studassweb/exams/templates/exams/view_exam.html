@@ -1,4 +1,4 @@
-{% extends "example/base.html" %}
+{% extends "exams/base.html" %}
 
 {% load i18n %}
 
@@ -13,5 +13,5 @@
 <p>{% trans "Examinator: " %}<a href="/exams/examinator/{{ examinator_id }}">{{ examinator_name }}</a></p>
 <p>{% trans "OCR: " %}{{ ocr }}</p>
 
-<p><a href="/exams/edit_exam/{{ id }}">Edit this exam</a></p>
+<p><a href="/exams/edit_exam/{{ id }}">{% trans "Edit this exam" %}</a></p>
 {% endblock %}

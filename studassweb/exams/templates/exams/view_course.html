@@ -1,4 +1,4 @@
-{% extends "example/base.html" %}
+{% extends "exams/base.html" %}
 
 {% load i18n %}
 
@@ -7,8 +7,8 @@
     {% for exam in exams %}
 		<p><a href="/exams/exam/{{ exam.id }}">{{ exam.exam_date|date:"Y-m-d" }} : {{ exam.examinator.name }}</a></p>
     {% empty %}
-        <p>No courses found!</p>
+        <p>{% trans "No courses found!" %}</p>
     {% endfor %}
 
-    <p><a href="/exams/edit_course/{{ id }}">Edit this course</a></p>
+    <p><a href="/exams/edit_course/{{ id }}">{% trans "Edit this course"%}</a></p>
 {% endblock %}

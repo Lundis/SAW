@@ -1,14 +1,45 @@
-{% extends "example/base.html" %}
+{% extends "exams/base.html" %}
 
 {% load i18n %}
 {% load bootstrap3 %}
+{% load static %}
 
 {% block inner_content %}
-<form action="" method="post" enctype="multipart/form-data" >
+<form id="addEditExamForm" action="" method="post" enctype="multipart/form-data" >
     {% csrf_token %}
     {% bootstrap_form form %}
-    {% bootstrap_formset filesformset %}
-    <input type="submit" value="Submit" />
+    <div id="examfilesformset_all">
+        {% for f in filesformset.forms %}
+            <div class="examfilesformset_single">
+                {#  {% bootstrap_field f.image%} #}
+                {{ f.id }}
+                {{ f.image }}
+                {% if f.instance.pk %}
+                    {# {% bootstrap_field f.DELETE%} #}
+
+                    {{ f.DELETE }}
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    {{ filesformset.management_form }}
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">
+            {% trans "Submit" %}
+        </button>
+    {% endbuttons %}
 </form>
 
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static "js/base/jquery.formset.js" %}"></script>
+    <script type="text/javascript">
+    $(function() {
+        $('.examfilesformset_single').formset({
+            prefix: '{{ filesformset.prefix }}',
+            formCssClass: 'dynamic-formasdf'
+        });
+    })
+    </script>
 {% endblock %}
