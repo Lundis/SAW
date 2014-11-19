@@ -12,7 +12,7 @@ def get_urls():
 
 def get_permissions():
     """
-    :return: a list of tuples containing the permissions of this module and their default group
+    :return: a tuple of tuples containing the permissions of this module and their default group
     """
     return (
         ("can_view_profiles", MEMBER),
@@ -23,16 +23,16 @@ def get_permissions():
 
 
 def get_settings_items():
-    return [MenuItem.get_or_create("users",
+    return [MenuItem.get_or_create(__package__,
                                    "User",
-                                   "/settings/user",
+                                   "/settings/users/user",
                                    permission=SAWPermission.get_or_create("can_edit_profile")),
-            MenuItem.get_or_create("users",
+            MenuItem.get_or_create(__package__,
                                    "Permissions",
-                                   "/settings/permissions",
+                                   "/settings/users/permissions",
                                    permission=SAWPermission.get_or_create("can_edit_permissions")),
-            MenuItem.get_or_create("users",
+            MenuItem.get_or_create(__package__,
                                    "Login",
-                                   "/settings/login",
+                                   "/settings/users/login",
                                    permission=SAWPermission.get_or_create("can_edit_login_settings"))
     ]
