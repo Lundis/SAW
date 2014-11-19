@@ -1,6 +1,7 @@
 from django.contrib.auth.models import Group
 from base.utils import IllegalArgumentException, get_modules_with
 from users.permissions import add_perm_to_group
+from .models import SAWPermission
 
 GUEST = "Guest"
 LOGGED_ON = "Logged On"
@@ -41,6 +42,19 @@ def is_perm_in_groups(perm, groups):
             return True
     return False
 
+def get_permissions_in_group(group):
+    """
+    :param group: a group name or an actual Group
+    :return: a list of permissions (SAWPermission) in this group.
+    """
+    if not isinstance(group, Group):
+        group = Group.objects.get(name=group)
+    all_perms = SAWPermission.objects.all()
+    perms = [sawp.permission.id for sawp in all_perms]
+    perms_in_group = group.permissions.filter(id__in=perms)
+    # iterate though the SAWPermissions: return only the ones in the group
+    return [perm for perm in all_perms if perm.permission in perms_in_group]
+
 
 def put_user_in_default_group(user, group):
     """
@@ -51,4 +65,5 @@ def put_user_in_default_group(user, group):
     """
     if group not in group_names:
         raise IllegalArgumentException("group " + group + " is not a default group")
+    #TODO: implement
     pass
