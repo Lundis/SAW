@@ -9,6 +9,7 @@ def setup_settings_menu():
     template, created = MenuTemplate.objects.get_or_create(path="settings/menu.html")
 
     menu, created = Menu.objects.get_or_create(menu_name="settings_menu", template=template)
+    menu.clear()
     settings_items_funcs = get_modules_with("register", "get_settings_items")
     for module, func in settings_items_funcs:
         if DisabledModule.is_enabled(module):
