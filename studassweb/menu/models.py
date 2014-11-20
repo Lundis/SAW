@@ -65,6 +65,7 @@ class MenuItem(models.Model):
     app_name = models.CharField(max_length=50, null=True, blank=True)
     display_name = models.CharField(max_length=30)
     url = models.URLField()
+    submenu = models.ForeignKey(Menu, null=True)
     # Does the item by default belong to a menu?
     # This is used to improve the usability of the installation wizard.
     MAIN_MENU = 'MM'
@@ -86,7 +87,7 @@ class MenuItem(models.Model):
         return self.display_name + ": " + self.url
 
     @classmethod
-    def get_or_create(cls, app_name, display_name, url, default_menu=NONE, permission=None):
+    def get_or_create(cls, app_name, display_name, url, default_menu=NONE, permission=None, submenu=None):
         """
         Shortcut function for MenuItem.objects.get_or_create
         :param app_name: Which app created this item (if any)
@@ -98,7 +99,8 @@ class MenuItem(models.Model):
         """
         item, created = cls.objects.get_or_create(app_name=app_name,
                                                   display_name=display_name,
-                                                  url=url)
+                                                  url=url,
+                                                  submenu=submenu)
         if created:
             item.default_menu = default_menu
             item.view_permission = permission
@@ -120,6 +122,9 @@ class MenuItem(models.Model):
         :return: True if this item has no associated permission or if the user has the permission
         """
         return not self.view_permission or self.view_permission.has_user_perm(user)
+
+    def has_submenu(self):
+        return self.submenu != None
 
 
 class ItemInMenu(models.Model):
