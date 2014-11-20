@@ -21,11 +21,11 @@ def get_permissions():
     :return: a list of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_create_polls", BOARD_MEMBER),
-        ("can_view_polls", GUEST),
-        ("can_view_member_polls", MEMBER),
-        ("can_view_board_polls", BOARD_MEMBER),
-        ("can_vote_public_polls", GUEST),
-        ("can_vote_member_polls", MEMBER),
-        ("can_vote_board_polls", BOARD_MEMBER),
+        ("can_create_polls", BOARD_MEMBER, "Can create polls"),
+        ("can_view_polls", GUEST, "Can view most polls"),
+        ("can_view_member_polls", MEMBER, "Can view polls for members"),
+        ("can_view_board_polls", BOARD_MEMBER, "Can view polls for board members"),
+        ("can_vote_public_polls", GUEST, "Can vote in public polls"),
+        ("can_vote_member_polls", MEMBER, "Can vote in member polls"),
+        ("can_vote_board_polls", BOARD_MEMBER, "Can vote in polls for board members"),
     )

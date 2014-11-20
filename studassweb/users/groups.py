@@ -20,7 +20,9 @@ def setup_default_groups():
               [Group.objects.get_or_create(name=group_name) for group_name in group_names]]
     for get_perms in permission_funcs:
         perms = get_perms()
-        for perm, group in perms:
+        for perm, group, description in perms:
+            # create the permission if it doesn't exist:
+            SAWPermission.get_or_create(perm, description)
             # ignore permissions that already are in a group.
             # we don't want duplicates and we don't want to ruin changes made by the user.
             if not is_perm_in_groups(perm, groups):

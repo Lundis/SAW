@@ -22,8 +22,8 @@ def get_permissions():
     :return: a list of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_view_public_news", GUEST),
-        ("can_view_member_news", MEMBER),
-        ("can_create_news", BOARD_MEMBER),
-        ("can_create_member_news", BOARD_MEMBER),
+        ("can_view_public_news", GUEST, "Access to most news articles"),
+        ("can_view_member_news", MEMBER, "Access to all news articles"),
+        ("can_create_news", BOARD_MEMBER, "Can create news articles"),
+        ("can_create_member_news", BOARD_MEMBER, "Can create news that are only visible to members"),
     )

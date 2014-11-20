@@ -21,6 +21,6 @@ def get_permissions():
     :return: a list of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_view_association", GUEST),
-        ("can_edit_association", BOARD_MEMBER),
+        ("can_view_association", GUEST, "Access to the page that shows the boards"),
+        ("can_edit_association", BOARD_MEMBER, "Can edit the board/committees for each year"),
     )

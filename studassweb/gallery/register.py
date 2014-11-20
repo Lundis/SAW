@@ -22,9 +22,9 @@ def get_permissions():
     :return: a list of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_view_public_albums", GUEST),
-        ("can_view_member_albums", MEMBER),
-        ("can_create_albums", BOARD_MEMBER),
-        ("can_edit_member_albums", MEMBER),
-        ("can_edit_all_albums", BOARD_MEMBER),
+        ("can_view_public_albums", GUEST, "Can view most albums"),
+        ("can_view_member_albums", MEMBER, "Can view all albums"),
+        ("can_create_albums", BOARD_MEMBER, "Can create albums"),
+        ("can_edit_member_albums", MEMBER, "Can upload images to albums that are for members"),
+        ("can_edit_all_albums", BOARD_MEMBER, "Can edit descriptions, upload and remove images to/from all albums"),
     )

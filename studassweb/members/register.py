@@ -21,6 +21,6 @@ def get_permissions():
     :return: a list of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_view_member_registry", BOARD_MEMBER),
-        ("can_edit_member_registry", BOARD_MEMBER),
+        ("can_view_member_registry", BOARD_MEMBER, "Can view the member registry"),
+        ("can_edit_member_registry", BOARD_MEMBER, "Can edit information in the member registry"),
     )

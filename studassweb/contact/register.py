@@ -23,6 +23,6 @@ def get_permissions():
     :return: a list of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_view_contact_form", GUEST),
-        ("can_use_contact_form", GUEST),
+        ("can_view_contact_form", GUEST, "Can view the contact form"),
+        ("can_use_contact_form", GUEST, "Can use the contact form"),
     )

@@ -22,7 +22,7 @@ def get_permissions():
     :return: a list of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_view_public_info_pages", GUEST),
-        ("can_view_member_info_pages", MEMBER),
-        ("can_edit_info_pages", BOARD_MEMBER),
+        ("can_view_public_info_pages", GUEST, "Access to most of the information pages"),
+        ("can_view_member_info_pages", MEMBER, "Access to all information pages"),
+        ("can_edit_info_pages", BOARD_MEMBER, "Can create and edit info pages"),
     )

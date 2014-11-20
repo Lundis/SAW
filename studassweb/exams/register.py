@@ -22,7 +22,7 @@ def get_permissions():
     :return: a list of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_view_exam_archive", GUEST),
-        ("can_upload_exams", MEMBER),
-        ("can_edit_exams", BOARD_MEMBER),
+        ("can_view_exam_archive", GUEST, "Can view the exam archive"),
+        ("can_upload_exams", MEMBER, "Can upload exams, add courses and examinators"),
+        ("can_edit_exams", BOARD_MEMBER, "Can edit and delete exams and descriptions"),
     )

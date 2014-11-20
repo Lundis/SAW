@@ -20,5 +20,5 @@ def get_permissions():
     :return: a list of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_install", WEBMASTER),
+        ("can_install", WEBMASTER, "Access to the installation wizard"),
     )

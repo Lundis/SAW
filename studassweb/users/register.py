@@ -15,10 +15,10 @@ def get_permissions():
     :return: a tuple of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_view_profiles", MEMBER),
-        ("can_edit_profile", LOGGED_ON),
-        ("can_edit_permissions", WEBMASTER),
-        ("can_edit_login_settings", WEBMASTER),
+        ("can_view_profiles", MEMBER, "Can view the profile pages of other users"),
+        ("can_edit_profile", LOGGED_ON, "Access to the settings page for editing personal user settings"),
+        ("can_edit_permissions", WEBMASTER, "Access to the settings page for permissions"),
+        ("can_edit_login_settings", WEBMASTER, "Access to the settings page for configuring how users can log in (LDAP, FB, G+ etc)"),
     )
 
 

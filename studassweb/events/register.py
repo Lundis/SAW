@@ -22,7 +22,7 @@ def get_permissions():
     :return: a list of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_view_events", GUEST),
-        ("can_signup_for_events", GUEST),
-        ("can_create_events", BOARD_MEMBER),
+        ("can_view_events", GUEST, "Can view events"),
+        ("can_signup_for_events", GUEST, "Can sign up for events"),
+        ("can_create_events", BOARD_MEMBER, "Can create events"),
     )

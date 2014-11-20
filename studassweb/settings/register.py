@@ -1,5 +1,14 @@
 from menu.models import MenuItem
 from users.models import SAWPermission
+from users.groups import LOGGED_ON
+
+def get_permissions():
+    """
+    :return: a tuple of tuples containing the permissions of this module and their default group
+    """
+    return (
+        ("can_view_settings", LOGGED_ON, "Access to the settings page"),
+    )
 
 def get_menu_items():
     return [MenuItem.get_or_create("settings",

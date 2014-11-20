@@ -1,21 +1,31 @@
 {% extends "settings/base.html" %}
 {% load i18n %}
 
-
 {% block inner_content %}
-    <p>herro, this is permission</p>
-    {% for group in groups %}
-        <div class="panel panel-default">
-            <div class="panel-heading">{{ group.name }}</div>
-            <div class="panel-body">
-                <div id="permission-group-{{ group.id }}"class="btn-group-vertical connected-sort ui-sortable">
-                    {% for perm in group.permissions %}
-                        <li id="permission-{{ perm.id }}" class="btn btn-primary permission ui-sortable-handle">
-                            {{ perm.permission.codename }}
-                        </li>
-                    {% endfor %}
+    <p>{% trans "Drag the permissions between the groups" %}</p>
+    <div class="row">
+        {% for group in groups %}
+            <div class="panel panel-default col-md-4">
+                <div class="panel-heading">{{ group.name }}</div>
+                <div class="panel-body">
+                    <div id="group-{{ group.id }}" class="btn-group-vertical connected-sort ui-sortable">
+                        {% for perm in group.permissions %}
+                            <li id="permission-{{ perm.id }}" class="btn btn-primary permission ui-sortable-handle"
+                                data-toggle="tooltip" data-placement="right" title="{{ perm.description }}">
+                                {{ perm.permission.name | capfirst }}
+                            </li>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
 {% endblock %}

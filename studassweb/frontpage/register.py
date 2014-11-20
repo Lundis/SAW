@@ -22,6 +22,6 @@ def get_permissions():
     :return: a list of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_view_frontpage", GUEST),
-        ("can_edit_frontpage", BOARD_MEMBER),
+        ("can_view_frontpage", GUEST, "Can view the frontpage"),
+        ("can_edit_frontpage", BOARD_MEMBER, "Can edit what’s visible on the front page"),
     )
