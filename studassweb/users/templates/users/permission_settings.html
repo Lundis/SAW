@@ -8,7 +8,7 @@
             <div class="panel panel-default col-md-4">
                 <div class="panel-heading">{{ group.name }}</div>
                 <div class="panel-body">
-                    <div id="group-{{ group.id }}" class="btn-group-vertical connected-sort ui-sortable">
+                    <div id="group-{{ group.id }}" class="btn-group-vertical connected-sort ui-sortable permission-container">
                         {% for perm in group.permissions %}
                             <li id="permission-{{ perm.id }}" class="btn btn-primary permission ui-sortable-handle"
                                 data-toggle="tooltip" data-placement="right" title="{{ perm.description }}">
@@ -19,13 +19,63 @@
                 </div>
             </div>
         {% endfor %}
+        <form id=""permission-form>
+
+        </form>
     </div>
 {% endblock %}
 
 {% block scripts %}
-<script>
-$(function () {
-    $('[data-toggle="tooltip"]').tooltip()
-})
-</script>
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+
+        <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+
+
+        $('#permission-form').submit(function() {
+            //updateHiddenFormFields();
+            return true; // return false to cancel form action
+        });
+
+        function updateHiddenFormFields() {
+            var old_fields = document.getElementsByClassName("permission-hidden-field");
+            for (var i = 0; i < old_fields.length; i++) {
+                old_fields[i].parentNode.removeChild(old_fields[i]);
+            }
+            group_containers = document.getElementsByClassName("permission-container")
+            for (var i = 0; i < group_containers.length; i++) {
+                permissions = group_containers[i].childNodes;
+                group_id = group_containers[i].getAttribute("id");
+                for (var j = 0; j < permissions.length; j++) {
+                    try {
+                        permission_id = permissions[j].getAttribute("id");
+                        add_hidden_input(permission_id, group_id);
+                    } catch(e) {
+                        // ignore error because it is weird and sucks and shouldn't exist
+                    }
+
+                }
+            }
+
+        }
+
+        function add_hidden_input(group_id, permission_id) {
+            var input_field = document.createElement("input");
+            input_field.setAttribute("name", permission_id);
+            input_field.setAttribute("value", group_id);
+            input_field.setAttribute("type", "hidden");
+            input_field.setAttribute("class","permission-hidden-field");
+            var form = document.getElementById("permission-form");
+            form.appendChild(input_field);
+        }
+
+        $(function() {
+            $( ".permission-container" ).sortable({
+                connectWith: ".connected-sort"
+            }).disableSelection();
+        });
+
+    </script>
 {% endblock %}
