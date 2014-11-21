@@ -4,14 +4,16 @@
 {% block inner_content %}
     <p>{% trans "Drag the permissions between the groups" %}</p>
     <div class="row">
+        <div id="permission-description"> Description here</div>
+    </div>
+    <div class="row">
         {% for group in groups %}
             <div class="panel panel-default col-md-4">
                 <div class="panel-heading">{{ group.name }}</div>
                 <div class="panel-body">
                     <div id="group-{{ group.id }}" class="btn-group-vertical connected-sort ui-sortable permission-container">
                         {% for perm in group.permissions %}
-                            <li id="permission-{{ perm.id }}" class="btn btn-primary permission ui-sortable-handle"
-                                data-toggle="tooltip" data-placement="right" title="{{ perm.description }}">
+                            <li id="permission-{{ perm.id }}" class="btn btn-primary permission ui-sortable-handle" title="{{ perm.description }}">
                                 {{ perm.permission.name }}
                             </li>
                         {% endfor %}
@@ -19,8 +21,13 @@
                 </div>
             </div>
         {% endfor %}
-        <form id=""permission-form>
-
+    </div>
+    <div class="row">
+        <form id="permission-form">
+            {% csrf_token %}
+            <button type="submit" value="Submit" class="btn btn-primary">
+                {% trans "Save" %}
+            </button>
         </form>
     </div>
 {% endblock %}
@@ -30,10 +37,10 @@
     <script>
         // bootstrap tooltips conflict with jquery-ui sortable
         // https://github.com/twbs/bootstrap/issues/6303
-        // The tooltips aren't as beautiful as they should be now, but at least it works.
-        var tooltip = $.fn.tooltip.noConflict();
-        $(function () {
-            $('[data-toggle="tooltip"]').tooltip();
+
+        $(".permission").mouseover(function(event) {
+            var description = document.getElementById("permission-description");
+            description.innerHTML = event.target.getAttribute("title");
         });
 
 
