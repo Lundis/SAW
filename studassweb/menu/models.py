@@ -66,6 +66,7 @@ class MenuItem(models.Model):
     display_name = models.CharField(max_length=30)
     url = models.URLField()
     submenu = models.ForeignKey(Menu, null=True)
+    # Why the fuck is this in the database??! TODO!!
     # Does the item by default belong to a menu?
     # This is used to improve the usability of the installation wizard.
     MAIN_MENU = 'MM'
@@ -78,6 +79,17 @@ class MenuItem(models.Model):
     )
     default_menu = models.CharField(max_length=2, choices=MENU_CHOICES)
     view_permission = models.ForeignKey(SAWPermission, null=True, blank=True)
+    # is the item managed by a specific app (referred to in app_name,
+    # or is it a custom item created by the user.
+    # I use choices instead of a boolean because more types might be added in the future.
+    TYPE_APP = 'AP'
+    TYPE_USER = 'US'
+    TYPE_CHOICES = (
+        (TYPE_APP, "Created by app"),
+        (TYPE_USER, "Created by user"),
+    )
+    type = models.CharField(max_length=2, choices=TYPE_CHOICES, default=TYPE_APP)
+
 
     class Meta:
         # Don't allow duplicates
