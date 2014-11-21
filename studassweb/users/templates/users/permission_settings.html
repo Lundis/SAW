@@ -12,7 +12,7 @@
                         {% for perm in group.permissions %}
                             <li id="permission-{{ perm.id }}" class="btn btn-primary permission ui-sortable-handle"
                                 data-toggle="tooltip" data-placement="right" title="{{ perm.description }}">
-                                {{ perm.permission.name | capfirst }}
+                                {{ perm.permission.name }}
                             </li>
                         {% endfor %}
                     </div>
@@ -26,12 +26,15 @@
 {% endblock %}
 
 {% block scripts %}
+    <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
     <script>
+        // bootstrap tooltips conflict with jquery-ui sortable
+        // https://github.com/twbs/bootstrap/issues/6303
+        // The tooltips aren't as beautiful as they should be now, but at least it works.
+        var tooltip = $.fn.tooltip.noConflict();
         $(function () {
             $('[data-toggle="tooltip"]').tooltip();
         });
-
-        <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
 
 
         $('#permission-form').submit(function() {
@@ -55,10 +58,8 @@
                     } catch(e) {
                         // ignore error because it is weird and sucks and shouldn't exist
                     }
-
                 }
             }
-
         }
 
         function add_hidden_input(group_id, permission_id) {
