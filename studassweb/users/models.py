@@ -28,6 +28,8 @@ class UserExtension(models.Model):
         user_ext = UserExtension(user=user)
         if member:
             if not enrollment_year:
+                # delete user if this fails
+                user.delete()
                 raise IllegalArgumentException("if the user is a member, enrollment year must be specified")
             if not graduation_year:
                 graduation_year = 0
