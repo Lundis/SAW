@@ -1,0 +1,21 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Info" %}
+    <h1>{{ category.name }}</h1>
+    {% if pages %}
+        <div class="list-group">
+            {% for page in pages %}
+                <a href="{{ page.get_absolute_url}}">
+                    {{ page.name }}
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>This category is empty</p>
+    {% endif %}
+    <a href="{% url "info.views.edit_page" category.id %}">
+        <div class="btn">Create new page</div>
+    </a>
+{% endblock content %}

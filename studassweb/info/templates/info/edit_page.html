@@ -1,0 +1,15 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block content %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Info" %}
+    <form action="" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button type="submit" class="btn btn-primary">
+            {% trans "Submit" %}
+        </button>
+    </form>
+{% endblock %}
