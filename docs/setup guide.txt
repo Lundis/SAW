@@ -22,7 +22,7 @@ After installing python 3.4 and pip (comes bundled with it on windows):
 
 
 * pillow
-    * This is for ImageField.
+    * This is for ImageField and CKeditor.
     * url: https://pillow.readthedocs.org/
     * install instructions:
         > pip install pillow
@@ -33,6 +33,12 @@ After installing python 3.4 and pip (comes bundled with it on windows):
     * url: https://github.com/dyve/django-bootstrap3
     * install instructions:
         > pip install django-bootstrap3
+
+* django-ckeditor
+    * This is for the WYSIWYG editor.
+    * url: https://github.com/shaunsephton/django-ckeditor
+    * install instructions:
+        > pip install django-ckeditor
 
 
 ===== Install Pycharm pro edition =====

@@ -1,10 +1,8 @@
-{% extends "base/base.html" %}
+{% extends "info/base.html" %}
 {% load i18n %}
 {% load bootstrap3 %}
 
-{% block content %}
-    {% load dynamic_menu %}
-    {% display_menu "main_menu" "Info" %}
+{% block inner_content %}
     <form action="" method="post">
         {% csrf_token %}
         {% bootstrap_form form %}

@@ -1,14 +1,12 @@
-{% extends "base/base.html" %}
+{% extends "info/base.html" %}
 
-{% block content %}
-    {% load dynamic_menu %}
-    {% display_menu "main_menu" "Info" %}
+{% block inner_content %}
     <h1>{{ category.name }}</h1>
-    {% if pages %}
+    {% if category.pages %}
         <div class="list-group">
-            {% for page in pages %}
+            {% for page in category.pages %}
                 <a href="{{ page.get_absolute_url}}">
-                    {{ page.name }}
+                    {{ page.title }}
                 </a>
             {% endfor %}
         </div>
@@ -18,4 +16,4 @@
     <a href="{% url "info.views.edit_page" category.id %}">
         <div class="btn">Create new page</div>
     </a>
-{% endblock content %}
+{% endblock %}
