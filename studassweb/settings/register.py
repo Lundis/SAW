@@ -2,12 +2,15 @@ from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import LOGGED_ON
 
+VIEW_SETTINGS = "can_view_settings"
+
+
 def get_permissions():
     """
     :return: a tuple of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_view_settings", LOGGED_ON, "Access to the settings page"),
+        (VIEW_SETTINGS, LOGGED_ON, "Access to the settings page"),
     )
 
 def get_menu_items():
@@ -15,7 +18,7 @@ def get_menu_items():
                                    "Settings",
                                    "/settings/",
                                    MenuItem.LOGIN_MENU,
-                                   SAWPermission.get_or_create("can_view_settings"))]
+                                   SAWPermission.get_or_create(VIEW_SETTINGS))]
 
 def get_urls():
     """

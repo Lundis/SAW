@@ -10,6 +10,7 @@ from .models import InstallProgress
 from users.decorators import has_permission
 from users.groups import setup_default_groups
 from settings.setup import setup_settings
+from .register import CAN_INSTALL
 
 
 def welcome(request):
@@ -23,10 +24,10 @@ def welcome(request):
         else:
             context['form'] = login_form
 
-
     return render(request, 'install/welcome.html', context)
 
-@has_permission("can_install")
+
+@has_permission(CAN_INSTALL)
 def association(request):
     form = AssociationForm(request.POST or None)
     if form.is_valid():
@@ -36,7 +37,8 @@ def association(request):
     context = {'form': form}
     return render(request, 'install/assoc.html', context)
 
-@has_permission("can_install")
+
+@has_permission(CAN_INSTALL)
 def modules(request):
     form = ModulesForm(request.POST or None, modules=settings.OPTIONAL_APPS)
     if form.is_valid():
@@ -49,7 +51,8 @@ def modules(request):
     context = {'form': form}
     return render(request, 'install/modules.html', context)
 
-@has_permission("can_install")
+
+@has_permission(CAN_INSTALL)
 def menu(request):
     form = MenuForm(request.POST or None)
     if form.is_valid():
@@ -73,6 +76,7 @@ def menu(request):
                'form': form}
     return render(request, 'install/menu.html', context)
 
+
 def get_main_menu_items():
     """
     :return: a list of menu items that represents either the current main menu or the default main menu
@@ -85,6 +89,7 @@ def get_main_menu_items():
         # load default menu items for the main menu
         print("main defaults: ", MenuItem.get_defaults(MenuItem.MAIN_MENU))
         return MenuItem.get_defaults(MenuItem.MAIN_MENU)
+
 
 def get_login_menu_items():
     """
@@ -99,7 +104,7 @@ def get_login_menu_items():
         print("login defaults: ", MenuItem.get_defaults(MenuItem.LOGIN_MENU))
         return MenuItem.get_defaults(MenuItem.LOGIN_MENU)
 
-@has_permission("can_install")
+@has_permission(CAN_INSTALL)
 def finished(request):
     setup_default_groups()
     InstallProgress.finish()
