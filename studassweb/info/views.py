@@ -4,9 +4,10 @@ from users.decorators import has_permission
 from menu.models import MenuItem, Menu
 from .models import InfoCategory, InfoPage
 from .forms import InfoPageForm, InfoCategoryForm
+from .register import EDIT, VIEW_PUBLIC
 
 
-@has_permission("can_view_public_info_pages")
+@has_permission(VIEW_PUBLIC)
 def main(request):
     """
     renders a list of the different categories. This page shouldn't be used in general, or just for searching purposes.
@@ -19,7 +20,7 @@ def main(request):
                                               'pages': pages_without_parent})
 
 
-@has_permission("can_view_public_info_pages")
+@has_permission(VIEW_PUBLIC)
 def view_page(request, category_id, page_id):
     """
     view a page
@@ -32,7 +33,7 @@ def view_page(request, category_id, page_id):
                                                    'page': page})
 
 
-@has_permission("can_edit_info_pages")
+@has_permission(EDIT)
 def edit_page(request, category_id, page_id=None):
     """
     edit or create a page
@@ -62,7 +63,7 @@ def edit_page(request, category_id, page_id=None):
                                                        'form': form})
 
 
-@has_permission("can_view_public_info_pages")
+@has_permission(VIEW_PUBLIC)
 def view_category(request, category_id):
     """
     renders a list of the pages in the specified category
@@ -77,7 +78,7 @@ def view_category(request, category_id):
     return render(request, "info/view_category.html", {'category': category})
 
 
-@has_permission("can_edit_info_pages")
+@has_permission(EDIT)
 def edit_category(request, category_id=None):
     """
     edit or create a new category

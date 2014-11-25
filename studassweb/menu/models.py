@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import SAWPermission
 
+
 class MenuTemplate(models.Model):
     path = models.CharField(max_length=100, unique=True)
 
