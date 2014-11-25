@@ -1,7 +1,9 @@
 {% extends "info/base.html" %}
+{% load i18n %}
+{% load sawp %}
 
 {% block inner_content %}
-    <p>herro this is info</p>
+    <h1>{% trans "Categories" %}</h1>
     <div class="list-group">
         {% for category in categories %}
             <a href="{{ category.get_absolute_url}}">
@@ -9,9 +11,8 @@
             </a>
         {% endfor %}
     </div>
-    {% load sawp %}
     {% has_perm "can_edit_info_pages" as show_create_button %}
     {% if show_create_button %}
-        <p>Create a new category <a href="{% url "info.views.edit_category" %}">here</a>.</p>
+        <p>{% trans "Create a new category" %} <a href="{% url "info.views.edit_category" %}">{% trans "here" %}</a>.</p>
     {% endif %}
 {% endblock %}
