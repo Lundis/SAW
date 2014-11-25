@@ -9,5 +9,9 @@
             </a>
         {% endfor %}
     </div>
-    <p>Create a new category <a href="{% url "info.views.edit_category" %}">here</a>.</p>
+    {% load sawp %}
+    {% has_perm "can_edit_info_pages" as show_create_button %}
+    {% if show_create_button %}
+        <p>Create a new category <a href="{% url "info.views.edit_category" %}">here</a>.</p>
+    {% endif %}
 {% endblock %}

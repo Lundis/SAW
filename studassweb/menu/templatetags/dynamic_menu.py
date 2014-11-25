@@ -10,6 +10,7 @@ def display_menu(context, menu_name, active_tab):
     menu = render_menu(menu_name, active_tab, context)
     return {'menu': menu}
 
+
 def render_menu(menu_name, active_tab, http_context):
     menu = Menu.objects.get(menu_name=menu_name)
     context = {'menuitems': menu.items(http_context['user']), 'active_tab': active_tab}
