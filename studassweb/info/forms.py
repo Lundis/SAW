@@ -6,12 +6,12 @@ class InfoCategoryForm(forms.ModelForm):
 
     class Meta:
         model = InfoCategory
-        fields = ("name",)
+        fields = ("name", "permission")
 
 
 class InfoPageForm(forms.ModelForm):
 
     class Meta:
         model = InfoPage
-        fields = ("title", "text", "category")
+        fields = ("title", "text", "category", "permission")
 
