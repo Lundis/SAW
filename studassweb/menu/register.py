@@ -11,6 +11,7 @@ def get_permissions():
         ("can_edit_menu", WEBMASTER, "Can change the menu layout"),
     )
 
+
 def get_settings_items():
     return [MenuItem.get_or_create(__package__,
                                    "Menu items",

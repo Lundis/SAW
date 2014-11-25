@@ -1,20 +1,26 @@
-from menu.models import MenuItem
+from menu.models import MenuItem, Menu
 from users.models import SAWPermission
 from users.groups import GUEST, MEMBER, BOARD_MEMBER
 
+
 def get_menu_items():
-    return [MenuItem.get_or_create("info",
+    item = MenuItem.get_or_create("info",
                                    "Info",
                                    "/info/",
                                    MenuItem.MAIN_MENU,
-                                   SAWPermission.get_or_create("can_view_public_info_pages"))]
+                                   SAWPermission.get_or_create("can_view_public_info_pages"))
+    if not item.submenu:
+        item.submenu, created = Menu.objects.get_or_create(menu_name="info_top_menu")
+        item.save()
+
+    return [item]
+
 
 def get_urls():
     """
     :returns: A tuple of regexes describing what URLs the top-level URL dispatcher should associate with this module
     """
-    return (r"^info/",)
-
+    return r"^info/",
 
 
 def get_permissions():

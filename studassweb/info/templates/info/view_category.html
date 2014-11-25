@@ -5,7 +5,7 @@
     {% if category.pages %}
         <div class="list-group">
             {% for page in category.pages %}
-                <a href="{{ page.get_absolute_url}}">
+                <a class="list-group-item" href="{{ page.get_absolute_url}}">
                     {{ page.title }}
                 </a>
             {% endfor %}

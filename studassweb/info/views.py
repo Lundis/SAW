@@ -1,8 +1,10 @@
 from django.shortcuts import render
+from django.http import Http404, HttpResponseRedirect
 from users.decorators import has_permission
+from menu.models import MenuItem, Menu
 from .models import InfoCategory, InfoPage
 from .forms import InfoPageForm, InfoCategoryForm
-from django.http import Http404, HttpResponseRedirect
+
 
 @has_permission("can_view_public_info_pages")
 def main(request):
@@ -92,6 +94,14 @@ def edit_category(request, category_id=None):
     form = InfoCategoryForm(request.POST or None, instance=category)
     if form.is_valid():
         cat = form.save()
+        # if it's a new category
+        if not category:
+            # add it to the info menu
+            #TODO: set the same permission as the category
+            item = MenuItem.get_or_create("info", cat.name, cat.get_absolute_url(), permission=None)
+            menu, created = Menu.objects.get_or_create(menu_name="info_top_menu")
+            #TODO: menu item index
+            menu.add_item(item, 0)
         return HttpResponseRedirect(cat.get_absolute_url())
     else:
          return render(request, "info/edit_category.html", {'category': category,

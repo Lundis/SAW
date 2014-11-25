@@ -48,6 +48,9 @@ class Menu(models.Model):
                 ItemInMenu.objects.filter(menu=self)
                 if not user or item_in_menu.item.can_user_view(user)]
 
+    def count(self):
+        return ItemInMenu.objects.filter(menu=self).count()
+
     @classmethod
     def get_or_none(cls, name):
         """
@@ -90,10 +93,9 @@ class MenuItem(models.Model):
     )
     type = models.CharField(max_length=2, choices=TYPE_CHOICES, default=TYPE_APP)
 
-
     class Meta:
         # Don't allow duplicates
-        unique_together = ('display_name', 'url')
+        unique_together = ('app_name', 'display_name', 'url')
 
     def __str__(self):
         return self.display_name + ": " + self.url
@@ -111,11 +113,11 @@ class MenuItem(models.Model):
         """
         item, created = cls.objects.get_or_create(app_name=app_name,
                                                   display_name=display_name,
-                                                  url=url,
-                                                  submenu=submenu)
+                                                  url=url)
         if created:
             item.default_menu = default_menu
             item.view_permission = permission
+            item.submenu = submenu
             item.save()
         return item
 
