@@ -5,25 +5,36 @@
 {% load static %}
 
 {% block inner_content %}
-<form id="addEditExamForm" action="" method="post" enctype="multipart/form-data" >
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    <div id="examfilesformset_all">
-        {% for f in filesformset.forms %}
-            <div class="examfilesformset_single">
-                {{ f.id }}
-                {% bootstrap_field f.image%}
-                {% if f.instance.pk %}{{ f.DELETE}}{% endif %}{# Note! removing this fucks with functionality #}
-            </div>
-        {% endfor %}
-    </div>
-    {{ filesformset.management_form }}
-    {% buttons %}
-        <button type="submit" class="btn btn-primary">
-            {% trans "Submit" %}
-        </button>
-    {% endbuttons %}
-</form>
+    {% if form.instance.pk %}
+        <form action="{% url 'exams_delete_exam' form.instance.pk %}" method="post">
+            {% csrf_token %}
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">
+                    {% trans "Remove this exam" %}
+                </button>
+            {% endbuttons %}
+        </form>
+    {% endif %}
+
+    <form id="addEditExamForm" action="" method="post" enctype="multipart/form-data" >
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <div id="examfilesformset_all">
+            {% for f in filesformset.forms %}
+                <div class="examfilesformset_single">
+                    {{ f.id }}
+                    {% bootstrap_field f.image%}
+                    {% if f.instance.pk %}{{ f.DELETE}}{% endif %}{# Note! removing this fucks with functionality #}
+                </div>
+            {% endfor %}
+        </div>
+        {{ filesformset.management_form }}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">
+                {% trans "Submit" %}
+            </button>
+        {% endbuttons %}
+    </form>
 
 {% endblock %}
 

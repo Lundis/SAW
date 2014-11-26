@@ -1,6 +1,7 @@
 {% extends "exams/base.html" %}
 
 {% load i18n %}
+{% load bootstrap3 %}
 
 {% block inner_content %}
     <h1>{{ name }}</h1>
@@ -8,6 +9,14 @@
 		<p><a href="/exams/exam/{{ exam.id }}">{{ exam.exam_date|date:"Y-m-d" }} : {{ exam.examinator.name }}</a></p>
     {% empty %}
         <p>{% trans "No courses found!" %}</p>
+        <form action="{% url 'exams_delete_course' id %}" method="post">
+            {% csrf_token %}
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">
+                    {% trans "Remove this course" %}
+                </button>
+            {% endbuttons %}
+        </form>
     {% endfor %}
 
     <p><a href="/exams/edit_course/{{ id }}">{% trans "Edit this course"%}</a></p>

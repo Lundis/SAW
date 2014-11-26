@@ -5,6 +5,9 @@
 
 
 {% block inner_content %}
+{% if form.instance.pk %}
+    <p>{% trans "Note: If you want to remove this examinator you first have to remove all associated exams." %}</p>
+{% endif %}
 <form action="" method="post">
     {% csrf_token %}
     {% bootstrap_form form %}
