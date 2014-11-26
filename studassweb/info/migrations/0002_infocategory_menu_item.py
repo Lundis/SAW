@@ -7,14 +7,15 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('menu', '0003_menuitem_submenu'),
+        ('menu', '0001_initial'),
+        ('info', '0001_initial'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='menuitem',
-            name='type',
-            field=models.CharField(max_length=2, choices=[('AP', 'Created by app'), ('US', 'Created by user')], default='AP'),
+            model_name='infocategory',
+            name='menu_item',
+            field=models.ForeignKey(to='menu.MenuItem', null=True),
             preserve_default=True,
         ),
     ]

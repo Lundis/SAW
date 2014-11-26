@@ -2,19 +2,25 @@ from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, BOARD_MEMBER
 
+
 def get_menu_items():
-    return [MenuItem.get_or_create("association",
-                                   "Association",
-                                   "/association/",
-                                   MenuItem.MAIN_MENU,
-                                   SAWPermission.get_or_create("can_view_association"))]
+    """
+    :return: a tuple ([main menu items], [settings menu items], [others])
+    """
+    return ([MenuItem.get_or_create(__package__,
+                                    "Association",
+                                    reverse_string="association_main",
+                                    permission=SAWPermission.get_or_create("can_view_association"))],
+            None,
+            None)
 
 
 def get_urls():
     """
     :returns: A tuple of regexes describing what URLs the top-level URL dispatcher should associate with this module
     """
-    return (r"^association/",)
+    return r"^association/",
+
 
 def get_permissions():
     """

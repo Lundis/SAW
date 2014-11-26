@@ -2,19 +2,21 @@ from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, MEMBER, BOARD_MEMBER
 
+
 def get_menu_items():
-    return [MenuItem.get_or_create("gallery",
-                                   "Gallery",
-                                   "/gallery/",
-                                   MenuItem.MAIN_MENU,
-                                   SAWPermission.get_or_create("can_view_public_albums"))]
+    return ([MenuItem.get_or_create(__package__,
+                                    "Gallery",
+                                    reverse_string="gallery_main",
+                                    permission=SAWPermission.get_or_create("can_view_public_albums"))],
+            None,
+            None)
+
 
 def get_urls():
     """
     :returns: A tuple of regexes describing what URLs the top-level URL dispatcher should associate with this module
     """
-    return (r"^gallery/",)
-
+    return r"^gallery/",
 
 
 def get_permissions():

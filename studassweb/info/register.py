@@ -4,16 +4,15 @@ from users.groups import GUEST, MEMBER, BOARD_MEMBER
 
 
 def get_menu_items():
-    item = MenuItem.get_or_create("info",
+    item = MenuItem.get_or_create(__package__,
                                   "Info",
-                                  "/info/",
-                                  MenuItem.MAIN_MENU,
-                                  SAWPermission.get_or_create("can_view_public_info_pages"))
+                                  reverse_string="info_view_categories",
+                                  permission=SAWPermission.get_or_create("can_view_public_info_pages"))
     if not item.submenu:
         item.submenu, created = Menu.objects.get_or_create(menu_name="info_top_menu")
         item.save()
 
-    return [item]
+    return [item], None, None
 
 
 def get_urls():

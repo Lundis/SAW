@@ -6,7 +6,6 @@ register = Library()
 
 @register.inclusion_tag('menu/menu_placeholder.html', takes_context=True)
 def display_menu(context, menu_name, active_tab):
-    print("display_menu called")
     menu = render_menu(menu_name, active_tab, context)
     return {'menu': menu}
 

@@ -6,9 +6,9 @@ from django.contrib.auth.models import Group
 from .register import EDIT_LOGIN_SETTINGS, EDIT_PROFILE, EDIT_PERMISSIONS
 
 urlpatterns = patterns('',
-    url(r'^permissions/$', 'users.settings_pages.edit_permissions', name='edit permissions'),
-    url(r'^user/$', 'users.settings_pages.edit_user', name='edit user'),
-    url(r'^login/$', 'users.settings_pages.edit_login', name='edit login'),
+    url(r'^permissions/$', 'users.settings_pages.edit_permissions', name='users_settings_edit_permissions'),
+    url(r'^user/$',        'users.settings_pages.edit_user',        name='users_settings_edit_user'),
+    url(r'^login/$',       'users.settings_pages.edit_login',       name='users_settings_edit_login'),
 )
 
 

@@ -5,6 +5,7 @@ from menu.models import MenuItem, Menu
 from .models import InfoCategory, InfoPage
 from .forms import InfoPageForm, InfoCategoryForm
 from .register import EDIT, VIEW_PUBLIC
+from base.forms import ConfirmationForm
 
 
 @has_permission(VIEW_PUBLIC)
@@ -108,3 +109,37 @@ def edit_category(request, category_id=None):
     else:
          return render(request, "info/edit_category.html", {'category': category,
                                                             'form': form})
+
+@has_permission(EDIT)
+def delete(request, category_id=None, page_id=None):
+    if category_id and page_id:
+        raise ValueError("You cannot delete both a category and a page at once")
+    elif not category_id and not page_id:
+        raise ValueError("You must specify a category or page to delete")
+
+    category = None
+    try:
+        category = InfoCategory.objects.get(id=category_id)
+    except InfoCategory.DoesNotExist:
+        pass
+    page = None
+    try:
+        page = InfoPage.objects.get(id=page_id)
+    except InfoPage.DoesNotExist:
+        pass
+
+    form = ConfirmationForm(request.POST or None)
+    if form.is_valid():
+        if page:
+            cat = page.category
+            page.delete()
+            if cat:
+                return HttpResponseRedirect(cat.get_absolute_url())
+        else:
+            category.delete()
+            return HttpResponseRedirect(reverse())
+
+
+    return render(request, "info/delete.html", {'category': category,
+                                                'page': page,
+                                                'form': form})

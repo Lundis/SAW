@@ -2,19 +2,21 @@ from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, BOARD_MEMBER
 
+
 def get_menu_items():
-    return [MenuItem.get_or_create("events",
-                                   "Events",
-                                   "/events/",
-                                   MenuItem.MAIN_MENU,
-                                   SAWPermission.get_or_create("can_view_events"))]
+    return ([MenuItem.get_or_create(__package__,
+                                    "Events",
+                                    reverse_string="events_home",
+                                    permission=SAWPermission.get_or_create("can_view_events"))],
+            None,
+            None)
+
 
 def get_urls():
     """
     :returns: A tuple of regexes describing what URLs the top-level URL dispatcher should associate with this module
     """
-    return (r"^events/",)
-
+    return r"^events/",
 
 
 def get_permissions():

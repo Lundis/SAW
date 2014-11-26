@@ -60,49 +60,15 @@ def menu(request):
         InstallProgress.menu_set()
         return HttpResponseRedirect('finished')
 
-    available_items = get_all_menu_items()
+    menu_items, login_items, other_items = get_all_menu_items()
 
-    menu_items = get_main_menu_items()
-    #filter away menu items
-    available_items = [item for item in available_items if item not in menu_items]
-
-    login_items = get_login_menu_items()
-    # filter away login items
-    available_items = [item for item in available_items if item not in login_items]
 
     context = {'menu_items': menu_items,
                'login_items': login_items,
-               'available_items': available_items,
+               'available_items': other_items,
                'form': form}
     return render(request, 'install/menu.html', context)
 
-
-def get_main_menu_items():
-    """
-    :return: a list of menu items that represents either the current main menu or the default main menu
-    """
-    main_menu = Menu.get_or_none("main_menu")
-    if main_menu:
-        # load the current menu items
-        return main_menu.items()
-    else:
-        # load default menu items for the main menu
-        print("main defaults: ", MenuItem.get_defaults(MenuItem.MAIN_MENU))
-        return MenuItem.get_defaults(MenuItem.MAIN_MENU)
-
-
-def get_login_menu_items():
-    """
-    :return: a list of menu items that represents either the current login menu or the default login menu
-    """
-    login_menu = Menu.get_or_none("login_menu")
-    if login_menu:
-        # load the current menu items
-        return login_menu.items()
-    else:
-        # load default menu items for the login menu
-        print("login defaults: ", MenuItem.get_defaults(MenuItem.LOGIN_MENU))
-        return MenuItem.get_defaults(MenuItem.LOGIN_MENU)
 
 @has_permission(CAN_INSTALL)
 def finished(request):

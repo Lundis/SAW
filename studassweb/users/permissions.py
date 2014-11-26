@@ -7,7 +7,10 @@ def has_user_perm(user, perm_name):
     :param user: User object
     :param perm_name: permission string
     """
-    sawp = SAWPermission.objects.get(permission__codename=perm_name)
+    try:
+        sawp = SAWPermission.objects.get(permission__codename=perm_name)
+    except SAWPermission.DoesNotExist:
+        return False
     return sawp.has_user_perm(user)
 
 

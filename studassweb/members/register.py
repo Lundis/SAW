@@ -2,19 +2,22 @@ from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import BOARD_MEMBER
 
+
 def get_menu_items():
-    return [MenuItem.get_or_create("members",
-                                   "Member Registry",
-                                   "/members/",
-                                   MenuItem.LOGIN_MENU,
-                                   SAWPermission.get_or_create("can_view_member_registry"))]
+    return (None,
+            [MenuItem.get_or_create(__package__,
+                                    "Member Registry",
+                                    reverse_string="members_home",
+                                    permission=SAWPermission.get_or_create("can_view_member_registry"))],
+            None)
 
 
 def get_urls():
     """
     :returns: A tuple of regexes describing what URLs the top-level URL dispatcher should associate with this module
     """
-    return (r"^members/",)
+    return r"^members/",
+
 
 def get_permissions():
     """

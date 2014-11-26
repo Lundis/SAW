@@ -2,18 +2,21 @@ from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, MEMBER, BOARD_MEMBER
 
+
 def get_menu_items():
-    return [MenuItem.get_or_create("polls",
-                                   "Polls",
-                                   "/polls/",
-                                   MenuItem.NONE,
-                                   SAWPermission.get_or_create("can_view_polls"))]
+    return ([MenuItem.get_or_create(__package__,
+                                    "Polls",
+                                    reverse_string="polls_home",
+                                    permission=SAWPermission.get_or_create("can_view_polls"))],
+            None,
+            None)
+
 
 def get_urls():
     """
     :returns: A tuple of regexes describing what URLs the top-level URL dispatcher should associate with this module
     """
-    return (r"^polls/",)
+    return r"^polls/",
 
 
 def get_permissions():

@@ -21,4 +21,9 @@
             {% trans "Submit" %}
         </button>
     </form>
+    <a href="{% url "info.views.delete_category" %}">
+        <div class="btn btn-danger">
+            {% trans "Delete" %}
+        </div>
+    </a>
 {% endblock %}

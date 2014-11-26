@@ -1,6 +1,5 @@
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'views.home', name='home'),
+    url(r'^$', 'polls.views.home', name='polls_home'),
 )

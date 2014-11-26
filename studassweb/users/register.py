@@ -31,14 +31,14 @@ def get_permissions():
 def get_settings_items():
     return [MenuItem.get_or_create(__package__,
                                    "User",
-                                   "/settings/users/user",
+                                   reverse_string="users_settings_edit_permissions",
                                    permission=SAWPermission.get_or_create(EDIT_PROFILE)),
             MenuItem.get_or_create(__package__,
                                    "Permissions",
-                                   "/settings/users/permissions",
+                                   reverse_string="users_settings_edit_user",
                                    permission=SAWPermission.get_or_create(EDIT_PERMISSIONS)),
             MenuItem.get_or_create(__package__,
                                    "Login",
-                                   "/settings/users/login",
+                                   reverse_string="users_settings_edit_login",
                                    permission=SAWPermission.get_or_create(EDIT_LOGIN_SETTINGS))
     ]
