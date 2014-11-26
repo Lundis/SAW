@@ -60,6 +60,7 @@ def edit_page(request, category_id, page_id=None):
         return HttpResponseRedirect(page.get_absolute_url())
     else:
         return render(request, "info/edit_page.html", {'category': category,
+                                                       'page': page,
                                                        'form': form})
 
 

@@ -1,6 +1,7 @@
 body {
-  padding-top: 80px;
+  padding-top: 51px;
 }
+
 #content {
   padding: 40px 15px;
   text-align: center;
@@ -10,4 +11,16 @@ body {
     margin-left: auto;
     margin-right: auto;
     margin-top: 20px;
+}
+
+.saw-navigator {
+    float:left;
+}
+
+.saw-navigator-item {
+}
+
+.saw-navigator-separator {
+    margin-left: 10px;
+    margin-right: 10px;
 }
