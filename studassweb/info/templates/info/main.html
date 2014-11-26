@@ -3,6 +3,9 @@
 {% load sawp %}
 
 {% block inner_content %}
+    {% load navigator %}
+    {% url "info.views.main" as info_url %}
+    {% display_navigator info_url "Info" %}
     <h1>{% trans "Categories" %}</h1>
     <div class="list-group">
         {% for category in categories %}

@@ -3,6 +3,9 @@
 {% load sawp %}
 
 {% block inner_content %}
+    {% load navigator %}
+    {% url "info.views.main" as info_url %}
+    {% display_navigator info_url "Info" category.get_absolute_url category.name %}
     <h1>{{ category.name }}</h1>
     {% if category.pages %}
         <div class="list-group">
@@ -18,7 +21,7 @@
     {% has_perm "can_edit_info_pages" as show_create_button %}
     {% if show_create_button %}
         <a href="{% url "info.views.edit_page" category.id %}">
-            <div class="btn">Create new page</div>
+            <div class="btn">{% trans "Create new page" %}</div>
         </a>
     {% endif %}
 {% endblock %}

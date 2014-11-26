@@ -1,6 +1,9 @@
 {% extends "info/base.html" %}
 
 {% block inner_content %}
+    {% load navigator %}
+    {% url "info.views.main" as info_url %}
+    {% display_navigator info_url "Info" category.get_absolute_url category.name page.get_absolute_url page.title %}
     <div class="col-md-9">
         <div class="row">
             <h1>{{ page.title }}</h1>
