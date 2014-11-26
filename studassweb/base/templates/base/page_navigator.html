@@ -1,6 +1,6 @@
 <div class="row">
     {% for item in items %}
-        <a href="{{ item.url }}"><div class="col-xs-1">{{ item.name }}</div></a>
-        <span class="glyphicon glyphicon-chevron-right col-xs-1"></span>
+        <a href="{{ item.url }}"><div class="saw-navigator saw-navigator-item">{{ item.name }}</div></a>
+        <div class="saw-navigator saw-navigator-separator"><span class="glyphicon glyphicon-chevron-right"></span></div>
     {% endfor %}
 </div>

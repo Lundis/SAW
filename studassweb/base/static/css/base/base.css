@@ -11,3 +11,15 @@ body {
     margin-right: auto;
     margin-top: 20px;
 }
+
+.saw-navigator {
+    float:left;
+}
+
+.saw-navigator-item {
+}
+
+.saw-navigator-separator {
+    margin-left: 10px;
+    margin-right: 10px;
+}
