@@ -108,3 +108,39 @@ def add_edit_course(request, course_id=-1):
 
     context = {'form': form}
     return render(request, 'exams/add_edit_course.html', context)
+
+
+def delete_exam(request, exam_id):
+    if request.method == 'POST':
+        try:
+            exam = SingleExam.objects.get(id=exam_id)
+            images = ExamFile.objects.filter(exam_id=exam_id)
+            images.delete()
+            exam.delete()
+            return HttpResponseRedirect('/exams/')
+        except SingleExam.DoesNotExist:
+            return HttpResponseNotFound('No such exam!')
+
+
+def delete_examinator(request, examinator_id):
+    if request.method == 'POST':
+        try:
+            examinator = Examinator.objects.get(id=examinator_id)
+            examinator.delete()
+            return HttpResponseRedirect('/exams/')
+        except Examinator.DoesNotExist:
+            return HttpResponseNotFound('No such examinator!')
+        except models.ProtectedError:
+            return HttpResponseNotFound('You need to remove associated exams first')
+
+
+def delete_course(request, course_id):
+    if request.method == 'POST':
+        try:
+            course = Course.objects.get(id=course_id)
+            course.delete()
+            return HttpResponseRedirect('/exams/')
+        except Course.DoesNotExist:
+            return HttpResponseNotFound('No such course!')
+        except models.ProtectedError:
+            return HttpResponseNotFound('You need to remove associated exams first')

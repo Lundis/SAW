@@ -16,10 +16,10 @@ class Examinator(models.Model):
 
 
 class SingleExam(models.Model):
-    course_id = models.ForeignKey(Course)
+    course_id = models.ForeignKey(Course, on_delete=models.PROTECT)
     ocr = models.TextField(blank=True)
     exam_date = models.DateTimeField()
-    examinator = models.ForeignKey(Examinator)
+    examinator = models.ForeignKey(Examinator, on_delete=models.PROTECT)
 
     def __str__(self):
         return str(self.exam_date) + " : " + str(self.examinator) + " : " + str(self.course_id)
