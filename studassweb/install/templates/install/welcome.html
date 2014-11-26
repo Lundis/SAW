@@ -13,7 +13,7 @@
     <div class="install-content">
     {% if form %}
         <p>Please log on to use this feature.</p>
-        <form action="/install/welcome" method="post" class=form">
+        <form action="{% url "install.views.welcome" %}" method="post" class=form">
             {% csrf_token %}
             {% bootstrap_form form %}
             {% buttons %}
@@ -24,7 +24,7 @@
         </form>
     {% else %}
         <h2>{% trans 'Welcome to the StudAssWeb Installation Wizard' %}!</h2>
-        <a href="/install/association">
+        <a href="{% url "install.views.association" %}">
             <button type="button" class="btn btn-primary" >
                 {% trans 'Get Started' %}
             </button>

@@ -57,10 +57,10 @@
             </ul>
         </div>
 
-        <form id="install-menu-form" action="menu" method="post" class=form">
+        <form id="install-menu-form" action="{% url "install.views.menu" %}" method="post" class=form">
             {% csrf_token %}
 
-            <a href="modules">
+            <a href="{% url "install.views.modules" %}">
                 <button type="button" class="btn btn-primary">
                     {% trans "Previous" %}
                 </button>
