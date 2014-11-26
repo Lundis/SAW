@@ -11,14 +11,9 @@
     <div id="examfilesformset_all">
         {% for f in filesformset.forms %}
             <div class="examfilesformset_single">
-                {#  {% bootstrap_field f.image%} #}
                 {{ f.id }}
-                {{ f.image }}
-                {% if f.instance.pk %}
-                    {# {% bootstrap_field f.DELETE%} #}
-
-                    {{ f.DELETE }}
-                {% endif %}
+                {% bootstrap_field f.image%}
+                {% if f.instance.pk %}{{ f.DELETE}}{% endif %}{# Note! removing this fucks with functionality #}
             </div>
         {% endfor %}
     </div>
@@ -34,12 +29,27 @@
 
 {% block scripts %}
     <script src="{% static "js/base/jquery.formset.js" %}"></script>
+    <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
     <script type="text/javascript">
-    $(function() {
-        $('.examfilesformset_single').formset({
-            prefix: '{{ filesformset.prefix }}',
-            formCssClass: 'dynamic-formasdf'
-        });
-    })
+        // bootstrap tooltips conflict with jquery-ui sortable
+        //var tooltip = $.fn.tooltip.noConflict();
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+
+            //Set up dynamic adding of images
+            $('.examfilesformset_single').formset({
+                prefix: '{{ filesformset.prefix }}',
+                formCssClass: 'dynamic-formasdf',
+                addText: '{% trans "Add another image" %}',
+                deleteText: '{% trans "Remove image" %}'
+            });
+
+            //Set up datepicker
+            $( "#id_exam_date" ).datepicker({
+                firstDay: 1,
+                dateFormat: "dd.mm.yy"
+            });
+        })
     </script>
 {% endblock %}
