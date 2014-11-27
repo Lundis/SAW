@@ -124,12 +124,17 @@ class MenuItem(models.Model):
         """
         menu_item = None
         created = False
+        if permission and isinstance(permission, str):
+            permission = SAWPermission.get_or_create(perm_name=permission)
+
         if linked_object:
             if reverse_string or url:
                 raise ValueError("reverse_string and/or url cannot be given at the same time as referred_item")
+            content_type = ContentType.objects.get_for_model(linked_object)
             menu_item, created = cls.objects.get_or_create(app_name=app_name,
                                                            display_name=display_name,
-                                                           link_target=linked_object)
+                                                           content_type=content_type,
+                                                           object_id=linked_object.id)
         elif reverse_string:
             if url:
                 raise ValueError("url cannot be given at the same time as referred_item")
@@ -170,7 +175,7 @@ class MenuItem(models.Model):
 
     def url(self):
         if self.link_target:
-            return self.item.get_absolute_url()
+            return self.link_target.get_absolute_url()
         elif self.reverse_string:
             return reverse(self.reverse_string)
         else:

@@ -4,6 +4,7 @@ from menu.models import MenuTemplate, Menu
 
 register = Library()
 
+
 @register.inclusion_tag('menu/menu_placeholder.html', takes_context=True)
 def display_menu(context, menu_name, active_tab):
     menu = render_menu(menu_name, active_tab, context)

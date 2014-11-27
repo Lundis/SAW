@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from ckeditor.fields import RichTextField
 from menu.models import MenuItem
-from users.models import SAWPermission
 from users.groups import GUEST, MEMBER, BOARD_MEMBER
 from .register import VIEW_BOARD, VIEW_MEMBER, VIEW_PUBLIC
 
@@ -41,8 +40,7 @@ class InfoPage(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse("info.views.view_page", kwargs={'category_id': self.category.id,
-                                                       'page_id': self.id})
+        return reverse("info.views.view_page", kwargs={'page_id': self.id})
 
 
 class InfoPageEdit(models.Model):

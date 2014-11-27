@@ -21,9 +21,11 @@
             {% trans "Submit" %}
         </button>
     </form>
-    <a href="{% url "info.views.delete_category" %}">
-        <div class="btn btn-danger">
-            {% trans "Delete" %}
-        </div>
-    </a>
+    {% if page %}
+        <a href="{% url "info_delete_page" page.id %}">
+            <div class="btn btn-danger">
+                {% trans "Delete" %}
+            </div>
+        </a>
+    {% endif %}
 {% endblock %}
