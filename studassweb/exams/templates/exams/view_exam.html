@@ -1,19 +1,20 @@
 {% extends "exams/base.html" %}
 
 {% load i18n %}
+{% load thumbnail %}
 
 {% block inner_content %}
     {% load navigator %}
     {% url "exams.views.main" as exams_url %}
     {% display_navigator exams_url "Exams" exam.get_absolute_url exam%}
-<p>{% trans "Images: " %}<br>
-    {% for examfile in images %}
-        <a href="{{ examfile.image.url }}"> {{ examfile.image.name }} </a><br>
-    {% endfor %}
-</p>
-<p>{% trans "Course name: " %}<a href="{% url 'exams_view_course' exam.course_id.id %}">{{ exam.course_id.name }}</a> </p>
-<p>{% trans "Exam date: " %}{{ exam.exam_date|date:"Y-m-d" }}</p>
-<p>{% trans "Examinator: " %}<a href="{% url 'exams_view_examinator' exam.examinator.id %}">{{ exam.examinator.name }}</a></p>
+    <p>{% trans "Images: " %}<br>
+        {% for examfile in images %}
+            <a href="{{ examfile.image.url }}"><img  class="img-thumbnail" src="{% thumbnail examfile.image 100x100 crop=scale %}"/></a>
+        {% endfor %}
+    </p>
+    <p>{% trans "Course name: " %}<a href="{% url 'exams_view_course' exam.course_id.id %}">{{ exam.course_id.name }}</a> </p>
+    <p>{% trans "Exam date: " %}{{ exam.exam_date|date:"Y-m-d" }}</p>
+    <p>{% trans "Examinator: " %}<a href="{% url 'exams_view_examinator' exam.examinator.id %}">{{ exam.examinator.name }}</a></p>
 
-<p><a href="{% url 'exams_edit_exam' exam.id %}">{% trans "Edit this exam" %}</a></p>
+    <p><a href="{% url 'exams_edit_exam' exam.id %}">{% trans "Edit this exam" %}</a></p>
 {% endblock %}
