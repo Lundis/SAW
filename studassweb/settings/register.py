@@ -15,11 +15,15 @@ def get_permissions():
 
 
 def get_menu_items():
+    """
+    :return: a tuple ([main menu items], [settings menu items], [others])
+    """
+    item, created = MenuItem.get_or_create(__package__,
+                                           "Settings",
+                                           reverse_string="settings_main",
+                                           permission=SAWPermission.get_or_create(VIEW_SETTINGS))
     return (None,
-            [MenuItem.get_or_create(__package__,
-                                    "Settings",
-                                    reverse_string="settings_main",
-                                    permission=SAWPermission.get_or_create(VIEW_SETTINGS))],
+            [item],
             None)
 
 

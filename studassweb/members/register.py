@@ -4,11 +4,15 @@ from users.groups import BOARD_MEMBER
 
 
 def get_menu_items():
+    """
+    :return: a tuple ([main menu items], [settings menu items], [others])
+    """
+    item, created = MenuItem.get_or_create(__package__,
+                                           "Member Registry",
+                                           reverse_string="members_home",
+                                           permission=SAWPermission.get_or_create("can_view_member_registry"))
     return (None,
-            [MenuItem.get_or_create(__package__,
-                                    "Member Registry",
-                                    reverse_string="members_home",
-                                    permission=SAWPermission.get_or_create("can_view_member_registry"))],
+            [item],
             None)
 
 

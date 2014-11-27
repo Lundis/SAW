@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load sawp %}
+{% load bootstrap3 %}
 
 {% block inner_content %}
     {% load navigator %}
@@ -19,9 +20,9 @@
             ?
         </p>
         <form action="{% if page %}
-            {% url "info_delete_page" page=page.id %}
+            {% url "info_delete_page" page_id=page.id %}
         {% else %}
-            {% url "info_delete_category" category=category.id %}
+            {% url "info_delete_category" category_id=category.id %}
         {% endif %}" method="post">
 
             {% csrf_token %}

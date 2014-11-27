@@ -4,7 +4,10 @@ from users.groups import GUEST, MEMBER, BOARD_MEMBER
 
 
 def get_menu_items():
-    item = MenuItem.get_or_create(__package__,
+    """
+    :return: a tuple ([main menu items], [settings menu items], [others])
+    """
+    item, created = MenuItem.get_or_create(__package__,
                                   "Info",
                                   reverse_string="info_view_categories",
                                   permission=SAWPermission.get_or_create("can_view_public_info_pages"))

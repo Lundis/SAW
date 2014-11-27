@@ -13,8 +13,8 @@ def get_permissions():
 
 
 def get_settings_items():
-    return [MenuItem.get_or_create(__package__,
-                                   'Menu items',
-                                   reverse_string='menu_settings_edit_menu',
-                                   permission=SAWPermission.get_or_create("can_edit_menu"))
-    ]
+    item, created = MenuItem.get_or_create(__package__,
+                                           'Menu items',
+                                           reverse_string='menu_settings_edit_menu',
+                                           permission=SAWPermission.get_or_create("can_edit_menu"))
+    return [item]

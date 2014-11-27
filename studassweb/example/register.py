@@ -2,11 +2,15 @@ from menu.models import MenuItem
 
 
 def get_menu_items():
+    """
+    :return: a tuple ([main menu items], [settings menu items], [others])
+    """
+    item, created = MenuItem.get_or_create(__package__,
+                                           "Example",
+                                           reverse_string="example_choose")
     return (None,
             None,
-            [MenuItem.get_or_create(__package__,
-                                    "Example",
-                                    reverse_string="example_choose")])
+            [item])
 
 
 def get_urls():

@@ -4,12 +4,14 @@ from users.groups import GUEST
 
 
 def get_menu_items():
-    return ([MenuItem.get_or_create(__package__,
-                                    "Contact",
-                                    reverse_string="contact_home",
-                                    permission=SAWPermission.get_or_create("can_view_contact_form"))],
-            None,
-            None)
+    """
+    :return: a tuple ([main menu items], [settings menu items], [others])
+    """
+    item, created = MenuItem.get_or_create(__package__,
+                                           "Contact",
+                                           reverse_string="contact_home",
+                                           permission=SAWPermission.get_or_create("can_view_contact_form"))
+    return [item], None, None
 
 
 def get_urls():

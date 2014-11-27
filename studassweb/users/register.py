@@ -24,21 +24,24 @@ def get_permissions():
         (VIEW_PROFILES, MEMBER, "Can view the profile pages of other users"),
         (EDIT_PROFILE, LOGGED_ON, "Access to the settings page for editing personal user settings"),
         (EDIT_PERMISSIONS, WEBMASTER, "Access to the settings page for permissions"),
-        (EDIT_LOGIN_SETTINGS, WEBMASTER, "Access to the settings page for configuring how users can log in (LDAP, FB, G+ etc)"),
+        (EDIT_LOGIN_SETTINGS, WEBMASTER,
+         "Access to the settings page for configuring how users can log in (LDAP, FB, G+ etc)"),
     )
 
 
 def get_settings_items():
-    return [MenuItem.get_or_create(__package__,
-                                   "User",
-                                   reverse_string="users_settings_edit_permissions",
-                                   permission=SAWPermission.get_or_create(EDIT_PROFILE)),
-            MenuItem.get_or_create(__package__,
-                                   "Permissions",
-                                   reverse_string="users_settings_edit_user",
-                                   permission=SAWPermission.get_or_create(EDIT_PERMISSIONS)),
-            MenuItem.get_or_create(__package__,
-                                   "Login",
-                                   reverse_string="users_settings_edit_login",
-                                   permission=SAWPermission.get_or_create(EDIT_LOGIN_SETTINGS))
-    ]
+    profile, created = MenuItem.get_or_create(__package__,
+                                              "User",
+                                              reverse_string="users_settings_edit_permissions",
+                                              permission=SAWPermission.get_or_create(EDIT_PROFILE))
+    permissions, created = MenuItem.get_or_create(__package__,
+                                                  "Permissions",
+                                                  reverse_string="users_settings_edit_user",
+                                                  permission=SAWPermission.get_or_create(EDIT_PERMISSIONS))
+    login, created = MenuItem.get_or_create(__package__,
+                                            "Login",
+                                            reverse_string="users_settings_edit_login",
+                                            permission=SAWPermission.get_or_create(EDIT_LOGIN_SETTINGS))
+    return [profile, permissions, login]
+
+

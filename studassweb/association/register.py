@@ -7,10 +7,11 @@ def get_menu_items():
     """
     :return: a tuple ([main menu items], [settings menu items], [others])
     """
-    return ([MenuItem.get_or_create(__package__,
-                                    "Association",
-                                    reverse_string="association_main",
-                                    permission=SAWPermission.get_or_create("can_view_association"))],
+    item, created = MenuItem.get_or_create(__package__,
+                                           "Association",
+                                           reverse_string="association_main",
+                                           permission=SAWPermission.get_or_create("can_view_association"))
+    return ([item],
             None,
             None)
 

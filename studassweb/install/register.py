@@ -4,11 +4,15 @@ from users.groups import WEBMASTER
 
 
 def get_menu_items():
+    """
+    :return: a tuple ([main menu items], [settings menu items], [others])
+    """
+    item, created = MenuItem.get_or_create(__package__,
+                                           "Install",
+                                           reverse_string="install_welcome",
+                                           permission=SAWPermission.get_or_create("can_install"))
     return (None,
-            [MenuItem.get_or_create(__package__,
-                                    "Install",
-                                    reverse_string="install_welcome",
-                                    permission=SAWPermission.get_or_create("can_install"))],
+            [item],
             None)
 
 
