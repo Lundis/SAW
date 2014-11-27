@@ -1,5 +1,6 @@
 from django.db import models
-
+from django.core.urlresolvers import reverse
+from datetime import datetime
 
 class Course(models.Model):
     name = models.CharField(max_length=100)
@@ -7,12 +8,18 @@ class Course(models.Model):
     def __str__(self):
         return str(self.name)
 
+    def get_absolute_url(self):
+        return reverse("exams.views.view_course", kwargs={'course_id': self.id})
+
 
 class Examinator(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse("exams.views.view_examinator", kwargs={'examinator_id': self.id})
 
 
 class SingleExam(models.Model):
@@ -22,7 +29,10 @@ class SingleExam(models.Model):
     examinator = models.ForeignKey(Examinator, on_delete=models.PROTECT)
 
     def __str__(self):
-        return str(self.exam_date) + " : " + str(self.examinator) + " : " + str(self.course_id)
+        return self.exam_date.strftime("%Y-%m-%d") + " : " + str(self.examinator) + " : " + str(self.course_id)
+
+    def get_absolute_url(self):
+        return reverse("exams.views.view_exam", kwargs={'exam_id': self.id})
 
 
 class ExamFile(models.Model):

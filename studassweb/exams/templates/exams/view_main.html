@@ -3,12 +3,16 @@
 {% load i18n %}
 
 {% block inner_content %}
+    {% load navigator %}
+    {% url "exams.views.main" as exams_url %}
+    {% display_navigator exams_url "Exams" %}
+
     {% for exam in exams %}
-		<p><a href="/exams/exam/{{ exam.id }}">{{ exam.course_id.name }}:{{ exam.id }}</a></p>
-	{% endfor %}
+        <p><a href="/exams/exam/{{ exam.id }}">{{ exam.exam_date|date:"Y-m-d" }} : {{ exam.course_id.name }}: {{ exam.examinator.name }}</a></p>
+    {% endfor %}
 
 
-    <p><a href="/exams/add_exam/">{% trans "Add new exam" %}</a> |
-    <a href="/exams/add_course/">{% trans "Add new course" %}</a> |
-    <a href="/exams/add_examinator/">{% trans "Add new examinator" %}</a></p>
+    <p><a href="{% url 'exams_add_exam' %}">{% trans "Add new exam" %}</a> |
+        <a href="{% url 'exams_add_course' %}">{% trans "Add new course" %}</a> |
+        <a href="{% url 'exams_add_examinator' %}">{% trans "Add new examinator" %}</a></p>
 {% endblock %}

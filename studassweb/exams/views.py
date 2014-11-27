@@ -7,7 +7,7 @@ from django.forms.models import inlineformset_factory
 
 
 def main(request):
-    exams = SingleExam.objects.filter()
+    exams = SingleExam.objects.filter().order_by('-exam_date')
     return render(request, 'exams/view_main.html',
                   {'exams': exams},)
 
@@ -18,9 +18,7 @@ def view_exam(request, exam_id):
         images = ExamFile.objects.filter(exam_id=exam_id)
 
         return render(request, 'exams/view_exam.html', {
-            'id': exam.id, 'images': images, 'course_id_id': exam.course_id.id, 'course_id_name': exam.course_id.name,
-            'ocr': exam.ocr, 'exam_date': exam.exam_date, 'examinator_id': exam.examinator.id,
-            'examinator_name': exam.examinator.name},)
+            'exam': exam, 'images': images},)
     except SingleExam.DoesNotExist:
         return HttpResponseNotFound('No exam with that id found')
 
@@ -30,7 +28,7 @@ def view_examinator(request, examinator_id):
         examinator = Examinator.objects.get(id=examinator_id)
         exams = SingleExam.objects.filter(examinator=examinator_id).order_by('-exam_date')
         return render(request, 'exams/view_examinator.html', {
-            'id': examinator.id, 'name': examinator.name, 'exams': exams},)
+            'examinator': examinator, 'exams': exams},)
     except Examinator.DoesNotExist:
         return HttpResponseNotFound('No examinator with that id found')
 
@@ -40,7 +38,7 @@ def view_course(request, course_id):
         course = Course.objects.get(id=course_id)
         exams = SingleExam.objects.filter(course_id=course_id).order_by('-exam_date')
         return render(request, 'exams/view_course.html', {
-            'id': course.id, 'name': course.name, 'exams': exams},)
+            'course': course, 'exams': exams},)
     except Course.DoesNotExist:
         return HttpResponseNotFound('No course with that id found')
 

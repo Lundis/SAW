@@ -5,6 +5,14 @@
 {% load static %}
 
 {% block inner_content %}
+    {% load navigator %}
+    {% url "exams.views.main" as exams_url %}
+    {% if form.instance.pk %}
+        {% display_navigator exams_url "Exams" form.instance.get_absolute_url form.instance%}
+    {% else %}
+        {% display_navigator exams_url "Exams" "#" "New exam" %}
+    {% endif %}
+
     {% if form.instance.pk %}
         <form action="{% url 'exams_delete_exam' form.instance.pk %}" method="post">
             {% csrf_token %}

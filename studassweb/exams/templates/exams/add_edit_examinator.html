@@ -5,17 +5,27 @@
 
 
 {% block inner_content %}
-{% if form.instance.pk %}
-    <p>{% trans "Note: If you want to remove this examinator you first have to remove all associated exams." %}</p>
-{% endif %}
-<form action="" method="post">
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    {% buttons %}
-        <button type="submit" class="btn btn-primary">
-            {% trans "Submit" %}
-        </button>
-    {% endbuttons %}
-</form>
+    {% load navigator %}
+    {% url "exams.views.main" as exams_url %}
+    {% if form.instance.pk %}
+        {% display_navigator exams_url "Exams" form.instance.get_absolute_url form.instance.name%}
+    {% else %}
+        {% display_navigator exams_url "Exams" "#" "New examinator" %}
+    {% endif %}
+
+
+    {% if form.instance.pk %}
+        <p>{% trans "Note: If you want to remove this examinator you first have to remove all associated exams." %}</p>
+    {% endif %}
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">
+                {% trans "Submit" %}
+            </button>
+        {% endbuttons %}
+    </form>
 
 {% endblock %}
