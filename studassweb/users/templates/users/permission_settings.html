@@ -54,13 +54,13 @@
             for (var i = 0; i < old_fields.length; i++) {
                 old_fields[i].parentNode.removeChild(old_fields[i]);
             }
-            group_containers = document.getElementsByClassName("permission-container")
+            var group_containers = document.getElementsByClassName("permission-container")
             for (var i = 0; i < group_containers.length; i++) {
-                permissions = group_containers[i].childNodes;
-                group_id = group_containers[i].getAttribute("id");
+                var permissions = group_containers[i].childNodes;
+                var group_id = group_containers[i].getAttribute("id").split("-")[1];
                 for (var j = 0; j < permissions.length; j++) {
                     try {
-                        permission_id = permissions[j].getAttribute("id");
+                        var permission_id = permissions[j].getAttribute("id").split("-")[1];
                         add_hidden_input(permission_id, group_id);
                     } catch(e) {
                         // ignore error because it is weird and sucks and shouldn't exist
