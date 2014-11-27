@@ -16,6 +16,6 @@
     </div>
     {% has_perm "can_edit_info_pages" as show_create_button %}
     {% if show_create_button %}
-        <p>{% trans "Create a new category" %} <a href="{% url "info.views.edit_category" %}">{% trans "here" %}</a>.</p>
+        <p>{% trans "Create a new category" %} <a href="{% url "info_new_category" %}">{% trans "here" %}</a>.</p>
     {% endif %}
 {% endblock %}

@@ -31,10 +31,10 @@
                     </div>
                     <div class="panel-body">
                         <div class="list-group">
-                            <a href="{% url "info.views.edit_page" category_id=category.id %}">
+                            <a href="{% url "info_new_page" category_id=category.id %}">
                                 <div class="btn list-group-item">{% trans "Create a new page" %}</div>
                             </a>
-                            <a href="{% url "info.views.edit_category" category.id %}">
+                            <a href="{% url "info_edit_category" category.id %}">
                                 <div class="btn list-group-item">{% trans "Edit this category" %}</div>
                             </a>
                         </div>
