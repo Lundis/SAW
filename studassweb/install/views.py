@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.conf import settings
-from install.forms import AssociationForm, ModulesForm, MenuForm
+from install.forms import AssociationForm, ModulesForm
 from users.forms import LoginForm
 from users.models import SAWPermission
 from menu.logic import get_all_menu_items
-from menu.models import Menu, MenuItem
+from menu.models import Menu
+from menu.forms import MenuForm
 from .models import InstallProgress
 from users.decorators import has_permission
 from users.groups import setup_default_groups
@@ -54,9 +55,14 @@ def modules(request):
 
 @has_permission(CAN_INSTALL)
 def menu(request):
-    form = MenuForm(request.POST or None)
+    form = MenuForm(request.POST or None, menus=("main", "login"))
     if form.is_valid():
-        form.apply()
+        main_menu, created = Menu.get_or_create("main_menu")
+        login_menu, created = Menu.get_or_create("login_menu")
+
+        #fill with new values
+        form.put_items_in_menu("main", main_menu)
+        form.put_items_in_menu("login", login_menu)
         InstallProgress.menu_set()
         return HttpResponseRedirect('finished')
 

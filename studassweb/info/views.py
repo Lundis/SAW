@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.http import Http404, HttpResponseRedirect
 from users.decorators import has_permission
-from menu.models import MenuItem, Menu
 from .models import InfoCategory, InfoPage
 from .forms import InfoPageForm, InfoCategoryForm
 from .register import EDIT, VIEW_PUBLIC
