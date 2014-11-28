@@ -125,8 +125,8 @@ class MenuForm(forms.Form):
         :return:
         """
         # get menus
-        main_menu, created = Menu.objects.get_or_create(menu_name="main_menu")
-        login_menu, created = Menu.objects.get_or_create(menu_name="login_menu")
+        main_menu, created = Menu.get_or_create("main_menu")
+        login_menu, created = Menu.get_or_create("login_menu")
 
         # clear them
         main_menu.clear()

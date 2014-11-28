@@ -29,16 +29,24 @@ class Menu(models.Model):
         """
         Add menu_item to this menu
         """
-        print(self.menu_name, " adding item ", menu_item.display_name, "on index ", index)
         link = ItemInMenu(menu=self, item=menu_item, display_order=index)
         link.save()
 
-    def remove_item(self, menu_item, index):
+    def remove_item(self, menu_item):
         """
         Remove menu_item from this menu
         """
-        link = ItemInMenu.objects.get(menu=self, item=menu_item, display_order=index)
+        link = ItemInMenu.objects.get(menu=self, item=menu_item)
         link.delete()
+
+    @classmethod
+    def remove_item_from_all_menus(cls, menu_item):
+        """
+        Remove menu_item from all menus
+        """
+        link = ItemInMenu.objects.filter(item=menu_item)
+        if link:
+            link.delete()
 
     def clear(self):
         """
@@ -56,6 +64,14 @@ class Menu(models.Model):
     def count(self):
         return ItemInMenu.objects.filter(menu=self).count()
 
+    def contains(self, item):
+        """
+        :param item: MenuItem
+        :return: true if this menu contains the menu item.
+        """
+        return ItemInMenu.objects.filter(menu=self, item=item).exists()
+
+
     @classmethod
     def get_or_none(cls, name):
         """
@@ -65,6 +81,15 @@ class Menu(models.Model):
             return cls.objects.get(menu_name=name)
         except cls.DoesNotExist:
             return None
+
+    @classmethod
+    def get_or_create(cls, name, template=None):
+        """
+        :param name: unique identifier for the menu
+        :param template: optional template used by the display_menu tag
+        :return: requested menu, boolean (if it was created)
+        """
+        return cls.objects.get_or_create(menu_name=name, template=template)
 
 
 class MenuItem(models.Model):
@@ -152,7 +177,7 @@ class MenuItem(models.Model):
             menu_item.view_permission = permission
             menu_item.submenu = submenu
             menu_item.save()
-        return menu_item
+        return menu_item, created
 
     @classmethod
     def get_defaults(cls, menu_id):
@@ -179,7 +204,30 @@ class MenuItem(models.Model):
         elif self.reverse_string:
             return reverse(self.reverse_string)
         else:
-            return self.url
+            return self.external_url
+
+    @classmethod
+    def get_all_that_links_to(cls, link_target):
+        """
+        Deletes all MenuItem that links to the target, and also any submenus owned by these items.
+        :param link_target: target model
+        """
+        content_type = ContentType.objects.get_for_model(link_target)
+        items = cls.objects.filter(content_type=content_type, object_id=link_target.id)
+        return items
+
+    @classmethod
+    def delete_all_that_links_to(cls, link_target):
+        """
+        Deletes all MenuItem that links to the target, and also any submenus owned by these items.
+        :param link_target: target model
+        """
+        items = cls.get_all_that_links_to(link_target)
+        if items:
+            for item in items:
+                if item.submenu:
+                    item.submenu.delete()
+                item.delete()
 
 
 class ItemInMenu(models.Model):

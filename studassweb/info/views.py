@@ -36,7 +36,7 @@ def view_page(request, page_id):
 
 
 @has_permission(EDIT)
-def edit_page(request, page_id=None):
+def edit_page(request, category_id=None, page_id=None):
     """
     edit or create a page
     :param request:
@@ -50,15 +50,18 @@ def edit_page(request, page_id=None):
     except InfoPage.DoesNotExist:
         pass
 
-    form = InfoPageForm(request.POST or None, instance=page)
+    # if this is a new page and a category is specified
+    if not category and category_id:
+        try:
+            category = InfoCategory.objects.get(id=category_id)
+        except InfoCategory.DoesNotExist:
+            pass
+
+    form = InfoPageForm(request.POST or None, instance=page, initial={'category': category})
     if form.is_valid():
         new_page = form.save()
         new_page.category = category
         new_page.save()
-        # if this is a new page
-        if not page:
-            # create a menu item
-            MenuItem.get_or_create(__package__, new_page.title, linked_object=new_page, permission=new_page.permission)
         return HttpResponseRedirect(new_page.get_absolute_url())
     else:
         return render(request, 'info/edit_page.html', {'category': category,
@@ -98,12 +101,6 @@ def edit_category(request, category_id=None):
     form = InfoCategoryForm(request.POST or None, instance=category)
     if form.is_valid():
         cat = form.save()
-        # if it's a new category
-        if not category:
-            # add it to the info menu
-            item = MenuItem.get_or_create('info', cat.name, linked_object=cat, permission=cat.permission)
-            menu, created = Menu.objects.get_or_create(menu_name='info_top_menu')
-            menu.add_item(item, menu.count())
         return HttpResponseRedirect(cat.get_absolute_url())
     else:
         return render(request, 'info/edit_category.html', {'category': category,
@@ -132,15 +129,11 @@ def delete(request, category_id=None, page_id=None):
     if form.is_valid():
         if page:
             cat = page.category
-            menu_items = MenuItem.filter(link_target=page)
-            menu_items.delete()
             page.delete()
             if cat:
                 return HttpResponseRedirect(cat.get_absolute_url())
         else:
-            menu_items = MenuItem.filter(link_target=category)
             category.delete()
-            menu_items.delete()
             return HttpResponseRedirect(reverse('info_view_categories'))
 
 

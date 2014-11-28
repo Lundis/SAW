@@ -62,7 +62,6 @@ def menu(request):
 
     menu_items, login_items, other_items = get_all_menu_items()
 
-
     context = {'menu_items': menu_items,
                'login_items': login_items,
                'available_items': other_items,
