@@ -90,9 +90,9 @@
                 old_fields[i].parentNode.removeChild(old_fields[i]);
             }
             new_menu_items = document.getElementById("install-menu-container").childNodes;
-            for (i = 0; i < new_menu_items.length; i++) {
+            for ( var i = 0; i < new_menu_items.length; i++) {
                 try {
-                    menu_id = "main-" + new_menu_items[i].getAttribute("id");
+                    var menu_id = "main-" + new_menu_items[i].getAttribute("id");
                     add_hidden_input(menu_id, i);
                 } catch(e) {
                     // ignore error because it is weird and sucks and shouldn't exist
@@ -101,9 +101,9 @@
             }
 
             new_login_items = document.getElementById("install-login-container").childNodes;
-            for (i = 0; i < new_login_items.length; i++) {
+            for (var i = 0; i < new_login_items.length; i++) {
                 try {
-                    menu_id  = "login-" + new_login_items[i].getAttribute("id");
+                    var menu_id  = "login-" + new_login_items[i].getAttribute("id");
                     add_hidden_input(menu_id, i);
                 } catch(e) {
                     // ignore error because it is weird and sucks and shouldn't exist

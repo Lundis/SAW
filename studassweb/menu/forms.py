@@ -23,6 +23,10 @@ class MenuForm(forms.Form):
         """
         self.menus = kwargs.pop('menus')
         self.verify_argument_menus()
+        if 'initial_items' in kwargs:
+            self.default_items = kwargs.pop('initial_items')
+        if 'available_items' in kwargs:
+            self.available_items = kwargs.pop('available_items')
         super(MenuForm, self).__init__(*args, **kwargs)
         # the first argument is the post data
         if len(args) > 0 and args[0]:
@@ -71,3 +75,36 @@ class MenuForm(forms.Form):
         for menuitem, order in self.cleaned_data[menu_string + '_menu_items']:
             menu_item = MenuItem.objects.get(id=menuitem)
             menu.add_item(menu_item, order)
+
+    def __str__(self):
+        """
+        renders the required javascript for this form
+        :return:
+        """
+
+    def rendered_menu_editors(self):
+        """
+        return a list of rendered menus
+        :return:
+        """
+        pass
+
+    def _render_menu(self, menu=None, menu_items=None):
+        """
+        renders the menu_item
+        :param menu:
+        :param menu_items:
+        :return:
+        """
+        pass
+
+    def render_available_items(self):
+        """
+        renders the available menu items
+        :return:
+        """
+        pass
+
+    @staticmethod
+    def get_form_id(self):
+        return "menu-editor-form"

@@ -4,31 +4,27 @@
 {% block inner_content %}
     <h3>{% trans "Drag the items to reorder them" %}</h3>
     <div class="row">
-        <div class="col-sm-4">
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">{{ menu.menu_name }}</div>
-                    <div class="panel-body">
-                        <div id="used-item-container" class="list-group ui-sortable connected-sort menu-item-container">
-                            {% for item in menu.items %}
-                                <li id="menu-item-{{ item.id }}" class="list-group-item menu-item ui-sortable-handle">
-                                    {{ item.display_name }}
-                                </li>
-                            {% endfor %}
-                        </div>
+        <div class="col-sm-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">{{ menu.menu_name }}</div>
+                <div class="panel-body">
+                    <div id="used-item-container" class="ui-sortable connected-sort menu-item-container">
+                        {% for item in menu.items %}
+                            <li id="menu-item-{{ item.id }}" class="btn btn-primary menu-item ui-sortable-handle">
+                                {{ item.display_name }}
+                            </li>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-sm-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     {% trans "Available items. Drag items here to remove them from the menu"  %}
                 </div>
                 <div class="panel-body">
-                    <div id="available-item-container" class="list-group ui-sortable connected-sort menu-item-container">
+                    <div id="available-item-container" class="ui-sortable connected-sort menu-item-container">
                         {% for item in available_items %}
-                            <li id="menu-item-{{ item.id }}" class="list-group-item menu-item ui-sortable-handle">
+                            <li id="menu-item-{{ item.id }}" class="btn btn-primary menu-item ui-sortable-handle">
                                 {{ item.display_name }}
                             </li>
                         {% endfor %}
@@ -39,10 +35,10 @@
         <div class="col-sm-2">
             <form action="{% url "menu_settings_edit_menu" menu.id %}" id="menu-items-form" method="post">
                 {% csrf_token %}
-                <div class="btn-group-vertical">
-                <button type="submit" value="Submit" class="btn btn-primary">
-                    {% trans "Save" %}
-                </button>
+                <div class="btn-group">
+                    <button type="submit" value="Submit" class="btn btn-primary">
+                        {% trans "Save" %}
+                    </button>
                     <a href="{% url "menu_settings_select_menu" %}" class="btn btn-primary">{% trans "Back" %}</a>
                 </div>
             </form>
@@ -75,8 +71,8 @@
             var index = 0;
             for (var i = 0; i < menu_items.length; i++) {
                 try {
-                    var menu_item_id = menu_items[i].getAttribute("id").split("-")[2];
-                    add_hidden_input(menu_item_id, index);
+                    var menu_item = getAttribute("id");
+                    add_hidden_input(menu_item, index);
                     index++;
                 } catch(e) {
                     // ignore error because it is weird and sucks and shouldn't exist
@@ -84,9 +80,9 @@
             }
         }
 
-        function add_hidden_input(menu_item_id, index) {
+        function add_hidden_input(menu_item, index) {
             var input_field = document.createElement("input");
-            input_field.setAttribute("name", menu_item_id);
+            input_field.setAttribute("name", menu_item);
             input_field.setAttribute("value", index);
             input_field.setAttribute("type", "hidden");
             input_field.setAttribute("class","permission-hidden-field");

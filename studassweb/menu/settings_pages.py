@@ -24,6 +24,8 @@ def edit_menu(request, menu_id):
     except Menu.DoesNotExist:
         raise Http404
 
+
+
     # Get all available menu items
     available_items = MenuItem.objects.all()
     # Filter away the ones in the menu
