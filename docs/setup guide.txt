@@ -42,6 +42,13 @@ To upgrade from a previous version, run:
     * url: https://github.com/shaunsephton/django-ckeditor
     * install instructions:
         > pip install django-ckeditor
+		
+* easy-thumbnails
+    * This is for the thumbnail generation
+    * url: https://github.com/SmileyChris/easy-thumbnails
+    * install instructions:
+        > pip install easy-thumbnails
+		> python manage.py migrate easy_thumbnails
 
 
 ===== Install Pycharm pro edition =====
