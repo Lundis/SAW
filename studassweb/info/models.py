@@ -40,6 +40,8 @@ class InfoCategory(models.Model):
             self.menu_item.submenu, created2 = Menu.get_or_create(__package__ + "_category_" + self.name)
             self.menu_item.save()
             self.save()
+            info_menu, created = Menu.get_or_create("info_top_menu")
+            info_menu.add_item(self.menu_item)
 
     def delete(self, *args, **kwargs):
         MenuItem.delete_all_that_links_to(self)

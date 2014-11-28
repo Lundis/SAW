@@ -25,10 +25,12 @@ class Menu(models.Model):
     def __str__(self):
         return self.menu_name
 
-    def add_item(self, menu_item, index):
+    def add_item(self, menu_item, index=None):
         """
         Add menu_item to this menu
         """
+        if not index:
+            index = self.count()
         link = ItemInMenu(menu=self, item=menu_item, display_order=index)
         link.save()
 

@@ -15,12 +15,20 @@ class InfoCategoryTest(TestCase):
         menu_item = MenuItem.get_all_that_links_to(cat)
         self.assertTrue(menu_item.count() == 1, "A single Menu item wasn't created")
 
+        # Check that the item was added to the top info menu
+        menu = Menu.get_or_none("info_top_menu")
+        self.assertIsNotNone(menu, "Info menu doesn't exist")
+        self.assertTrue(menu.contains(menu_item), "Category item isn't in the info menu")
+
         # The menu item should have a submenu
         submenu = menu_item[0].submenu
         self.assertIsNotNone(submenu, "Submenu wasn't created")
 
         # Let's delete the category
         cat.delete()
+
+        # was it removed from the info menu?
+        self.assertFalse(menu.contains(menu_item), "Category item is still in the info menu after deletion")
 
         # Was the submenu and the menu item deleted as well?
         try:
