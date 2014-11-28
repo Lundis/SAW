@@ -11,6 +11,9 @@ class Course(models.Model):
     def get_absolute_url(self):
         return reverse("exams.views.view_course", kwargs={'course_id': self.id})
 
+    def get_exam_count(self):
+        return str(SingleExam.objects.filter(course_id=self.id).count())
+
 
 class Examinator(models.Model):
     name = models.CharField(max_length=100)
@@ -20,6 +23,9 @@ class Examinator(models.Model):
 
     def get_absolute_url(self):
         return reverse("exams.views.view_examinator", kwargs={'examinator_id': self.id})
+
+    def get_exam_count(self):
+        return str(SingleExam.objects.filter(examinator=self.id).count())
 
 
 class SingleExam(models.Model):

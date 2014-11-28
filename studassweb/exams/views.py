@@ -8,8 +8,10 @@ from django.forms.models import inlineformset_factory
 
 def main(request):
     exams = SingleExam.objects.filter().order_by('-exam_date')
+    courses = Course.objects.filter().order_by('name')
+    examinators = Examinator.objects.filter().order_by('name')
     return render(request, 'exams/view_main.html',
-                  {'exams': exams},)
+                  {'exams': exams, 'courses': courses, 'examinators': examinators},)
 
 
 def view_exam(request, exam_id):

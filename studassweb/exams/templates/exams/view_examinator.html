@@ -16,7 +16,7 @@
         <form action="{% url 'exams_delete_examinator' examinator.id %}" method="post">
             {% csrf_token %}
             {% buttons %}
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-danger">
                     {% trans "Remove this examinator" %}
                 </button>
             {% endbuttons %}
