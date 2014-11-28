@@ -3,6 +3,7 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 from base.models import SiteConfiguration, DisabledModule
 from menu.models import MenuItem, Menu
+from menu.fields import HiddenMenuField
 import datetime
 
 import re
@@ -63,31 +64,6 @@ class ModulesForm(forms.Form):
 
 
 # dynamic menu field and form: http://stackoverflow.com/questions/6154580/django-dynamic-form-example
-class HiddenMenuField(forms.IntegerField):
-
-    def __init__(self, *args, **kwargs):
-        name = kwargs.pop('name')
-        super(HiddenMenuField, self).__init__(*args, **kwargs)
-        self.name = name
-
-    def clean(self, value):
-        """
-
-        :param value: The value attribute of the field
-        :return: clean value
-        """
-        cleaned_num = super(HiddenMenuField, self).clean(value)
-        # Check that the id is positive and that the menu item actually exists
-        if cleaned_num < 0:
-            raise forms.ValidationError("Menu item index below 0")
-        # assumes that the form has only added proper fields
-        menu_item_index = int(self.name.split('-')[3])
-        if MenuItem.objects.filter(id=menu_item_index).count() != 1:
-            raise forms.ValidationError("Menu item " + menu_item_index + " does not exist! You h4x0r!!")
-        # else return the cleaned value
-        return cleaned_num
-
-
 class MenuForm(forms.Form):
     def __init__(self, *args, **kwargs):
         """
