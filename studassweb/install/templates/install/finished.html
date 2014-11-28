@@ -17,7 +17,7 @@
         <p> {% trans 'Please restart the server if you made any changes to the modules or if this was the first time you ran the installation wizard' %}!</p>
         <a href="/"><p>{% trans 'Click here to check it out!' %}</p></a>
 
-        <a href="menu"><button type="button" class="btn btn-primary">
+        <a href="{% url "install.views.menu" %}"><button type="button" class="btn btn-primary">
             Previous
         </button></a>
     </div>

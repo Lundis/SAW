@@ -1,5 +1,10 @@
 from django.db import models
 from users.models import SAWPermission
+from django.core.urlresolvers import reverse
+from django.core.validators import ValidationError
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+
 
 class MenuTemplate(models.Model):
     path = models.CharField(max_length=100, unique=True)
@@ -24,16 +29,24 @@ class Menu(models.Model):
         """
         Add menu_item to this menu
         """
-        print(self.menu_name, " adding item ", menu_item.display_name, "on index ", index)
         link = ItemInMenu(menu=self, item=menu_item, display_order=index)
         link.save()
 
-    def remove_item(self, menu_item, index):
+    def remove_item(self, menu_item):
         """
         Remove menu_item from this menu
         """
-        link = ItemInMenu.objects.get(menu=self, item=menu_item, display_order=index)
+        link = ItemInMenu.objects.get(menu=self, item=menu_item)
         link.delete()
+
+    @classmethod
+    def remove_item_from_all_menus(cls, menu_item):
+        """
+        Remove menu_item from all menus
+        """
+        link = ItemInMenu.objects.filter(item=menu_item)
+        if link:
+            link.delete()
 
     def clear(self):
         """
@@ -48,6 +61,17 @@ class Menu(models.Model):
                 ItemInMenu.objects.filter(menu=self)
                 if not user or item_in_menu.item.can_user_view(user)]
 
+    def count(self):
+        return ItemInMenu.objects.filter(menu=self).count()
+
+    def contains(self, item):
+        """
+        :param item: MenuItem
+        :return: true if this menu contains the menu item.
+        """
+        return ItemInMenu.objects.filter(menu=self, item=item).exists()
+
+
     @classmethod
     def get_or_none(cls, name):
         """
@@ -58,52 +82,102 @@ class Menu(models.Model):
         except cls.DoesNotExist:
             return None
 
+    @classmethod
+    def get_or_create(cls, name, template=None):
+        """
+        :param name: unique identifier for the menu
+        :param template: optional template used by the display_menu tag
+        :return: requested menu, boolean (if it was created)
+        """
+        return cls.objects.get_or_create(menu_name=name, template=template)
+
 
 class MenuItem(models.Model):
 
     #app_name is used for checking if it belongs to a disabled module
     app_name = models.CharField(max_length=50, null=True, blank=True)
     display_name = models.CharField(max_length=30)
-    url = models.URLField()
-    # Does the item by default belong to a menu?
-    # This is used to improve the usability of the installation wizard.
-    MAIN_MENU = 'MM'
-    LOGIN_MENU = 'LM'
-    NONE = 'NO'
-    MENU_CHOICES = (
-        (MAIN_MENU, "Main menu"),
-        (LOGIN_MENU, "Login menu"),
-        (NONE, "No menu"),
-    )
-    default_menu = models.CharField(max_length=2, choices=MENU_CHOICES)
+    # A field for referring to external URLs
+    external_url = models.URLField(null=True, blank=True)
+    # A field for getting a link using reverse()
+    reverse_string = models.CharField(max_length=100, null=True, blank=True)
+    # A generic field for linking to any model
+    content_type = models.ForeignKey(ContentType, null=True)
+    object_id = models.PositiveIntegerField(null=True)
+    link_target = GenericForeignKey('content_type', 'object_id')
+
+    submenu = models.ForeignKey(Menu, null=True)
     view_permission = models.ForeignKey(SAWPermission, null=True, blank=True)
+    # is the item managed by a specific app (referred to in app_name,
+    # or is it a custom item created by the user.
+    # I use choices instead of a boolean because it's clearer and more types might be added in the future.
+    TYPE_APP = 'AP'
+    TYPE_USER = 'US'
+    TYPE_CHOICES = (
+        (TYPE_APP, "Created by app"),
+        (TYPE_USER, "Created by user"),
+    )
+    type = models.CharField(max_length=2, choices=TYPE_CHOICES, default=TYPE_APP)
 
     class Meta:
         # Don't allow duplicates
-        unique_together = ('display_name', 'url')
+        unique_together = ('app_name', 'display_name')
 
     def __str__(self):
-        return self.display_name + ": " + self.url
+        return self.display_name + ": " + self.url()
+
+    def clean(self, *args, **kwargs):
+        super(MenuItem, self).clean(*args, **kwargs)
+        if not self.url and not self.reverse_string and not self.item:
+            raise ValidationError("no link defined for the menu item")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super(MenuItem, self).save(*args, **kwargs)
 
     @classmethod
-    def get_or_create(cls, app_name, display_name, url, default_menu=NONE, permission=None):
+    def get_or_create(cls, app_name, display_name, reverse_string=None, linked_object=None, url=None, permission=None, submenu=None):
         """
-        Shortcut function for MenuItem.objects.get_or_create
+        Convenience wrapper to create or get valid menu items
         :param app_name: Which app created this item (if any)
         :param display_name:  The string that is shown to the user
+        :param reverse_string: a string that can be called by Django's reverse() function to get a URL
+        :param linked_object: a Django model with a get_absolute_url() method
         :param url: URL
-        :param default_menu: The default menu this item belongs to
         :param permission: The permission required to view this item. if None, anyone can view it
         :return:
         """
-        item, created = cls.objects.get_or_create(app_name=app_name,
-                                                  display_name=display_name,
-                                                  url=url)
+        menu_item = None
+        created = False
+        if permission and isinstance(permission, str):
+            permission = SAWPermission.get_or_create(perm_name=permission)
+
+        if linked_object:
+            if reverse_string or url:
+                raise ValueError("reverse_string and/or url cannot be given at the same time as referred_item")
+            content_type = ContentType.objects.get_for_model(linked_object)
+            menu_item, created = cls.objects.get_or_create(app_name=app_name,
+                                                           display_name=display_name,
+                                                           content_type=content_type,
+                                                           object_id=linked_object.id)
+        elif reverse_string:
+            if url:
+                raise ValueError("url cannot be given at the same time as referred_item")
+            menu_item, created = cls.objects.get_or_create(app_name=app_name,
+                                                           display_name=display_name,
+                                                           reverse_string=reverse_string)
+        elif url:
+            menu_item, created = cls.objects.get_or_create(app_name=app_name,
+                                                           display_name=display_name,
+                                                           external_url=url)
+        else:
+            raise ValueError("No url, reverse string or item was given to MenuItem.get_or_create()")
+
         if created:
-            item.default_menu = default_menu
-            item.view_permission = permission
-            item.save()
-        return item
+            menu_item.view_permission = permission
+            menu_item.submenu = submenu
+            menu_item.save()
+        return menu_item, created
 
     @classmethod
     def get_defaults(cls, menu_id):
@@ -120,6 +194,40 @@ class MenuItem(models.Model):
         :return: True if this item has no associated permission or if the user has the permission
         """
         return not self.view_permission or self.view_permission.has_user_perm(user)
+
+    def has_submenu(self):
+        return self.submenu is not None
+
+    def url(self):
+        if self.link_target:
+            return self.link_target.get_absolute_url()
+        elif self.reverse_string:
+            return reverse(self.reverse_string)
+        else:
+            return self.external_url
+
+    @classmethod
+    def get_all_that_links_to(cls, link_target):
+        """
+        Deletes all MenuItem that links to the target, and also any submenus owned by these items.
+        :param link_target: target model
+        """
+        content_type = ContentType.objects.get_for_model(link_target)
+        items = cls.objects.filter(content_type=content_type, object_id=link_target.id)
+        return items
+
+    @classmethod
+    def delete_all_that_links_to(cls, link_target):
+        """
+        Deletes all MenuItem that links to the target, and also any submenus owned by these items.
+        :param link_target: target model
+        """
+        items = cls.get_all_that_links_to(link_target)
+        if items:
+            for item in items:
+                if item.submenu:
+                    item.submenu.delete()
+                item.delete()
 
 
 class ItemInMenu(models.Model):

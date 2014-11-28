@@ -1,8 +1,28 @@
-{% extends "example/base.html" %}
+{% extends "exams/base.html" %}
 
 {% load i18n %}
+{% load bootstrap3 %}
 
 {% block inner_content %}
-<p>{% trans "Examinator name: " %}{{ name }}</p>
+    {% load navigator %}
+    {% url "exams.views.main" as exams_url %}
+    {% display_navigator exams_url "Exams" examinator.get_absolute_url examinator.name%}
 
+    <h1>{{ examinator.name }}</h1>
+    {% for exam in exams %}
+        <p><a href="{% url 'exams_view_exam' exam.id %}">{{ exam.exam_date|date:"Y-m-d" }} : {{ exam.course_id.name }}</a></p>
+    {% empty %}
+        <p>{% trans "No courses found!"%}</p>
+        <form action="{% url 'exams_delete_examinator' examinator.id %}" method="post">
+            {% csrf_token %}
+            {% buttons %}
+                <button type="submit" class="btn btn-danger">
+                    {% trans "Remove this examinator" %}
+                </button>
+            {% endbuttons %}
+        </form>
+    {% endfor %}
+
+
+    <p><a href="{% url 'exams_edit_examinator' examinator.id %}">{% trans "Edit this examinator"%}</a></p>
 {% endblock %}

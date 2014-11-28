@@ -9,6 +9,7 @@ import re
 
 # TODO for all forms: sanitize input according to the requirements / design.
 
+
 class AssociationForm(forms.Form):
     name = forms.CharField(label=_('Association name'))
     founded = forms.IntegerField(label=_('Founded year'), min_value=0, max_value=datetime.datetime.now().year)
@@ -32,7 +33,6 @@ class AssociationForm(forms.Form):
         site_config.association_name = self.cleaned_data['name']
         site_config.association_founded = self.cleaned_data['founded']
         site_config.save()
-
 
 
 class ModulesForm(forms.Form):
@@ -62,7 +62,6 @@ class ModulesForm(forms.Form):
                     DisabledModule.disable(module)
 
 
-
 # dynamic menu field and form: http://stackoverflow.com/questions/6154580/django-dynamic-form-example
 class HiddenMenuField(forms.IntegerField):
 
@@ -87,6 +86,7 @@ class HiddenMenuField(forms.IntegerField):
             raise forms.ValidationError("Menu item " + menu_item_index + " does not exist! You h4x0r!!")
         # else return the cleaned value
         return cleaned_num
+
 
 class MenuForm(forms.Form):
     def __init__(self, *args, **kwargs):
@@ -119,15 +119,14 @@ class MenuForm(forms.Form):
                 else:
                     self.cleaned_data['login_menu_items'].append((int(matches.group(2)), value,))
 
-
     def apply(self):
         """
         Saves the menu to the database. Will crash if run before is_valid().
         :return:
         """
         # get menus
-        main_menu, created = Menu.objects.get_or_create(menu_name="main_menu")
-        login_menu, created = Menu.objects.get_or_create(menu_name="login_menu")
+        main_menu, created = Menu.get_or_create("main_menu")
+        login_menu, created = Menu.get_or_create("login_menu")
 
         # clear them
         main_menu.clear()

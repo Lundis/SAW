@@ -2,7 +2,6 @@ from django.shortcuts import render
 from .forms import LoginForm, RegisterForm
 from django.http import HttpResponseRedirect
 from django.contrib.auth import logout
-from django.utils.translation import ugettext as _
 
 
 def login_view(request):

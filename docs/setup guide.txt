@@ -7,10 +7,13 @@ If you're running Windows 7 or earlier, you need to restart the computer now.
 Other OSs: pip might not be installed along with Python. You then need to install it manually using some OS-specific method
 
 
-===== Install Django 1.7 =====
+===== Install Django 1.7.1 =====
 
 After installing python 3.4 and pip (comes bundled with it on windows):
-    > pip install django==1.7
+    > pip install django==1.7.1
+
+To upgrade from a previous version, run:
+    > pip install django==1.7.1 --upgrade
 
 ===== Install Dependencies =====
 
@@ -22,7 +25,7 @@ After installing python 3.4 and pip (comes bundled with it on windows):
 
 
 * pillow
-    * This is for ImageField.
+    * This is for ImageField and CKeditor.
     * url: https://pillow.readthedocs.org/
     * install instructions:
         > pip install pillow
@@ -33,6 +36,12 @@ After installing python 3.4 and pip (comes bundled with it on windows):
     * url: https://github.com/dyve/django-bootstrap3
     * install instructions:
         > pip install django-bootstrap3
+
+* django-ckeditor
+    * This is for the WYSIWYG editor.
+    * url: https://github.com/shaunsephton/django-ckeditor
+    * install instructions:
+        > pip install django-ckeditor
 
 
 ===== Install Pycharm pro edition =====

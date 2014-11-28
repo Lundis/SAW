@@ -5,7 +5,10 @@ from django.contrib.auth.models import User
 class News(models.Model):
     title = models.CharField(max_length=100)
     summary = models.TextField(max_length=200)
-    text = models.TextField(max_length=2000)
+    # preformatted text used for editing the article
+    text = models.TextField()
+    # formatted html
+    text_html = models.TextField()
     publication_date = models.DateTimeField()
     picture = models.ImageField()
     author = models.ForeignKey(User)

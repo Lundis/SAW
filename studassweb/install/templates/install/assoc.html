@@ -12,7 +12,7 @@
 {% block content %}
     <div class="install-content">
 
-        <form action="association" method="post" class=form">
+        <form action="{% url "install.views.association" %}" method="post" class=form">
             {% csrf_token %}
             {% bootstrap_form form %}
             <a href="welcome"><button type="button" class="btn btn-primary">
@@ -23,7 +23,7 @@
             </button>
         </form>
         <ul class="pager left">
-            <li><a href="welcome">{% trans "Previous" %}</a></li>
+            <li><a href="{% url "install.views.welcome" %}">{% trans "Previous" %}</a></li>
         </ul>
     </div>
 {% endblock %}

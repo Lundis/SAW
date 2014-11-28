@@ -28,6 +28,8 @@ class UserExtension(models.Model):
         user_ext = UserExtension(user=user)
         if member:
             if not enrollment_year:
+                # delete user if this fails
+                user.delete()
                 raise IllegalArgumentException("if the user is a member, enrollment year must be specified")
             if not graduation_year:
                 graduation_year = 0
@@ -64,9 +66,10 @@ class SAWPermission(models.Model):
         """
         :return: The requested SAWPermission
         """
-        permission, created = Permission.objects.get_or_create(name=perm_name,
-                                                                    codename=perm_name,
-                                                                    content_type=DummyPermissionBase.get_content_type())
+        fancy_name = perm_name[0].upper() + perm_name[1:].replace("_", " ")
+        permission, created = Permission.objects.get_or_create(name=fancy_name,
+                                                               codename=perm_name,
+                                                               content_type=DummyPermissionBase.get_content_type())
         saw_permission, created = cls.objects.get_or_create(permission=permission)
         # if the description isn't "" and the object was created or it doesn't have a description, add the description
         if description and (created or not saw_permission.description):

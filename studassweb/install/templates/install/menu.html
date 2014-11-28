@@ -16,146 +16,140 @@
         <div class="panel panel-default">
             <div class="panel-heading">{% trans "Main Menu" %}!</div>
             <div class="panel-body">
-                <div class="btn-toolbar">
-                    <div id="install-menu-container" class="btn-group connected-sort">
-                        {% for menu_item in menu_items %}
-                            <li id="menu-item-{{ menu_item.id }}" class="btn btn-primary install-menu-item">
-                                {{ menu_item.display_name }}
-                            </li>
-                        {% endfor %}
-                    </div>
-                    <div class="btn-group">
-                        <div class="btn btn-primary disabled">
-                            Login
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="panel panel-default">
-            <div class="panel-heading">{% trans "Login menu items. These will be visible in a dropdown menu after the user has logged on." %}</div>
-            <div class="panel-body">
-                <div class="btn-toolbar">
-                    <div id="install-login-container" class="btn-group connected-sort">
-                        {% for menu_item in login_items %}
-                            <li id="menu-item-{{ menu_item.id }}" class="btn btn-primary install-menu-item">
-                                {{ menu_item.display_name }}
-                            </li>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                {% trans "Available menu items. Click or drag them above to add them to the menu." %}
-            </div>
-            <div class="panel-body">
-
-                <ul id="install-available-container" class="btn-group connected-sort">
-                    {% for menu_item in available_items %}
+                <div id="install-menu-container" class="btn-group connected-sort">
+                    {% for menu_item in menu_items %}
                         <li id="menu-item-{{ menu_item.id }}" class="btn btn-primary install-menu-item">
                             {{ menu_item.display_name }}
                         </li>
                     {% endfor %}
-                </ul>
+                </div>
             </div>
-
-            <form id="install-menu-form" action="menu" method="post" class=form">
-                {% csrf_token %}
-
-                <a href="modules">
-                    <button type="button" class="btn btn-primary">
-                        {% trans "Previous" %}
-                    </button>
-                </a>
-                <button type="submit" value="Submit" class="btn btn-primary">
-                    {% trans "Next" %}
-                </button>
-            </form>
         </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">{% trans "Login menu items. These will be visible in a dropdown menu after the user has logged on." %}</div>
+        <div class="panel-body">
+            <div class="btn-toolbar">
+                <div id="install-login-container" class="btn-group connected-sort">
+                    {% for menu_item in login_items %}
+                        <li id="menu-item-{{ menu_item.id }}" class="btn btn-primary install-menu-item">
+                            {{ menu_item.display_name }}
+                        </li>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            {% trans "Available menu items. Click or drag them above to add them to the menu." %}
+        </div>
+        <div class="panel-body">
+
+            <ul id="install-available-container" class="btn-group connected-sort">
+                {% for menu_item in available_items %}
+                    <li id="menu-item-{{ menu_item.id }}" class="btn btn-primary install-menu-item">
+                        {{ menu_item.display_name }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <form id="install-menu-form" action="{% url "install.views.menu" %}" method="post" class=form">
+            {% csrf_token %}
+
+            <a href="{% url "install.views.modules" %}">
+                <button type="button" class="btn btn-primary">
+                    {% trans "Previous" %}
+                </button>
+            </a>
+            <button type="submit" value="Submit" class="btn btn-primary">
+                {% trans "Next" %}
+            </button>
+        </form>
+    </div>
     </div>
 {% endblock %}
 
 
 {% block scripts %}
 
-<script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
-<script>
+    <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+    <script>
 
-$('#install-menu-form').submit(function() {
-        updateHiddenFormFields();
-        return true; // return false to cancel form action
-});
+        $('#install-menu-form').submit(function() {
+            updateHiddenFormFields();
+            return true; // return false to cancel form action
+        });
 
-function updateHiddenFormFields() {
-    var old_fields = document.getElementsByClassName("install-hidden-field");
-    for (i = 0; i < old_fields.length; i++) {
-        old_fields[i].parentNode.removeChild(old_fields[i]);
-    }
-    new_menu_items = document.getElementById("install-menu-container").childNodes;
-    for (i = 0; i < new_menu_items.length; i++) {
-        try {
-            menu_id = "main-" + new_menu_items[i].getAttribute("id");
-            add_hidden_input(menu_id, i);
-        } catch(e) {
-            // ignore error because it is weird and sucks and shouldn't exist
+        function updateHiddenFormFields() {
+            var old_fields = document.getElementsByClassName("install-hidden-field");
+            for (i = 0; i < old_fields.length; i++) {
+                old_fields[i].parentNode.removeChild(old_fields[i]);
+            }
+            new_menu_items = document.getElementById("install-menu-container").childNodes;
+            for (i = 0; i < new_menu_items.length; i++) {
+                try {
+                    menu_id = "main-" + new_menu_items[i].getAttribute("id");
+                    add_hidden_input(menu_id, i);
+                } catch(e) {
+                    // ignore error because it is weird and sucks and shouldn't exist
+                }
+
+            }
+
+            new_login_items = document.getElementById("install-login-container").childNodes;
+            for (i = 0; i < new_login_items.length; i++) {
+                try {
+                    menu_id  = "login-" + new_login_items[i].getAttribute("id");
+                    add_hidden_input(menu_id, i);
+                } catch(e) {
+                    // ignore error because it is weird and sucks and shouldn't exist
+                }
+            }
         }
 
-    }
-
-    new_login_items = document.getElementById("install-login-container").childNodes;
-    for (i = 0; i < new_login_items.length; i++) {
-        try {
-            menu_id  = "login-" + new_login_items[i].getAttribute("id");
-            add_hidden_input(menu_id, i);
-        } catch(e) {
-            // ignore error because it is weird and sucks and shouldn't exist
+        function add_hidden_input(menu_id, order) {
+            var input_field = document.createElement("input");
+            input_field.setAttribute("name", menu_id);
+            input_field.setAttribute("value", order);
+            input_field.setAttribute("type", "hidden");
+            input_field.setAttribute("class","install-hidden-field");
+            var form = document.getElementById("install-menu-form");
+            form.appendChild(input_field);
         }
-    }
-}
 
-function add_hidden_input(menu_id, order) {
-    var input_field = document.createElement("input");
-    input_field.setAttribute("name", menu_id);
-    input_field.setAttribute("value", order);
-    input_field.setAttribute("type", "hidden");
-    input_field.setAttribute("class","install-hidden-field");
-    var form = document.getElementById("install-menu-form");
-    form.appendChild(input_field);
-}
+        $(function() {
+            $( "#install-menu-container, #install-available-container, #install-login-container" ).sortable({
+                connectWith: ".connected-sort"
+            }).disableSelection();
+        });
 
-$(function() {
-    $( "#install-menu-container, #install-available-container, #install-login-container" ).sortable({
-        connectWith: ".connected-sort"
-    }).disableSelection();
-});
+        $(".install-menu-item").click(click_handler);
 
-$(".install-menu-item").click(click_handler);
+        function click_handler(event) {
+            // workaround for firefox's double-event firing
+            var is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+            if (is_firefox) {
+                // do nothing
+            } else if (event.target.parentNode.id == "install-menu-container") {
 
-function click_handler(event) {
-    // workaround for firefox's double-event firing
-    var is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-    if (is_firefox) {
-        // do nothing
-    } else if (event.target.parentNode.id == "install-menu-container") {
+                document.getElementById("install-menu-container").removeChild(event.target);
+                document.getElementById("install-login-container").appendChild(event.target);
 
-        document.getElementById("install-menu-container").removeChild(event.target);
-        document.getElementById("install-login-container").appendChild(event.target);
+            } else if (event.target.parentNode.id == "install-login-container"){
 
-    } else if (event.target.parentNode.id == "install-login-container"){
+                document.getElementById("install-login-container").removeChild(event.target);
+                document.getElementById("install-available-container").appendChild(event.target);
 
-        document.getElementById("install-login-container").removeChild(event.target);
-        document.getElementById("install-available-container").appendChild(event.target);
+            } else {
 
-    } else {
+                document.getElementById("install-available-container").removeChild(event.target);
+                document.getElementById("install-menu-container").appendChild(event.target);
+            }
+        }
 
-        document.getElementById("install-available-container").removeChild(event.target);
-        document.getElementById("install-menu-container").appendChild(event.target);
-    }
-}
-
-</script>
+    </script>
 {% endblock %}

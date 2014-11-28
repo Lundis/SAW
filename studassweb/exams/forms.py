@@ -1,6 +1,7 @@
 from django import forms
 from django.utils.translation import ugettext as _
 from exams.models import *
+from datetime import date
 
 
 class ExamForm(forms.ModelForm):
@@ -10,9 +11,14 @@ class ExamForm(forms.ModelForm):
         self.fields['course_id'].label_from_instance = lambda obj: "%s" % obj.name
         self.fields['examinator'].label_from_instance = lambda obj: "%s" % obj.name
 
+    exam_date = forms.DateTimeField(
+        widget=forms.DateInput(format='%d.%m.%Y'),
+        input_formats=('%d.%m.%Y',),
+        initial=date.today)
+
     class Meta:
         model = SingleExam
-        fields = ('course_id', 'examinator', 'ocr', 'exam_date', 'image')
+        fields = ('course_id', 'examinator', 'exam_date')
 
 
 class ExaminatorForm(forms.ModelForm):
@@ -27,3 +33,10 @@ class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = ('name',)
+
+
+class ExamFileForm(forms.ModelForm):
+
+    class Meta:
+        model = ExamFile
+        fields = ('image',)

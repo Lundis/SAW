@@ -1,13 +1,74 @@
-{% extends "example/base.html" %}
+{% extends "exams/base.html" %}
 
 {% load i18n %}
 {% load bootstrap3 %}
+{% load static %}
 
 {% block inner_content %}
-<form action="/exams/add_exam/" method="post" enctype="multipart/form-data" >
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    <input type="submit" value="Submit" />
-</form>
+    {% load navigator %}
+    {% url "exams.views.main" as exams_url %}
+    {% if form.instance.pk %}
+        {% display_navigator exams_url "Exams" form.instance.get_absolute_url form.instance%}
+    {% else %}
+        {% display_navigator exams_url "Exams" "#" "New exam" %}
+    {% endif %}
 
+    {% if form.instance.pk %}
+        <form action="{% url 'exams_delete_exam' form.instance.pk %}" method="post">
+            {% csrf_token %}
+            {% buttons %}
+                <button type="submit" class="btn btn-danger">
+                    {% trans "Remove this exam" %}
+                </button>
+            {% endbuttons %}
+        </form>
+    {% endif %}
+
+    <form id="addEditExamForm" action="" method="post" enctype="multipart/form-data" >
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <div id="examfilesformset_all">
+            {% for f in filesformset.forms %}
+                <div class="examfilesformset_single">
+                    {{ f.id }}
+                    {% bootstrap_field f.image%}
+                    {% if f.instance.pk %}{{ f.DELETE}}{% endif %}{# Note! removing this fucks with functionality #}
+                </div>
+            {% endfor %}
+        </div>
+        {{ filesformset.management_form }}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">
+                {% trans "Submit" %}
+            </button>
+        {% endbuttons %}
+    </form>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static "js/base/jquery.formset.js" %}"></script>
+    <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+    <script type="text/javascript">
+        // bootstrap tooltips conflict with jquery-ui sortable
+        //var tooltip = $.fn.tooltip.noConflict();
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+
+            //Set up dynamic adding of images
+            $('.examfilesformset_single').formset({
+                prefix: '{{ filesformset.prefix }}',
+                formCssClass: 'dynamic-formasdf',
+                addText: '{% trans "Add another image" %}',
+                deleteText: '{% trans "Remove image" %}'
+            });
+
+            //Set up datepicker
+            $( "#id_exam_date" ).datepicker({
+                firstDay: 1,
+                dateFormat: "dd.mm.yy"
+            });
+        })
+    </script>
 {% endblock %}

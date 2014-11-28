@@ -7,32 +7,41 @@ def get_urls():
     """
     :returns: A tuple of regexes describing what URLs the top-level URL dispatcher should associate with this module
     """
-    return (r"^users/",)
+    return r"^users/",
+
+
+VIEW_PROFILES = "can_view_profiles"
+EDIT_PROFILE = "can_edit_profile"
+EDIT_PERMISSIONS = "can_edit_permissions"
+EDIT_LOGIN_SETTINGS = "can_edit_login_settings"
 
 
 def get_permissions():
     """
-    :return: a list of tuples containing the permissions of this module and their default group
+    :return: a tuple of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_view_profiles", MEMBER),
-        ("can_edit_profile", LOGGED_ON),
-        ("can_edit_permissions", WEBMASTER),
-        ("can_edit_login_settings", WEBMASTER),
+        (VIEW_PROFILES, MEMBER, "Can view the profile pages of other users"),
+        (EDIT_PROFILE, LOGGED_ON, "Access to the settings page for editing personal user settings"),
+        (EDIT_PERMISSIONS, WEBMASTER, "Access to the settings page for permissions"),
+        (EDIT_LOGIN_SETTINGS, WEBMASTER,
+         "Access to the settings page for configuring how users can log in (LDAP, FB, G+ etc)"),
     )
 
 
 def get_settings_items():
-    return [MenuItem.get_or_create("users",
-                                   "User",
-                                   "/settings/user",
-                                   permission=SAWPermission.get_or_create("can_edit_profile")),
-            MenuItem.get_or_create("users",
-                                   "Permissions",
-                                   "/settings/permissions",
-                                   permission=SAWPermission.get_or_create("can_edit_permissions")),
-            MenuItem.get_or_create("users",
-                                   "Login",
-                                   "/settings/login",
-                                   permission=SAWPermission.get_or_create("can_edit_login_settings"))
-    ]
+    profile, created = MenuItem.get_or_create(__package__,
+                                              "User",
+                                              reverse_string="users_settings_edit_permissions",
+                                              permission=SAWPermission.get_or_create(EDIT_PROFILE))
+    permissions, created = MenuItem.get_or_create(__package__,
+                                                  "Permissions",
+                                                  reverse_string="users_settings_edit_user",
+                                                  permission=SAWPermission.get_or_create(EDIT_PERMISSIONS))
+    login, created = MenuItem.get_or_create(__package__,
+                                            "Login",
+                                            reverse_string="users_settings_edit_login",
+                                            permission=SAWPermission.get_or_create(EDIT_LOGIN_SETTINGS))
+    return [profile, permissions, login]
+
+

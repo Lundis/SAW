@@ -1,0 +1,21 @@
+{% extends "info/base.html" %}
+{% load i18n %}
+{% load sawp %}
+
+{% block inner_content %}
+    {% load navigator %}
+    {% url "info.views.main" as info_url %}
+    {% display_navigator info_url "Info" %}
+    <h1>{% trans "Categories" %}</h1>
+    <div class="list-group">
+        {% for category in categories %}
+            <a href="{{ category.get_absolute_url}}">
+                {{ category.name }}
+            </a>
+        {% endfor %}
+    </div>
+    {% has_perm "can_edit_info_pages" as show_create_button %}
+    {% if show_create_button %}
+        <p>{% trans "Create a new category" %} <a href="{% url "info_new_category" %}">{% trans "here" %}</a>.</p>
+    {% endif %}
+{% endblock %}
