@@ -18,9 +18,19 @@ class MenuTemplate(models.Model):
         return self.path
 
 
+TYPE_APP = 'AP'
+TYPE_USER = 'US'
+TYPE_CHOICES = (
+    (TYPE_APP, "Created by app"),
+    (TYPE_USER, "Created by user"),
+)
+
+
 class Menu(models.Model):
     menu_name = models.CharField(max_length=30, unique=True)
     template = models.ForeignKey(MenuTemplate, blank=True, null=True)
+    # was the menu created by an app or a user?
+    created_by = models.CharField(max_length=2, choices=TYPE_CHOICES, default=TYPE_APP)
 
     def __str__(self):
         return self.menu_name
@@ -105,8 +115,9 @@ class MenuItem(models.Model):
     #app_name is used for checking if it belongs to a disabled module
     app_name = models.CharField(max_length=50, null=True, blank=True)
     display_name = models.CharField(max_length=30)
+
     # A field for referring to external URLs
-    external_url = models.URLField(null=True, blank=True)
+    external_url = models.CharField(max_length=200, null=True, blank=True)
     # A field for getting a link using reverse()
     reverse_string = models.CharField(max_length=100, null=True, blank=True)
     # A generic field for linking to any model
@@ -116,19 +127,11 @@ class MenuItem(models.Model):
 
     submenu = models.ForeignKey(Menu, null=True)
     view_permission = models.ForeignKey(SAWPermission, null=True, blank=True)
-    # is the item managed by a specific app (referred to in app_name,
-    # or is it a custom item created by the user.
-    # I use choices instead of a boolean because it's clearer and more types might be added in the future.
-    TYPE_APP = 'AP'
-    TYPE_USER = 'US'
-    TYPE_CHOICES = (
-        (TYPE_APP, "Created by app"),
-        (TYPE_USER, "Created by user"),
-    )
-    type = models.CharField(max_length=2, choices=TYPE_CHOICES, default=TYPE_APP)
+    # was the menu created by an app or a user?
+    created_by = models.CharField(max_length=2, choices=TYPE_CHOICES, default=TYPE_APP)
 
     class Meta:
-        # Don't allow duplicates
+        # Don't allow duplicates inside apps
         unique_together = ('app_name', 'display_name')
 
     def __str__(self):
@@ -236,6 +239,10 @@ class MenuItem(models.Model):
                 if item.submenu:
                     item.submenu.delete()
                 item.delete()
+
+    @classmethod
+    def get_all_custom_items(cls):
+        return cls.objects.filter(created_by=TYPE_USER)
 
 
 class ItemInMenu(models.Model):

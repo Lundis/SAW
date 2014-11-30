@@ -21,7 +21,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-5">
+        <div class="col-sm-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3>{% trans "Select a menu to edit." %}</h3>
@@ -35,6 +35,24 @@
                         {% endfor %}
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="col-sm-1">
+            <a href="{% url "menu_settings_new_menu" %}" class="btn btn-primary">{% trans "Create a new menu" %}</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                {% trans "Click on a custom menu item to edit it or " %}
+                <a href="{% url "menu_settings_new_menu_item" %}">{% trans "create a new one" %}</a>
+            </div>
+            <div class="panel-body">
+                {% for item in custom_menu_items %}
+                    <a href="{% url "menu_settings_edit_menu_item" item_id=item.id %}" title="{{ item.get_absolute_url }}">
+                        {{ item.display_name }}
+                    </a>
+                {% endfor %}
             </div>
         </div>
     </div>

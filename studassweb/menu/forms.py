@@ -2,7 +2,7 @@ from django import forms
 from django.template.loader import get_template
 from django.template import Context
 from .fields import HiddenMenuField
-from .models import MenuItem, Menu
+from .models import MenuItem, Menu, TYPE_USER
 import re
 
 # dynamic menu field and form: http://stackoverflow.com/questions/6154580/django-dynamic-form-example
@@ -142,3 +142,30 @@ class MenuForm(forms.Form):
     @staticmethod
     def get_submit_js():
         return "updateHiddenFormFields();"
+
+
+class MenuCreationForm(forms.ModelForm):
+    class Meta():
+        model = Menu
+        fields = ('menu_name',)
+
+    def clean(self):
+        super(MenuCreationForm, self).clean()
+
+    def save(self, *args, **kwargs):
+        menu = super(MenuCreationForm, self).save(self, *args, **kwargs)
+        menu.created_by = TYPE_USER
+        menu.save()
+        return menu
+
+
+class MenuItemForm(forms.ModelForm):
+    class Meta():
+        model = MenuItem
+        fields = ('display_name', 'external_url', 'submenu', 'view_permission')
+
+    def save(self, *args, **kwargs):
+        item = super(MenuItemForm, self).save(self, *args, **kwargs)
+        item.created_by = TYPE_USER
+        item.save()
+        return item
