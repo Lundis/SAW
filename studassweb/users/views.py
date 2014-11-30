@@ -1,7 +1,9 @@
 from django.shortcuts import render
-from .forms import LoginForm, RegisterForm
+from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.contrib.auth import logout
+from .forms import LoginForm, RegisterForm
+from .models import UserExtension
 
 
 def login_view(request):
@@ -41,3 +43,10 @@ def register(request):
         form.save()
         return render(request, 'users/register.html')
     return render(request, 'users/register.html', {'form': form})
+
+
+def view_profile(request, username):
+    user = User.objects.get(username=username)
+    user_ext = UserExtension.objects.get(user=user)
+    context = {'user_ext': user_ext}
+    return render(request, 'users/view_profile.html', context)

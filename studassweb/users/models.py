@@ -6,11 +6,12 @@ from base.utils import IllegalArgumentException
 
 
 class UserExtension(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    avatar = models.ImageField(upload_to='users/avatars', default='users/avatars/default_avatar.png')
     # A field where the user can write a short text about themselves
     description = models.TextField(max_length=1000, blank=True, default="")
     link_to_homepage = models.URLField(blank=True, default="")
-    member = models.ForeignKey(Member, null=True, blank=True, unique=True)
+    member = models.ForeignKey(Member, null=True, blank=True, unique=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.user.username
@@ -27,19 +28,17 @@ class UserExtension(models.Model):
         user.save()
         user_ext = UserExtension(user=user)
         if member:
-            if not enrollment_year:
+            if enrollment_year is None:
                 # delete user if this fails
                 user.delete()
                 raise IllegalArgumentException("if the user is a member, enrollment year must be specified")
-            if not graduation_year:
+            if graduation_year is None:
                 graduation_year = 0
             _member = Member(enrollment_year=enrollment_year, graduation_year=graduation_year)
             _member.save()
             user_ext.member = _member
         user_ext.save()
         return user_ext
-
-
 
 
 class LdapLink(models.Model):

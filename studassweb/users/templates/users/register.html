@@ -1,12 +1,10 @@
 {% extends 'base/base.html' %}
 {% load i18n %}
-
+{% load bootstrap3 %}
 
 {% block title %}
 {% trans "Register" %}
 {%  endblock %}
-
-
 
 {% block content %}
     {% load dynamic_menu %}
@@ -15,7 +13,6 @@
     {% if form %}
         <form action="/users/register/" method="post">
             {% csrf_token %}
-            {% load bootstrap3 %}
             {% bootstrap_form form %}
             <input type="submit" value="Submit" />
         </form>

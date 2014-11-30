@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from base.models import SiteConfiguration
 from .models import UserExtension
+from members.models import Member
 import datetime
 
 
@@ -78,3 +79,16 @@ class RegisterForm(forms.Form):
                                       self.cleaned_data['member'],
                                       self.cleaned_data['enrollment_year'],
                                       self.cleaned_data['graduation_year'])
+
+
+class UserBaseForm(forms.ModelForm):
+
+    class Meta():
+        model = User
+        fields = ('email',)
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta():
+        model = UserExtension
+        fields = ('avatar', 'description', 'link_to_homepage')

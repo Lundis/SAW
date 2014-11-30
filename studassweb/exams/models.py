@@ -2,6 +2,7 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from datetime import datetime
 
+
 class Course(models.Model):
     name = models.CharField(max_length=100)
 

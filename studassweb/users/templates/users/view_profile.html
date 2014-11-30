@@ -1,0 +1,20 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "" %}
+    <div class="container">
+    <div class="row">
+        <div class="col-sm-3">
+            <img src="{{ user_ext.avatar.url }}" width="200px" height="200px" alt="User avatar" />
+        </div>
+        <div class="col-sm-8">
+            <h1>{{ user_ext.user.username }}</h1>
+        </div>
+    </div>
+    <div class="row">
+        <p>{{ user_ext.description }}</p>
+    </div>
+
+    </div>
+{% endblock %}
