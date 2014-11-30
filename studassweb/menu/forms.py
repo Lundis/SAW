@@ -1,6 +1,8 @@
 from django import forms
+from django.template.loader import get_template
+from django.template import Context
 from .fields import HiddenMenuField
-from .models import MenuItem
+from .models import MenuItem, Menu
 import re
 
 # dynamic menu field and form: http://stackoverflow.com/questions/6154580/django-dynamic-form-example
@@ -14,19 +16,25 @@ class MenuForm(forms.Form):
     :param kwargs:
     :return:
     """
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, menus=None, initial_items=None, available_items=None, **kwargs):
         """
 
         :param args:
         :param kwargs: must contain menus, which is a list or tuples tuples of alphabetic letters
         :return:
         """
-        self.menus = kwargs.pop('menus')
+        self.menus = menus
         self.verify_argument_menus()
-        if 'initial_items' in kwargs:
-            self.default_items = kwargs.pop('initial_items')
-        if 'available_items' in kwargs:
-            self.available_items = kwargs.pop('available_items')
+        self.menus = {}
+        for menu in menus:
+            self.menus[menu.menu_name] = menu
+        if initial_items:
+            if isinstance(initial_items, dict):
+                self.default_items = initial_items
+            else:
+                raise ValueError("initial_items must be a dictionary")
+
+        self.available_items = available_items
         super(MenuForm, self).__init__(*args, **kwargs)
         # the first argument is the post data
         if len(args) > 0 and args[0]:
@@ -43,13 +51,12 @@ class MenuForm(forms.Form):
         if not menus_type is list and not menus_type is tuple:
             raise ValueError("menus must be a list or a tuple")
         for menu in self.menus:
-            if not isinstance(menu, str):
-                raise ValueError("item " + menu + " in menus is not a string")
-            if not re.match(r'^[a-zA-Z]+$', menu):
-                raise ValueError("item " + menu + " contains non-alphabetic characters")
+            if not isinstance(menu, Menu):
+                raise ValueError("item " + menu + " in menus is not a Menu")
 
     def add_menu_fields(self, post_data):
-        menu_regex = '|'.join(self.menus)
+        menu_strings = self.menus.keys()
+        menu_regex = '|'.join(menu_strings)
         for name, index in post_data.items():
             matches = re.match(r"^(" + menu_regex + ")-menu-item-(\d+)$", name)
             # if it's a match and it isn't a duplicate
@@ -57,23 +64,26 @@ class MenuForm(forms.Form):
                 self.fields[name] = HiddenMenuField(name=name, initial=index, required=True)
 
     def clean(self):
-        for menu in self.menus:
-            self.cleaned_data[menu + '_menu_items'] = []
-        menu_regex = '|'.join(self.menus)
-        for name, value in self.cleaned_data.items():
+        menu_strings = self.menus.keys()
+        for menu_string in menu_strings:
+            self.cleaned_data[menu_string + '_menu_items'] = []
 
+        menu_regex = '|'.join(menu_strings)
+        for name, value in self.cleaned_data.items():
             matches = re.match(r"^(" + menu_regex + ")-menu-item-(\d+)$", name)
 
             if matches:
-                menu = self.menus[self.menus.index(matches.group(1))]
-                self.cleaned_data[menu + '_menu_items'].append((int(matches.group(2)), value,))
+                menu = self.menus[matches.group(1)]
+                self.cleaned_data[menu.menu_name + '_menu_items'].append((int(matches.group(2)), value,))
 
-    def put_items_in_menu(self, menu_string, menu):
-        if menu_string not in self.menus:
-            raise ValueError("the specified menu identifier (" + menu_string + ") is not in " + self.menus)
+    def put_items_in_menus(self):
+        for menu in self.menus.values():
+            self._put_items_in_menu(menu)
+
+    def _put_items_in_menu(self, menu):
         menu.clear()
-        for menuitem, order in self.cleaned_data[menu_string + '_menu_items']:
-            menu_item = MenuItem.objects.get(id=menuitem)
+        for menu_item, order in self.cleaned_data[menu.menu_name + '_menu_items']:
+            menu_item = MenuItem.objects.get(id=menu_item)
             menu.add_item(menu_item, order)
 
     def __str__(self):
@@ -81,30 +91,55 @@ class MenuForm(forms.Form):
         renders the required javascript for this form
         :return:
         """
+        template = get_template("menu/menu_form.html")
+        context = {'menu_strings': self.menus.values(),
+                   'form_name': self.get_form_id()}
+        result = template.render(Context(context))
+        return result
 
     def rendered_menu_editors(self):
         """
         return a list of rendered menus
         :return:
         """
-        pass
+        menu_html = {}
+        for menu_name, menu in self.menus.items():
+            if self.default_items:
+                items = self.default_items[menu_name]
+            else:
+                items = menu.items()
+            menu_html[menu_name] = self._render_menu(menu_name, items)
+        return menu_html
 
-    def _render_menu(self, menu=None, menu_items=None):
+    @staticmethod
+    def _render_menu(menu_name, menu_items):
         """
-        renders the menu_item
-        :param menu:
+        renders the menu items of a menu
+        :param menu_name:
         :param menu_items:
         :return:
         """
-        pass
+        template = get_template("menu/menu_editor.html")
+        context = Context({'menu_name': menu_name,
+                           'items': menu_items})
+        result = template.render(context)
+        return result
 
     def render_available_items(self):
         """
         renders the available menu items
         :return:
         """
-        pass
+        if self.available_items:
+            items = self.available_items
+        else:
+            items = None
+        return self._render_menu("available", items)
 
     @staticmethod
-    def get_form_id(self):
+    def get_form_id():
         return "menu-editor-form"
+
+    @staticmethod
+    def get_submit_js():
+        return "updateHiddenFormFields();"

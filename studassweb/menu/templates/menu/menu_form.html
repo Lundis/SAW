@@ -1,6 +1,4 @@
 <script>
-
-
     function updateHiddenFormFields() {
         var old_fields = document.getElementsByClassName("hidden-menu-field");
         for (i = 0; i < old_fields.length; i++) {
@@ -9,9 +7,9 @@
         {% for menu in menu_strings %}
             var new_{{ menu }}_items = document.getElementById("{{ menu }}-menu-container").childNodes;
             var index = 0;
-            for ( var i = 0; i < new_menu_items.length; i++) {
+            for ( var i = 0; i < new_{{ menu }}_items.length; i++) {
                 try {
-                    var menu_id = {{ menu }} + new_{{ menu }}_items[i].getAttribute("id");
+                    var menu_id = "{{ menu }}-" + new_{{ menu }}_items[i].getAttribute("id");
                     add_hidden_input(menu_id, index);
                     index++;
                 } catch(e) {
@@ -27,7 +25,7 @@
         input_field.setAttribute("value", order);
         input_field.setAttribute("type", "hidden");
         input_field.setAttribute("class","hidden-menu-field");
-        var form = document.getElementById("menu-editor-form");
+        var form = document.getElementById("{{ form_name }}");
         form.appendChild(input_field);
     }
 </script>

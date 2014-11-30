@@ -55,24 +55,34 @@ def modules(request):
 
 @has_permission(CAN_INSTALL)
 def menu(request):
-    form = MenuForm(request.POST or None, menus=("main", "login"))
+    main_menu, created = Menu.get_or_create("main_menu")
+    login_menu, created = Menu.get_or_create("login_menu")
+    if InstallProgress.is_menu_set():
+        # fetch items from current menus
+        menu_items = main_menu.items()
+        login_items = login_menu.items()
+        available_items = get_other_items(menu_items + login_items)
+    else:
+        # use default layout
+        menu_items, login_items, available_items = get_all_menu_items()
+    form = MenuForm(request.POST or None,
+                    menus=(main_menu, login_menu),
+                    initial_items={main_menu.menu_name: menu_items,
+                                   login_menu.menu_name: login_items},
+                    available_items=available_items)
     if form.is_valid():
-        main_menu, created = Menu.get_or_create("main_menu")
-        login_menu, created = Menu.get_or_create("login_menu")
-
-        #fill with new values
-        form.put_items_in_menu("main", main_menu)
-        form.put_items_in_menu("login", login_menu)
+        form.put_items_in_menus()
         InstallProgress.menu_set()
         return HttpResponseRedirect('finished')
 
-    menu_items, login_items, other_items = get_all_menu_items()
-
-    context = {'menu_items': menu_items,
-               'login_items': login_items,
-               'available_items': other_items,
-               'form': form}
+    context = {'form': form}
     return render(request, 'install/menu.html', context)
+
+
+def get_other_items(occupied=[]):
+    menu_items, login_items, other_items = get_all_menu_items()
+    all = menu_items + login_items + other_items
+    return [item for item in all if not item in occupied]
 
 
 @has_permission(CAN_INSTALL)
