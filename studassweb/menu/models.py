@@ -29,7 +29,7 @@ class Menu(models.Model):
         """
         Add menu_item to this menu
         """
-        if not index:
+        if index is None:
             index = self.count()
         link = ItemInMenu(menu=self, item=menu_item, display_order=index)
         link.save()
@@ -40,6 +40,12 @@ class Menu(models.Model):
         """
         link = ItemInMenu.objects.get(menu=self, item=menu_item)
         link.delete()
+        # reorder the remaining items
+        index = 0
+        for item in self.items():
+            item.display_order = index
+            index += 1
+            item.save()
 
     @classmethod
     def remove_item_from_all_menus(cls, menu_item):
@@ -241,8 +247,9 @@ class ItemInMenu(models.Model):
     display_order = models.IntegerField()
 
     class Meta:
-        unique_together = ('menu', 'item')
+        unique_together = (('menu', 'item'),
+                           ('menu', 'display_order'))
         ordering = ['menu', 'display_order']
 
     def __str__(self):
-        return self.item + " in " + self.menu
+        return self.item.display_name + " in " + self.menu.menu_name

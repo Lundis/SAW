@@ -8,13 +8,9 @@
             <div class="panel panel-default">
                 <div class="panel-heading">{{ menu.menu_name }}</div>
                 <div class="panel-body">
-                    <div id="used-item-container" class="ui-sortable connected-sort menu-item-container">
-                        {% for item in menu.items %}
-                            <li id="menu-item-{{ item.id }}" class="btn btn-primary menu-item ui-sortable-handle">
-                                {{ item.display_name }}
-                            </li>
-                        {% endfor %}
-                    </div>
+                    {% for menu_html in form.rendered_menu_editors.values %}
+                        {{ menu_html }}
+                    {% endfor %}
                 </div>
             </div>
             <div class="panel panel-default">
@@ -22,19 +18,14 @@
                     {% trans "Available items. Drag items here to remove them from the menu"  %}
                 </div>
                 <div class="panel-body">
-                    <div id="available-item-container" class="ui-sortable connected-sort menu-item-container">
-                        {% for item in available_items %}
-                            <li id="menu-item-{{ item.id }}" class="btn btn-primary menu-item ui-sortable-handle">
-                                {{ item.display_name }}
-                            </li>
-                        {% endfor %}
-                    </div>
+                    {{ form.render_available_items }}
                 </div>
             </div>
         </div>
         <div class="col-sm-2">
-            <form action="{% url "menu_settings_edit_menu" menu.id %}" id="menu-items-form" method="post">
+            <form action="{% url "menu_settings_edit_menu" menu.id %}" id="{{ form.get_form_id }}" method="post" onsubmit="{{ form.get_submit_js }}">
                 {% csrf_token %}
+                {{ form }}
                 <div class="btn-group">
                     <button type="submit" value="Submit" class="btn btn-primary">
                         {% trans "Save" %}
@@ -43,53 +34,12 @@
                 </div>
             </form>
         </div>
-
     </div>
 {% endblock %}
 
 {% block scripts %}
     <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
     <script>
-        $(".menu").mouseover(function(event) {
-            var menu_id = event.target.getAttribute("id").split("-")[1];
-            $(".menu-items").addClass("hidden")
-            $("#menu-items-" + menu_id).removeClass("hidden");
-
-        });
-
-        $('#permission-form').submit(function() {
-            updateHiddenFormFields();
-            return true; // return false to cancel form action
-        });
-
-        function updateHiddenFormFields() {
-            var old_fields = document.getElementsByClassName("menu-hidden-field");
-            for (var i = 0; i < old_fields.length; i++) {
-                old_fields[i].parentNode.removeChild(old_fields[i]);
-            }
-            var menu_items = document.getElementById("used-item-container").childNodes;
-            var index = 0;
-            for (var i = 0; i < menu_items.length; i++) {
-                try {
-                    var menu_item = getAttribute("id");
-                    add_hidden_input(menu_item, index);
-                    index++;
-                } catch(e) {
-                    // ignore error because it is weird and sucks and shouldn't exist
-                }
-            }
-        }
-
-        function add_hidden_input(menu_item, index) {
-            var input_field = document.createElement("input");
-            input_field.setAttribute("name", menu_item);
-            input_field.setAttribute("value", index);
-            input_field.setAttribute("type", "hidden");
-            input_field.setAttribute("class","permission-hidden-field");
-            var form = document.getElementById("menu-items-form");
-            form.appendChild(input_field);
-        }
-
         $(function() {
             $( ".menu-item-container" ).sortable({
                 connectWith: ".connected-sort"

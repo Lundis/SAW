@@ -29,10 +29,9 @@ class MenuForm(forms.Form):
         for menu in menus:
             self.menus[menu.menu_name] = menu
         if initial_items:
-            if isinstance(initial_items, dict):
-                self.default_items = initial_items
-            else:
+            if not isinstance(initial_items, dict):
                 raise ValueError("initial_items must be a dictionary")
+        self.default_items = initial_items
 
         self.available_items = available_items
         super(MenuForm, self).__init__(*args, **kwargs)

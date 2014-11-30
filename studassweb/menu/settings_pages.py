@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.http import Http404, HttpResponseRedirect
 from .models import Menu, MenuItem
 from .register import EDIT_MENUS
+from .forms import MenuForm
 
 
 urlpatterns = patterns('',
@@ -24,12 +25,16 @@ def edit_menu(request, menu_id):
     except Menu.DoesNotExist:
         raise Http404
 
-
-
     # Get all available menu items
     available_items = MenuItem.objects.all()
     # Filter away the ones in the menu
     available_items = [item for item in available_items if not menu.contains(item)]
 
-    return render(request, "menu/settings_edit_menu.html", {'menu': menu,
-                                                            'available_items': available_items})
+    form = MenuForm(request.POST or None,
+                    menus=(menu,),
+                    available_items=available_items)
+    if form.is_valid():
+        form.put_items_in_menus()
+    context = {'menu': menu,
+               'form': form}
+    return render(request, "menu/settings_edit_menu.html", context)

@@ -15,5 +15,4 @@ def setup_settings_menu():
         if DisabledModule.is_enabled(module):
             settings_items = func()
             for item in settings_items:
-                # TODO: fix the ordering somehow
-                menu.add_item(item, 0)
+                menu.add_item(item)
