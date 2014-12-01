@@ -1,7 +1,15 @@
 <div id="{{ menu_name }}-menu-container" class="btn-group connected-sort menu-item-container">
     {% for menu_item in items %}
-        <li id="menu-item-{{ menu_item.id }}" class="btn btn-primary menu-item">
+        <li id="menu-item-{{ menu_item.id }}" class="btn
+        {% if menu_item.created_by == "US" %}
+        btn-success
+        {% else %}
+        btn-primary
+        {% endif %}menu-item" title="{{ menu_item.app_name }}: {{ menu_item.url }}">
             {{ menu_item.display_name }}
+            {% if menu_item.submenu %}
+                <span class="caret"></span>
+            {% endif %}
         </li>
     {% endfor %}
 </div>
