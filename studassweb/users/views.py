@@ -68,8 +68,15 @@ def register_thanks(request):
 
 
 def view_profile(request, username):
-    user = User.objects.get(username=username)
-    user_ext = UserExtension.objects.get(user=user)
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        raise Http404
+    try:
+        user_ext = UserExtension.objects.get(user=user)
+    except UserExtension.DoesNotExist:
+        user_ext = UserExtension.create_for_user(user)
+
     try:
         member = Member.objects.get(user=user)
     except Member.DoesNotExist:

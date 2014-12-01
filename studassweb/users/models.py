@@ -35,6 +35,10 @@ class UserExtension(models.Model):
         user.first_name = first_name
         user.last_name = last_name
         user.save()
+        return cls.create_for_user(user)
+
+    @classmethod
+    def create_for_user(cls, user):
         user_ext = UserExtension(user=user)
         # make sure the verification code is unique
         user_ext.email_verification_code = _generate_email_ver_code()

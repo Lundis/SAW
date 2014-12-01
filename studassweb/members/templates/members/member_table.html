@@ -22,7 +22,11 @@
             {% for user_ext in user_exts %}
                 {% setvar user_ext.member as member %}
                 <tr>
-                    <td>{{ user_ext.user.username }}</td>
+                    <td>
+                        <a href="{% url "users_view_profile" username=user_ext.user.username %}">
+                            {{ user_ext.user.username }}
+                        </a>
+                    </td>
                     <td>{{ user_ext.user.first_name }} {{ user_ext.user.last_name }}</td>
                     <td>
                         {% if member and not member.confirmed %}
