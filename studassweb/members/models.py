@@ -14,7 +14,9 @@ class Member(models.Model):
     def confirm(self):
         self.confirmed = True
         self.save()
-        put_user_in_default_group(self.user, MEMBER)
+        # give additional rights to user if he doesn't already have them.
+        if not self.user.groups.filter(name=MEMBER).exists():
+            put_user_in_default_group(self.user, MEMBER)
 
     def deny(self):
         self.delete()
