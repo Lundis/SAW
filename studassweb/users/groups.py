@@ -67,11 +67,11 @@ def put_user_in_default_group(user, group):
     :return:
     """
     if group not in group_names:
-        raise IllegalArgumentException("group " + group + " is not a default group")
+        raise IllegalArgumentException("group \"" + group + "\" is not a default group")
     # remove old groups
     user_old_groups = user.groups.filter(name__in=group_names)
-    for group in user_old_groups:
-        user.groups.remove(group)
+    for old_group in user_old_groups:
+        user.groups.remove(old_group)
     # add user to all groups up to the specified one
     for group_name in group_names:
         group_inst = Group.objects.get(name=group_name)

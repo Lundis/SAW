@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from users.groups import put_user_in_default_group, MEMBER
-from users.models import UserExtension
+import users.models
 
 
 class Member(models.Model):
@@ -20,7 +20,7 @@ class Member(models.Model):
         self.delete()
 
     def deny_permanently(self):
-        user_ext = UserExtension.objects.get(user=self.user)
+        user_ext = users.models.UserExtension.objects.get(user=self.user)
         user_ext.can_apply_for_membership = False
         user_ext.save()
 

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User, Permission, ContentType, Group
 from solo.models import SingletonModel
+import members.models
 import random
 
 
@@ -50,6 +51,12 @@ class UserExtension(models.Model):
             return True
         except cls.DoesNotExist:
             return False
+
+    def member(self):
+        try:
+            return members.models.Member.objects.get(user=self.user)
+        except members.models.Member.DoesNotExist:
+            return None
 
 
 class LdapLink(models.Model):
