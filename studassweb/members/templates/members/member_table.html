@@ -26,7 +26,6 @@
                     <td>{{ user_ext.user.first_name }} {{ user_ext.user.last_name }}</td>
                     <td>
                         {% if member and not member.confirmed %}
-                            Yes
                             <a href="{% url "members_confirm_membership" member_id=member.id %}">
                                 <span class="glyphicon glyphicon-ok-circle"></span>
                             </a>
@@ -34,14 +33,14 @@
                                 <span class="glyphicon glyphicon-remove-circle"></span>
                             </a>
                         {% else %}
-                            No
+                            -
                         {% endif %}
                     </td>
                     <td>
                         {% if member and member.confirmed %}
-                            Yes
+                            <span class="glyphicon glyphicon-ok"></span>
                         {% else %}
-                            No
+                            -
                         {% endif %}
                     </td>
                 </tr>
