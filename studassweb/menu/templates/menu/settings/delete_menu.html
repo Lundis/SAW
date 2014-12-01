@@ -1,0 +1,16 @@
+{% extends "settings/base.html" %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block inner_content %}
+    <p>{% trans "Are you sure you want to delete the menu" %}
+        "{{ menu.menu_name }}"?
+    </p>
+    <form action=" {% url "menu_settings_delete_menu" menu_id=menu.id %}" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button type="submit" class="btn btn-primary">
+            {% trans "Confirm" %}
+        </button>
+    </form>
+{% endblock %}

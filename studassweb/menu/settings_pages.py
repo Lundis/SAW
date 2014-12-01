@@ -10,19 +10,27 @@ from base.forms import ConfirmationForm
 
 
 urlpatterns = patterns('',
-    url(r'^$', 'menu.settings_pages.select_menu', name='menu_settings_select_menu'),
-    url(r'^edit_menu_item/(?P<item_id>\d+)$', 'menu.settings_pages.edit_menu_item', name='menu_settings_edit_menu_item'),
-    url(r'^new_menu_item$', 'menu.settings_pages.edit_menu_item', name='menu_settings_new_menu_item'),
-    url(r'^delete_menu_item/(?P<item_id>\d+)$', 'menu.settings_pages.delete_menu_item', name='menu_settings_delete_menu_item'),
-    url(r'^new_menu$', 'menu.settings_pages.new_menu', name='menu_settings_new_menu'),
-    url(r'^edit/(?P<menu_id>\d+)/$', 'menu.settings_pages.edit_menu', name='menu_settings_edit_menu'),
+    url(r'^$',                                  'menu.settings_pages.select_menu',
+        name='menu_settings_select_menu'),
+    url(r'^edit_menu_item/(?P<item_id>\d+)$' ,  'menu.settings_pages.edit_menu_item',
+        name='menu_settings_edit_menu_item'),
+    url(r'^new_menu_item$',                     'menu.settings_pages.edit_menu_item',
+        name='menu_settings_new_menu_item'),
+    url(r'^delete_menu_item/(?P<item_id>\d+)$', 'menu.settings_pages.delete_menu_item',
+        name='menu_settings_delete_menu_item'),
+    url(r'^new_menu$',                          'menu.settings_pages.new_menu',
+        name='menu_settings_new_menu'),
+    url(r'^delete_menu/(?P<menu_id>\d+)$',      'menu.settings_pages.delete_menu',
+        name='menu_settings_delete_menu'),
+    url(r'^edit/(?P<menu_id>\d+)$',             'menu.settings_pages.edit_menu',
+        name='menu_settings_edit_menu'),
 )
 
 
 @has_permission(EDIT_MENUS)
 def select_menu(request):
     custom_items = MenuItem.get_all_custom_items()
-    return render(request, "menu/settings_select_menu.html", {'menus': Menu.objects.all(),
+    return render(request, "menu/settings/select_menu.html", {'menus': Menu.objects.all(),
                                                               'custom_menu_items': custom_items})
 
 
@@ -33,13 +41,11 @@ def new_menu(request):
         menu = form.save()
         return HttpResponseRedirect(reverse("menu_settings_edit_menu", kwargs={'menu_id': menu.id}))
     context = {'form': form}
-    return render(request, "menu/settings_new_menu.html", context)
+    return render(request, "menu/settings/new_menu.html", context)
 
 
 @has_permission(EDIT_MENUS)
-def delete(request, menu_id):
-
-    menu = None
+def delete_menu(request, menu_id):
     try:
         menu = Menu.objects.get(id=menu_id)
     except Menu.DoesNotExist:
@@ -53,8 +59,8 @@ def delete(request, menu_id):
         menu.delete()
         return HttpResponseRedirect(reverse('menu_settings_select_menu'))
 
-    return render(request, "info/delete.html", {'menu': menu,
-                                                'form': form})
+    return render(request, "menu/settings/delete_menu.html", {'menu': menu,
+                                                              'form': form})
 
 
 @has_permission(EDIT_MENUS)
@@ -76,7 +82,8 @@ def edit_menu(request, menu_id):
         form.put_items_in_menus()
     context = {'menu': menu,
                'form': form}
-    return render(request, "menu/settings_edit_menu.html", context)
+    return render(request, "menu/settings/edit_menu.html", context)
+
 
 @has_permission(EDIT_MENUS)
 def edit_menu_item(request, item_id=None):
@@ -95,7 +102,8 @@ def edit_menu_item(request, item_id=None):
         return HttpResponseRedirect(reverse("menu.settings_pages.select_menu"))
     context = {'menu_item': menu_item,
                'form': form}
-    return render(request, "menu/settings_edit_menu_item.html", context)
+    return render(request, "menu/settings/edit_menu_item.html", context)
+
 
 @has_permission(EDIT_MENUS)
 def delete_menu_item(request, item_id):
@@ -106,5 +114,11 @@ def delete_menu_item(request, item_id):
 
     if menu_item.created_by != TYPE_USER:
         return HttpResponseBadRequest("Only user-managed menu items can be deleted")
-    menu_item.delete()
-    return HttpResponseRedirect(reverse("menu.settings_pages.select_menu"))
+
+    form = ConfirmationForm(request.POST or None)
+    if form.is_valid():
+        menu_item.delete()
+        return HttpResponseRedirect(reverse('menu_settings_select_menu'))
+
+    return render(request, "menu/settings/delete_menu_item.html", {'menu_item': menu_item,
+                                                              'form': form})

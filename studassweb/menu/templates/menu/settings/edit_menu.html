@@ -26,11 +26,14 @@
             <form action="{% url "menu_settings_edit_menu" menu.id %}" id="{{ form.get_form_id }}" method="post" onsubmit="{{ form.get_submit_js }}">
                 {% csrf_token %}
                 {{ form }}
-                <div class="btn-group">
+                <div class="btn-group-vertical">
                     <button type="submit" value="Submit" class="btn btn-primary">
                         {% trans "Save" %}
                     </button>
                     <a href="{% url "menu_settings_select_menu" %}" class="btn btn-primary">{% trans "Back" %}</a>
+                    {% if menu.created_by == "US" %}
+                        <a href="{% url "menu_settings_delete_menu" menu_id=menu.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+                    {% endif %}
                 </div>
             </form>
         </div>
