@@ -13,7 +13,7 @@ class MenuTemplate(models.Model):
 
     @classmethod
     def default(cls):
-        obj, created = cls.objects.get_or_create(path="menu/menu.html")
+        obj, created = cls.objects.get_or_create(path="menu/menus/default_menu.html")
         return obj
 
     def __str__(self):
@@ -109,7 +109,11 @@ class Menu(models.Model):
         :param template: optional template used by the display_menu tag
         :return: requested menu, boolean (if it was created)
         """
-        return cls.objects.get_or_create(menu_name=name, template=template)
+        menu, created = cls.objects.get_or_create(menu_name=name)
+        if created and template:
+            menu.template = template
+            menu.save()
+        return menu, created
 
 
 class MenuItem(models.Model):
