@@ -21,3 +21,10 @@ class MemberForm(forms.ModelForm):
         if graduate:
             if graduate <= enroll:
                 self._errors['graduation_year'] = _("You cannot have graduated before you enrolled")
+
+    def save(self, user, commit=True):
+        member = super(MemberForm, self).save(commit=False)
+        member.user = user
+        if commit:
+            member.save()
+        return member

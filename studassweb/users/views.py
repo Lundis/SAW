@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect, HttpResponseBadRequest
+from django.http import HttpResponseRedirect, HttpResponseBadRequest, Http404
 from django.contrib.auth import logout, login, authenticate
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from members.models import Member
 from .forms import LoginForm, RegisterForm
 from .models import UserExtension
@@ -41,15 +43,28 @@ def register(request):
     :return:
     """
     form = RegisterForm(request.POST or None)
+
     if form.is_valid():
         user_ext = form.save()
         put_user_in_default_group(user_ext.user, LOGGED_ON)
         user = authenticate(username=form.cleaned_data['user_name'],
                             password=form.cleaned_data['password'])
         login(request, user)
+        return HttpResponseRedirect(reverse("users_register_thanks"))
 
-        return render(request, 'users/register/register.html')
-    return render(request, 'users/register/register.html', {'form': form})
+    context = {'form': form}
+    return render(request, 'users/register/register.html', context)
+
+
+@login_required
+def register_thanks(request):
+    try:
+        user_ext = UserExtension.objects.get(user=request.user)
+    except UserExtension.DoesNotExist:
+        raise Http404
+    context = {'code': user_ext.email_verification_code}
+
+    return render(request, 'users/register/register_thanks.html', context)
 
 
 def view_profile(request, username):
@@ -64,8 +79,7 @@ def view_profile(request, username):
     return render(request, 'users/view_profile.html', context)
 
 
-def verify_email(request):
-    code = request.GET.get('code', None)
+def verify_email(request, code):
     if code is None:
         return HttpResponseBadRequest("The verification code is missing")
     if len(code) != 32:

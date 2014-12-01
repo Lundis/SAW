@@ -11,24 +11,11 @@
     {% display_menu "main_menu" "Register" %}
     <div class="container">
         <div class="col-sm-8">
-            {% if form %}
-                <form action="{% url "users_register" %}" method="post">
-                    {% csrf_token %}
-                    {% bootstrap_form form %}
-                    <input type="submit" value="Submit" />
-                </form>
-            {% else %}
-
-                <h1>{% trans "Thanks for registering" %}!</h1>
-                <p>
-                    {% trans "A confirmation email has been sent to the address you specified" %}.
-                    {% trans "After confirming it you can apply for a members account" %}.
-                </p>
-                <p>
-                    {% trans "You can edit additional profile settings " %}
-                    <a href="{% url "users_settings_edit_user" %}">{% trans "here" %}</a>
-                </p>
-            {% endif %}
+            <form action="{% url "users_register" %}" method="post">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <input type="submit" value="Submit" />
+            </form>
         </div>
     </div>
 {% endblock %}

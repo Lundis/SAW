@@ -11,9 +11,9 @@
     {% display_menu "main_menu" "Register" %}
     <div class="container">
         {% if success %}
-            <h2>{% trans "Thanks for verifying your email!" %}! </h2>
+            <h2>{% trans "Thanks for verifying your email" %}! </h2>
             <p>{% trans "If you are a member of this association you can now apply for a member account" %}
-                <a href="{% url "users_apply_member" %}">{% trans "here" %}.</a>
+                <a href="{% url "members_apply_membership" %}">{% trans "here" %}.</a>
             </p>
         {% else %}
             <h2>{% trans "Error: Your verification code did not match any user" %}!</h2>

@@ -3,7 +3,6 @@ from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
 from users.decorators import has_permission
-from users.groups import put_user_in_default_group, MEMBER
 from .models import Member
 from .forms import MemberForm
 from .register import CAN_VIEW
@@ -11,7 +10,8 @@ from .register import CAN_VIEW
 
 @has_permission(CAN_VIEW)
 def view_members(request):
-    pass
+    context = {}
+    return render(request, 'members/members_table.html', context)
 
 
 @login_required()
@@ -32,8 +32,7 @@ def apply_membership(request):
     context = {}
     form = MemberForm(request.POST or None)
     if form.is_valid():
-        form.save()
-        put_user_in_default_group(user, MEMBER)
+        form.save(user)
     else:
         context['form'] = form
     return render(request, 'members/member_application.html', context)
