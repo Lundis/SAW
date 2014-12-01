@@ -79,4 +79,9 @@ def put_user_in_default_group(user, group):
         # stop when we've hit the specified one
         if group_name == group:
             break
+    # Give access to the admin pages to webmasters
+    if group == WEBMASTER:
+        user.is_staff = True
+    else:
+        user.is_staff = False
     user.save()
