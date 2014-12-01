@@ -1,0 +1,24 @@
+{% extends 'base/base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block title %}
+    {% trans "Register" %}
+{%  endblock %}
+
+{% block content %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Register" %}
+    <div class="container">
+        {% if form %}
+            <form action="{% url "users_apply_member" %}" method="post">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <input type="submit" value="Submit" />
+            </form>
+        {% else %}
+            <h2>{% trans "Thanks for applying!" %}! </h2>
+            <p>{% trans "A board member will confirm your membership soon" %}.</p>
+        {% endif %}
+    </div>
+{% endblock %}

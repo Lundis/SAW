@@ -5,7 +5,7 @@
         btn-success
         {% else %}
         btn-primary
-        {% endif %}menu-item" title="{{ menu_item.app_name }}: {{ menu_item.url }}">
+        {% endif %}menu-item" title="{{ menu_item.app_name }}: {% if show_urls %}{{ menu_item.url }}{% endif %}">
             {{ menu_item.display_name }}
             {% if menu_item.submenu %}
                 <span class="caret"></span>

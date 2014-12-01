@@ -5,7 +5,7 @@ from install.forms import AssociationForm, ModulesForm
 from users.forms import LoginForm
 from users.models import SAWPermission
 from menu.logic import get_all_menu_items
-from menu.models import Menu
+from menu.models import Menu, MenuItem
 from menu.forms import MenuForm
 from .models import InstallProgress
 from users.decorators import has_permission
@@ -45,6 +45,7 @@ def modules(request):
     if form.is_valid():
         form.apply()
         InstallProgress.modules_set()
+        MenuItem.remove_disabled_items()
         # create settings menu
         setup_settings()
         return HttpResponseRedirect('menu')
@@ -81,8 +82,8 @@ def menu(request):
 
 def get_other_items(occupied=[]):
     menu_items, login_items, other_items = get_all_menu_items()
-    all = menu_items + login_items + other_items
-    return [item for item in all if not item in occupied]
+    all_items = menu_items + login_items + other_items
+    return [item for item in all_items if not item in occupied]
 
 
 @has_permission(CAN_INSTALL)

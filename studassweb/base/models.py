@@ -1,6 +1,7 @@
 from django.db import models
 from solo.models import SingletonModel
 from django.contrib.auth.models import User
+from .utils import get_all_modules
 
 
 class SiteConfiguration(SingletonModel):
@@ -50,6 +51,11 @@ class DisabledModule(models.Model):
         except cls.DoesNotExist:
             # Nothing to be done
             pass
+
+    @classmethod
+    def get_all_enabled_modules(cls):
+        all_modules = get_all_modules()
+        return [mod for mod in all_modules if cls.is_enabled(mod)]
 
 
 class Comment(models.Model):

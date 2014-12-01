@@ -1,8 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import User, Permission, ContentType, Group
 from solo.models import SingletonModel
-from members.models import Member
-from base.utils import IllegalArgumentException
+import random
+
+
+def _generate_email_ver_code():
+        code = ""
+        alphabet = "qwertyuiopasdfghjklzxcvbnm1234567890"
+        for i in range(32):
+            code += alphabet[random.randint(0, len(alphabet)-1)]
+        return code
 
 
 class UserExtension(models.Model):
@@ -11,14 +18,15 @@ class UserExtension(models.Model):
     # A field where the user can write a short text about themselves
     description = models.TextField(max_length=1000, blank=True, default="")
     link_to_homepage = models.URLField(blank=True, default="")
-    member = models.ForeignKey(Member, null=True, blank=True, unique=True, on_delete=models.SET_NULL)
+    email_verified = models.BooleanField(default=False)
+    email_verification_code = models.CharField(max_length=32, unique=True)
+    can_apply_for_membership = models.BooleanField(default=True)
 
     def __str__(self):
         return self.user.username
 
     @classmethod
-    def create_user(cls, username, password, first_name, last_name, email,
-                    member=False, enrollment_year=None, graduation_year=0):
+    def create_user(cls, username, password, first_name, last_name, email):
         """
         :return:
         """
@@ -27,18 +35,21 @@ class UserExtension(models.Model):
         user.last_name = last_name
         user.save()
         user_ext = UserExtension(user=user)
-        if member:
-            if enrollment_year is None:
-                # delete user if this fails
-                user.delete()
-                raise IllegalArgumentException("if the user is a member, enrollment year must be specified")
-            if graduation_year is None:
-                graduation_year = 0
-            _member = Member(enrollment_year=enrollment_year, graduation_year=graduation_year)
-            _member.save()
-            user_ext.member = _member
+        # make sure the verification code is unique
+        user_ext.email_verification_code = _generate_email_ver_code()
+        while cls.objects.filter(email_verification_code=user_ext.email_verification_code).exists():
+            user_ext = _generate_email_ver_code()
         user_ext.save()
         return user_ext
+
+    @classmethod
+    def verify_email(cls, code):
+        try:
+            user_ext = cls.objects.get(email_verification_code=code)
+            user_ext.email_verified = True
+            return True
+        except cls.DoesNotExist:
+            return False
 
 
 class LdapLink(models.Model):

@@ -9,12 +9,12 @@
                 {% trans item.display_name %}
             </a></li>
         {% endfor %}
-        <li><a href="/users/logout/">Logout</a></li>
+        <li><a href="{% url "users_logout" %}">Logout</a></li>
     </ul>
 </li>
 {% else %}
 {# show login button #}
 <li {% if active_tab == "Login" %} class="active" {% endif %}>
-    <a href="/users/login/">Login</a>
+    <a href="{% url "users_login" %}">Login</a>
 </li>
 {% endif %}

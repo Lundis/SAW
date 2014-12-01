@@ -1,9 +1,11 @@
 from django.db import models
-from users.models import SAWPermission
+from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.core.validators import ValidationError
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from users.models import SAWPermission
+from base.models import DisabledModule
 
 
 class MenuTemplate(models.Model):
@@ -243,6 +245,15 @@ class MenuItem(models.Model):
     @classmethod
     def get_all_custom_items(cls):
         return cls.objects.filter(created_by=TYPE_USER)
+
+    @classmethod
+    def remove_disabled_items(cls):
+        enabled_modules = DisabledModule.get_all_enabled_modules()
+        # delete all items that have a non-empty app_name that doesn't point to an active module
+        disabled_items = cls.objects.filter(~Q(app_name__in=enabled_modules),
+                                            ~Q(app_name__isnull=True),
+                                            ~Q(app_name=""))
+        disabled_items.delete()
 
 
 class ItemInMenu(models.Model):

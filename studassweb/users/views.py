@@ -1,9 +1,11 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect
-from django.contrib.auth import logout
+from django.http import HttpResponseRedirect, HttpResponseBadRequest
+from django.contrib.auth import logout, login, authenticate
+from members.models import Member
 from .forms import LoginForm, RegisterForm
 from .models import UserExtension
+from .groups import put_user_in_default_group, LOGGED_ON
 
 
 def login_view(request):
@@ -40,13 +42,33 @@ def register(request):
     """
     form = RegisterForm(request.POST or None)
     if form.is_valid():
-        form.save()
-        return render(request, 'users/register.html')
-    return render(request, 'users/register.html', {'form': form})
+        user_ext = form.save()
+        put_user_in_default_group(user_ext.user, LOGGED_ON)
+        user = authenticate(username=form.cleaned_data['user_name'],
+                            password=form.cleaned_data['password'])
+        login(request, user)
+
+        return render(request, 'users/register/register.html')
+    return render(request, 'users/register/register.html', {'form': form})
 
 
 def view_profile(request, username):
     user = User.objects.get(username=username)
     user_ext = UserExtension.objects.get(user=user)
-    context = {'user_ext': user_ext}
+    try:
+        member = Member.objects.get(user=user)
+    except Member.DoesNotExist:
+        member = None
+    context = {'user_ext': user_ext,
+               'member': member}
     return render(request, 'users/view_profile.html', context)
+
+
+def verify_email(request):
+    code = request.GET.get('code', None)
+    if code is None:
+        return HttpResponseBadRequest("The verification code is missing")
+    if len(code) != 32:
+        return HttpResponseBadRequest("The verification code has an invalid length")
+    success = UserExtension.verify_email(code)
+    return render(request, 'users/register/email_verification.html', {'success': success})

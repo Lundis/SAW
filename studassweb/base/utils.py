@@ -3,6 +3,7 @@ from django.conf import settings
 from inspect import isfunction
 from importlib import import_module
 
+
 def get_modules_with(file_name, function_name):
     """
     :param file_name: filename (without .py ending) that must be in the module. None if you're just looking for modules.

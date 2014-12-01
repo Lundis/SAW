@@ -10,19 +10,32 @@ from base.forms import ConfirmationForm
 
 
 urlpatterns = patterns('',
-    url(r'^$',                                  'menu.settings_pages.select_menu',
+    url(r'^$',
+        'menu.settings_pages.select_menu',
         name='menu_settings_select_menu'),
-    url(r'^edit_menu_item/(?P<item_id>\d+)$' ,  'menu.settings_pages.edit_menu_item',
+
+    url(r'^edit_menu_item/(?P<item_id>\d+)$',
+        'menu.settings_pages.edit_menu_item',
         name='menu_settings_edit_menu_item'),
-    url(r'^new_menu_item$',                     'menu.settings_pages.edit_menu_item',
+
+    url(r'^new_menu_item$',
+        'menu.settings_pages.edit_menu_item',
         name='menu_settings_new_menu_item'),
-    url(r'^delete_menu_item/(?P<item_id>\d+)$', 'menu.settings_pages.delete_menu_item',
+
+    url(r'^delete_menu_item/(?P<item_id>\d+)$',
+        'menu.settings_pages.delete_menu_item',
         name='menu_settings_delete_menu_item'),
-    url(r'^new_menu$',                          'menu.settings_pages.new_menu',
+
+    url(r'^new_menu$',
+        'menu.settings_pages.new_menu',
         name='menu_settings_new_menu'),
-    url(r'^delete_menu/(?P<menu_id>\d+)$',      'menu.settings_pages.delete_menu',
+
+    url(r'^delete_menu/(?P<menu_id>\d+)$',
+        'menu.settings_pages.delete_menu',
         name='menu_settings_delete_menu'),
-    url(r'^edit/(?P<menu_id>\d+)$',             'menu.settings_pages.edit_menu',
+
+    url(r'^edit/(?P<menu_id>\d+)$',
+        'menu.settings_pages.edit_menu',
         name='menu_settings_edit_menu'),
 )
 
@@ -121,4 +134,4 @@ def delete_menu_item(request, item_id):
         return HttpResponseRedirect(reverse('menu_settings_select_menu'))
 
     return render(request, "menu/settings/delete_menu_item.html", {'menu_item': menu_item,
-                                                              'form': form})
+                                                                   'form': form})

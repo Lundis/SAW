@@ -1,6 +1,7 @@
 from django import forms
 from django.template.loader import get_template
 from django.template import Context
+from django.core.urlresolvers import reverse, NoReverseMatch
 from .fields import HiddenMenuField
 from .models import MenuItem, Menu, TYPE_USER
 import re
@@ -19,12 +20,13 @@ class MenuForm(forms.Form):
     def __init__(self, *args, menus=None, initial_items=None, available_items=None, **kwargs):
         """
 
-        :param args:
-        :param kwargs: must contain menus, which is a list or tuples tuples of alphabetic letters
+        :param menus: a list of menus
+        :param initial_items: a dict of items that will be rendered inside each menu
+        :param available_items: the items that will be rendered as not belonging to a menu
         :return:
         """
         self.menus = menus
-        self.verify_argument_menus()
+        self._verify_argument_menus()
         self.menus = {}
         for menu in menus:
             self.menus[menu.menu_name] = menu
@@ -39,7 +41,7 @@ class MenuForm(forms.Form):
         if len(args) > 0 and args[0]:
             self.add_menu_fields(args[0])
 
-    def verify_argument_menus(self):
+    def _verify_argument_menus(self):
         """
         Verifies that the menus keyword argument was correct.
         :return:
@@ -102,25 +104,28 @@ class MenuForm(forms.Form):
         :return:
         """
         menu_html = {}
+        show_urls = MenuForm._can_show_urls()
         for menu_name, menu in self.menus.items():
             if self.default_items:
                 items = self.default_items[menu_name]
             else:
                 items = menu.items()
-            menu_html[menu_name] = self._render_menu(menu_name, items)
+            menu_html[menu_name] = self._render_menu(menu_name, items, show_urls)
         return menu_html
 
     @staticmethod
-    def _render_menu(menu_name, menu_items):
+    def _render_menu(menu_name, menu_items, show_urls=True):
         """
         renders the menu items of a menu
         :param menu_name:
         :param menu_items:
         :return:
         """
+
         template = get_template("menu/menu_editor.html")
         context = Context({'menu_name': menu_name,
-                           'items': menu_items})
+                           'items': menu_items,
+                           'show_urls': show_urls})
         result = template.render(context)
         return result
 
@@ -129,11 +134,12 @@ class MenuForm(forms.Form):
         renders the available menu items
         :return:
         """
+        show_urls = MenuForm._can_show_urls()
         if self.available_items:
             items = self.available_items
         else:
             items = None
-        return self._render_menu("available", items)
+        return self._render_menu("available", items, show_urls)
 
     @staticmethod
     def get_form_id():
@@ -143,14 +149,23 @@ class MenuForm(forms.Form):
     def get_submit_js():
         return "updateHiddenFormFields();"
 
+    @staticmethod
+    def _can_show_urls():
+        """
+        Checks if the server has been restarted after the installation wizard, by trying to reverse settings_main.
+        :return:
+        """
+        try:
+            reverse("settings_main")
+            return True
+        except NoReverseMatch:
+            return False
+
 
 class MenuCreationForm(forms.ModelForm):
     class Meta():
         model = Menu
         fields = ('menu_name',)
-
-    def clean(self):
-        super(MenuCreationForm, self).clean()
 
     def save(self, *args, **kwargs):
         menu = super(MenuCreationForm, self).save(self, *args, **kwargs)
