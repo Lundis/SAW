@@ -7,6 +7,7 @@ from .utils import get_all_modules
 class SiteConfiguration(SingletonModel):
     association_name = models.CharField(max_length=100, default='Site name')
     association_founded = models.IntegerField(default=1900)
+    bootstrap_theme_url = models.CharField(max_length=200, default="css/bootstrap.min.css")
 
     @classmethod
     def instance(cls):
