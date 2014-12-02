@@ -59,8 +59,8 @@ def modules(request):
 def menu(request):
     # set up menus
     setup_menu_module()
-    main_menu = Menu.get_or_none("main_menu")
-    login_menu = Menu.get_or_none("login_menu")
+    main_menu = Menu.get("main_menu")
+    login_menu = Menu.get("login_menu")
     if InstallProgress.is_menu_set():
         # fetch items from current menus
         menu_items = main_menu.items()

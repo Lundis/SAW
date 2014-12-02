@@ -126,26 +126,25 @@ class Menu(models.Model):
 
 
     @classmethod
-    def get_or_none(cls, name):
+    def get(cls, name):
         """
         Returns the menu if it exists, otherwise None
         """
-        try:
-            return cls.objects.get(menu_name=name)
-        except cls.DoesNotExist:
-            return None
+        return cls.objects.get(menu_name=name)
 
     @classmethod
-    def get_or_create(cls, name, template=None):
+    def get_or_create(cls, name, template=None, created_by=TYPE_APP):
         """
+        returns the menu, and updates it with the specified values
         :param name: unique identifier for the menu
         :param template: optional template used by the display_menu tag
         :return: requested menu, boolean (if it was created)
         """
         menu, created = cls.objects.get_or_create(menu_name=name)
-        if created and template:
+        if template:
             menu.template = template
-            menu.save()
+        menu.created_by = created_by
+        menu.save()
         return menu, created
 
 
@@ -197,8 +196,6 @@ class MenuItem(models.Model):
         :param permission: The permission required to view this item. if None, anyone can view it
         :return:
         """
-        menu_item = None
-        created = False
         if permission and isinstance(permission, str):
             permission = SAWPermission.get_or_create(perm_name=permission)
 
@@ -223,9 +220,11 @@ class MenuItem(models.Model):
         else:
             raise ValueError("No url, reverse string or item was given to MenuItem.get_or_create()")
 
-        if created:
+        if permission:
             menu_item.view_permission = permission
+        if submenu:
             menu_item.submenu = submenu
+        if permission or submenu:
             menu_item.save()
         return menu_item, created
 

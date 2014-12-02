@@ -189,12 +189,15 @@ class MenuItemForm(forms.ModelForm):
 
 class MainMenuForm(forms.ModelForm):
     template = forms.ModelChoiceField(MenuTemplate.objects.filter(for_main_menu=True),
-                                      initial=Menu.get_or_none("main_menu").template,
                                       required=True)
 
     class Meta():
         model = MainMenuSettings
         fields = ('image',)
+
+    def __init__(self, *args, **kwargs):
+        kwargs['initial'] = {'template': Menu.get("main_menu").template}
+        super(MainMenuForm, self).__init__(*args, **kwargs)
 
     def clean(self):
         super(MainMenuForm, self).clean()
@@ -204,7 +207,7 @@ class MainMenuForm(forms.ModelForm):
 
     def save(self, commit=True):
         menu_settings = super(MainMenuForm, self).save(commit)
-        main_menu = Menu.get_or_none("main_menu")
+        main_menu = Menu.get("main_menu")
         main_menu.template = self.cleaned_data['template']
         if commit:
             main_menu.save()
