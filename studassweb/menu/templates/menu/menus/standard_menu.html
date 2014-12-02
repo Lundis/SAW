@@ -17,7 +17,11 @@
                         {% elif  ratio >= 4 %}
                             col-xs-10
                         {% endif %}">
-                <img src="{{ menu_settings.image.url }}" style="position:relative;top:10px" height="80" />
+                {% if menu_settings.image %}
+                    <img src="{{ menu_settings.image.url }}" style="position:relative;top:10px" height="80" />
+                {% else %}
+                    <img src="http://placehold.it/80x80" style="position:relative;top:10px" height="80" />
+                {% endif %}
             </div>
             <div class="col-xs-2 pull-right">
                 <div class="col-xs-12 pull-right">
