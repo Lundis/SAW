@@ -7,6 +7,7 @@ from users.models import SAWPermission
 from menu.logic import get_all_menu_items
 from menu.models import Menu, MenuItem, MenuTemplate
 from menu.forms import MenuForm
+from menu.setup import setup_menu_module
 from .models import InstallProgress
 from users.decorators import has_permission
 from users.groups import setup_default_groups
@@ -56,9 +57,10 @@ def modules(request):
 
 @has_permission(CAN_INSTALL)
 def menu(request):
-
-    main_menu, created = Menu.get_or_create("main_menu", MenuTemplate.default())
-    login_menu, created = Menu.get_or_create("login_menu")
+    # set up menus
+    setup_menu_module()
+    main_menu = Menu.get_or_none("main_menu")
+    login_menu = Menu.get_or_none("login_menu")
     if InstallProgress.is_menu_set():
         # fetch items from current menus
         menu_items = main_menu.items()

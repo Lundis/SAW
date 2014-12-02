@@ -5,7 +5,8 @@ from django.http import Http404, HttpResponseRedirect, HttpResponseBadRequest
 from django.core.urlresolvers import reverse
 from .models import Menu, MenuItem, TYPE_USER
 from .register import EDIT_MENUS
-from .forms import MenuForm, MenuCreationForm, MenuItemForm
+from .forms import MenuForm, MenuCreationForm, MenuItemForm, MainMenuForm
+from .models import MainMenuSettings
 from base.forms import ConfirmationForm
 
 
@@ -37,6 +38,10 @@ urlpatterns = patterns('',
     url(r'^edit/(?P<menu_id>\d+)$',
         'menu.settings_pages.edit_menu',
         name='menu_settings_edit_menu'),
+
+    url(r'^edit_layout$',
+        'menu.settings_pages.edit_menu_layout',
+        name='menu_settings_edit_menu_layout')
 )
 
 
@@ -135,3 +140,15 @@ def delete_menu_item(request, item_id):
 
     return render(request, "menu/settings/delete_menu_item.html", {'menu_item': menu_item,
                                                                    'form': form})
+
+
+@has_permission(EDIT_MENUS)
+def edit_menu_layout(request):
+    form = MainMenuForm(request.POST or None,
+                        request.FILES or None,
+                        instance=MainMenuSettings.instance())
+    if form.is_valid():
+        form.save()
+
+    context = {'form': form}
+    return render(request, 'menu/settings/edit_menu_layout.html', context)

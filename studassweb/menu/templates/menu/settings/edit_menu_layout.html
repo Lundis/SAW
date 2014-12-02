@@ -1,0 +1,14 @@
+{% extends "settings/base.html" %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% block inner_content %}
+    <h1>{% trans "Menu layout editor" %}</h1>
+
+    <form action="{% url "menu_settings_edit_menu_layout" %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% bootstrap_form  form %}
+        <button type="submit" class="btn btn-primary">
+            {% trans "Submit" %}
+        </button>
+    </form>
+{% endblock %}

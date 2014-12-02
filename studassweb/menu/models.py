@@ -6,18 +6,51 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from users.models import SAWPermission
 from base.models import DisabledModule
+from .setup import PATH_CHOICES
+from solo.models import SingletonModel
 
 
 class MenuTemplate(models.Model):
-    path = models.CharField(max_length=100, unique=True)
-
-    @classmethod
-    def default(cls):
-        obj, created = cls.objects.get_or_create(path="menu/menus/default_menu.html")
-        return obj
+    path = models.CharField(max_length=10, unique=True, blank=False, choices=PATH_CHOICES, default="standard")
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(null=True)
+    uses_image = models.BooleanField(default=False)
+    preview = models.ImageField(null=True)
+    for_main_menu = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.path
+        return self.name
+
+    @classmethod
+    def get(cls, name):
+        return cls.objects.get(name=name)
+
+    @classmethod
+    def create(cls, name, path, description, uses_image, for_main_menu=False):
+        obj, created = cls.objects.get_or_create(path=path, name=name)
+        if created:
+            obj.description = description
+            obj.for_main_menu = for_main_menu
+            obj.uses_image = uses_image
+            obj.save()
+        return obj, created
+
+
+class MainMenuSettings(SingletonModel):
+    image = models.ImageField(upload_to="menu/images", null=True, blank=True)
+
+    @classmethod
+    def instance(cls):
+        return cls.objects.get_or_create()[0]
+
+    def image_ratio(self):
+        """
+        :return: width/height of the image rounded to the closest integer. 1 if it doesn't exist
+        """
+        if self.image:
+            return int(round(self.image.width / self.image.height, 0))
+        else:
+            return 1
 
 
 TYPE_APP = 'AP'

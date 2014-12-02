@@ -2,8 +2,9 @@ from django import forms
 from django.template.loader import get_template
 from django.template import Context
 from django.core.urlresolvers import reverse, NoReverseMatch
+from django.utils.translation import ugettext as _
 from .fields import HiddenMenuField
-from .models import MenuItem, Menu, TYPE_USER
+from .models import MenuItem, Menu, TYPE_USER, MainMenuSettings, MenuTemplate
 import re
 
 # dynamic menu field and form: http://stackoverflow.com/questions/6154580/django-dynamic-form-example
@@ -184,3 +185,27 @@ class MenuItemForm(forms.ModelForm):
         item.created_by = TYPE_USER
         item.save()
         return item
+
+
+class MainMenuForm(forms.ModelForm):
+    template = forms.ModelChoiceField(MenuTemplate.objects.filter(for_main_menu=True),
+                                      initial=Menu.get_or_none("main_menu").template,
+                                      required=True)
+
+    class Meta():
+        model = MainMenuSettings
+        fields = ('image',)
+
+    def clean(self):
+        super(MainMenuForm, self).clean()
+        template = self.cleaned_data['template']
+        if not 'image' in self.cleaned_data and template.uses_image:
+            raise forms.ValidationError(_("You need to specify an image for the requested layout"))
+
+    def save(self, commit=True):
+        menu_settings = super(MainMenuForm, self).save(commit)
+        main_menu = Menu.get_or_none("main_menu")
+        main_menu.template = self.cleaned_data['template']
+        if commit:
+            main_menu.save()
+        return menu_settings
