@@ -32,13 +32,12 @@ EXTERNAL_APPS = (
     'solo',  # singleton models. pip install django-solo
     'bootstrap3',  # bootstrap templates
     'ckeditor',
-    'easy_thumbnails',#you need to run "python manage.py migrate easy_thumbnails" after installing
+    'easy_thumbnails',  #you need to run "python manage.py migrate easy_thumbnails" after installing
 )
 
 NON_OPTIONAL_APPS = (
     'base',
     'members',
-    'theme',
     'menu',
     'install',
     'users',

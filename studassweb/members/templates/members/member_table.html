@@ -1,0 +1,54 @@
+{% extends 'base/base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% load setvar %}
+
+{% block title %}
+    {% trans "Register" %}
+{%  endblock %}
+
+{% block content %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Member Registry" %}
+    <div class="container">
+        <table class="table table-striped table-condensed">
+            <tr>
+                <th>{% trans "User name" %}</th>
+                <th>{% trans "Real name" %}</th>
+                <th>{% trans "Applying for membership" %}</th>
+                <th>{% trans "Member?" %}</th>
+                <th></th>
+            </tr>
+            {% for user_ext in user_exts %}
+                {% setvar user_ext.member as member %}
+                <tr>
+                    <td>
+                        <a href="{% url "users_view_profile" username=user_ext.user.username %}">
+                            {{ user_ext.user.username }}
+                        </a>
+                    </td>
+                    <td>{{ user_ext.user.first_name }} {{ user_ext.user.last_name }}</td>
+                    <td>
+                        {% if member and not member.confirmed %}
+                            <a href="{% url "members_confirm_membership" member_id=member.id %}">
+                                <span class="glyphicon glyphicon-ok-circle"></span>
+                            </a>
+                            <a href="{% url "members_deny_membership" member_id=member.id %}">
+                                <span class="glyphicon glyphicon-remove-circle"></span>
+                            </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if member and member.confirmed %}
+                            <span class="glyphicon glyphicon-ok"></span>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

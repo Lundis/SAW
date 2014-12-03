@@ -1,4 +1,4 @@
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from base.utils import IllegalArgumentException, get_modules_with
 from users.permissions import add_perm_to_group
 from .models import SAWPermission
@@ -44,6 +44,7 @@ def is_perm_in_groups(perm, groups):
             return True
     return False
 
+
 def get_permissions_in_group(group):
     """
     :param group: a group name or an actual Group
@@ -66,6 +67,21 @@ def put_user_in_default_group(user, group):
     :return:
     """
     if group not in group_names:
-        raise IllegalArgumentException("group " + group + " is not a default group")
-    #TODO: implement
-    pass
+        raise IllegalArgumentException("group \"" + group + "\" is not a default group")
+    # remove old groups
+    user_old_groups = user.groups.filter(name__in=group_names)
+    for old_group in user_old_groups:
+        user.groups.remove(old_group)
+    # add user to all groups up to the specified one
+    for group_name in group_names:
+        group_inst = Group.objects.get(name=group_name)
+        user.groups.add(group_inst)
+        # stop when we've hit the specified one
+        if group_name == group:
+            break
+    # Give access to the admin pages to webmasters
+    if group == WEBMASTER:
+        user.is_staff = True
+    else:
+        user.is_staff = False
+    user.save()

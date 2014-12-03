@@ -19,4 +19,8 @@ def get_settings_items():
                                            'Menu items',
                                            reverse_string='menu_settings_select_menu',
                                            permission=SAWPermission.get_or_create(EDIT_MENUS))
-    return [item]
+    menu_layout, created = MenuItem.get_or_create(__package__,
+                                                  "Main Menu Layout",
+                                                  reverse_string="menu_settings_edit_menu_layout",
+                                                  permission=SAWPermission.get_or_create(EDIT_MENUS))
+    return [item, menu_layout]

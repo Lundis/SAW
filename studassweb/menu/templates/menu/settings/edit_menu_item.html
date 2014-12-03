@@ -1,0 +1,23 @@
+{% extends "settings/base.html" %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block inner_content %}
+    <h1>{% trans "Menu Item Editor" %}</h1>
+    <p>{% trans "Select either a URL or a submenu." %}</p>
+    {% if menu_item %}
+        <form action="{% url "menu_settings_edit_menu_item" item_id=menu_item.id %}"  method="post">
+    {% else %}
+        <form action="{% url "menu_settings_new_menu_item" %}"  method="post">
+    {% endif %}
+{% csrf_token %}
+{% bootstrap_form form %}
+<button type="submit" value="Submit" class="btn btn-primary">
+    {% trans "Save" %}
+</button>
+<a href="{% url "menu_settings_select_menu" %}" class="btn btn-primary">{% trans "Back" %}</a>
+{% if menu_item %}
+    <a href="{% url "menu_settings_delete_menu_item" item_id=menu_item.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+{% endif %}
+</form>
+{% endblock %}

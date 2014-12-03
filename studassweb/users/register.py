@@ -32,11 +32,11 @@ def get_permissions():
 def get_settings_items():
     profile, created = MenuItem.get_or_create(__package__,
                                               "User",
-                                              reverse_string="users_settings_edit_permissions",
+                                              reverse_string="users_settings_edit_user",
                                               permission=SAWPermission.get_or_create(EDIT_PROFILE))
     permissions, created = MenuItem.get_or_create(__package__,
                                                   "Permissions",
-                                                  reverse_string="users_settings_edit_user",
+                                                  reverse_string="users_settings_edit_permissions",
                                                   permission=SAWPermission.get_or_create(EDIT_PERMISSIONS))
     login, created = MenuItem.get_or_create(__package__,
                                             "Login",

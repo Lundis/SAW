@@ -1,0 +1,12 @@
+{% extends "settings/base.html" %}
+{% load i18n %}
+
+{% block inner_content %}
+    <form action="{% url "menu_settings_new_menu" %}" method="post" >
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit" value="Submit" class="btn btn-primary">
+            {% trans "Create" %}
+        </button>
+    </form>
+{% endblock %}

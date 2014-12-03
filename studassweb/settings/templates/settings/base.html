@@ -16,12 +16,12 @@
     <div>
         <div class="container">
             <div class="row">
-                <div class="col-md-2" id="settings-side-menu">
+                <div class="col-sm-3 col-md-2" id="settings-side-menu">
                     {% block settings_menu %}
                         {% display_menu "settings_menu" "" %}
                     {% endblock %}
                 </div>
-                <div class="col-md-10">
+                <div class="col-sm-9 col-md-10">
                     {% block inner_content %}
                         <h3>{% trans "Welcome to the settings page. Choose a category in the menu to the left." %}</h3>
                     {% endblock %}

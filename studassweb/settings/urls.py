@@ -8,7 +8,7 @@ urlpatterns = patterns('',
 
 # At this point the settings menu has been set up. If not, something is very wrong and this will fail.
 modules = ()
-for menu_item in Menu.get_or_none("settings_menu").items():
+for menu_item in Menu.get("settings_menu").items():
     module = menu_item.app_name
     # Make sure that we only add each module once.
     if module not in modules:

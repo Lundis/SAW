@@ -1,4 +1,4 @@
-from base.utils import get_modules_with, get_function_from_module
+from base.utils import get_modules_with
 from base.models import DisabledModule
 
 

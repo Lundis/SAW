@@ -1,11 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.conf import settings
-from install.forms import AssociationForm, ModulesForm, MenuForm
+from install.forms import AssociationForm, ModulesForm
 from users.forms import LoginForm
 from users.models import SAWPermission
 from menu.logic import get_all_menu_items
-from menu.models import Menu, MenuItem
+from menu.models import Menu, MenuItem, MenuTemplate
+from menu.forms import MenuForm
+from menu.setup import setup_menu_module
 from .models import InstallProgress
 from users.decorators import has_permission
 from users.groups import setup_default_groups
@@ -44,6 +46,7 @@ def modules(request):
     if form.is_valid():
         form.apply()
         InstallProgress.modules_set()
+        MenuItem.remove_disabled_items()
         # create settings menu
         setup_settings()
         return HttpResponseRedirect('menu')
@@ -54,19 +57,36 @@ def modules(request):
 
 @has_permission(CAN_INSTALL)
 def menu(request):
-    form = MenuForm(request.POST or None)
+    # set up menus
+    setup_menu_module()
+    main_menu = Menu.get("main_menu")
+    login_menu = Menu.get("login_menu")
+    if InstallProgress.is_menu_set():
+        # fetch items from current menus
+        menu_items = main_menu.items()
+        login_items = login_menu.items()
+        available_items = get_other_items(menu_items + login_items)
+    else:
+        # use default layout
+        menu_items, login_items, available_items = get_all_menu_items()
+    form = MenuForm(request.POST or None,
+                    menus=(main_menu, login_menu),
+                    initial_items={main_menu.menu_name: menu_items,
+                                   login_menu.menu_name: login_items},
+                    available_items=available_items)
     if form.is_valid():
-        form.apply()
+        form.put_items_in_menus()
         InstallProgress.menu_set()
         return HttpResponseRedirect('finished')
 
-    menu_items, login_items, other_items = get_all_menu_items()
-
-    context = {'menu_items': menu_items,
-               'login_items': login_items,
-               'available_items': other_items,
-               'form': form}
+    context = {'form': form}
     return render(request, 'install/menu.html', context)
+
+
+def get_other_items(occupied=[]):
+    menu_items, login_items, other_items = get_all_menu_items()
+    all_items = menu_items + login_items + other_items
+    return [item for item in all_items if not item in occupied]
 
 
 @has_permission(CAN_INSTALL)

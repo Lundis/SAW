@@ -1,0 +1,10 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Events" %}
+    <div class="container">
+        {% block inner_content %}
+        {% endblock %}
+    </div>
+{% endblock %}

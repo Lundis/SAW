@@ -23,11 +23,15 @@ def get_urls():
     return r"^members/",
 
 
+CAN_VIEW = "can_view_member_registry"
+CAN_EDIT = "can_edit_member_registry"
+
+
 def get_permissions():
     """
     :return: a list of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_view_member_registry", BOARD_MEMBER, "Can view the member registry"),
-        ("can_edit_member_registry", BOARD_MEMBER, "Can edit information in the member registry"),
+        (CAN_VIEW, BOARD_MEMBER, "Can view the member registry"),
+        (CAN_EDIT, BOARD_MEMBER, "Can edit information in the member registry"),
     )

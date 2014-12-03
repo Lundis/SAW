@@ -1,34 +1,81 @@
 from django.db import models
-from users.models import SAWPermission
+from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.core.validators import ValidationError
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from users.models import SAWPermission
+from base.models import DisabledModule
+from .setup import PATH_CHOICES
+from solo.models import SingletonModel
 
 
 class MenuTemplate(models.Model):
-    path = models.CharField(max_length=100, unique=True)
-
-    @classmethod
-    def default(cls):
-        obj, created = cls.objects.get_or_create(path="menu/menu.html")
-        return obj
+    path = models.CharField(max_length=10, unique=True, blank=False, choices=PATH_CHOICES, default="standard")
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(null=True)
+    uses_image = models.BooleanField(default=False)
+    preview = models.ImageField(null=True)
+    for_main_menu = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.path
+        return self.name
+
+    @classmethod
+    def get(cls, name):
+        return cls.objects.get(name=name)
+
+    @classmethod
+    def create(cls, name, path, description, uses_image, for_main_menu=False):
+        obj, created = cls.objects.get_or_create(path=path, name=name)
+        if created:
+            obj.description = description
+            obj.for_main_menu = for_main_menu
+            obj.uses_image = uses_image
+            obj.save()
+        return obj, created
+
+
+class MainMenuSettings(SingletonModel):
+    image = models.ImageField(upload_to="menu/images", null=True, blank=True)
+
+    @classmethod
+    def instance(cls):
+        return cls.objects.get_or_create()[0]
+
+    def image_ratio(self):
+        """
+        :return: width/height of the image rounded to the closest integer. 1 if it doesn't exist
+        """
+        if self.image:
+            return int(round(self.image.width / self.image.height, 0))
+        else:
+            return 1
+
+
+TYPE_APP = 'AP'
+TYPE_USER = 'US'
+TYPE_CHOICES = (
+    (TYPE_APP, "Created by app"),
+    (TYPE_USER, "Created by user"),
+)
 
 
 class Menu(models.Model):
     menu_name = models.CharField(max_length=30, unique=True)
     template = models.ForeignKey(MenuTemplate, blank=True, null=True)
+    # was the menu created by an app or a user?
+    created_by = models.CharField(max_length=2, choices=TYPE_CHOICES, default=TYPE_APP)
 
     def __str__(self):
         return self.menu_name
 
-    def add_item(self, menu_item, index):
+    def add_item(self, menu_item, index=None):
         """
         Add menu_item to this menu
         """
+        if index is None:
+            index = self.count()
         link = ItemInMenu(menu=self, item=menu_item, display_order=index)
         link.save()
 
@@ -38,6 +85,12 @@ class Menu(models.Model):
         """
         link = ItemInMenu.objects.get(menu=self, item=menu_item)
         link.delete()
+        # reorder the remaining items
+        index = 0
+        for item in self.items():
+            item.display_order = index
+            index += 1
+            item.save()
 
     @classmethod
     def remove_item_from_all_menus(cls, menu_item):
@@ -73,23 +126,26 @@ class Menu(models.Model):
 
 
     @classmethod
-    def get_or_none(cls, name):
+    def get(cls, name):
         """
         Returns the menu if it exists, otherwise None
         """
-        try:
-            return cls.objects.get(menu_name=name)
-        except cls.DoesNotExist:
-            return None
+        return cls.objects.get(menu_name=name)
 
     @classmethod
-    def get_or_create(cls, name, template=None):
+    def get_or_create(cls, name, template=None, created_by=TYPE_APP):
         """
+        returns the menu, and updates it with the specified values
         :param name: unique identifier for the menu
         :param template: optional template used by the display_menu tag
         :return: requested menu, boolean (if it was created)
         """
-        return cls.objects.get_or_create(menu_name=name, template=template)
+        menu, created = cls.objects.get_or_create(menu_name=name)
+        if template:
+            menu.template = template
+        menu.created_by = created_by
+        menu.save()
+        return menu, created
 
 
 class MenuItem(models.Model):
@@ -97,8 +153,9 @@ class MenuItem(models.Model):
     #app_name is used for checking if it belongs to a disabled module
     app_name = models.CharField(max_length=50, null=True, blank=True)
     display_name = models.CharField(max_length=30)
+
     # A field for referring to external URLs
-    external_url = models.URLField(null=True, blank=True)
+    external_url = models.CharField(max_length=200, null=True, blank=True)
     # A field for getting a link using reverse()
     reverse_string = models.CharField(max_length=100, null=True, blank=True)
     # A generic field for linking to any model
@@ -108,19 +165,11 @@ class MenuItem(models.Model):
 
     submenu = models.ForeignKey(Menu, null=True)
     view_permission = models.ForeignKey(SAWPermission, null=True, blank=True)
-    # is the item managed by a specific app (referred to in app_name,
-    # or is it a custom item created by the user.
-    # I use choices instead of a boolean because it's clearer and more types might be added in the future.
-    TYPE_APP = 'AP'
-    TYPE_USER = 'US'
-    TYPE_CHOICES = (
-        (TYPE_APP, "Created by app"),
-        (TYPE_USER, "Created by user"),
-    )
-    type = models.CharField(max_length=2, choices=TYPE_CHOICES, default=TYPE_APP)
+    # was the menu created by an app or a user?
+    created_by = models.CharField(max_length=2, choices=TYPE_CHOICES, default=TYPE_APP)
 
     class Meta:
-        # Don't allow duplicates
+        # Don't allow duplicates inside apps
         unique_together = ('app_name', 'display_name')
 
     def __str__(self):
@@ -147,8 +196,6 @@ class MenuItem(models.Model):
         :param permission: The permission required to view this item. if None, anyone can view it
         :return:
         """
-        menu_item = None
-        created = False
         if permission and isinstance(permission, str):
             permission = SAWPermission.get_or_create(perm_name=permission)
 
@@ -173,9 +220,11 @@ class MenuItem(models.Model):
         else:
             raise ValueError("No url, reverse string or item was given to MenuItem.get_or_create()")
 
-        if created:
+        if permission:
             menu_item.view_permission = permission
+        if submenu:
             menu_item.submenu = submenu
+        if permission or submenu:
             menu_item.save()
         return menu_item, created
 
@@ -229,6 +278,19 @@ class MenuItem(models.Model):
                     item.submenu.delete()
                 item.delete()
 
+    @classmethod
+    def get_all_custom_items(cls):
+        return cls.objects.filter(created_by=TYPE_USER)
+
+    @classmethod
+    def remove_disabled_items(cls):
+        enabled_modules = DisabledModule.get_all_enabled_modules()
+        # delete all items that have a non-empty app_name that doesn't point to an active module
+        disabled_items = cls.objects.filter(~Q(app_name__in=enabled_modules),
+                                            ~Q(app_name__isnull=True),
+                                            ~Q(app_name=""))
+        disabled_items.delete()
+
 
 class ItemInMenu(models.Model):
     """
@@ -239,8 +301,9 @@ class ItemInMenu(models.Model):
     display_order = models.IntegerField()
 
     class Meta:
-        unique_together = ('menu', 'item')
+        unique_together = (('menu', 'item'),
+                           ('menu', 'display_order'))
         ordering = ['menu', 'display_order']
 
     def __str__(self):
-        return self.item + " in " + self.menu
+        return self.item.display_name + " in " + self.menu.menu_name
