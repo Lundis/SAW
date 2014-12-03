@@ -26,6 +26,10 @@ class LoginForm(forms.Form):
 
     def login_user(self, request):
         user = authenticate(username=self.cleaned_data['user_name'], password=self.cleaned_data['password'])
+        try:
+            user_ext =  UserExtension.objects.get(user=user)
+        except UserExtension.DoesNotExist:
+            user_ext = UserExtension.create_for_user(user)
         login(request, user)
 
 
