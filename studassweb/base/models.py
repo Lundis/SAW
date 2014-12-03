@@ -1,20 +1,28 @@
-from django.db import models
 from solo.models import SingletonModel
 from django.contrib.auth.models import User
-from .utils import get_all_modules
 from django.db import models
 from urllib.request import urlopen
+from urllib.parse import urlparse
+from django.conf import settings
+from django.utils import timezone
 import json
-import datetime
 from io import BytesIO
 import shutil
+import os
+import datetime
+from .utils import get_all_modules
+
+THEME_DIR = os.path.join(settings.STATIC_DIR, "css", "themes")
 
 
 class BootswatchTheme(models.Model):
-    name = models.CharField(max_length=50)
-    theme_path = models.CharField(max_length=200, default="css/bootstrap.min.css")
+    name = models.CharField(max_length=50, unique=True)
+    theme_path = models.CharField(max_length=200)
     preview_image = models.ImageField(upload_to="base/theme_previews")
     preview_url = models.URLField()
+
+    def __str__(self):
+        return self.name
 
     @classmethod
     def create_from_json(cls, json_dict, version):
@@ -23,11 +31,43 @@ class BootswatchTheme(models.Model):
         :param json_dict:
         :return:
         """
-#        preview_image_stream = BytesIO(urlopen(json_dict['thumbnail']).read())
-#        filename
-#        preview_image.image.save(json_dict['name'] + "_preview")
-#        bst = BootswatchTheme(name=json_dict['name'],
-#                              preview_image=)
+        # http://stackoverflow.com/questions/7243750/download-file-from-web-in-python-3
+
+        #first download the image
+        preview_image_stream = BytesIO(urlopen(json_dict['thumbnail']).read())
+        original_image_filename = urlparse(json_dict['thumbnail']).path.split("/")[-1]
+        image_folder = os.path.join(settings.MEDIA_ROOT, "base", "bootswatch", version)
+        if not os.path.exists(image_folder):
+            os.makedirs(image_folder)
+        image_path = os.path.join(image_folder, json_dict['name'] + "_" + original_image_filename)
+        # save the image to disk - overwrite old file (it shouldn't exist)
+        with open(image_path, 'wb') as out_file:
+            shutil.copyfileobj(preview_image_stream, out_file)
+
+        # same for the css file
+        theme_stream = BytesIO(urlopen(json_dict['cssMin']).read())
+        theme_filename = urlparse(json_dict['cssMin']).path.split("/")[-1]
+        theme_folder = os.path.join(THEME_DIR, version, json_dict['name'])
+        if not os.path.exists(theme_folder):
+            os.makedirs(theme_folder)
+        theme_path = os.path.join(theme_folder, theme_filename)
+        with open(theme_path, 'wb') as out_file:
+            shutil.copyfileobj(theme_stream, out_file)
+
+        try:
+            # update old entry if it exists
+            bst = cls.objects.get(name=json_dict['name'])
+            bst.theme_path = theme_path
+            bst.preview_image = image_path
+            bst.preview_url = json_dict['preview']
+        except cls.DoesNotExist:
+            # otherwise create a new one
+            bst = BootswatchTheme(name=json_dict['name'],
+                                  theme_path=theme_path,
+                                  preview_image=image_path,
+                                  preview_url=json_dict['preview'])
+
+        return bst.save()
 
 
 class SiteConfiguration(SingletonModel):
@@ -38,7 +78,7 @@ class SiteConfiguration(SingletonModel):
     # optional theme modifier css file
     bootstrap_theme_mod_url = models.CharField(max_length=200, default="css/themes/bootstrap-theme.min.css")
     bootswatch_version = models.CharField(max_length=50, default=None, null=True)
-    bootswatch_last_checked = models.DateTimeField(default=datetime.datetime(year=2000, month=1, day=1))
+    bootswatch_last_checked = models.DateTimeField(default=timezone.datetime(year=2000, month=1, day=1))
 
     @classmethod
     def instance(cls):
@@ -61,9 +101,9 @@ class SiteConfiguration(SingletonModel):
         """
         instance = cls.instance()
         if instance.bootswatch_version:
-            updated_ago = datetime.datetime.now() - instance.bootswatch_last_checked
-            # Don't check for updates more often than once every week
-            if updated_ago < datetime.timedelta(week=1):
+            updated_ago = timezone.now() - instance.bootswatch_last_checked
+            # Don't check for updates more often than once a week
+            if updated_ago < datetime.timedelta(weeks=1):
                 return
         cls._update_bootswatch()
 
@@ -71,6 +111,13 @@ class SiteConfiguration(SingletonModel):
     def _update_bootswatch(cls):
         data = urlopen("http://api.bootswatch.com/3/").read().decode()
         data_dict = json.loads(data)
+        version = data_dict['version']
+        for theme_data in data_dict['themes']:
+            BootswatchTheme.create_from_json(theme_data, version)
+        instance = cls.instance()
+        instance.bootswatch_version = version
+        instance.bootswatch_last_checked = timezone.datetime.now()
+        instance.save()
 
 
 class DisabledModule(models.Model):

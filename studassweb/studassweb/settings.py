@@ -115,10 +115,16 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
+
 LOGIN_URL = '/users/login/'
 
 #Note that this is only development/debugging settings!
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
+STATIC_DIR = os.path.join(os.path.dirname(SITE_ROOT), 'static')
 MEDIA_ROOT = os.path.join(os.path.dirname(SITE_ROOT), 'uploaded_media')
 MEDIA_URL = '/media/'
 

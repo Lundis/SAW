@@ -8,3 +8,4 @@ studassweb/db.sqlite3
 __pycache__/
 local_settings.py
 studassweb/uploaded_media/
+studassweb/static/
