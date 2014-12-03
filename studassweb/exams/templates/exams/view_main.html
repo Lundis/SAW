@@ -6,18 +6,55 @@
     {% load navigator %}
     {% url "exams.views.main" as exams_url %}
     {% display_navigator exams_url "Exams" %}
+    <div class="row">
+        <div class="col-sm-6">
+            <h3>Courses</h3>
+            <div class="list-group">
+                {% for course in courses %}
+                    <a class="list-group-item" href="{% url 'exams_view_course' course.id %}">{{ course.name }}
+                        <span class="badge">
+                            {{ course.get_exam_count }}
+                        </span>
+                    </a>
+                {% empty %}
+                    <p>{% trans "No courses found!" %}</p>
+                {% endfor %}
+            </div>
+            <h3>Examinators</h3>
+            <div class="list-group">
+                {% for examinator in examinators %}
+                    <a class="list-group-item" href="{% url 'exams_view_examinator' examinator.id %}">{{ examinator.name }}
+                        <span class="badge">
+                                {{ examinator.get_exam_count }}
+                        </span>
+                    </a>
+                {% empty %}
+                    <p>{% trans "No examinators found!" %}</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-sm-4 col-md-3 pull-right">
+            {% if True %}
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h2 class="panel-title">{% trans "Add" %}</h2>
+                    </div>
+                    <div class="panel-body">
+                        <div class="list-group">
+                            <a href="{% url 'exams_add_exam' %}">
+                                <div class="btn list-group-item">{% trans "Add new exam" %}</div>
+                            </a>
+                            <a href="{% url 'exams_add_course' %}">
+                                <div class="btn list-group-item">{% trans "Add new course" %}</div>
+                            </a>
+                            <a href="{% url 'exams_add_examinator' %}">
+                                <div class="btn list-group-item">{% trans "Add new examinator" %}</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
-    <h3>Courses</h3>
-    {% for course in courses %}
-        <p><a href="{% url 'exams_view_course' course.id %}">{{ course.name }}({{ course.get_exam_count }})</a></p>
-    {% endfor %}
-    <h3>Examinators</h3>
-    {% for examinator in examinators %}
-        <p><a href="{% url 'exams_view_examinator' examinator.id %}">{{ examinator.name }}({{ examinator.get_exam_count }})</a></p>
-    {% endfor %}
-
-    <br>
-    <p><a href="{% url 'exams_add_exam' %}">{% trans "Add new exam" %}</a> |
-        <a href="{% url 'exams_add_course' %}">{% trans "Add new course" %}</a> |
-        <a href="{% url 'exams_add_examinator' %}">{% trans "Add new examinator" %}</a></p>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
