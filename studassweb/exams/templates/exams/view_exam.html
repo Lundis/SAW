@@ -7,20 +7,59 @@
     {% load navigator %}
     {% url "exams.views.main" as exams_url %}
     {% display_navigator exams_url "Exams" exam.get_absolute_url exam%}
-    <p>{% trans "Images: " %}<br>
-        {% for examfile in images %}
-            <a href="{{ examfile.image.url }}"><img  class="img-thumbnail" src="{% thumbnail examfile.image 100x100 crop=scale %}"/></a>
-        {% endfor %}
-    </p>
-    <p>{% trans "Course name: " %}<a href="{% url 'exams_view_course' exam.course_id.id %}">{{ exam.course_id.name }}</a> </p>
-    <p>{% trans "Exam date: " %}{{ exam.exam_date|date:"Y-m-d" }}</p>
-    <p>
-    {% if exam.examinator %}
-        {% trans "Examinator: " %}<a href="{% url 'exams_view_examinator' exam.examinator.id %}">{{ exam.examinator.name }}</a>
-    {% else %}
-        {% trans "Examinator: Unknown examinator" %}
-    {% endif %}
-    </p>
-
-    <p><a href="{% url 'exams_edit_exam' exam.id %}">{% trans "Edit this exam" %}</a></p>
+    <div class="row">
+        <div class="col-sm-6">
+            <h1>Exam</h1>
+            <ul class="list-group">
+                <li class="list-group-item">
+                    {% for examfile in images %}
+                        <a href="{{ examfile.image.url }}"><img  class="img-thumbnail" src="{% thumbnail examfile.image 100x100 crop=scale %}"/></a>
+                    {% endfor %}
+                </li>
+                <li class="list-group-item">{% trans "Name: " %}<a href="{% url 'exams_view_course' exam.course_id.id %}">{{ exam.course_id.name }}</a> </li>
+                <li class="list-group-item">{% trans "Date: " %}{{ exam.exam_date|date:"Y-m-d" }}</li>
+                <li class="list-group-item">
+                    {% if exam.examinator %}
+                        {% trans "Examinator: " %}<a href="{% url 'exams_view_examinator' exam.examinator.id %}">{{ exam.examinator.name }}</a>
+                    {% else %}
+                        {% trans "Examinator: Unknown examinator" %}
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+        <div class="col-sm-4 col-md-3 pull-right">
+            {% if True %}
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h2 class="panel-title">{% trans "Edit" %}</h2>
+                    </div>
+                    <div class="panel-body">
+                        <div class="list-group">
+                            <a href="{% url 'exams_edit_exam' exam.id %}">
+                                <div class="btn list-group-item">{% trans "Edit this exam" %}</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h2 class="panel-title">{% trans "Add" %}</h2>
+                    </div>
+                    <div class="panel-body">
+                        <div class="list-group">
+                            <a href="{% url 'exams_add_exam' %}">
+                                <div class="btn list-group-item">{% trans "Add new exam" %}</div>
+                            </a>
+                            <a href="{% url 'exams_add_course' %}">
+                                <div class="btn list-group-item">{% trans "Add new course" %}</div>
+                            </a>
+                            <a href="{% url 'exams_add_examinator' %}">
+                                <div class="btn list-group-item">{% trans "Add new examinator" %}</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
