@@ -34,9 +34,9 @@ class SiteConfiguration(SingletonModel):
     association_name = models.CharField(max_length=100, default='Site name')
     association_founded = models.IntegerField(default=1900)
     # main bootstrap theme css file
-    bootstrap_theme_url = models.CharField(max_length=200, default="css/bootstrap.min.css")
+    bootstrap_theme_url = models.CharField(max_length=200, default="css/themes/bootstrap.min.css")
     # optional theme modifier css file
-    bootstrap_theme_mod_url = models.CharField(max_length=200, default="css/bootstrap-theme.min.css")
+    bootstrap_theme_mod_url = models.CharField(max_length=200, default="css/themes/bootstrap-theme.min.css")
     bootswatch_version = models.CharField(max_length=50, default=None, null=True)
     bootswatch_last_checked = models.DateTimeField(default=datetime.datetime(year=2000, month=1, day=1))
 
