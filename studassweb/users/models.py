@@ -52,6 +52,7 @@ class UserExtension(models.Model):
         try:
             user_ext = cls.objects.get(email_verification_code=code)
             user_ext.email_verified = True
+            user_ext.save()
             return True
         except cls.DoesNotExist:
             return False
