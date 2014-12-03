@@ -33,13 +33,20 @@ class SingleExam(models.Model):
     course_id = models.ForeignKey(Course, on_delete=models.PROTECT)
     ocr = models.TextField(blank=True)
     exam_date = models.DateTimeField()
-    examinator = models.ForeignKey(Examinator, on_delete=models.PROTECT)
+    examinator = models.ForeignKey(Examinator, on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
-        return self.exam_date.strftime("%Y-%m-%d") + " : " + str(self.examinator) + " : " + str(self.course_id)
+        return self.exam_date.strftime("%Y-%m-%d") + " : " + str(self.examinator_with_default_values) + " : " + str(self.course_id)
 
     def get_absolute_url(self):
         return reverse("exams.views.view_exam", kwargs={'exam_id': self.id})
+
+    @property
+    def examinator_with_default_values(self):
+        if self.examinator:
+            return self.examinator
+        else:
+            return Examinator(name="Unknown examinator")
 
 
 class ExamFile(models.Model):

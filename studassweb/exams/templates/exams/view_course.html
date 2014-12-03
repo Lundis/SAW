@@ -9,7 +9,7 @@
     {% display_navigator exams_url "Exams" course.get_absolute_url course.name%}
     <h1>{{ course.name }}</h1>
     {% for exam in exams %}
-		<p><a href="/exams/exam/{{ exam.id }}">{{ exam.exam_date|date:"Y-m-d" }} : {{ exam.examinator.name }}</a></p>
+		<p><a href="/exams/exam/{{ exam.id }}">{{ exam.exam_date|date:"Y-m-d" }} : {{ exam.examinator_with_default_values }}</a></p>
     {% empty %}
         <p>{% trans "No exams found!" %}</p>
         <form action="{% url 'exams_delete_course' course.id %}" method="post">
