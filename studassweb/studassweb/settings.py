@@ -32,7 +32,7 @@ EXTERNAL_APPS = (
     'solo',  # singleton models. pip install django-solo
     'bootstrap3',  # bootstrap templates
     'ckeditor',
-    'easy_thumbnails',  #you need to run "python manage.py migrate easy_thumbnails" after installing
+    'easy_thumbnails',  # you need to run "python manage.py migrate easy_thumbnails" after installing
 )
 
 NON_OPTIONAL_APPS = (
@@ -123,7 +123,7 @@ MEDIA_ROOT = os.path.join(os.path.dirname(SITE_ROOT), 'uploaded_media')
 MEDIA_URL = '/media/'
 
 # wysiwyg editor files will be uploaded to MEDIA_ROOT/CKEDITOR_UPLOAD_PATH
-CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_UPLOAD_PATH = "ckeditor/"
 CKEDITOR_IMAGE_BACKEND = "pillow"
 CKEDITOR_JQUERY_URL = '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
 CKEDITOR_CONFIGS = {
@@ -133,5 +133,5 @@ CKEDITOR_CONFIGS = {
 }
 
 
-THUMBNAIL_DEBUG = True #DEBUG SETTING!
+THUMBNAIL_DEBUG = True  # DEBUG SETTING!
 THUMBNAIL_BASEDIR = "thumbnails"

@@ -1,8 +1,7 @@
 from django.conf.urls import patterns, url
 from users.decorators import has_permission
 from django.shortcuts import render
-from urllib.request import urlopen
-import json
+from .models import SiteConfiguration
 
 from .register import EDIT_THEME
 
@@ -14,8 +13,6 @@ urlpatterns = patterns('',
 
 @has_permission(EDIT_THEME)
 def edit_theme(request):
-    # http://bootswatch.com/help/#api
-    data = urlopen("http://api.bootswatch.com/3/").read().decode()
-    data_dict = json.loads(data)
+    SiteConfiguration.update_bootswatch()
     context = {}
     return render(request, 'base/settings/theme_editor.html', context)
