@@ -2,12 +2,43 @@ from django.db import models
 from solo.models import SingletonModel
 from django.contrib.auth.models import User
 from .utils import get_all_modules
+from django.db import models
+from urllib.request import urlopen
+import json
+import datetime
+from io import BytesIO
+import shutil
+
+
+class BootswatchTheme(models.Model):
+    name = models.CharField(max_length=50)
+    theme_path = models.CharField(max_length=200, default="css/bootstrap.min.css")
+    preview_image = models.ImageField(upload_to="base/theme_previews")
+    preview_url = models.URLField()
+
+    @classmethod
+    def create_from_json(cls, json_dict, version):
+        """
+        Parses the theme data from the JSON
+        :param json_dict:
+        :return:
+        """
+#        preview_image_stream = BytesIO(urlopen(json_dict['thumbnail']).read())
+#        filename
+#        preview_image.image.save(json_dict['name'] + "_preview")
+#        bst = BootswatchTheme(name=json_dict['name'],
+#                              preview_image=)
 
 
 class SiteConfiguration(SingletonModel):
     association_name = models.CharField(max_length=100, default='Site name')
     association_founded = models.IntegerField(default=1900)
+    # main bootstrap theme css file
     bootstrap_theme_url = models.CharField(max_length=200, default="css/bootstrap.min.css")
+    # optional theme modifier css file
+    bootstrap_theme_mod_url = models.CharField(max_length=200, default="css/bootstrap-theme.min.css")
+    bootswatch_version = models.CharField(max_length=50, default=None, null=True)
+    bootswatch_last_checked = models.DateTimeField(default=datetime.datetime(year=2000, month=1, day=1))
 
     @classmethod
     def instance(cls):
@@ -22,13 +53,32 @@ class SiteConfiguration(SingletonModel):
         """
         return cls.instance().association_founded
 
+    @classmethod
+    def update_bootswatch(cls):
+        """
+        Updates bootswatch if it's outdated
+        :return:
+        """
+        instance = cls.instance()
+        if instance.bootswatch_version:
+            updated_ago = datetime.datetime.now() - instance.bootswatch_last_checked
+            # Don't check for updates more often than once every week
+            if updated_ago < datetime.timedelta(week=1):
+                return
+        cls._update_bootswatch()
+
+    @classmethod
+    def _update_bootswatch(cls):
+        data = urlopen("http://api.bootswatch.com/3/").read().decode()
+        data_dict = json.loads(data)
+
 
 class DisabledModule(models.Model):
     app_name = models.CharField(max_length=50, unique=True)
 
     @classmethod
     def is_disabled(cls, name):
-        return cls.objects.filter(app_name=name).count() == 1
+        return cls.objects.filter(app_name=name).exists()
 
     @classmethod
     def is_enabled(cls, name):
