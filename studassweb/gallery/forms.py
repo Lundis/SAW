@@ -5,7 +5,7 @@ class AlbumForm(forms.ModelForm):
 
     class Meta:
         model = Album
-        fields = ('author', 'created','description', 'modified', 'name')
+        fields = ('author','description', 'name')
 
 
 class PictureForm(forms.Form):

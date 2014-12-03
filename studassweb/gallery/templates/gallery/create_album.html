@@ -1,10 +1,13 @@
-{% extends "example/base.html" %}
+{% extends "gallery/base.html" %}
 
 {% load i18n %}
 {% load bootstrap3 %}
+{% load static %}
 
-{% block content %}
-<form action="/album/create/" method="post" enctype="multipart/form-data" >
+
+{% block inner_content %}
+    {% load navigator %}
+<form action="{% url "gallery_create_album" %}" method="post" enctype="multipart/form-data" >
     {% csrf_token %}
     {% bootstrap_form form %}
     <input type="submit" value="Submit" />

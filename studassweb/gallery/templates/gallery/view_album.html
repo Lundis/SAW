@@ -1,0 +1,25 @@
+{% extends "gallery/base.html" %}
+
+{% load i18n %}
+{% load bootstrap3 %}
+{% load thumbnail %}
+
+{% block inner_content %}
+    {% load navigator %}
+    {% url "gallery_main" as gallery_url %}
+    {% display_navigator gallery_url "Gallery" album.name album.get_absolute_url%}
+    <h1>{{ album.name }}</h1>
+    {% for album in gallery %}
+		<p><a href="/gallery/album/{{ album.album_id }}"></a></p>
+    {% empty %}
+        <p>{% trans "No albums found!" %}</p>
+        <form action="{% url 'gallery.views.edit_album' album.album_id %}" method="post">
+            {% csrf_token %}
+            {% buttons %}
+                <button type="submit" class="btn btn-danger">
+                    {% trans "delete album" %}
+                </button>
+            {% endbuttons %}
+        </form>
+    {% endfor %}
+{% endblock %}
