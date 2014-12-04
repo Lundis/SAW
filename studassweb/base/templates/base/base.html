@@ -8,13 +8,10 @@
 	<title>{% block title %}{% endblock %}</title>
 	<!-- viewport for Bootstrap -->
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-    {% if site_config.bootstrap_theme_url %}
-	    <link href="{% static site_config.bootstrap_theme_url %}" rel="stylesheet">
+	<link href="{% static site_config.bootstrap_theme_url %}" rel="stylesheet">
+    {% if site_config.bootstrap_theme_mod_url %}
         <link href="{% static site_config.bootstrap_theme_mod_url %}" rel="stylesheet">
-    {% else %}
-	    <link href="{% static "css/themes/bootstrap.min.css" %}" rel="stylesheet">
-        <link href="{% static "css/themes/bootstrap-theme.min.css" %}" rel="stylesheet">
-	{% endif %}
+    {% endif %}
     <link rel="stylesheet" type="text/css" href="{% static "css/base/base.css" %}" />
     {% block head %}
     {% endblock %}

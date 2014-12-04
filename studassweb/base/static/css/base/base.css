@@ -9,18 +9,6 @@
     margin-top: 20px;
 }
 
-.saw-navigator {
-    float:left;
-}
-
-.saw-navigator-item {
-}
-
-.saw-navigator-separator {
-    margin-left: 10px;
-    margin-right: 10px;
-}
-
 .menu-item-container {
     min-height: 40px;
     min-width: 200px;
