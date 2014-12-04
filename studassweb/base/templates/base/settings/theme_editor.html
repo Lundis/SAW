@@ -1,5 +1,35 @@
 {% extends "settings/base.html" %}
+{% load i18n %}
 
 {% block inner_content %}
-    Theme editor
+    <h1>Theme editor</h1>
+    <form action="{% url "base_settings_set_default_theme" %}" method="post">
+        {% csrf_token %}
+        <button type="submit" value="Submit" class="btn btn-primary">
+            {% trans "Set default theme" %}
+        </button>
+    </form>
+    <div class="row">
+        {% for theme in themes %}
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        {{ theme.name }}
+                        <form action="{% url "base_settings_set_bootswatch_theme" %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="theme" value="{{ theme.name }}" />
+                            <button type="submit" value="Submit" class="btn btn-primary ">
+                                {% trans "Use this theme" %}
+                            </button>
+                        </form>
+                    </div>
+                    <div class="panel-body">
+                        <a href="{{ theme.preview_url }}">
+                            <img src="{{ theme.preview_image.url }}" class="img-responsive" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

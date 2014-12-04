@@ -13,7 +13,7 @@ import datetime
 from concurrent import futures
 from .utils import get_all_modules
 
-THEME_DIR = os.path.join(settings.STATIC_DIR, "css", "themes")
+THEME_DIR = os.path.join("css", "bootswatch_themes")
 
 
 class BootswatchTheme(models.Model):
@@ -34,51 +34,63 @@ class BootswatchTheme(models.Model):
         """
         # http://stackoverflow.com/questions/7243750/download-file-from-web-in-python-3
 
-        #first download the image
+        # first download the image
         preview_image_stream = BytesIO(urlopen(json_dict['thumbnail']).read())
         original_image_filename = urlparse(json_dict['thumbnail']).path.split("/")[-1]
-        image_folder = os.path.join(settings.MEDIA_ROOT, "base", "bootswatch", version)
-        if not os.path.exists(image_folder):
-            os.makedirs(image_folder)
+
+        image_folder = os.path.join("base",
+                                    "bootswatch",
+                                    version)
+        image_absolute_folder = os.path.join(settings.MEDIA_URL, image_folder)
+        if not os.path.exists(image_absolute_folder):
+            os.makedirs(image_absolute_folder)
         image_filename = json_dict['name'] + "_" + original_image_filename
-        image_path = os.path.join(image_folder, image_filename)
+        image_absolute_path = os.path.join(image_absolute_folder, image_filename)
+        image_relative_path = os.path.join(image_folder, image_filename)
         # save the image to disk - overwrite old file (it shouldn't exist)
-        with open(image_path, 'wb') as out_file:
+        with open(os.path.join(image_folder, image_absolute_path), 'wb') as out_file:
             shutil.copyfileobj(preview_image_stream, out_file)
 
         # same for the css file
         theme_stream = BytesIO(urlopen(json_dict['cssMin']).read())
         theme_filename = urlparse(json_dict['cssMin']).path.split("/")[-1]
         theme_folder = os.path.join(THEME_DIR, version, json_dict['name'])
-        if not os.path.exists(theme_folder):
-            os.makedirs(theme_folder)
-        theme_path = os.path.join(theme_folder, theme_filename)
-        with open(theme_path, 'wb') as out_file:
+        theme_absolute_folder = os.path.join(settings.STATIC_DIR, theme_folder)
+        if not os.path.exists(theme_absolute_folder):
+            os.makedirs(theme_absolute_folder)
+        theme_absolute_path = os.path.join(theme_absolute_folder, theme_filename)
+        theme_relative_path = os.path.join(theme_folder, theme_filename)
+        print(theme_absolute_path)
+        with open(theme_absolute_path, 'wb') as out_file:
             shutil.copyfileobj(theme_stream, out_file)
 
         try:
             # update old entry if it exists
             bst = cls.objects.get(name=json_dict['name'])
-            bst.theme_path = theme_path
-            bst.preview_image = image_filename
+            bst.theme_path = theme_relative_path
+            bst.preview_image = image_relative_path
             bst.preview_url = json_dict['preview']
         except cls.DoesNotExist:
             # otherwise create a new one
             bst = BootswatchTheme(name=json_dict['name'],
-                                  theme_path=theme_path,
-                                  preview_image=image_filename,
+                                  theme_path=theme_relative_path,
+                                  preview_image=image_relative_path,
                                   preview_url=json_dict['preview'])
 
         return bst.save()
+
+
+THEME_DEFAULT_CSS = "css/themes/bootstrap.min.css"
+THEME_DEFAULT_CSS_MOD = "css/themes/bootstrap-theme.min.css"
 
 
 class SiteConfiguration(SingletonModel):
     association_name = models.CharField(max_length=100, default='Site name')
     association_founded = models.IntegerField(default=1900)
     # main bootstrap theme css file
-    bootstrap_theme_url = models.CharField(max_length=200, default="css/themes/bootstrap.min.css")
+    bootstrap_theme_url = models.CharField(max_length=200, default=THEME_DEFAULT_CSS)
     # optional theme modifier css file
-    bootstrap_theme_mod_url = models.CharField(max_length=200, default="css/themes/bootstrap-theme.min.css")
+    bootstrap_theme_mod_url = models.CharField(max_length=200, null=True, blank=True, default=THEME_DEFAULT_CSS_MOD)
     bootswatch_version = models.CharField(max_length=50, default=None, null=True)
     bootswatch_last_checked = models.DateTimeField(default=timezone.datetime(year=2000, month=1, day=1))
 

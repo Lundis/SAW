@@ -202,8 +202,9 @@ class MainMenuForm(forms.ModelForm):
     def clean(self):
         super(MainMenuForm, self).clean()
         template = self.cleaned_data['template']
-        if not 'image' in self.cleaned_data and template.uses_image:
-            raise forms.ValidationError(_("You need to specify an image for the requested layout"))
+        if template.uses_image:
+            if not 'image' in self.cleaned_data:
+                raise forms.ValidationError(_("You need to specify an image for the requested layout"))
 
     def save(self, commit=True):
         menu_settings = super(MainMenuForm, self).save(commit)
