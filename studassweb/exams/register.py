@@ -2,6 +2,9 @@ from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, MEMBER, BOARD_MEMBER
 
+CAN_VIEW_EXAM_ARCHIVE = "can_view_exam_archive"
+CAN_UPLOAD_EXAMS = "can_upload_exams"
+CAN_EDIT_EXAMS = "can_edit_exams"
 
 def get_menu_items():
     """
@@ -28,7 +31,8 @@ def get_permissions():
     :return: a list of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_view_exam_archive", GUEST, "Can view the exam archive"),
-        ("can_upload_exams", MEMBER, "Can upload exams, add courses and examinators"),
-        ("can_edit_exams", BOARD_MEMBER, "Can edit and delete exams and descriptions"),
+        (CAN_VIEW_EXAM_ARCHIVE, GUEST, "Can view the exam archive"),
+        (CAN_UPLOAD_EXAMS, MEMBER, "Can upload exams, add courses and examinators"),
+        (CAN_EDIT_EXAMS, BOARD_MEMBER, "Can edit and delete all exams, courses and examinators. " \
+                                       "A user can always edit and delete stuff created by themselves"),
     )
