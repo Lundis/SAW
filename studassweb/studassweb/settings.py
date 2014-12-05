@@ -141,3 +141,63 @@ CKEDITOR_CONFIGS = {
 
 THUMBNAIL_DEBUG = True  # DEBUG SETTING!
 THUMBNAIL_BASEDIR = "thumbnails"
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'djangodebugfile': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(os.path.join(os.path.dirname(SITE_ROOT), 'logs'), 'djangodebug.log'),
+            'formatter': 'verbose'
+        },
+        'appdebugfile': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(os.path.join(os.path.dirname(SITE_ROOT), 'logs'), 'appdebug.log'),
+            'formatter': 'verbose'
+        },
+        'allwarnings': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(os.path.join(os.path.dirname(SITE_ROOT), 'logs'), 'allwarnings.log'),
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['djangodebugfile', 'allwarnings'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'studassweb': {
+            'handlers': ['appdebugfile','allwarnings'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+
+
+    },
+}
+
+#This is the logger added to every module
+local_logger_conf = {
+    'handlers': ['allwarnings', 'appdebugfile'],
+    'level': 'DEBUG',
+    'propagate': True,
+}
+
+#Add to every module
+for app in get_all_modules():
+    LOGGING['loggers'][app] = local_logger_conf
+
