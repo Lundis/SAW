@@ -54,7 +54,7 @@ class RegisterForm(forms.Form):
 
             # check that the email isn't already registered to an account
             if User.objects.filter(email=self.cleaned_data['email']).count() != 0:
-                self._errors['graduation_year'] = _("An account associated to this email already exists")
+                self._errors['email'] = _("An account associated to this email already exists")
 
             # make sure the passwords are equal
             if self.cleaned_data['password'] != self.cleaned_data['password_repeat']:

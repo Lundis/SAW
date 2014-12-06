@@ -17,7 +17,7 @@
                     </a>
                 {% empty %}
                     <p>{% trans "No exams found!" %}</p>
-                    <form action="{% url 'exams_delete_examinator' examinator.id %}" method="post">
+                    <form action="{% url 'exams_delete_examinator' examinator.id %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
                         {% csrf_token %}
                         {% buttons %}
                             <button type="submit" class="btn btn-danger">
