@@ -1,5 +1,5 @@
 from django import forms
-from .models import Member
+from .models import Member, PaymentPurpose
 from base.models import SiteConfiguration
 from django.utils.translation import ugettext as _
 
@@ -28,3 +28,9 @@ class MemberForm(forms.ModelForm):
         if commit:
             member.save()
         return member
+
+
+class PaymentPurposeForm(forms.ModelForm):
+    class Meta():
+        model = PaymentPurpose
+        fields = ('purpose', 'description')

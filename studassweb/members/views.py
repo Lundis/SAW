@@ -5,9 +5,10 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from users.decorators import has_permission
 from users.models import UserExtension
-from .models import Member
-from .forms import MemberForm
+from .models import Member, PaymentPurpose
+from .forms import MemberForm, PaymentPurposeForm
 from .register import CAN_VIEW, CAN_EDIT
+from base.forms import ConfirmationForm
 
 
 @has_permission(CAN_VIEW)
@@ -64,3 +65,50 @@ def apply_membership(request):
     else:
         context['form'] = form
     return render(request, 'members/member_application.html', context)
+
+@has_permission(CAN_EDIT)
+def add_paymentpurpose(request):
+    if request.method == 'POST':
+        form = PaymentPurposeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/members')  # TODO user probably wants feedback
+
+    form = PaymentPurposeForm()
+    context = {'form': form}
+    return render(request, 'members/add_paymentpurpose.html', context)
+
+
+@has_permission(CAN_EDIT)
+def edit_paymentpurpose(request, paymentpurpose_id):
+    try:
+        paymentpurpose = PaymentPurpose.objects.get(id=paymentpurpose_id)
+    except PaymentPurpose.DoesNotExist:
+        raise Http404
+
+    form = PaymentPurposeForm(instance=paymentpurpose)
+
+    if request.method == 'POST':
+        form = PaymentPurposeForm(request.POST, instance=paymentpurpose)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/members')  # TODO user probably wants feedback
+
+    context = {'form': form}
+    return render(request, 'members/edit_paymentpurpose.html', context)
+
+
+@has_permission(CAN_EDIT)
+def delete_paymentpurpose(request, paymentpurpose_id):
+    try:
+        paymentpurpose = PaymentPurpose.objects.get(id=paymentpurpose_id)
+    except PaymentPurpose.DoesNotExist:
+        raise Http404
+
+    form = ConfirmationForm(request.POST or None)
+    if form.is_valid():
+        paymentpurpose.delete()
+        return HttpResponseRedirect('/members')  # TODO user probably wants feedback
+    
+    context = {'form': form}
+    return render(request, 'members/delete_paymentpurpose.html', context)
