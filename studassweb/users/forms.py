@@ -3,6 +3,8 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from .models import UserExtension
+import logging
+logger = logging.getLogger(__name__)
 
 
 class LoginForm(forms.Form):
@@ -26,15 +28,17 @@ class LoginForm(forms.Form):
 
     def login_user(self, request):
         user = authenticate(username=self.cleaned_data['user_name'], password=self.cleaned_data['password'])
+        #UserExtension is normally created when creating user, except for SuperUsers.
         try:
-            user_ext =  UserExtension.objects.get(user=user)
+            UserExtension.objects.get(user=user)
         except UserExtension.DoesNotExist:
-            user_ext = UserExtension.create_for_user(user)
+            UserExtension.create_for_user(user)
+            logging.warning('UserExtension was created at login for user %s.', user.name)
         login(request, user)
 
 
 class RegisterForm(forms.Form):
-    user_name = forms.CharField(label=_("User name"), min_length=6, max_length=20)
+    user_name = forms.CharField(label=_("User name"), min_length=3, max_length=20)
     password = forms.CharField(label=_("Password"), widget=forms.PasswordInput())
     password_repeat = forms.CharField(label=_("Repeat password"), widget=forms.PasswordInput)
     first_name = forms.CharField(label=_("First name"), max_length=50)
