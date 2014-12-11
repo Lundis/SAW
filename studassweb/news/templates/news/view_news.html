@@ -1,0 +1,15 @@
+{# THIS IS ONLY A PLACEHOLDER FOR THE BUSINESS PITCH! #}
+{% extends 'base/base.html' %}
+{% load i18n %}
+
+{% block title %}
+    {% trans "News" %}
+{%  endblock %}
+
+{% block content %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "News" %}
+    <div class="container">
+        {% block inner_content %}Not yet implemented.{% endblock %}
+    </div>
+{% endblock %}
