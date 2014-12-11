@@ -33,7 +33,7 @@ class LoginForm(forms.Form):
             UserExtension.objects.get(user=user)
         except UserExtension.DoesNotExist:
             UserExtension.create_for_user(user)
-            logging.warning('UserExtension was created at login for user %s.', user.name)
+            logging.warning('UserExtension was created at login')
         login(request, user)
 
 

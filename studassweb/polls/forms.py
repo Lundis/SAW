@@ -8,8 +8,8 @@ from polls.models import *
 class PollForm(forms.ModelForm):
 
     class Meta:
-       model = Poll
-       fields = ('name')
+        model = Poll
+        fields = ('name',)
 
 
 class ChoiceForm(forms.ModelForm):
