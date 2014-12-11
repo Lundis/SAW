@@ -1,0 +1,11 @@
+{% extends "polls/base.html" %}
+
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block inner_content %}
+    {% load navigator %}
+    {% url "polls.views.home" as polls_url %}
+    {% display_navigator polls_url "Polls" poll.get_absolute_url poll.name%}
+    <h1>{{ poll.name }}</h1>
+{% endblock %}
