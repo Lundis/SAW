@@ -1,3 +1,5 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static "css/menu/menu_editor.css" %}" />
 <div id="{{ menu_name }}-menu-container" class="btn-group connected-sort menu-item-container">
     {% for menu_item in items %}
         <li id="menu-item-{{ menu_item.id }}" class="btn
