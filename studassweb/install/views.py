@@ -13,6 +13,9 @@ from users.decorators import has_permission
 from users.groups import setup_default_groups
 from settings.setup import setup_settings
 from .register import CAN_INSTALL
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def welcome(request):
@@ -32,9 +35,11 @@ def welcome(request):
 @has_permission(CAN_INSTALL)
 def association(request):
     form = AssociationForm(request.POST or None)
+    logger.info('In association, form is defined: %s', bool(form))
     if form.is_valid():
         form.apply()
         InstallProgress.site_name_set()
+        logger.info('In association, redirecting to modules')
         return HttpResponseRedirect('modules')
     context = {'form': form}
     return render(request, 'install/assoc.html', context)
@@ -43,12 +48,14 @@ def association(request):
 @has_permission(CAN_INSTALL)
 def modules(request):
     form = ModulesForm(request.POST or None, modules=settings.OPTIONAL_APPS)
+    logger.info('In modules, form is defined: %s', bool(form))
     if form.is_valid():
         form.apply()
         InstallProgress.modules_set()
         MenuItem.remove_disabled_items()
         # create settings menu
         setup_settings()
+        logger.info('In modules, redirecting to menu')
         return HttpResponseRedirect('menu')
 
     context = {'form': form}
@@ -62,11 +69,13 @@ def menu(request):
     main_menu = Menu.get("main_menu")
     login_menu = Menu.get("login_menu")
     if InstallProgress.is_menu_set():
+        logger.info('in Menu, is_menu_set() equals True')
         # fetch items from current menus
         menu_items = main_menu.items()
         login_items = login_menu.items()
         available_items = get_other_items(menu_items + login_items)
     else:
+        logger.info('in Menu, is_menu_set() equals False')
         # use default layout
         menu_items, login_items, available_items = get_all_menu_items()
     form = MenuForm(request.POST or None,
@@ -75,6 +84,7 @@ def menu(request):
                                    login_menu.menu_name: login_items},
                     available_items=available_items)
     if form.is_valid():
+        logger.info('in Menu, form.is_valid() equals True')
         form.put_items_in_menus()
         InstallProgress.menu_set()
         return HttpResponseRedirect('finished')
@@ -91,6 +101,7 @@ def get_other_items(occupied=[]):
 
 @has_permission(CAN_INSTALL)
 def finished(request):
+    logger.info('in Finished')
     setup_default_groups()
     InstallProgress.finish()
     context = {}
