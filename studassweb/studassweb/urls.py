@@ -9,8 +9,12 @@ from django.conf.urls.static import static
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^ckeditor/', include('ckeditor.urls')),
-)\
-+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) #development!
+)
+if settings.MEDIA_DJANGO:
+    # Static files (CSS, JavaScript, Images)
+    # https://docs.djangoproject.com/en/1.7/howto/static-files/
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) #development!
+
 
 if not InstallProgress.is_finished():
     urlpatterns += (

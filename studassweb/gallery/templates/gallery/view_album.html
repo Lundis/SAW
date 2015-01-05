@@ -10,10 +10,10 @@
     {% display_navigator gallery_url "Gallery" album.name album.get_absolute_url%}
     <h1>{{ album.name }}</h1>
     {% for album in gallery %}
-		<p><a href="/gallery/album/{{ album.album_id }}"></a></p>
+		<p><a href="/gallery/album/{{ album.id }}"></a></p>
     {% empty %}
         <p>{% trans "No albums found!" %}</p>
-        <form action="{% url 'gallery.views.edit_album' album.album_id %}" method="post">
+        <form action="{% url 'gallery.views.edit_album' album.id %}" method="post">
             {% csrf_token %}
             {% buttons %}
                 <button type="submit" class="btn btn-danger">
