@@ -10,19 +10,21 @@ def view_gallery(request):
 def view_album(request, album_id):
     try:
         album = Album.objects.get(id=album_id)
-        return render(request, 'album/view_album.html', {
+        print (album)
+        return render(request, 'gallery/view_album.html', {
             'album': album},)
     except Album.DoesNotExist:
         return HttpResponseNotFound('error')
 
 
 def edit_album(request, album_id):
-    """
-    Renders the album edit blabla
-    :param request:
-    :return:
-    """
-    pass
+    try:
+        album = Album.objects.get(id=album_id)
+        return render(request, 'gallery/edit_album.html', {
+            'album': album},)
+    except Album.DoesNotExist:
+        return HttpResponseNotFound('error')
+
 
 def create_album(request, album_id=None):
     try:
