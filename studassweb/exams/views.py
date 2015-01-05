@@ -7,6 +7,7 @@ from django.forms.models import inlineformset_factory
 from users import permissions
 from .register import CAN_VIEW_EXAM_ARCHIVE, CAN_UPLOAD_EXAMS, CAN_EDIT_EXAMS
 from users.decorators import has_permission
+from django.core.urlresolvers import reverse
 import logging
 
 logger = logging.getLogger(__name__)
@@ -107,7 +108,7 @@ def add_edit_exam(request, exam_id=-1):
             for obj in fileformset.deleted_objects:
                 obj.delete()
 
-            return HttpResponseRedirect('/exams/exam/' + str(tmpexam.id))
+            return HttpResponseRedirect(reverse("exams_view_exam", args=[tmpexam.id]))
 
     context = {'form': form, 'filesformset': fileformset}
     return render(request, 'exams/add_edit_exam.html', context)
@@ -132,7 +133,7 @@ def add_edit_examinator(request, examinator_id=-1):
             tmp = form.save(commit=False)
             tmp.created_by = request.user
             tmp.save()
-            return HttpResponseRedirect('/exams/examinator/' + str(tmp.id))
+            return HttpResponseRedirect(reverse("exams_view_examinator", args=[tmp.id]))
 
     context = {'form': form}
     return render(request, 'exams/add_edit_examinator.html', context)
@@ -157,7 +158,7 @@ def add_edit_course(request, course_id=-1):
                 tmp = form.save(commit=False)
                 tmp.created_by = request.user
                 tmp.save()
-                return HttpResponseRedirect('/exams/course/' + str(tmp.id))
+                return HttpResponseRedirect(reverse("exams_view_course", args=[tmp.id]))
 
         context = {'form': form}
         return render(request, 'exams/add_edit_course.html', context)
@@ -171,7 +172,7 @@ def delete_exam(request, exam_id):
                     images = ExamFile.objects.filter(exam_id=exam_id)
                     images.delete()
                     exam.delete()
-                    return HttpResponseRedirect('/exams/')  # TODO give feedback to user
+                    return HttpResponseRedirect(reverse("exams_main"))  # TODO give feedback to user
                 else:
                     logger.warning('User %s tried to delete exam %s', request.user, exam_id)
                     return HttpResponseForbidden('You don\'t have permission to remove this!')
@@ -188,7 +189,7 @@ def delete_examinator(request, examinator_id):
             examinator = Examinator.objects.get(id=examinator_id)
             if permissions.has_user_perm(request.user, CAN_EDIT_EXAMS) or examinator.created_by == request.user:
                 examinator.delete()
-                return HttpResponseRedirect('/exams/')  # TODO give feedback to user
+                return HttpResponseRedirect(reverse("exams_main"))  # TODO give feedback to user
             else:
                 logger.warning('User %s tried to delete examinator %s', request.user, examinator_id)
                 return HttpResponseForbidden('You don\'t have permission to remove this!')
@@ -207,7 +208,7 @@ def delete_course(request, course_id):
             course = Course.objects.get(id=course_id)
             if permissions.has_user_perm(request.user, CAN_EDIT_EXAMS) or course.created_by == request.user:
                 course.delete()
-                return HttpResponseRedirect('/exams/')  # TODO give feedback to user
+                return HttpResponseRedirect(reverse("exams_main"))  # TODO give feedback to user
             else:
                 logger.warning('User %s tried to delete course %s', request.user, course_id)
                 return HttpResponseForbidden('You don\'t have permission to remove this!')
