@@ -1,0 +1,34 @@
+{% extends "boards/base.html" %}
+
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block inner_content %}
+    {% load navigator %}
+    {% url "boards.views.boards_main" as boards_url %}
+    {% display_navigator boards_url "Boards" role.get_absolute_url role.name%}
+    <div class="row">
+        <div class="col-sm-6">
+            <h1>{{ role.name }}</h1>
+            <div class="list-group">
+
+                {% for boardmember in boardmembers %}
+                    <a class="list-group-item" href="{% boardmember.get_absolute_url %}">
+                        {{ boardmember.year }} : {{ boardmember }} TODO fix this so it looks nice
+                    </a>
+                {% empty %}
+                    <p>{% trans "No members with this role found!" %}</p>
+                    <form action="{% url 'boards_delete_role' course.id %}" method="post">
+                        {% csrf_token %}
+                        {% buttons %}
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('{% trans "Are you sure?" %}')">
+                                {% trans "Remove this role" %}
+                            </button>
+                        {% endbuttons %}
+                    </form>
+                {% endfor %}
+            </div>
+        </div>
+
+        </div>
+{% endblock %}

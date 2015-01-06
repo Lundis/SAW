@@ -27,8 +27,8 @@ class BoardType(models.Model):
 
 class Board(models.Model):
     year = models.IntegerField()
-    photo = models.ImageField(upload_to='boards/photos')
-    board = models.ForeignKey(BoardType, on_delete=models.PROTECT)
+    photo = models.ImageField(upload_to='boards/photos', blank=True)
+    boardtype = models.ForeignKey(BoardType, on_delete=models.PROTECT)
 
     def __str__(self):
         return str(self.board.name) + " " + str(self.year)
@@ -41,7 +41,7 @@ class BoardMember(models.Model):
     board = models.ForeignKey(Board, on_delete=models.PROTECT)
     role = models.ForeignKey(Role, on_delete=models.PROTECT)
     member = models.ForeignKey(Member, on_delete=models.PROTECT)
-    photo = models.ImageField(upload_to='boards/photos')
+    photo = models.ImageField(upload_to='boards/photos', blank=True)
 
     def __str__(self):
         return str(self.role.name) + " " + str(self.user.get_full_name())
