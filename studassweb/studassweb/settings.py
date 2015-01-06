@@ -103,6 +103,15 @@ INSTALLED_APPS = (
 # load local settings
 exec(open(os.path.join(os.path.dirname(__file__), 'settings_local.py')).read(), globals())
 
+# Set up static file serving
+if DEBUG:
+    STATICFILES_DIRS = (
+        STATIC_DIR,
+    )
+else:
+    # We are using an external static file server such as apache.
+    STATIC_ROOT = STATIC_DIR
+
 # Load non-critical modules dynamically
 # http://stackoverflow.com/questions/24027901/dynamically-loading-django-apps-at-runtime
 # load this after local settings due to dependencies

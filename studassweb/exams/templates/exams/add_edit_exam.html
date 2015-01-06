@@ -4,54 +4,50 @@
 {% load bootstrap3 %}
 {% load static %}
 
-{% block inner_content %}
+{% block main_content %}
     {% load navigator %}
     {% url "exams.views.main" as exams_url %}
     {% if form.instance.pk %}
-        {% display_navigator exams_url "Exams" form.instance.get_absolute_url form.instance%}
+        {% display_navigator exams_url "Exams" form.instance.get_absolute_url form.instance %}
     {% else %}
         {% display_navigator exams_url "Exams" "#" "New exam" %}
     {% endif %}
-    <div class="row">
-        <div class="col-sm-6">
-            {% if form.instance.pk %}
-                <h1>Edit {{ form.instance.name }}</h1>
-            {% else %}
-                <h1>Add examinator</h1>
-            {% endif %}
+    {% if form.instance.pk %}
+        <h1>Edit {{ form.instance.name }}</h1>
+    {% else %}
+        <h1>Add examinator</h1>
+    {% endif %}
 
-            {% if form.instance.pk %}
-                <form action="{% url 'exams_delete_exam' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
-                    {% csrf_token %}
-                    {% buttons %}
-                        <button type="submit" class="btn btn-danger">
-                            {% trans "Remove this exam" %}
-                        </button>
-                    {% endbuttons %}
-                </form>
-            {% endif %}
+    {% if form.instance.pk %}
+        <form action="{% url 'exams_delete_exam' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
+            {% csrf_token %}
+            {% buttons %}
+                <button type="submit" class="btn btn-danger">
+                    {% trans "Remove this exam" %}
+                </button>
+            {% endbuttons %}
+        </form>
+    {% endif %}
 
-            <form id="addEditExamForm" action="" method="post" enctype="multipart/form-data" >
-                {% csrf_token %}
-                {% bootstrap_form form %}
-                <div id="examfilesformset_all">
-                    {% for f in filesformset.forms %}
-                        <div class="examfilesformset_single">
-                            {{ f.id }}
-                            {% bootstrap_field f.image%}
-                            {% if f.instance.pk %}{{ f.DELETE}}{% endif %}{# Note! removing this fucks with functionality #}
-                        </div>
-                    {% endfor %}
+    <form id="addEditExamForm" action="" method="post" enctype="multipart/form-data" >
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <div id="examfilesformset_all">
+            {% for f in filesformset.forms %}
+                <div class="examfilesformset_single">
+                    {{ f.id }}
+                    {% bootstrap_field f.image%}
+                    {% if f.instance.pk %}{{ f.DELETE}}{% endif %}{# Note! removing this fucks with functionality #}
                 </div>
-                {{ filesformset.management_form }}
-                {% buttons %}
-                    <button type="submit" class="btn btn-primary">
-                        {% trans "Submit" %}
-                    </button>
-                {% endbuttons %}
-            </form>
+            {% endfor %}
         </div>
-    </div>
+        {{ filesformset.management_form }}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">
+                {% trans "Submit" %}
+            </button>
+        {% endbuttons %}
+    </form>
 {% endblock %}
 
 {% block scripts %}

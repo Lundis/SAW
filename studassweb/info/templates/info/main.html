@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load sawp %}
 
-{% block inner_content %}
+{% block main_content %}
     {% load navigator %}
     {% url "info.views.main" as info_url %}
     {% display_navigator info_url "Info" %}
@@ -14,8 +14,12 @@
             </a>
         {% endfor %}
     </div>
+
+{% endblock %}
+
+{% block sidebar %}
     {% has_perm "info" "EDIT" as show_create_button %}
     {% if show_create_button %}
         <p>{% trans "Create a new category" %} <a href="{% url "info_new_category" %}">{% trans "here" %}</a>.</p>
     {% endif %}
-{% endblock %}
+{% endblock sidebar %}
