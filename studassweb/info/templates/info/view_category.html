@@ -2,46 +2,44 @@
 {% load i18n %}
 {% load sawp %}
 
-{% block inner_content %}
+{% block main_content %}
     {% load navigator %}
     {% url "info.views.main" as info_url %}
     {% display_navigator info_url "Info" category.get_absolute_url category.name %}
-    <div class="row">
-        <div class="col-sm-6">
-            <h1>{{ category.name }}</h1>
-            {% if category.pages %}
-                <div class="list-group">
-                    {% for page in category.pages %}
-                        <a class="list-group-item" href="{{ page.get_absolute_url}}">
-                            {{ page.title }}
+    <h1>{{ category.name }}</h1>
+    {% if category.pages %}
+        <div class="list-group">
+            {% for page in category.pages %}
+                {% can_view_object page as show_page %}
+                {% if show_page %}
+                    <a class="list-group-item" href="{{ page.get_absolute_url}}">
+                        {{ page.title }}
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>{% trans "This category is empty" %}</p>
+    {% endif %}
+    {% endblock main_content %}
+{% block sidebar %}
+        {% has_perm "info" "EDIT" as show_edit_buttons %}
+        {% if show_edit_buttons %}
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h2 class="panel-title">{% trans "Edit" %}</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="list-group">
+                        <a href="{% url "info_new_page" category_id=category.id %}">
+                            <div class="btn list-group-item">{% trans "Create a new page" %}</div>
                         </a>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p>{% trans "This category is empty" %}</p>
-            {% endif %}
-        </div>
-        <div class="col-sm-2 col-md-3 col-xs-1"></div>
-        <div class="col-sm-4 col-md-3">
-            {% has_perm "can_edit_info_pages" as show_edit_buttons %}
-            {% if show_edit_buttons %}
-                <div class="panel panel-info">
-                    <div class="panel-heading">
-                        <h2 class="panel-title">{% trans "Edit" %}</h2>
-                    </div>
-                    <div class="panel-body">
-                        <div class="list-group">
-                            <a href="{% url "info_new_page" category_id=category.id %}">
-                                <div class="btn list-group-item">{% trans "Create a new page" %}</div>
-                            </a>
-                            <a href="{% url "info_edit_category" category.id %}">
-                                <div class="btn list-group-item">{% trans "Edit this category" %}</div>
-                            </a>
-                        </div>
+                        <a href="{% url "info_edit_category" category.id %}">
+                            <div class="btn list-group-item">{% trans "Edit this category" %}</div>
+                        </a>
                     </div>
                 </div>
+            </div>
 
-            {% endif %}
-        </div>
-    </div>
-{% endblock %}
+        {% endif %}
+{% endblock sidebar %}

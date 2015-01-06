@@ -4,9 +4,14 @@ from django.core.urlresolvers import reverse
 from .views import welcome, association, modules, menu, finished
 from django.conf import settings
 from menu.logic import get_all_menu_items
+from base.models import SiteConfiguration
 
 SUPERUSER_USERNAME = "install_superuser"
 SUPERUSER_PASSWORD = "install_superuser"
+
+ASSOCIATION_NAME = "Super association"
+ASSOCIATION_FOUNDED = "1990"
+
 
 
 class InstallHttpTests(TestCase):
@@ -33,20 +38,22 @@ class InstallHttpTests(TestCase):
 
         #POST Association page
         request = self.factory.post(reverse("install.views.association"),
-                                    {'name': 'Super association', 'founded': '1990', })
+                                    {'name': ASSOCIATION_NAME, 'founded': ASSOCIATION_FOUNDED, })
         request.user = self.superuser
         response = association(request)
         #we should _maybe_ check that it redirects to the right page but it doesn't really work.
         #self.assertRedirects(response, reverse("install.views.modules"), fetch_redirect_response=False)
         self.assertEqual(response.status_code, 302)
-
+        #Check that it's actually saved in DB
+        site_config = SiteConfiguration.instance()
+        self.assertEqual(site_config.association_name, ASSOCIATION_NAME)
+        self.assertEqual(str(site_config.association_founded), ASSOCIATION_FOUNDED)
 
         #GET Modules page
         request = self.factory.get(reverse("install.views.modules"))
         request.user = self.superuser
         response = modules(request)
         self.assertEqual(response.status_code, 200)
-
 
         #POST Modules page
         #association=on&contact=on&events=on&exams=on&frontpage=on&gallery=on&info=on&news=on&polls=on
@@ -58,7 +65,7 @@ class InstallHttpTests(TestCase):
         request.user = self.superuser
         response = modules(request)
         self.assertEqual(response.status_code, 302)
-
+        #TODO check that all modules are actually enabled
 
         #GET Menu page
         request = self.factory.get(reverse("install.views.menu"))
@@ -92,6 +99,7 @@ class InstallHttpTests(TestCase):
         request.user = self.superuser
         response = menu(request)
         self.assertEqual(response.status_code, 302)
+        #TODO check that the menu is saved correctly. This one might be hard(?)
 
 
         #GET Finished page

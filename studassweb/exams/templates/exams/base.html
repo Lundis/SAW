@@ -5,10 +5,7 @@
     {% trans "Exams" %}
 {%  endblock %}
 
-{% block content %}
+{% block menu %}
     {% load dynamic_menu %}
     {% display_menu "main_menu" "Exams" %}
-    <div class="container">
-        {% block inner_content %}{% endblock %}
-    </div>
 {% endblock %}

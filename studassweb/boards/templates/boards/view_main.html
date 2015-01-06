@@ -1,0 +1,44 @@
+{% extends "boards/base.html" %}
+
+{% load i18n %}
+
+{% block inner_content %}
+    {% load navigator %}
+    {% url "boards.views.main" as boards_url %}
+    {% display_navigator boards_url "Boards" %}
+    <div class="row">
+        <div class="col-sm-6">
+            <h3>Boards</h3>
+            <div class="list-group">
+                {% for board in boards %}
+                    <a class="list-group-item" href="TODO do the model linky ting">{{ board }}</a>
+                {% empty %}
+                    <p>{% trans "No boards found!" %}</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-sm-4 col-md-3 pull-right">
+            {% if show_add_buttons%}
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h2 class="panel-title">{% trans "Add" %}</h2>
+                    </div>
+                    <div class="panel-body">
+                        <div class="list-group">
+                            <a href="{% url 'boards_add_board' %}">
+                                <div class="btn list-group-item">{% trans "Add new board" %}</div>
+                            </a>
+                            <a href="{% url 'boards_add_boardtype' %}">
+                                <div class="btn list-group-item">{% trans "Add new boardtype" %}</div>
+                            </a>
+                            <a href="{% url 'boards_add_role' %}">
+                                <div class="btn list-group-item">{% trans "Add new role" %}</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

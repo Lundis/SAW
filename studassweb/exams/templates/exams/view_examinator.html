@@ -3,66 +3,62 @@
 {% load i18n %}
 {% load bootstrap3 %}
 
-{% block inner_content %}
+{% block main_content %}
     {% load navigator %}
     {% url "exams.views.main" as exams_url %}
     {% display_navigator exams_url "Exams" examinator.get_absolute_url examinator.name%}
-    <div class="row">
-        <div class="col-sm-6">
-            <h1>{{ examinator.name }}</h1>
-            <div class="list-group">
-                {% for exam in exams %}
-                    <a class="list-group-item" href="{% url 'exams_view_exam' exam.id %}">
-                        {{ exam.exam_date|date:"Y-m-d" }} : {{ exam.course_id.name }}
+    <h1>{{ examinator.name }}</h1>
+    <div class="list-group">
+        {% for exam in exams %}
+            <a class="list-group-item" href="{% url 'exams_view_exam' exam.id %}">
+                {{ exam.exam_date|date:"Y-m-d" }} : {{ exam.course_id.name }}
+            </a>
+        {% empty %}
+            <p>{% trans "No exams found!" %}</p>
+            <form action="{% url 'exams_delete_examinator' examinator.id %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
+                {% csrf_token %}
+                {% buttons %}
+                    <button type="submit" class="btn btn-danger">
+                        {% trans "Remove this examinator" %}
+                    </button>
+                {% endbuttons %}
+            </form>
+        {% endfor %}
+    </div>
+{% endblock %}
+{% block sidebar %}
+    {% if show_edit_buttons%}
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Edit" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <a href="{% url 'exams_edit_examinator' examinator.id %}">
+                        <div class="btn list-group-item">{% trans "Edit this examinator" %}</div>
                     </a>
-                {% empty %}
-                    <p>{% trans "No exams found!" %}</p>
-                    <form action="{% url 'exams_delete_examinator' examinator.id %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
-                        {% csrf_token %}
-                        {% buttons %}
-                            <button type="submit" class="btn btn-danger">
-                                {% trans "Remove this examinator" %}
-                            </button>
-                        {% endbuttons %}
-                    </form>
-                {% endfor %}
+                </div>
             </div>
         </div>
-        <div class="col-sm-4 col-md-3 pull-right">
-            {% if show_edit_buttons%}
-                <div class="panel panel-info">
-                    <div class="panel-heading">
-                        <h2 class="panel-title">{% trans "Edit" %}</h2>
-                    </div>
-                    <div class="panel-body">
-                        <div class="list-group">
-                            <a href="{% url 'exams_edit_examinator' examinator.id %}">
-                                <div class="btn list-group-item">{% trans "Edit this examinator" %}</div>
-                            </a>
-                        </div>
-                    </div>
+    {% endif %}
+    {% if show_add_buttons%}
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Add" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <a href="{% url 'exams_add_exam' %}">
+                        <div class="btn list-group-item">{% trans "Add new exam" %}</div>
+                    </a>
+                    <a href="{% url 'exams_add_course' %}">
+                        <div class="btn list-group-item">{% trans "Add new course" %}</div>
+                    </a>
+                    <a href="{% url 'exams_add_examinator' %}">
+                        <div class="btn list-group-item">{% trans "Add new examinator" %}</div>
+                    </a>
                 </div>
-            {% endif %}
-            {% if show_add_buttons%}
-                <div class="panel panel-info">
-                    <div class="panel-heading">
-                        <h2 class="panel-title">{% trans "Add" %}</h2>
-                    </div>
-                    <div class="panel-body">
-                        <div class="list-group">
-                            <a href="{% url 'exams_add_exam' %}">
-                                <div class="btn list-group-item">{% trans "Add new exam" %}</div>
-                            </a>
-                            <a href="{% url 'exams_add_course' %}">
-                                <div class="btn list-group-item">{% trans "Add new course" %}</div>
-                            </a>
-                            <a href="{% url 'exams_add_examinator' %}">
-                                <div class="btn list-group-item">{% trans "Add new examinator" %}</div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
+            </div>
         </div>
-    </div>
+    {% endif %}
 {% endblock %}

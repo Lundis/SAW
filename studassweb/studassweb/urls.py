@@ -13,7 +13,7 @@ urlpatterns = patterns('',
 if settings.MEDIA_DJANGO:
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/1.7/howto/static-files/
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) #development!
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
 if not InstallProgress.is_finished():

@@ -2,30 +2,28 @@
 {% load i18n %}
 {% load bootstrap3 %}
 
-{% block inner_content %}
-    {% load navigator %}
-    {% url "info.views.main" as info_url %}
-
-    {% load navigator %}
-    {% url "info.views.main" as info_url %}
-    {% if page %}
-        {% display_navigator info_url "Info" category.get_absolute_url category.name page.get_absolute_url page.title %}
-    {% else %}
-        {% display_navigator info_url "Info" category.get_absolute_url category.name "#" "New Page" %}
-    {% endif %}
-    <form action="" method="post">
-        {% csrf_token %}
-        {{ form.media }}
-        {{ form.as_p }}
-
-        <button type="submit" class="btn btn-primary">
-            {% trans "Submit" %}
-        </button>
+{% block content %}
+    <div class="container">
+        {% load navigator %}
+        {% url "info.views.main" as info_url %}
         {% if page %}
-            <a href="{% url "info_delete_page" page.id %}" class="btn btn-danger">
-                {% trans "Delete" %}
-            </a>
+            {% display_navigator info_url "Info" category.get_absolute_url category.name page.get_absolute_url page.title %}
+        {% else %}
+            {% display_navigator info_url "Info" category.get_absolute_url category.name "#" "New Page" %}
         {% endif %}
-    </form>
+        <form action="" method="post">
+            {% csrf_token %}
+            {{ form.media }}
+            {{ form.as_p }}
 
+            <button type="submit" class="btn btn-primary">
+                {% trans "Submit" %}
+            </button>
+            {% if page %}
+                <a href="{% url "info_delete_page" page.id %}" class="btn btn-danger">
+                    {% trans "Delete" %}
+                </a>
+            {% endif %}
+        </form>
+    </div>
 {% endblock %}

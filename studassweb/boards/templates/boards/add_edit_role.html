@@ -1,0 +1,38 @@
+{% extends "boards/base.html" %}
+
+{% load i18n %}
+{% load bootstrap3 %}
+
+
+{% block inner_content %}
+    {% load navigator %}
+    {% url "boards.views.main" as boards_url %}
+    {% if form.instance.pk %}
+        {% display_navigator exams_url "Boards" form.instance.get_absolute_url form.instance.name%}
+    {% else %}
+        {% display_navigator exams_url "Boards" "#" "New role" %}
+    {% endif %}
+    <div class="row">
+        <div class="col-sm-6">
+            {% if form.instance.pk %}
+                <h1>Edit {{ form.instance.name }}</h1>
+            {% else %}
+                <h1>Add role</h1>
+            {% endif %}
+
+            {% if form.instance.pk %}
+                <p>{% trans "Note: If you want to remove this role you first have to remove all members with this role." %}</p>
+            {% endif %}
+
+            <form action="" method="post">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                {% buttons %}
+                    <button type="submit" class="btn btn-primary">
+                        {% trans "Submit" %}
+                    </button>
+                {% endbuttons %}
+            </form>
+        </div>
+    </div>
+{% endblock %}

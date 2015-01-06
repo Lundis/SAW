@@ -4,7 +4,8 @@ from django.core.urlresolvers import reverse
 from ckeditor.fields import RichTextField
 from menu.models import MenuItem, Menu
 from users.groups import GUEST, MEMBER, BOARD_MEMBER
-from .register import VIEW_BOARD, VIEW_MEMBER, VIEW_PUBLIC
+from users.permissions import has_user_perm
+from .register import VIEW_BOARD, VIEW_MEMBER, VIEW_PUBLIC, EDIT
 
 PERMISSION_CHOICES = (
     (GUEST, VIEW_PUBLIC),
@@ -47,6 +48,13 @@ class InfoCategory(models.Model):
         MenuItem.delete_all_that_links_to(self)
         super(InfoCategory, self, *args, **kwargs)
 
+    def can_view(self, user):
+        return has_user_perm(user, self.permission)
+
+    @staticmethod
+    def can_edit(user):
+        return has_user_perm(user, EDIT)
+
 
 class InfoPage(models.Model):
     title = models.CharField(max_length=50)
@@ -75,6 +83,13 @@ class InfoPage(models.Model):
     def delete(self, *args, **kwargs):
         MenuItem.delete_all_that_links_to(self)
         super(InfoPage, self).delete(*args, **kwargs)
+
+    def can_view(self, user):
+        return has_user_perm(user, self.permission)
+
+    @staticmethod
+    def can_edit(user):
+        return has_user_perm(user, EDIT)
 
 
 class InfoPageEdit(models.Model):
