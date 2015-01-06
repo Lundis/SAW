@@ -8,11 +8,3 @@
     margin-right: auto;
     margin-top: 20px;
 }
-
-.menu-item-container {
-    min-height: 40px;
-    min-width: 200px;
-    border: 1px solid;
-    padding: 5px;
-    border-color: grey;
-}
