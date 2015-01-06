@@ -31,7 +31,7 @@ class Board(models.Model):
     boardtype = models.ForeignKey(BoardType, on_delete=models.PROTECT)
 
     def __str__(self):
-        return str(self.board.name) + " " + str(self.year)
+        return str(self.boardtype.name) + " " + str(self.year)
 
     def get_absolute_url(self):
         return reverse("boards.views.view_board", kwargs={'board_id': self.id})

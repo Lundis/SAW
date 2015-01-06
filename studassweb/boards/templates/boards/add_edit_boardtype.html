@@ -10,17 +10,17 @@
     {% if form.instance.pk %}
         {% display_navigator exams_url "Boards" form.instance.get_absolute_url form.instance.name%}
     {% else %}
-        {% display_navigator exams_url "Boards" "#" "New role" %}
+        {% display_navigator exams_url "Boards" "#" "New board type" %}
     {% endif %}
 
     {% if form.instance.pk %}
         <h1>Edit {{ form.instance.name }}</h1>
     {% else %}
-        <h1>Add role</h1>
+        <h1>Add board type</h1>
     {% endif %}
 
     {% if form.instance.pk %}
-        <p>{% trans "Note: If you want to remove this role you first have to remove all members with this role." %}</p>
+        <p>{% trans "Note: If you want to remove this board type you first have to remove all boards of this type." %}</p>
     {% endif %}
 
     <form action="" method="post">

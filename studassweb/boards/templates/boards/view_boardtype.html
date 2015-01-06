@@ -6,21 +6,21 @@
 {% block main_content %}
     {% load navigator %}
     {% url "boards.views.boards_main" as boards_url %}
-    {% display_navigator boards_url "Boards" role.get_absolute_url role.name%}
-    <h1>{{ role.name }}</h1>
+    {% display_navigator boards_url "Boards" boardtype.get_absolute_url boardtype.name%}
+    <h1>{{ boardtype.name }}</h1>
     <div class="list-group">
 
-        {% for boardmember in boardmembers %}
-            <a class="list-group-item" href="{{ boardmember.get_absolute_url }}">
-                {{ boardmember.year }} : {{ boardmember }} TODO fix this so it looks nice
+        {% for board in boards %}
+            <a class="list-group-item" href="{{ board.get_absolute_url }}">
+                {{ board.year }} TODO getmembercount would be nice
             </a>
         {% empty %}
-            <p>{% trans "No members with this role found!" %}</p>
-            <form action="{% url 'boards_delete_role' role.id %}" method="post">
+            <p>{% trans "No boards with this board type found!" %}</p>
+            <form action="{% url 'boards_delete_boardtype' boardtype.id %}" method="post">
                 {% csrf_token %}
                 {% buttons %}
                     <button type="submit" class="btn btn-danger" onclick="return confirm('{% trans "Are you sure?" %}')">
-                        {% trans "Remove this role" %}
+                        {% trans "Remove this board type" %}
                     </button>
                 {% endbuttons %}
             </form>

@@ -8,19 +8,19 @@
     {% load navigator %}
     {% url "boards.views.main" as boards_url %}
     {% if form.instance.pk %}
-        {% display_navigator exams_url "Boards" form.instance.get_absolute_url form.instance.name%}
+        {% display_navigator exams_url "Boards" form.instance.get_absolute_url form.instance%}
     {% else %}
-        {% display_navigator exams_url "Boards" "#" "New role" %}
+        {% display_navigator exams_url "Boards" "#" "New board" %}
     {% endif %}
 
     {% if form.instance.pk %}
-        <h1>Edit {{ form.instance.name }}</h1>
+        <h1>Edit {{ form.instance }}</h1>
     {% else %}
-        <h1>Add role</h1>
+        <h1>Add board</h1>
     {% endif %}
 
     {% if form.instance.pk %}
-        <p>{% trans "Note: If you want to remove this role you first have to remove all members with this role." %}</p>
+        <p>{% trans "Note: If you want to remove this board you first have to remove all members." %}</p>
     {% endif %}
 
     <form action="" method="post">
