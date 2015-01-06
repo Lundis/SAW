@@ -117,13 +117,13 @@ INSTALLED_APPS += EXTERNAL_APPS + NON_OPTIONAL_APPS + OPTIONAL_APPS
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
     'formatters': {
         'verbose': {
             'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
         },
         'simple': {
-            'format': '%(levelname)s %(message)s'
+            'format': 'ISNOTUSEDANYWHERE %(levelname)s %(message)s'
         },
     },
     'handlers': {
@@ -145,15 +145,20 @@ LOGGING = {
             'filename': os.path.join(os.path.join(os.path.dirname(SITE_ROOT), 'logs'), 'allwarnings.log'),
             'formatter': 'verbose'
         },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
-            'handlers': ['djangodebugfile', 'allwarnings'],
+            'handlers': ['djangodebugfile', 'allwarnings', 'console'],
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
         },
         'studassweb': {
-            'handlers': ['appdebugfile','allwarnings'],
+            'handlers': ['appdebugfile','allwarnings', 'console'],
             'level': 'DEBUG',
             'propagate': True,
         },
@@ -164,7 +169,7 @@ LOGGING = {
 
 #This is the logger added to every module
 local_logger_conf = {
-    'handlers': ['allwarnings', 'appdebugfile'],
+    'handlers': ['allwarnings', 'appdebugfile', 'console'],
     'level': 'DEBUG',
     'propagate': True,
 }
