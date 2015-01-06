@@ -15,20 +15,20 @@ def get_modules_with(file_name, function_name):
     for module in modules_in_base_dir:
         # is it a python module?
         if os.path.isfile(os.path.join(module, "__init__.py")):
-            if file_name == None:
+            if file_name is None:
                 modules += ((module, None ),)
                 continue
             # check if the file exists in this module
             app_path = os.path.join(settings.BASE_DIR, module)
             file_path = os.path.join(app_path, file_name + ".py")
             if os.path.isfile(file_path):
-                if function_name == None:
+                if function_name is None:
                     modules += ((module, None), )
                     continue
 
                 # now load the module, the file and get the function.
                 f = get_function_from_module(module, file_name, function_name)
-                if f != None:
+                if f is not None:
                     modules += ((module, f), )
                 # else catch exception and log error? will fail for now.
                 # It shouldn't fail when used correctly. ever.
