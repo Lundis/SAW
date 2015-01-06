@@ -12,9 +12,12 @@
             {% if category.pages %}
                 <div class="list-group">
                     {% for page in category.pages %}
-                        <a class="list-group-item" href="{{ page.get_absolute_url}}">
-                            {{ page.title }}
-                        </a>
+                        {% can_view_object page as show_page %}
+                        {% if show_page %}
+                            <a class="list-group-item" href="{{ page.get_absolute_url}}">
+                                {{ page.title }}
+                            </a>
+                        {% endif %}
                     {% endfor %}
                 </div>
             {% else %}
@@ -23,7 +26,7 @@
         </div>
         <div class="col-sm-2 col-md-3 col-xs-1"></div>
         <div class="col-sm-4 col-md-3">
-            {% has_perm "can_edit_info_pages" as show_edit_buttons %}
+            {% has_perm "info" "EDIT" as show_edit_buttons %}
             {% if show_edit_buttons %}
                 <div class="panel panel-info">
                     <div class="panel-heading">
