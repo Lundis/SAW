@@ -8,9 +8,9 @@ def get_menu_items():
     :return: a tuple ([main menu items], [settings menu items], [others])
     """
     item, created = MenuItem.get_or_create(__package__,
-                                  "Info",
-                                  reverse_string="info_view_categories",
-                                  permission=SAWPermission.get_or_create("can_view_public_info_pages"))
+                                           "Info",
+                                           reverse_string="info_view_categories",
+                                           permission=SAWPermission.get_or_create(VIEW_PUBLIC))
     if not item.submenu:
         item.submenu, created = Menu.objects.get_or_create(menu_name="info_top_menu")
         item.save()
