@@ -7,7 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('association', '0001_initial'),
+        ('boards', '0001_initial'),
     ]
 
     operations = [
@@ -19,13 +19,13 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='board',
             name='photo',
-            field=models.ImageField(upload_to='association/photos'),
+            field=models.ImageField(upload_to='boards/photos'),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='boardmember',
             name='photo',
-            field=models.ImageField(upload_to='association/photos'),
+            field=models.ImageField(upload_to='boards/photos'),
             preserve_default=True,
         ),
     ]
