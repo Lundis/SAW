@@ -7,19 +7,20 @@
     {% trans "Register" %}
 {%  endblock %}
 
-{% block content %}
+{% block menu %}
     {% load dynamic_menu %}
     {% display_menu "main_menu" "Member Registry" %}
-    <div class="container">
-        <h1>{% trans "Add Payment purpose" %}</h1>
-        <form action="" method="post">
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            {% buttons %}
-                <button type="submit" class="btn btn-primary">
-                    {% trans "Submit" %}
-                </button>
-            {% endbuttons %}
-        </form>
-    </div>
+{% endblock %}
+
+{% block main_content %}
+    <h1>{% trans "Add Payment purpose" %}</h1>
+    <form action="" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">
+                {% trans "Submit" %}
+            </button>
+        {% endbuttons %}
+    </form>
 {% endblock %}

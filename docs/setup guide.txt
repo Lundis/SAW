@@ -96,5 +96,18 @@ Then download it at http://www.jetbrains.com/pycharm/
         * You will be asked for a username, email (optional) and password
         * enter something simple. for instance "lundis", no email, password "a"
 
+* Create local settings file from template
+    1. copy "studassweb/settings_local.py.template"  to  "studassweb/settings_local.py"
+
 
 REMEMBER TO VISIT LOCALHOST:8000/install to set up the menu.
+
+
+===== Local settings file =====
+
+You must copy the file
+"studassweb/settings_local.py.template"
+to
+"studassweb/settings_local.py"
+
+If you get some settings-related error in the future, try removing the file and copy the template again.

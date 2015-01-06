@@ -104,7 +104,7 @@ INSTALLED_APPS = (
 exec(open(os.path.join(os.path.dirname(__file__), 'settings_local.py')).read(), globals())
 
 # Set up static file serving
-if DEBUG:
+if STATIC_DJANGO:
     STATICFILES_DIRS = (
         STATIC_DIR,
     )
