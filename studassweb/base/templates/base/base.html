@@ -18,29 +18,53 @@
 </head>
 
 <body>
-{% block menu %}
-    {% load dynamic_menu %}
-    {% display_menu "main_menu" "" %}
-{% endblock menu %}
-{% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-8 col-md-9">
-                {% block  main_content %}
-                {% endblock main_content %}
+<div id="site-wrapper">
+    {% block menu %}
+        {% load dynamic_menu %}
+        {% display_menu "main_menu" "" %}
+    {% endblock menu %}
+
+    <div id="content-wrapper">
+        {% block content %}
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-8 col-md-9">
+                        {% block  main_content %}
+                        {% endblock main_content %}
+                    </div>
+                    <div class="col-sm-4 col-md-3">
+                        {% block sidebar %}
+                        {% endblock sidebar %}
+                    </div>
+                </div>
             </div>
-            <div class="col-sm-4 col-md-3">
-                {% block sidebar %}
-                {% endblock sidebar %}
+        {% endblock content %}
+    </div>
+
+    <div id="footer-container">
+        <div class="navbar navbar-default no-margin no-bottom-border " >
+            <div class="container">
+                <div class="col-xs-12 footer text-center navbar-brand">
+                    <span class="glyphicon glyphicon-copyright-mark"></span>
+                    {% now "Y" %} {{ site_config.association_name }}
+                </div>
             </div>
         </div>
     </div>
-{% endblock content %}
 
-
-<div class="container footer"><span class="glyphicon glyphicon-copyright-mark"></span> {% now "Y" %} {{ site_config.association_name }} </div>
-
-
+    <div class="container">
+        <div class="row">
+            <noscript class="container noscript-warning">
+                <div class="row text-center">
+                    <strong>You have disabled Javascript.
+                        To view this site properly, please turn it on,
+                        or switch to a browser that supports Javascript.
+                    </strong>
+                </div>
+            </noscript>
+        </div>
+    </div>
+</div>
 <!-- Placed last to improve loading times -->
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -48,8 +72,6 @@
 <script src="{% static "js/bootstrap.min.js" %}"></script>
 <script src="{% static "js/base/base.js" %}"></script>
 {% block scripts %}{% endblock %}
+
 </body>
-
-
-
 </html>

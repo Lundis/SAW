@@ -59,12 +59,11 @@ class BootswatchTheme(models.Model):
         theme_stream = BytesIO(urlopen(json_dict['cssMin']).read())
         theme_filename = urlparse(json_dict['cssMin']).path.split("/")[-1]
         theme_folder = os.path.join(THEME_DIR, version, json_dict['name'])
-        theme_absolute_folder = os.path.join(settings.STATIC_ROOT, theme_folder)
+        theme_absolute_folder = os.path.join(settings.STATIC_DIR, theme_folder)
         if not os.path.exists(theme_absolute_folder):
             os.makedirs(theme_absolute_folder)
         theme_absolute_path = os.path.join(theme_absolute_folder, theme_filename)
         theme_relative_path = os.path.join(theme_folder, theme_filename)
-        print(theme_absolute_path)
         with open(theme_absolute_path, 'wb') as out_file:
             logger.info("Saving theme css: %s", theme_absolute_path)
             shutil.copyfileobj(theme_stream, out_file)
