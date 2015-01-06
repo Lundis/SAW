@@ -4,7 +4,7 @@
 {% load sawp %}
 {% load bootstrap3 %}
 
-{% block inner_content %}
+{% block main_content %}
     {% load navigator %}
     {% url "info.views.main" as info_url %}
     {% display_navigator info_url "Info" "#" "Delete" %}

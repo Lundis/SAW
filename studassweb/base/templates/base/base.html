@@ -5,10 +5,10 @@
 <!DOCTYPE html >
 <html lang="en">
 <head>
-	<title>{% block title %}{% endblock %}</title>
-	<!-- viewport for Bootstrap -->
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link href="{% static site_config.bootstrap_theme_url %}" rel="stylesheet">
+    <title>{% block title %}{% endblock %}</title>
+    <!-- viewport for Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{% static site_config.bootstrap_theme_url %}" rel="stylesheet">
     {% if site_config.bootstrap_theme_mod_url %}
         <link href="{% static site_config.bootstrap_theme_mod_url %}" rel="stylesheet">
     {% endif %}
@@ -18,9 +18,23 @@
 </head>
 
 <body>
-{% block content %}
+{% block menu %}
     {% load dynamic_menu %}
     {% display_menu "main_menu" "" %}
+{% endblock menu %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 col-md-9">
+                {% block  main_content %}
+                {% endblock main_content %}
+            </div>
+            <div class="col-sm-4 col-md-3">
+                {% block sidebar %}
+                {% endblock sidebar %}
+            </div>
+        </div>
+    </div>
 {% endblock content %}
 
 
