@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
             name='BoardMember',
             fields=[
                 ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
-                ('board', models.ForeignKey(to='association.Board')),
+                ('board', models.ForeignKey(to='boards.Board')),
                 ('person_id', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
                 ('photo', models.ForeignKey(to='gallery.Photo')),
             ],
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
                 ('name', models.CharField(max_length=100)),
-                ('board', models.ForeignKey(to='association.Board')),
+                ('board', models.ForeignKey(to='boards.Board')),
             ],
             options={
             },
@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='boardmember',
             name='role',
-            field=models.ForeignKey(to='association.Role'),
+            field=models.ForeignKey(to='boards.Role'),
             preserve_default=True,
         ),
     ]
