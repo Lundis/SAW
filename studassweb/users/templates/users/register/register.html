@@ -6,16 +6,15 @@
     {% trans "Register" %}
 {%  endblock %}
 
-{% block content %}
+{% block menu %}
     {% load dynamic_menu %}
     {% display_menu "main_menu" "Register" %}
-    <div class="container">
-        <div class="col-sm-8">
-            <form action="{% url "users_register" %}" method="post">
-                {% csrf_token %}
-                {% bootstrap_form form %}
-                <input type="submit" value="Submit" />
-            </form>
-        </div>
-    </div>
+{% endblock %}
+
+{% block main_content %}
+    <form action="{% url "users_register" %}" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <input type="submit" value="Submit" />
+    </form>
 {% endblock %}

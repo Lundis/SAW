@@ -7,9 +7,13 @@
     {% trans "Register" %}
 {%  endblock %}
 
-{% block content %}
+
+{% block menu %}
     {% load dynamic_menu %}
     {% display_menu "main_menu" "Member Registry" %}
+{% endblock %}
+
+{% block content %}
     <div class="container">
         <h1>{% trans "Delete Payment purpose" %}</h1>
         <p>{% trans "Are you sure you want to delete this Payment purpose?" %}</p>
