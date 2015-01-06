@@ -12,6 +12,9 @@ import os
 import datetime
 from concurrent import futures
 from .utils import get_all_modules
+import logging
+
+logger = logging.Logger(__name__)
 
 THEME_DIR = os.path.join("css", "bootswatch_themes")
 
@@ -41,27 +44,29 @@ class BootswatchTheme(models.Model):
         image_folder = os.path.join("base",
                                     "bootswatch",
                                     version)
-        image_absolute_folder = os.path.join(settings.MEDIA_URL, image_folder)
+        image_absolute_folder = os.path.join(settings.MEDIA_ROOT, image_folder)
         if not os.path.exists(image_absolute_folder):
             os.makedirs(image_absolute_folder)
         image_filename = json_dict['name'] + "_" + original_image_filename
         image_absolute_path = os.path.join(image_absolute_folder, image_filename)
         image_relative_path = os.path.join(image_folder, image_filename)
         # save the image to disk - overwrite old file (it shouldn't exist)
-        with open(os.path.join(image_folder, image_absolute_path), 'wb') as out_file:
+        with open(image_absolute_path, 'wb') as out_file:
+            logger.info("Saving preview image: %s", image_absolute_path)
             shutil.copyfileobj(preview_image_stream, out_file)
 
         # same for the css file
         theme_stream = BytesIO(urlopen(json_dict['cssMin']).read())
         theme_filename = urlparse(json_dict['cssMin']).path.split("/")[-1]
         theme_folder = os.path.join(THEME_DIR, version, json_dict['name'])
-        theme_absolute_folder = os.path.join(settings.STATIC_DIR, theme_folder)
+        theme_absolute_folder = os.path.join(settings.STATIC_ROOT, theme_folder)
         if not os.path.exists(theme_absolute_folder):
             os.makedirs(theme_absolute_folder)
         theme_absolute_path = os.path.join(theme_absolute_folder, theme_filename)
         theme_relative_path = os.path.join(theme_folder, theme_filename)
         print(theme_absolute_path)
         with open(theme_absolute_path, 'wb') as out_file:
+            logger.info("Saving theme css: %s", theme_absolute_path)
             shutil.copyfileobj(theme_stream, out_file)
 
         try:
