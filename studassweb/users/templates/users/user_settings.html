@@ -3,7 +3,7 @@
 {% load bootstrap3 %}
 
 {% block inner_content %}
-    <h1>User settings for {{ user.username }}</h1>
+    <h2>User settings for <a href="{% url "users_view_profile" username=user.username %}">{{ user.username }}</a></h2>
     <form action="{% url "users_settings_edit_user" %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% bootstrap_form profile_form %}
