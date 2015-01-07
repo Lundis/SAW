@@ -3,9 +3,9 @@ from users.models import SAWPermission
 from users.groups import GUEST, BOARD_MEMBER
 
 CAN_VIEW_BOARDS = "can_view_boards"
-CAN_EDIT_BOARDS = "can_view_boards"
-CAN_EDIT_ROLES = "can_view_boards"
-CAN_EDIT_BOARDTYPES = "can_view_boards"
+CAN_EDIT_BOARDS = "can_edit_boards"
+CAN_EDIT_ROLES = "can_edit_roles"
+CAN_EDIT_BOARDTYPES = "can_edit_boardtypes"
 
 
 def get_menu_items():

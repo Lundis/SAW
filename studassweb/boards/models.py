@@ -24,6 +24,10 @@ class BoardType(models.Model):
     def get_absolute_url(self):
         return reverse("boards.views.view_boardtype", kwargs={'boardtype_id': self.id})
 
+    def get_member_count(self):
+        #TODO
+        return -1
+
 
 class Board(models.Model):
     year = models.IntegerField()
@@ -35,6 +39,9 @@ class Board(models.Model):
 
     def get_absolute_url(self):
         return reverse("boards.views.view_board", kwargs={'board_id': self.id})
+
+    def get_member_count(self):
+        return str(BoardMember.objects.filter(board=self.id).count())
 
 
 class BoardMember(models.Model):

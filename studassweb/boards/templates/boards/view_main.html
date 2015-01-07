@@ -1,6 +1,7 @@
 {% extends "boards/base.html" %}
 
 {% load i18n %}
+{% load sawp %}
 
 {% block main_content %}
     {% load navigator %}
@@ -16,22 +17,31 @@
     </div>
 {% endblock %}
 {% block sidebar %}
-    {% if show_add_buttons%}
+    {% has_perm "boards" "CAN_EDIT_BOARDS" as can_edit_boards %}
+    {% has_perm "boards" "CAN_EDIT_ROLES" as can_edit_roles %}
+    {% has_perm "boards" "CAN_EDIT_BOARDTYPES" as can_edit_boardtypes %}
+    {% if can_edit_boards or can_edit_roles or can_edit_boardtypes%}
         <div class="panel panel-info">
             <div class="panel-heading">
                 <h2 class="panel-title">{% trans "Add" %}</h2>
             </div>
             <div class="panel-body">
                 <div class="list-group">
-                    <a href="{% url 'boards_add_board' %}">
-                        <div class="btn list-group-item">{% trans "Add new board" %}</div>
-                    </a>
-                    <a href="{% url 'boards_add_boardtype' %}">
-                        <div class="btn list-group-item">{% trans "Add new boardtype" %}</div>
-                    </a>
-                    <a href="{% url 'boards_add_role' %}">
-                        <div class="btn list-group-item">{% trans "Add new role" %}</div>
-                    </a>
+                    {% if can_edit_boards%}
+                        <a href="{% url 'boards_add_board' %}">
+                            <div class="btn list-group-item">{% trans "Add new board" %}</div>
+                        </a>
+                    {% endif %}
+                    {% if can_edit_boardtypes%}
+                        <a href="{% url 'boards_add_boardtype' %}">
+                            <div class="btn list-group-item">{% trans "Add new boardtype" %}</div>
+                        </a>
+                    {% endif %}
+                    {% if can_edit_roles%}
+                        <a href="{% url 'boards_add_role' %}">
+                            <div class="btn list-group-item">{% trans "Add new role" %}</div>
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </div>

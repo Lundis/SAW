@@ -13,16 +13,13 @@ logger = logging.getLogger(__name__)
 
 def boards_main(request):
     boards = Board.objects.filter().order_by('-year')
-
-    show_add_buttons = True
-    return render(request, 'boards/view_main.html', {
-        'boards': boards, 'show_add_buttons': show_add_buttons},)
+    return render(request, 'boards/view_main.html', {'boards': boards, },)
 
 
 def view_role(request, role_id):
     try:
         role = Role.objects.get(id=role_id)
-        boardmembers = BoardMember.objects.filter(role=role_id) #TODO ? .order_by('-year')
+        boardmembers = BoardMember.objects.filter(role=role_id)
 
         return render(request, 'boards/view_role.html', {
             'role': role, 'boardmembers': boardmembers, },)
@@ -86,7 +83,7 @@ def delete_role(request, role_id):
             logger.warning('User %s tried to delete role %s which is still in use', request.user, role)
             return HttpResponseNotFound('You need to remove all board members with this role first')
     else:
-            logger.warning('Attempted to access delete_role via GET')
+            logger.warning('Attempted to access delete_role via other method than POST')
             return HttpResponseNotAllowed(['POST', ])
 
 
@@ -109,7 +106,7 @@ def add_board(request):
     form = BoardForm()
 
     if request.method == 'POST':
-        form = BoardForm(request.POST)
+        form = BoardForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse("boards_view_board", args=[form.instance.id]))
@@ -131,7 +128,7 @@ def edit_board(request, board_id):
     form = BoardForm(instance=board)
 
     if request.method == 'POST':
-        form = BoardForm(request.POST, instance=board)
+        form = BoardForm(request.POST, request.FILES, instance=board)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse("boards_view_board", args=[form.instance.id]))
@@ -157,7 +154,7 @@ def delete_board(request, board_id):
             logger.warning('User %s tried to delete board %s which is still in use', request.user, board)
             return HttpResponseNotFound('You need to remove all board members within this board first')
     else:
-            logger.warning('Attempted to access delete_board via GET')
+            logger.warning('Attempted to access delete_board via other method than POST')
             return HttpResponseNotAllowed(['POST', ])
 
 
@@ -233,16 +230,80 @@ def delete_boardtype(request, boardtype_id):
 
 
 def view_boardmember(request, boardmember_id):
-    return HttpResponseNotFound('Not implemented')
+    try:
+        boardmember = BoardMember.objects.get(id=boardmember_id)
+
+        #TODO get all boards this member has been on
+        #1 Get all boardmembers with this member
+        #2 Get board from each of the boardmembers
+        #3 Put in array
+        #4 profit!!!
+
+        boards = {}
+
+
+        return render(request, 'boards/view_boardmember.html', {
+            'boardmember': boardmember, 'boards': boards},)
+    except BoardMember.DoesNotExist:
+        logger.warning('Could not find board member with id %s', boardmember_id)
+        return HttpResponseNotFound('No board member with that id found')
 
 
 def add_boardmember(request):
-    return HttpResponseNotFound('Not implemented')
+    if not permissions.has_user_perm(request.user, CAN_EDIT_BOARDS):
+        logger.warning('User %s tried to add board member', request.user)
+        return HttpResponseForbidden('You don\'t have permission to add board members!')
+    form = BoardMemberForm()
+
+    if request.method == 'POST':
+        form = BoardMemberForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse("boards_view_boardmember", args=[form.instance.id]))
+
+    context = {'form': form}
+    return render(request, 'boards/add_edit_boardmember.html', context)
 
 
 def edit_boardmember(request, boardmember_id):
-    return HttpResponseNotFound('Not implemented')
+    if not permissions.has_user_perm(request.user, CAN_EDIT_BOARDS):
+            logger.warning('User %s tried to edit board member %s', request.user, boardmember_id)
+            return HttpResponseForbidden('You don\'t have permission to edit this board member!')
+    try:
+        boardmember = BoardMember.objects.get(id=boardmember_id)
+    except BoardMember.DoesNotExist:
+        logger.warning('User %s tried to edit nonexistant board member id %s', request.user, boardmember_id)
+        return HttpResponseNotFound('No such board member!')
+
+    form = BoardMemberForm(instance=boardmember)
+
+    if request.method == 'POST':
+        form = BoardMemberForm(request.POST, request.FILES, instance=boardmember)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse("boards_view_boardmember", args=[form.instance.id]))
+
+    context = {'form': form}
+    return render(request, 'boards/add_edit_boardmember.html', context)
 
 
 def delete_boardmember(request, boardmember_id):
-    return HttpResponseNotFound('Not implemented')
+    if request.method == 'POST':
+        try:
+            boardmember = BoardMember.objects.get(id=boardmember_id)
+            if permissions.has_user_perm(request.user, CAN_EDIT_BOARDS):
+                boardmember.delete()
+                return HttpResponseRedirect(reverse("boards_main"))  # TODO give feedback to user
+            else:
+                logger.warning('User %s tried to delete board member %s', request.user, boardmember)
+                return HttpResponseForbidden('You don\'t have permission to remove this!')
+        except BoardMember.DoesNotExist:
+            logger.warning('User %s tried to delete nonexistant board member id %s', request.user, boardmember_id)
+            return HttpResponseNotFound('No such board member!')
+        except models.ProtectedError:
+            #TODO remove this later when it is certain it is not needed
+            logger.warning('User %s tried to delete board member %s which is still in use THISSHOULDNEVERHAPPEN', request.user, boardmember)
+            return HttpResponseNotFound('You need to remove something first')
+    else:
+            logger.warning('Attempted to access delete_boardmember via other method than POST')
+            return HttpResponseNotAllowed(['POST', ])

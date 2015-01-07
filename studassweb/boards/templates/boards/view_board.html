@@ -2,6 +2,8 @@
 
 {% load i18n %}
 {% load bootstrap3 %}
+{% load sawp %}
+{% load thumbnail %}
 
 {% block main_content %}
     {% load navigator %}
@@ -9,11 +11,23 @@
     {% display_navigator boards_url "Boards" board.get_absolute_url board%}
     <h1>{{ board }}</h1>
     <div class="list-group">
-
+        {% if board.photo %}
+            <li class="list-group-item">
+                <a href="{{ board.photo.url }}"><img  class="img-thumbnail" src="{% thumbnail board.photo 200x100 crop=scale %}"/></a>
+            </li>
+        {% else %}
+            <li class="list-group-item">
+                DEBUG! no photo
+            </li>
+        {% endif %}
+        <li class="list-group-item">{% trans "Year: " %}{{ board.year }}</li>
+        <li class="list-group-item">{% trans "Board type: " %}<a href="{% url 'boards_view_boardtype' board.boardtype.id %}">{{ board.boardtype }}</a> </li>
+        {% trans "Board members:" %}
+        <br>
         {% for boardmember in boardmembers %}
-            <a class="list-group-item" href="{{ boardmember.get_absolute_url }}">
-                {{ boardmember.year }} : {{ boardmember }} TODO fix this so it looks nice
-            </a>
+            <li><a class="list-group-item" href="{{ boardmember.get_absolute_url }}">
+                {{ boardmember.role }} : {{ boardmember }} TODO fix this so it looks nice
+            </a></li>
         {% empty %}
             <p>{% trans "No members added to this board!" %}</p>
             <form action="{% url 'boards_delete_board' board.id %}" method="post">
@@ -28,4 +42,48 @@
     </div>
 {% endblock %}
 {% block sidebar %}
+    {% has_perm "boards" "CAN_EDIT_BOARDS" as can_edit_boards %}
+    {% has_perm "boards" "CAN_EDIT_ROLES" as can_edit_roles %}
+    {% has_perm "boards" "CAN_EDIT_BOARDTYPES" as can_edit_boardtypes %}
+    {% if can_edit_boards or can_edit_roles or can_edit_boardtypes%}
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Edit" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    {% if can_edit_boards%}
+                        <a href="{% url 'boards_edit_board' board.id %}">
+                            <div class="btn list-group-item">{% trans "Edit this board" %}</div>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Add" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    {% if can_edit_boards%}
+                        <a href="{% url 'boards_add_boardmember' %}">
+                            <div class="btn list-group-item">{% trans "Add new board member" %}</div>
+                        </a>
+                        <a href="{% url 'boards_add_board' %}">
+                            <div class="btn list-group-item">{% trans "Add new board" %}</div>
+                        </a>
+                    {% endif %}
+                    {% if can_edit_boardtypes%}
+                        <a href="{% url 'boards_add_boardtype' %}">
+                            <div class="btn list-group-item">{% trans "Add new boardtype" %}</div>
+                        </a>
+                    {% endif %}
+                    {% if can_edit_roles%}
+                        <a href="{% url 'boards_add_role' %}">
+                            <div class="btn list-group-item">{% trans "Add new role" %}</div>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
