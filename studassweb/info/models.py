@@ -3,14 +3,13 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from ckeditor.fields import RichTextField
 from menu.models import MenuItem, Menu
-from users.groups import GUEST, MEMBER, BOARD_MEMBER
-from users.permissions import has_user_perm
+from users.permissions import has_user_perm, get_readable_perm
 from .register import VIEW_BOARD, VIEW_MEMBER, VIEW_PUBLIC, EDIT
 
 PERMISSION_CHOICES = (
-    (GUEST, VIEW_PUBLIC),
-    (MEMBER, VIEW_MEMBER),
-    (BOARD_MEMBER, VIEW_BOARD),
+    ("VIEW_PUBLIC", VIEW_PUBLIC),
+    ("VIEW_MEMBER", VIEW_MEMBER),
+    ("VIEW_BOARD", VIEW_BOARD),
 )
 
 
@@ -19,7 +18,7 @@ class InfoCategory(models.Model):
     # an info category has an associated menu item, which in turn has a submenu
     menu_item = models.ForeignKey(MenuItem, null=True)
 
-    permission = models.CharField(max_length=100, choices=PERMISSION_CHOICES, default=GUEST)
+    permission = models.CharField(max_length=15, choices=PERMISSION_CHOICES, default="VIEW_PUBLIC")
 
     def __str__(self):
         return self.name
@@ -49,18 +48,21 @@ class InfoCategory(models.Model):
         super(InfoCategory, self, *args, **kwargs)
 
     def can_view(self, user):
-        return has_user_perm(user, self.permission)
+        return has_user_perm(user, self.get_permission_str())
 
     @staticmethod
     def can_edit(user):
         return has_user_perm(user, EDIT)
+
+    def get_permission_str(self):
+        return dict(PERMISSION_CHOICES)[self.permission]
 
 
 class InfoPage(models.Model):
     title = models.CharField(max_length=50)
     text = RichTextField()
     category = models.ForeignKey(InfoCategory, null=True)
-    permission = models.CharField(max_length=100, choices=PERMISSION_CHOICES, default=GUEST)
+    permission = models.CharField(max_length=100, choices=PERMISSION_CHOICES, default="VIEW_PUBLIC")
 
     def __str__(self):
         return self.title
@@ -85,11 +87,14 @@ class InfoPage(models.Model):
         super(InfoPage, self).delete(*args, **kwargs)
 
     def can_view(self, user):
-        return has_user_perm(user, self.permission)
+        return has_user_perm(user, self.get_permission_str())
 
     @staticmethod
     def can_edit(user):
         return has_user_perm(user, EDIT)
+
+    def get_permission_str(self):
+        return dict(PERMISSION_CHOICES)[self.permission]
 
 
 class InfoPageEdit(models.Model):

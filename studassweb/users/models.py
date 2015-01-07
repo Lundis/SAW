@@ -3,6 +3,7 @@ from django.contrib.auth.models import User, Permission, ContentType, Group
 from solo.models import SingletonModel
 import members.models
 import random
+import users.groups
 
 
 def _generate_email_ver_code():
@@ -103,8 +104,8 @@ class SAWPermission(models.Model):
         """
         :return: True if the user has this permission
         """
-        guest_group, created = Group.objects.get_or_create(name="Guest")
-        is_guest_permission = guest_group.permissions.filter(pk=self.permission.pk)
+        guest_group, created = Group.objects.get_or_create(name=users.groups.GUEST)
+        is_guest_permission = guest_group.permissions.filter(pk=self.permission.pk).exists()
         return user.is_superuser or is_guest_permission or \
                user.has_perm(self.permission.content_type.app_label + "." + self.permission.codename)
 
