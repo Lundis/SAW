@@ -1,0 +1,19 @@
+{% extends "boards/base.html" %}
+
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block main_content %}
+    {% load navigator %}
+    {% url "boards.views.boards_main" as boards_url %}
+    {% display_navigator boards_url "Boards" boardmember.get_absolute_url boardmember%}
+    <h1>{{ boardmember }}</h1>
+    <div class="list-group">
+        TODO insert information and show all boards this member has been on
+        {% for board in boards %}
+
+        {% endfor %}
+    </div>
+{% endblock %}
+{% block sidebar %}
+{% endblock %}
