@@ -20,6 +20,7 @@
                 <th>{% trans "Real name" %}</th>
                 <th>{% trans "Applying for membership" %}</th>
                 <th>{% trans "Member?" %}</th>
+                <th>{% trans "Group" %}</th>
                 <th></th>
             </tr>
             {% for user_ext in user_exts %}
@@ -49,6 +50,9 @@
                         {% else %}
                             -
                         {% endif %}
+                    </td>
+                    <td>
+                        {{ user_ext.groups.0 }}
                     </td>
                 </tr>
             {% endfor %}

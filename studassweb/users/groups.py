@@ -2,6 +2,9 @@ from django.contrib.auth.models import Group, User
 from base.utils import IllegalArgumentException, get_modules_with
 from users.permissions import add_perm_to_group
 from .models import SAWPermission
+import logging
+
+logger = logging.Logger(__name__)
 
 GUEST = "Guest"
 LOGGED_ON = "Logged On"
@@ -85,3 +88,16 @@ def put_user_in_default_group(user, group):
     else:
         user.is_staff = False
     user.save()
+
+
+def get_user_group(user):
+    """
+    Returns the default group this user is in
+    :param user:
+    :return: Group name
+    """
+    for group in reversed(group_names):
+        if user.groups.filter(name=group).exists():
+            return group
+    logger.error("User %s is not in any default group", user)
+    return None

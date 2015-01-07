@@ -64,6 +64,14 @@ class UserExtension(models.Model):
         except members.models.Member.DoesNotExist:
             return None
 
+    def groups(self):
+        """
+        Returns any groups this user is in. Only the most import default group is returned.
+        TODO: also return custom groups
+        :return:
+        """
+        return users.groups.get_user_group(self.user),
+
 
 class LdapLink(models.Model):
     user = models.ForeignKey(User)
