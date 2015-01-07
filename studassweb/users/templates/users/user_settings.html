@@ -6,7 +6,7 @@
     <h1>User settings for {{ user.username }}</h1>
     <form action="{% url "users_settings_edit_user" %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {% bootstrap_form  profile_form %}
+        {% bootstrap_form profile_form %}
         {% bootstrap_form user_form %}
         <button type="submit" class="btn btn-primary">
             {% trans "Submit" %}

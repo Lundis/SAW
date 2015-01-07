@@ -36,7 +36,7 @@ def edit_user(request):
     if user_form.is_valid() and profile_form.is_valid():
         user = user_form.save()
         profile_form.save()
-        return HttpResponseRedirect(reverse("users_view_profile", username=user.username))
+        return HttpResponseRedirect(reverse("users_view_profile", kwargs={"username":user.username}))
     context = {'user_form': user_form,
                'profile_form': profile_form}
     return render(request, "users/user_settings.html", context)
