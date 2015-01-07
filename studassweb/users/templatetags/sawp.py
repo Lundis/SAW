@@ -26,12 +26,15 @@ def has_perm(context, app, perm_constant):
 
 @register.assignment_tag(takes_context=True)
 def can_edit_object(context, obj):
-    logger.debug("can_edit_object(context, %s", obj)
-    return obj.can_edit(context['user'])
+    access = obj.can_edit(context['user'])
+    logger.debug("can_edit_object(context, %s): %s", obj, access)
+    return access
 
 
 @register.assignment_tag(takes_context=True)
-def can_view_object(context, obj_str):
-    obj = obj_str
-    logger.debug("can_view_object(context, %s", obj)
-    return obj.can_view(context['user'])
+def can_view_object(context, obj):
+    access = obj.can_view(context['user'])
+    logger.debug("can_view_object(context, %s): %s", obj, access)
+    if hasattr(obj, "permission"):
+        logger.debug("user: %s, permission: %s", context['user'], obj.permission)
+    return access
