@@ -65,10 +65,3 @@ def get_str_from_module(app, module, var_name):
 
 def get_all_modules():
     return [mod for mod, f in get_modules_with(None, None)]
-
-
-class IllegalArgumentException(ValueError):
-    """
-    An exception used when an illegal argument is passed to a function.
-    """
-    pass

@@ -1,5 +1,5 @@
 from django.contrib.auth.models import Group, User
-from base.utils import IllegalArgumentException, get_modules_with
+from base.utils import get_modules_with
 from users.permissions import add_perm_to_group
 from .models import SAWPermission
 import logging
@@ -70,7 +70,7 @@ def put_user_in_default_group(user, group):
     :return:
     """
     if group not in group_names:
-        raise IllegalArgumentException("group \"" + group + "\" is not a default group")
+        raise ValueError("group \"" + group + "\" is not a default group")
     # remove old groups
     user_old_groups = user.groups.filter(name__in=group_names)
     for old_group in user_old_groups:
