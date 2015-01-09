@@ -1,7 +1,9 @@
 {% extends "boards/base.html" %}
 
 {% load i18n %}
+{% load bootstrap3 %}
 {% load sawp %}
+{% load thumbnail %}
 
 {% block main_content %}
     {% load navigator %}
@@ -10,7 +12,16 @@
     <h3>Boards</h3>
     <div class="list-group">
         {% for board in boards %}
-            <a class="list-group-item" href="{{ board.get_absolute_url }}">{{ board }}</a>
+            <li class="list-group-item">
+                {% if board.photo %}
+                    <img  class="img-thumbnail" src="{% thumbnail board.photo 100x100 crop=scale %}"/>
+                {% endif %}
+                <a href="{{ board.get_absolute_url }}">{{ board }}
+                <span class="badge">
+                    {{ board.get_member_count }}
+                </span>
+                </a>
+            </li>
         {% empty %}
             <p>{% trans "No boards found!" %}</p>
         {% endfor %}
