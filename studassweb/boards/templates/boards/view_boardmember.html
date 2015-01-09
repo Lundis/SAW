@@ -9,9 +9,11 @@
     {% display_navigator boards_url "Boards" boardmember.get_absolute_url boardmember%}
     <h1>{{ boardmember }}</h1>
     <div class="list-group">
-        TODO insert information and show all boards this member has been on
+        {% trans "Member of the following boards:" %}
         {% for board in boards %}
-
+            <a class="list-group-item" href="{{ board.get_absolute_url }}">{{ board }}</a>
+        {% empty %}
+            <p>{% trans "This member is not in any boards!" %}</p>
         {% endfor %}
     </div>
 {% endblock %}

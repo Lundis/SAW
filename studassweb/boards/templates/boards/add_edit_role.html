@@ -8,9 +8,9 @@
     {% load navigator %}
     {% url "boards.views.main" as boards_url %}
     {% if form.instance.pk %}
-        {% display_navigator exams_url "Boards" form.instance.get_absolute_url form.instance.name%}
+        {% display_navigator boards_url "Boards" form.instance.get_absolute_url form.instance.name%}
     {% else %}
-        {% display_navigator exams_url "Boards" "#" "New role" %}
+        {% display_navigator boards_url "Boards" "#" "New role" %}
     {% endif %}
 
     {% if form.instance.pk %}

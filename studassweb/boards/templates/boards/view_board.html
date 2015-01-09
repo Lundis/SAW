@@ -9,27 +9,20 @@
     {% load navigator %}
     {% url "boards.views.boards_main" as boards_url %}
     {% display_navigator boards_url "Boards" board.get_absolute_url board%}
-    <h1>{{ board }}</h1>
+    <h1><a href="{% url 'boards_view_boardtype' board.boardtype.id %}">{{ board.boardtype }}</a> {{ board.year }}</h1>
     <div class="list-group">
         {% if board.photo %}
             <li class="list-group-item">
-                <a href="{{ board.photo.url }}"><img  class="img-thumbnail" src="{% thumbnail board.photo 200x100 crop=scale %}"/></a>
-            </li>
-        {% else %}
-            <li class="list-group-item">
-                DEBUG! no photo
+                <a href="{{ board.photo.url }}"><img  class="img-thumbnail" src="{% thumbnail board.photo 300x200 crop=scale %}"/></a>
             </li>
         {% endif %}
-        <li class="list-group-item">{% trans "Year: " %}{{ board.year }}</li>
-        <li class="list-group-item">{% trans "Board type: " %}<a href="{% url 'boards_view_boardtype' board.boardtype.id %}">{{ board.boardtype }}</a> </li>
-        {% trans "Board members:" %}
-        <br>
+        <li class="list-group-item">{% trans "Board members:" %}</li>
         {% for boardmember in boardmembers %}
-            <li><a class="list-group-item" href="{{ boardmember.get_absolute_url }}">
-                {{ boardmember.role }} : {{ boardmember }} TODO fix this so it looks nice
+            <li class="list-group-item"><a class="list-group-item" href="{{ boardmember.get_absolute_url }}">
+                {{ boardmember }}
             </a></li>
         {% empty %}
-            <p>{% trans "No members added to this board!" %}</p>
+            <li class="list-group-item">{% trans "No members added to this board!" %}</li>
             <form action="{% url 'boards_delete_board' board.id %}" method="post">
                 {% csrf_token %}
                 {% buttons %}
