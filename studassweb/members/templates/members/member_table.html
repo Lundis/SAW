@@ -19,6 +19,8 @@
             <th class="col-realname">{% trans "Real name" %}</th>
             <th class="col-applying">{% trans "Applying for membership" %}</th>
             <th class="col-member">{% trans "Member?" %}</th>
+            <th class="col-enrollment hidden">{% trans "Enrolled" %}</th>
+            <th class="col-graduation hidden">{% trans "Graduated" %}</th>
             <th class="col-groups">{% trans "Groups" %}</th>
             {% for column in extra_columns %}
                 <th class="col-{{ column.id }}">column.name</th>
@@ -49,6 +51,20 @@
                 <td class="col-member">
                     {% if member.confirmed %}
                         <span class="glyphicon glyphicon-ok"></span>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td class="col-enrollment hidden">
+                    {% if member.enrollment_year %}
+                        {{ member.enrollment_year }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td class="col-graduation hidden">
+                    {% if member.graduation_year %}
+                        {{ member.graduation_year }}
                     {% else %}
                         -
                     {% endif %}
@@ -93,6 +109,16 @@
                         id="col-member-selector"
                         data-toggle="button" aria-pressed="true">
                         {% trans "Member" %}?
+                    </li>
+                    <li class="list-group-item btn btn-info col-checkbox"
+                        id="col-enrollment-selector"
+                        data-toggle="button" aria-pressed="true">
+                        {% trans "Enrolled" %}?
+                    </li>
+                    <li class="list-group-item btn btn-info col-checkbox"
+                        id="col-graduation-selector"
+                        data-toggle="button" aria-pressed="true">
+                        {% trans "Graduated" %}?
                     </li>
                     <li class="list-group-item btn btn-info active col-checkbox"
                         id="col-groups-selector"
