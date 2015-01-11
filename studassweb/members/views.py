@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from users.decorators import has_permission
 from users.models import UserExtension
-from .models import Member, PaymentPurpose
+from .models import Member, PaymentPurpose, CustomField, CustomEntry
 from .forms import MemberApplicationForm, PaymentPurposeForm
 from .register import CAN_VIEW, CAN_EDIT
 from base.forms import ConfirmationForm
@@ -13,8 +13,16 @@ from base.forms import ConfirmationForm
 
 @has_permission(CAN_VIEW)
 def view_members(request):
-
-    context = {'members': Member.objects.all()}
+    rows = []
+    extra_columns = CustomField.objects.all()
+    for member in Member.objects.all():
+        row = [member, []]
+        for column in extra_columns:
+            value = CustomEntry.objects.get_or_create(field=column, member=member)
+            row[1].append(('col-%s' % column.id, value))
+        rows.append(row)
+    context = {'members_data': rows,
+               'extra_columns': extra_columns}
     return render(request, 'members/member_table.html', context)
 
 

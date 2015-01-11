@@ -62,7 +62,7 @@ class Payment(models.Model):
 
 
 class CustomField(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
 
     class Meta:
         ordering = ("name",)
@@ -71,4 +71,7 @@ class CustomField(models.Model):
 class CustomEntry(models.Model):
     field = models.ForeignKey(CustomField)
     member = models.ForeignKey(Member)
-    content = models.TextField()
+    content = models.TextField(default="")
+
+    class Meta:
+        unique_together = ("field", "member")
