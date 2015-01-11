@@ -22,17 +22,16 @@
             <th>{% trans "Group" %}</th>
             <th></th>
         </tr>
-        {% for user_ext in user_exts %}
-            {% setvar user_ext.member as member %}
+        {% for member in members %}
             <tr>
                 <td>
-                    <a href="{% url "users_view_profile" username=user_ext.user.username %}">
-                        {{ user_ext.user.username }}
+                    <a href="{% url "users_view_profile" username=member.user_ext.user.username %}">
+                        {{ member.user_ext.user.username }}
                     </a>
                 </td>
-                <td>{{ user_ext.user.first_name }} {{ user_ext.user.last_name }}</td>
+                <td>{{ member.first_name }} {{ member.last_name }}</td>
                 <td>
-                    {% if member and not member.confirmed %}
+                    {% if member.applying %}
                         <a href="{% url "members_confirm_membership" member_id=member.id %}">
                             <span class="glyphicon glyphicon-ok-circle"></span>
                         </a>
@@ -44,14 +43,14 @@
                     {% endif %}
                 </td>
                 <td>
-                    {% if member and member.confirmed %}
+                    {% if member.confirmed %}
                         <span class="glyphicon glyphicon-ok"></span>
                     {% else %}
                         -
                     {% endif %}
                 </td>
                 <td>
-                    {{ user_ext.groups.0 }}
+                    {{ member.user_ext.groups.0 }}
                 </td>
             </tr>
         {% endfor %}

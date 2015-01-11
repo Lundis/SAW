@@ -7,7 +7,7 @@ import logging
 logger = logging.Logger(__name__)
 
 GUEST = "Guest"
-LOGGED_ON = "Logged On"
+LOGGED_ON = "Registered"
 MEMBER = "Member"
 BOARD_MEMBER = "Board Member"
 WEBMASTER = "Webmaster"

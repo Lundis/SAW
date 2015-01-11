@@ -1,9 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User, Permission, ContentType, Group
 from solo.models import SingletonModel
-import members.models
+from base.models import DisabledModule
+from importlib import import_module
 import random
 import users.groups
+import logging
+
+logger = logging.Logger(__name__)
 
 
 def _generate_email_ver_code():
@@ -22,7 +26,6 @@ class UserExtension(models.Model):
     link_to_homepage = models.URLField(blank=True, default="")
     email_verified = models.BooleanField(default=False)
     email_verification_code = models.CharField(max_length=32, unique=True)
-    can_apply_for_membership = models.BooleanField(default=True)
 
     def __str__(self):
         return self.user.username
@@ -46,6 +49,12 @@ class UserExtension(models.Model):
         while cls.objects.filter(email_verification_code=user_ext.email_verification_code).exists():
             user_ext = _generate_email_ver_code()
         user_ext.save()
+        # Create a member object for superusers if the members module is enabled
+        if DisabledModule.is_enabled("members"):
+            # dynamic import to get rid of dependency
+            members = import_module("members.models")
+            members.Member.create_from_user_ext(user_ext)
+            logger.warning('Member for user %s was created at login' % user.username)
         return user_ext
 
     @classmethod
@@ -57,12 +66,6 @@ class UserExtension(models.Model):
             return True
         except cls.DoesNotExist:
             return False
-
-    def member(self):
-        try:
-            return members.models.Member.objects.get(user=self.user)
-        except members.models.Member.DoesNotExist:
-            return None
 
     def groups(self):
         """
