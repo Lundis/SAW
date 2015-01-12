@@ -88,50 +88,48 @@
             <h2 class="panel-title">{% trans "Show columns" %}</h2>
         </div>
         <div class="panel-body">
-            <div class="list-group">
-                <ul class="list-group checked-list-box">
-                    <li type="button" class="list-group-item btn btn-info active col-checkbox"
-                        id="col-username-selector"
-                        data-toggle="button" aria-pressed="true">
-                        {% trans "Username" %}
+            <ul class="list-group">
+                <li type="button" class="list-group-item btn btn-info active col-checkbox"
+                    id="col-username-selector"
+                    data-toggle="button" aria-pressed="true">
+                    {% trans "Username" %}
+                </li>
+                <li class="list-group-item btn btn-info active col-checkbox"
+                    id="col-realname-selector"
+                    data-toggle="button" aria-pressed="true">
+                    {% trans "Real Name" %}
+                </li>
+                <li class="list-group-item btn btn-info active col-checkbox"
+                    id="col-applying-selector"
+                    data-toggle="button" aria-pressed="true">
+                    {% trans "Applying" %}
+                </li>
+                <li class="list-group-item btn btn-info active col-checkbox"
+                    id="col-member-selector"
+                    data-toggle="button" aria-pressed="true">
+                    {% trans "Member" %}?
+                </li>
+                <li class="list-group-item btn btn-info col-checkbox"
+                    id="col-enrollment-selector"
+                    data-toggle="button" aria-pressed="true">
+                    {% trans "Enrolled" %}?
+                </li>
+                <li class="list-group-item btn btn-info col-checkbox"
+                    id="col-graduation-selector"
+                    data-toggle="button" aria-pressed="true">
+                    {% trans "Graduated" %}?
+                </li>
+                <li class="list-group-item btn btn-info active col-checkbox"
+                    id="col-groups-selector"
+                    data-toggle="button" aria-pressed="true">{% trans "Groups" %}
+                </li>
+                {% for column in extra_columns %}
+                    <li class="list-group-item btn btn-info hidden col-checkbox"
+                        id="col-{{ column.id }}-selector">
+                        column.name
                     </li>
-                    <li class="list-group-item btn btn-info active col-checkbox"
-                        id="col-realname-selector"
-                        data-toggle="button" aria-pressed="true">
-                        {% trans "Real Name" %}
-                    </li>
-                    <li class="list-group-item btn btn-info active col-checkbox"
-                        id="col-applying-selector"
-                        data-toggle="button" aria-pressed="true">
-                        {% trans "Applying" %}
-                    </li>
-                    <li class="list-group-item btn btn-info active col-checkbox"
-                        id="col-member-selector"
-                        data-toggle="button" aria-pressed="true">
-                        {% trans "Member" %}?
-                    </li>
-                    <li class="list-group-item btn btn-info col-checkbox"
-                        id="col-enrollment-selector"
-                        data-toggle="button" aria-pressed="true">
-                        {% trans "Enrolled" %}?
-                    </li>
-                    <li class="list-group-item btn btn-info col-checkbox"
-                        id="col-graduation-selector"
-                        data-toggle="button" aria-pressed="true">
-                        {% trans "Graduated" %}?
-                    </li>
-                    <li class="list-group-item btn btn-info active col-checkbox"
-                        id="col-groups-selector"
-                        data-toggle="button" aria-pressed="true">{% trans "Groups" %}
-                    </li>
-                    {% for column in extra_columns %}
-                        <li class="list-group-item btn btn-info hidden col-checkbox"
-                            id="col-{{ column.id }}-selector">
-                            column.name
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
+                {% endfor %}
+            </ul>
         </div>
     </div>
 {% endblock %}
