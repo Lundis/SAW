@@ -58,6 +58,9 @@ class BoardMember(models.Model):
     member = models.ForeignKey(Member, on_delete=models.PROTECT)
     photo = models.ImageField(upload_to='boards/photos', blank=True)
 
+    class Meta:
+        unique_together = ("board", "role", "member")
+
     def __str__(self):
         return str(self.role.name) + " " + str(self.member.get_full_name())
 
