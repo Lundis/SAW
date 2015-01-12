@@ -31,10 +31,10 @@ class Article(models.Model):
         unique_together = ("slug", "created_date")
 
     def get_summary(self):
-        if self.summary is not None or self.summary != "":
+        if self.summary:
             return self.summary
         else:
-            return
+            return self.title[:200]
 
     def get_absolute_url(self):
         return reverse("news_view_article", kwargs={'slug': self.slug,
