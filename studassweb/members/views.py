@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 from users.decorators import has_permission
 from users.models import UserExtension
 from .models import Member, PaymentPurpose, CustomField, CustomEntry
-from .forms import MemberApplicationForm, PaymentPurposeForm
+from .forms import MemberApplicationForm, PaymentPurposeForm, MemberEditForm
 from .register import CAN_VIEW, CAN_EDIT
 from base.forms import ConfirmationForm
 
@@ -24,6 +24,25 @@ def view_members(request):
     context = {'members_data': rows,
                'extra_columns': extra_columns}
     return render(request, 'members/member_table.html', context)
+
+
+@has_permission(CAN_EDIT)
+def edit_member(request, member_id=None):
+    if member_id is not None:
+        try:
+            member = Member.objects.get(id=member_id)
+        except Member.DoesNotExist:
+            return HttpResponseBadRequest("Member does not exist")
+    else:
+        member = None
+    form = MemberEditForm(request.POST or None, instance=member)
+    if form.is_valid():
+        form.save()
+        return HttpResponseRedirect(reverse("members_home"))
+    else:
+        context = {'member': member,
+                   'form': form}
+        return render(request, 'members/edit_member.html', context)
 
 
 @has_permission(CAN_EDIT)

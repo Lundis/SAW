@@ -1,0 +1,11 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% trans " Member Registry" %}
+{%  endblock %}
+
+{% block menu %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Member Registry" %}
+{% endblock %}

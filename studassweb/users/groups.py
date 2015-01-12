@@ -1,4 +1,5 @@
 from django.contrib.auth.models import Group, User
+from django.utils.translation import ugettext as _
 from base.utils import get_modules_with
 from users.permissions import add_perm_to_group
 from .models import SAWPermission
@@ -14,6 +15,13 @@ WEBMASTER = "Webmaster"
 
 # the list of groups in hierarchical order
 group_names = [GUEST, LOGGED_ON, MEMBER, BOARD_MEMBER, WEBMASTER]
+
+
+GROUP_CHOICES = ((GUEST, _(GUEST)),
+                 (LOGGED_ON, _(LOGGED_ON)),
+                 (MEMBER, _(MEMBER)),
+                 (BOARD_MEMBER, _(BOARD_MEMBER)),
+                 (WEBMASTER, _(WEBMASTER)))
 
 
 def setup_default_groups():
@@ -62,15 +70,15 @@ def get_permissions_in_group(group):
     return [perm for perm in all_perms if perm.permission in perms_in_group]
 
 
-def put_user_in_default_group(user, group):
+def put_user_in_default_group(user, new_group_name):
     """
     This function puts the user in one of the default groups
-    :param group: one of the default groups
+    :param new_group_name: one of the default groups
     :param user: User
     :return:
     """
-    if group not in group_names:
-        raise ValueError("group \"" + group + "\" is not a default group")
+    if new_group_name not in group_names:
+        raise ValueError("new_group_name \"" + new_group_name + "\" is not a default new_group_name")
     # remove old groups
     user_old_groups = user.groups.filter(name__in=group_names)
     for old_group in user_old_groups:
@@ -80,10 +88,10 @@ def put_user_in_default_group(user, group):
         group_inst = Group.objects.get(name=group_name)
         user.groups.add(group_inst)
         # stop when we've hit the specified one
-        if group_name == group:
+        if group_name == new_group_name:
             break
-    # Give access to the admin pages to webmasters
-    if group == WEBMASTER:
+    # Give webmasters access to the admin pages
+    if new_group_name == WEBMASTER:
         user.is_staff = True
     else:
         user.is_staff = False

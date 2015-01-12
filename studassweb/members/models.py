@@ -1,15 +1,17 @@
 from django.db import models
+from django.core.validators import ValidationError
+from django.utils.translation import ugettext as _
 from users.groups import put_user_in_default_group, MEMBER
 from users.models import UserExtension
-import datetime
+from base.models import SiteConfiguration
 
 
 class Member(models.Model):
-    user_ext = models.ForeignKey(UserExtension, null=True, unique=True, on_delete=models.PROTECT)
+    user_ext = models.ForeignKey(UserExtension, null=True, blank=True, unique=True, on_delete=models.PROTECT)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
-    enrollment_year = models.IntegerField(default=datetime.datetime.now().year)
+    email = models.EmailField(unique=True, null=True, blank=True)
+    enrollment_year = models.IntegerField(null=True)
     graduation_year = models.IntegerField(null=True, blank=True)
     # is the user a confirmed member of the association?
     confirmed = models.BooleanField(default=False)
@@ -41,6 +43,15 @@ class Member(models.Model):
                                       self.last_name,
                                       str(self.enrollment_year),
                                       str(self.graduation_year))
+
+    def clean(self):
+        super(Member, self).clean()
+        if self.enrollment_year is not None:
+            if self.enrollment_year < SiteConfiguration.founded():
+                raise ValidationError(_("Enrollment year cannot be before the association was founded"))
+            if self.graduation_year is not None:
+                if self.enrollment_year > self.graduation_year:
+                    raise ValidationError(_("Graduation year cannot be before enrollment year"))
 
     @classmethod
     def create_from_user_ext(cls, user_ext, confirmed=False):
