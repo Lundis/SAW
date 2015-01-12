@@ -59,7 +59,7 @@ class BoardMember(models.Model):
     photo = models.ImageField(upload_to='boards/photos', blank=True)
 
     def __str__(self):
-        return str(self.role.name) + " " + str(self.member.user.get_full_name())
+        return str(self.role.name) + " " + str(self.member.get_full_name())
 
     def get_absolute_url(self):
         return reverse("boards.views.view_boardmember", kwargs={'boardmember_id': self.id})

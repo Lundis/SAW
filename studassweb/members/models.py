@@ -37,6 +37,9 @@ class Member(models.Model):
         self.deny()
         self.can_apply_for_membership = False
         self.save()
+    
+    def get_full_name(self):
+        return "%s %s" % (self.first_name, self.last_name)
 
     def __str__(self):
         return "{} {}[{}->{}]".format(self.first_name,
