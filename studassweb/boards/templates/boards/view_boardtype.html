@@ -6,7 +6,7 @@
 
 {% block main_content %}
     {% load navigator %}
-    {% url "boards.views.boards_main" as boards_url %}
+    {% url "boards_main" as boards_url %}
     {% display_navigator boards_url "Boards" boardtype.get_absolute_url boardtype.name%}
     <h1>{{ boardtype.name }}</h1>
     <div class="list-group">

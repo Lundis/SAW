@@ -7,7 +7,7 @@
 
 {% block main_content %}
     {% load navigator %}
-    {% url "boards.views.boards_main" as boards_url %}
+    {% url "boards_main" as boards_url %}
     {% display_navigator boards_url "Boards" board.get_absolute_url board%}
     <h1><a href="{% url 'boards_view_boardtype' board.boardtype.id %}">{{ board.boardtype }}</a> {{ board.year }}</h1>
     <div class="list-group">

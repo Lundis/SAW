@@ -6,7 +6,7 @@
 
 {% block main_content %}
     {% load navigator %}
-    {% url "boards.views.main" as boards_url %}
+    {% url "boards_main" as boards_url %}
     {% if form.instance.pk %}
         {% display_navigator boards_url "Boards" form.instance.get_absolute_url form.instance%}
     {% else %}
