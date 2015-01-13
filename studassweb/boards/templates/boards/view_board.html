@@ -19,6 +19,9 @@
         <li class="list-group-item">{% trans "Board members:" %}</li>
         {% for boardmember in boardmembers %}
             <li class="list-group-item"><a class="list-group-item" href="{{ boardmember.get_absolute_url }}">
+                {% if boardmember.photo %}
+                    <img  class="img-thumbnail" src="{% thumbnail boardmember.photo 100x100 crop=scale %}"/>
+                {% endif %}
                 {{ boardmember }}
             </a></li>
         {% empty %}

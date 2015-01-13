@@ -234,7 +234,7 @@ def view_boardmember(request, boardmember_id):
         boardmember = BoardMember.objects.get(id=boardmember_id)
 
         boards = []
-        all_boardmembers = BoardMember.objects.filter(member=boardmember)
+        all_boardmembers = BoardMember.objects.filter(member=boardmember.member)
         for bm in all_boardmembers:
             boards.append(bm.board)
 

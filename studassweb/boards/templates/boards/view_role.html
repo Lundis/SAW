@@ -17,7 +17,7 @@
                 {% if boardmember.photo %}
                     <img  class="img-thumbnail" src="{% thumbnail boardmember.photo 100x100 crop=scale %}"/>
                 {% endif %}
-                {{ boardmember.member.user.get_full_name }} ({{ boardmember.board}})
+                {{ boardmember.member.get_full_name }} ({{ boardmember.board}})
             </a>
         {% empty %}
             <p>{% trans "No members with this role found!" %}</p>

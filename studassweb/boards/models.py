@@ -11,7 +11,7 @@ class Role(models.Model):
         return str(self.name)
 
     def get_absolute_url(self):
-        return reverse("boards.views.view_role", kwargs={'role_id': self.id})
+        return reverse("boards_view_role", kwargs={'role_id': self.id})
 
 
 #Styrelsen, maskinutskottet etc.
@@ -22,7 +22,7 @@ class BoardType(models.Model):
         return str(self.name)
 
     def get_absolute_url(self):
-        return reverse("boards.views.view_boardtype", kwargs={'boardtype_id': self.id})
+        return reverse("boards_view_boardtype", kwargs={'boardtype_id': self.id})
 
     def get_board_count(self):
         return str(Board.objects.filter(boardtype=self.id).count())
@@ -46,7 +46,7 @@ class Board(models.Model):
         return str(self.boardtype.name) + " " + str(self.year)
 
     def get_absolute_url(self):
-        return reverse("boards.views.view_board", kwargs={'board_id': self.id})
+        return reverse("boards_view_board", kwargs={'board_id': self.id})
 
     def get_member_count(self):
         return str(BoardMember.objects.filter(board=self.id).count())
@@ -65,7 +65,7 @@ class BoardMember(models.Model):
         return str(self.role.name) + " " + str(self.member.get_full_name())
 
     def get_absolute_url(self):
-        return reverse("boards.views.view_boardmember", kwargs={'boardmember_id': self.id})
+        return reverse("boards_view_boardmember", kwargs={'boardmember_id': self.id})
 
 
 
