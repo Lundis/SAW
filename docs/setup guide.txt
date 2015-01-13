@@ -7,13 +7,13 @@ If you're running Windows 7 or earlier, you need to restart the computer now.
 Other OSs: pip might not be installed along with Python. You then need to install it manually using some OS-specific method
 
 
-===== Install Django 1.7.1 =====
+===== Install Django 1.7.2 =====
 
 After installing python 3.4 and pip (comes bundled with it on windows):
-    > pip install django==1.7.1
+    > pip install django==1.7.2
 
 To upgrade from a previous version, run:
-    > pip install django==1.7.1 --upgrade
+    > pip install django==1.7.2 --upgrade
 
 ===== Install Dependencies =====
 
@@ -56,6 +56,8 @@ To upgrade from a previous version, run:
 Students can get it for free by applying at http://www.jetbrains.com/student/
 
 Then download it at http://www.jetbrains.com/pycharm/
+
+Enter your jetbrains login details when Pycharm asks for a license.
 
 
 ===== Configure Pycharm =====
@@ -109,5 +111,7 @@ You must copy the file
 "studassweb/settings_local.py.template"
 to
 "studassweb/settings_local.py"
+
+the reset_db scripts do this for you if you don't have one, but if it needs to be updated you have to do it yourself.
 
 If you get some settings-related error in the future, try removing the file and copy the template again.
