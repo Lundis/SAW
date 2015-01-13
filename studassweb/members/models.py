@@ -10,7 +10,7 @@ class Member(models.Model):
     user_ext = models.ForeignKey(UserExtension, null=True, blank=True, unique=True, on_delete=models.PROTECT)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
     enrollment_year = models.IntegerField(null=True)
     graduation_year = models.IntegerField(null=True, blank=True)
     # is the user a confirmed member of the association?
@@ -19,6 +19,9 @@ class Member(models.Model):
     applying = models.BooleanField(default=False)
     # can the user apply for membership?
     can_apply_for_membership = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ("first_name", "last_name", "email")
 
     def confirm(self):
         self.confirmed = True
