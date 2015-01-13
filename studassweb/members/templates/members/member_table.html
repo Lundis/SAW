@@ -1,38 +1,44 @@
-{% extends 'base/base.html' %}
+{% extends 'members/base.html' %}
 {% load i18n %}
 {% load bootstrap3 %}
 {% load setvar %}
 
-{% block title %}
-    {% trans "Register" %}
-{%  endblock %}
-
-{% block menu %}
-    {% load dynamic_menu %}
-    {% display_menu "main_menu" "Member Registry" %}
-{% endblock %}
-
 {% block main_content %}
     <table class="table table-striped table-condensed">
         <tr>
-            <th>{% trans "User name" %}</th>
-            <th>{% trans "Real name" %}</th>
-            <th>{% trans "Applying for membership" %}</th>
-            <th>{% trans "Member?" %}</th>
-            <th>{% trans "Group" %}</th>
-            <th></th>
+            <th class="col-username">
+                {% trans "User name" %}
+                <div id="user-search-button" class="btn btn-link btn-xs">
+                    <span class="glyphicon glyphicon-search"></span>
+                </div>
+            </th>
+            <th class="col-realname">{% trans "Real name" %}</th>
+            <th class="col-applying">{% trans "Applying for membership" %}</th>
+            <th class="col-member">{% trans "Member?" %}</th>
+            <th class="col-enrollment hidden">{% trans "Enrolled" %}</th>
+            <th class="col-graduation hidden">{% trans "Graduated" %}</th>
+            <th class="col-groups">{% trans "Groups" %}</th>
+            {% for column in extra_columns %}
+                <th class="col-{{ column.id }}">column.name</th>
+            {% endfor %}
+            <th class="col-edit"> {% trans "Edit" %}</th>
         </tr>
-        {% for user_ext in user_exts %}
-            {% setvar user_ext.member as member %}
+        {% for row in members_data %}
+            {% setvar row.0 as member %}
+            {% setvar row.1 as columns %}
             <tr>
-                <td>
-                    <a href="{% url "users_view_profile" username=user_ext.user.username %}">
-                        {{ user_ext.user.username }}
-                    </a>
+                <td class="col-username">
+                    {% if member.user_ext %}
+                        <a href="{% url "users_view_profile" username=member.user_ext.user.username %}">
+                            {{ member.user_ext.user.username }}
+                        </a>
+                    {% else %}
+                        <span class="glyphicon glyphicon-remove"></span>
+                    {% endif %}
                 </td>
-                <td>{{ user_ext.user.first_name }} {{ user_ext.user.last_name }}</td>
-                <td>
-                    {% if member and not member.confirmed %}
+                <td class="col-realname">{{ member.first_name }} {{ member.last_name }}</td>
+                <td class="col-applying">
+                    {% if member.applying %}
                         <a href="{% url "members_confirm_membership" member_id=member.id %}">
                             <span class="glyphicon glyphicon-ok-circle"></span>
                         </a>
@@ -43,15 +49,39 @@
                         -
                     {% endif %}
                 </td>
-                <td>
-                    {% if member and member.confirmed %}
+                <td class="col-member">
+                    {% if member.confirmed %}
                         <span class="glyphicon glyphicon-ok"></span>
                     {% else %}
                         -
                     {% endif %}
                 </td>
+                <td class="col-enrollment hidden">
+                    {% if member.enrollment_year %}
+                        {{ member.enrollment_year }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td class="col-graduation hidden">
+                    {% if member.graduation_year %}
+                        {{ member.graduation_year }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td class="col-groups">
+                    {{ member.user_ext.groups.0 }}
+                </td>
+                {% for column in columns %}
+                    <td class="{{ column.0 }} hidden">
+                        {{ column.1 }}
+                    </td>
+                {% endfor %}
                 <td>
-                    {{ user_ext.groups.0 }}
+                    <a href="{% url "members_edit_member" member_id=member.id %}">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </a>
                 </td>
             </tr>
         {% endfor %}
@@ -64,9 +94,70 @@
             <h2 class="panel-title">{% trans "Show columns" %}</h2>
         </div>
         <div class="panel-body">
-            <div class="list-group">
-                Not implemented yet.
+            <div type="button" class="btn btn-info btn-block btn-xs active col-checkbox"
+                 id="col-username-selector"
+                 data-toggle="button" aria-pressed="true">
+                {% trans "Username" %}
             </div>
+            <div type="button" class="btn btn-info btn-block btn-xs active col-checkbox"
+                 id="col-realname-selector"
+                 data-toggle="button" aria-pressed="true">
+                {% trans "Real Name" %}
+            </div>
+            <div type="button" class="btn btn-info btn-block btn-xs active col-checkbox"
+                 id="col-applying-selector"
+                 data-toggle="button" aria-pressed="true">
+                {% trans "Applying" %}
+            </div>
+            <div type="button" class="btn btn-info btn-block btn-xs active col-checkbox"
+                 id="col-member-selector"
+                 data-toggle="button" aria-pressed="true">
+                {% trans "Member" %}?
+            </div>
+            <div type="button" class="btn btn-info btn-block btn-xs active col-checkbox"
+                 id="col-enrollment-selector"
+                 data-toggle="button" aria-pressed="true">
+                {% trans "Enrolled" %}?
+            </div>
+            <div type="button" class="btn btn-info btn-block btn-xs active col-checkbox"
+                 id="col-graduation-selector"
+                 data-toggle="button" aria-pressed="true">
+                {% trans "Graduated" %}?
+            </div>
+            <div type="button" class="btn btn-info btn-block btn-xs active col-checkbox"
+                 id="col-groups-selector"
+                 data-toggle="button" aria-pressed="true">{% trans "Groups" %}
+            </div>
+            {% for column in extra_columns %}
+                <div type="button" class="btn btn-info btn-block btn-xs col-checkbox"
+                     id="col-{{ column.id }}-selector">
+                    column.name
+                </div>
+            {% endfor %}
         </div>
     </div>
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h2 class="panel-title">{% trans "Actions" %}</h2>
+        </div>
+        <div class="panel-body">
+            <div type="button" class="btn btn-default btn-block btn-xs"
+                 id="new-column-button">{% trans "Create new column" %}
+            </div>
+            <a href="{% url "members_add_member" %}" class="btn btn-default btn-block btn-xs" >
+                {% trans "Add new member" %}
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        $(".col-checkbox").click(function() {
+            var id = this.id;
+            var col_name = id.substr(0, id.length-9);
+            $("." + col_name).toggleClass("hidden");
+        });
+
+    </script>
 {% endblock %}

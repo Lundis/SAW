@@ -24,9 +24,17 @@ class BoardType(models.Model):
     def get_absolute_url(self):
         return reverse("boards.views.view_boardtype", kwargs={'boardtype_id': self.id})
 
+    def get_board_count(self):
+        return str(Board.objects.filter(boardtype=self.id).count())
+
     def get_member_count(self):
-        #TODO
-        return -1
+        # We might not need this function
+        # Get all boards of this type
+        all_boards = Board.objects.filter(boardtype=self.id)
+        member_sum = 0
+        for board in all_boards:
+            member_sum += board.get_member_count()
+        return member_sum
 
 
 class Board(models.Model):
@@ -50,8 +58,11 @@ class BoardMember(models.Model):
     member = models.ForeignKey(Member, on_delete=models.PROTECT)
     photo = models.ImageField(upload_to='boards/photos', blank=True)
 
+    class Meta:
+        unique_together = ("board", "role", "member")
+
     def __str__(self):
-        return str(self.role.name) + " " + str(self.user.get_full_name())
+        return str(self.role.name) + " " + str(self.member.get_full_name())
 
     def get_absolute_url(self):
         return reverse("boards.views.view_boardmember", kwargs={'boardmember_id': self.id})

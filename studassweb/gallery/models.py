@@ -23,5 +23,5 @@ class Photo(models.Model):
     album_id = models.ForeignKey(Album)
     author = models.ForeignKey(User)
     description = models.TextField(max_length=300)
-    uploaded = models.DateTimeField()
+    uploaded = models.DateTimeField(auto_now_add=True)
 
