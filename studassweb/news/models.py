@@ -36,7 +36,8 @@ class Article(models.Model):
         if self.summary:
             return self.summary
         else:
-            return complete_html(self.text[:300])
+            html, closing_tags = complete_html(self.text[:300])
+            return "%s<p><strong>...</strong></p>%s" % (html, closing_tags)
 
     def comments(self):
         """

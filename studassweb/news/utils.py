@@ -37,6 +37,6 @@ def complete_html(html):
         html = html[:match.start()]
     parser = HTMLTagCloser()
     parser.feed(html)
-    return html + parser.get_end_of_string()
+    return html, parser.get_end_of_string()
 
 
