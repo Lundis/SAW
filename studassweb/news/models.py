@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from ckeditor.fields import RichTextField
 from django.template.defaultfilters import slugify
+from base.models import Comment
 
 
 class Category(models.Model):
@@ -35,6 +36,12 @@ class Article(models.Model):
             return self.summary
         else:
             return self.title[:200]
+
+    def comments(self):
+        """
+        :return: A QuerySet of the comments for this object
+        """
+        return Comment.get_comments_for_object(self)
 
     def get_absolute_url(self):
         return reverse("news_view_article", kwargs={'slug': self.slug,

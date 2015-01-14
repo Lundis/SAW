@@ -5,6 +5,8 @@ from urllib.request import urlopen
 from urllib.parse import urlparse
 from django.conf import settings
 from django.utils import timezone
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 import json
 from io import BytesIO
 import shutil
@@ -180,5 +182,30 @@ class DisabledModule(models.Model):
 
 class Comment(models.Model):
     text = models.TextField(max_length=400)
-    created = models.DateTimeField('Date created')
+    created = models.DateTimeField('Date created', auto_now_add=True)
     author = models.ForeignKey(User)
+
+    # A generic field for linking to any model
+    _content_type = models.ForeignKey(ContentType)
+    _object_id = models.PositiveIntegerField()
+    target = GenericForeignKey('_content_type', '_object_id')
+
+    class Meta:
+        ordering = ("_object_id", "created")
+
+    def set_target(self, target):
+        """
+        :param target: A Django Model
+        :return:
+        """
+        self._content_type = ContentType.objects.get_for_model(target)
+        self._object_id = target.id
+
+    @classmethod
+    def get_comments_for_object(cls, obj):
+        content_type = ContentType.objects.get_for_model(obj)
+        return cls.objects.filter(_content_type=content_type, _object_id=obj.id)
+
+    def __str__(self):
+        return "%s#%s" % (self.target, self.id)
+
