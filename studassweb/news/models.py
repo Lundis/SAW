@@ -23,7 +23,7 @@ class Article(models.Model):
     created_time = models.TimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     # A small thumbnail used in the news feed
-    picture = models.ImageField(upload_to="news/article_thumbnails")
+    picture = models.ImageField(upload_to="news/article_thumbnails", blank=True, null=True)
     author = models.ForeignKey(User)
     categories = models.ManyToManyField(Category, through="ArticleInCategory", blank=True)
 
