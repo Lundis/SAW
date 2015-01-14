@@ -4,7 +4,7 @@ from users.groups import GUEST, MEMBER, BOARD_MEMBER
 
 VIEW_PUBLIC = "can_view_public_news"
 VIEW_MEMBER = "can_view_member_news"
-EDIT_PUBLIC = "can_create_news"
+EDIT = "can_create_news"
 
 
 def get_menu_items():
@@ -34,5 +34,5 @@ def get_permissions():
     return (
         (VIEW_PUBLIC, GUEST, "Access to public news articles"),
         (VIEW_MEMBER, MEMBER, "Access to all news articles"),
-        (EDIT_PUBLIC, BOARD_MEMBER, "Can create news articles"),
+        (EDIT, BOARD_MEMBER, "Can create news articles"),
     )

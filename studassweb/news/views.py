@@ -2,8 +2,10 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.utils.translation import ugettext as _
+from users.decorators import has_permission
 from .models import Article, Category
 from .forms import ArticleForm, CategoryForm
+from .register import EDIT
 import datetime
 
 ARTICLES_PER_PAGE = 10
@@ -28,6 +30,7 @@ def view_article(request, year, month, day, slug):
     return render(request, "news/view_article.html", context)
 
 
+@has_permission(EDIT)
 def edit_article(request, slug=None):
     if slug is not None:
         try:
@@ -46,6 +49,7 @@ def edit_article(request, slug=None):
         return render(request, 'news/add_edit_article.html', context)
 
 
+@has_permission(EDIT)
 def edit_category(request, category_id=None):
     if category_id is not None:
         try:

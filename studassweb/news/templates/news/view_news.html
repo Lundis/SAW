@@ -1,11 +1,70 @@
 {% extends 'news/base.html' %}
 {% load i18n %}
-
+{% load sawp %}
 
 {% block main_content %}
-
-
+    {% for article in articles %}
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <div class="container">
+                    <div class="row">
+                        <h1 class="pull-left col-xs-10">
+                            {{ article.title }}
+                        </h1>
+                        <div class="pull-right col-xs-2">
+                            {{ article.created_date }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                {{ article.get_summary }}
+            </div>
+            <div class="panel-footer">
+                <div class="container">
+                    <div class="row">
+                        <div class="pull-left col-xs-10">
+                            {% if article.comments.count > 0 %}
+                                {{ article.comments.count }}
+                            {% else %}
+                                {% trans "No" %}
+                            {% endif %}
+                            {% if article.comments.count == 1 %}
+                                {% trans "comment" %}
+                            {% else %}
+                                {% trans "comments" %}
+                            {% endif %}
+                        </div>
+                        <div class="pull-right col-xs-2">
+                            {% trans "By" %} {{ article.author }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}
 
 {% block sidebar %}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            {% trans "search/sort" %}
+        </div>
+        <div class="panel-body">
+        </div>
+    </div>
+    {% has_perm "news" "EDIT" as show_edit_panel %}
+    {% if show_edit_panel %}
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                {% trans "Actions" %}
+            </div>
+            <div class="panel-body">
+                <a class="btn btn-default btn-block"
+                   href="{% url "news_add_article" %}">
+                    {% trans "Create new article" %}
+                </a>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
