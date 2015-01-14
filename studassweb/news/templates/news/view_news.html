@@ -6,38 +6,37 @@
     {% for article in articles %}
         <div class="panel panel-primary">
             <div class="panel-heading">
-                <div class="container">
-                    <div class="row">
-                        <h1 class="pull-left col-xs-10">
-                            {{ article.title }}
-                        </h1>
-                        <div class="pull-right col-xs-2">
-                            {{ article.created_date }}
+                <div class="row inherit-padding-left-right">
+                    {% if article.picture %}
+                        <div class="pull-left news-picture">
+                            <img src="{{ article.picture.url }}" class="img-responsive img-rounded" />
                         </div>
+                    {% endif %}
+                    <div class="pull-left inherit-padding-left-right">
+                        <h2>{{ article.title }}</h2>
                     </div>
                 </div>
             </div>
             <div class="panel-body">
-                {{ article.get_summary }}
+                {{ article.get_summary | safe }}
             </div>
             <div class="panel-footer">
-                <div class="container">
-                    <div class="row">
-                        <div class="pull-left col-xs-10">
-                            {% if article.comments.count > 0 %}
-                                {{ article.comments.count }}
-                            {% else %}
-                                {% trans "No" %}
-                            {% endif %}
-                            {% if article.comments.count == 1 %}
-                                {% trans "comment" %}
-                            {% else %}
-                                {% trans "comments" %}
-                            {% endif %}
-                        </div>
-                        <div class="pull-right col-xs-2">
-                            {% trans "By" %} {{ article.author }}
-                        </div>
+                <div class="row inherit-padding-left-right">
+                    <div class="pull-left">
+                        {% if article.comments.count > 0 %}
+                            {{ article.comments.count }}
+                        {% else %}
+                            {% trans "No" %}
+                        {% endif %}
+                        {% if article.comments.count == 1 %}
+                            {% trans "comment" %}
+                        {% else %}
+                            {% trans "comments" %}
+                        {% endif %}
+                    </div>
+                    <div class="pull-right text-right">
+                        {% trans "By" %} {{ article.author }}
+                        {{ article.created_date }}
                     </div>
                 </div>
             </div>

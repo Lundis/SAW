@@ -11,12 +11,23 @@ import datetime
 ARTICLES_PER_PAGE = 10
 
 
-def home(request, page=0):
+def home(request, page=0, category_id=None):
     page = int(page)
-    news = Article.objects.all()[page*ARTICLES_PER_PAGE:(page + 1)*ARTICLES_PER_PAGE]
+    if category_id is not None:
+        try:
+            category = Category.objects.get(id=category_id)
+        except Category.DoesNotExist:
+            pass
+        articles = Article.objects.filter(categories__id=category_id)
+    else:
+        articles = Article.objects.all()
+        category = None
+
+    articles = articles[page*ARTICLES_PER_PAGE:(page + 1)*ARTICLES_PER_PAGE]
     categories = Category.objects.all()
-    context = {'news': news,
-               'categories': categories}
+    context = {'articles': articles,
+               'categories': categories,
+               'category': category}
     return render(request, "news/view_news.html", context)
 
 
@@ -39,14 +50,21 @@ def edit_article(request, slug=None):
             raise Http404(_("The requested article could not be found!"))
     else:
         member = None
-    form = ArticleForm(request.POST or None, instance=member)
+    form = ArticleForm(request.POST or None,
+                       request.FILES or None,
+                       instance=member)
     if form.is_valid():
-        article = form.save()
+        article = form.save(user=request.user)
         return HttpResponseRedirect(article.get_absolute_url())
     else:
         context = {'member': member,
                    'form': form}
         return render(request, 'news/add_edit_article.html', context)
+
+
+@has_permission(EDIT)
+def delete_article(request):
+    pass
 
 
 @has_permission(EDIT)

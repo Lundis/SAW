@@ -1,6 +1,10 @@
 {% extends "base/base.html" %}
-
+{% load static %}
 {% load i18n %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/news/news.css" %}" />
+{% endblock %}
 
 {% block title %}
     {% trans "News" %}

@@ -1,11 +1,42 @@
 {% extends 'news/base.html' %}
 {% load i18n %}
+{% load bootstrap3 %}
 
 
 {% block main_content %}
+    {% load navigator %}
+    {% url "news_home" as news_url %}
+    {% if page %}
+        {% display_navigator news_url "News" article.get_absolute_url article.title %}
+    {% else %}
+        {% display_navigator news_url "News" "#" "New Article" %}
+    {% endif %}
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.media }}
+        {% bootstrap_form form %}
 
-
+        <button type="submit" class="btn btn-primary">
+            {% trans "Submit" %}
+        </button>
+        {% if article %}
+            <a href="{% url "news_delete_news" page.id %}" class="btn btn-danger">
+                {% trans "Delete" %}
+            </a>
+        {% endif %}
+    </form>
 {% endblock %}
 
 {% block sidebar %}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            {% trans "Actions" %}
+        </div>
+        <div class="panel-body">
+            <a class="btn btn-default btn-block"
+               href="{% url "news_add_article" %}">
+                {% trans "Create new article" %}
+            </a>
+        </div>
+    </div>
 {% endblock %}

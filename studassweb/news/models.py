@@ -15,7 +15,7 @@ class Category(models.Model):
 
 class Article(models.Model):
     title = models.CharField(max_length=100)
-    summary = models.TextField(max_length=200, blank=True, null=True)
+    summary = models.TextField(max_length=300, blank=True, null=True)
     slug = models.SlugField(editable=False)
     text = RichTextField()
     # split the
@@ -25,7 +25,7 @@ class Article(models.Model):
     # A small thumbnail used in the news feed
     picture = models.ImageField(upload_to="news/article_thumbnails")
     author = models.ForeignKey(User)
-    categories = models.ManyToManyField(Category, through="ArticleInCategory")
+    categories = models.ManyToManyField(Category, through="ArticleInCategory", blank=True)
 
     class Meta:
         ordering = ["-created_date", "-created_time"]
@@ -35,7 +35,7 @@ class Article(models.Model):
         if self.summary:
             return self.summary
         else:
-            return self.title[:200]
+            return self.text[:200]
 
     def comments(self):
         """
