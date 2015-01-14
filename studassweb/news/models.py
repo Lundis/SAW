@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from ckeditor.fields import RichTextField
 from django.template.defaultfilters import slugify
 from base.models import Comment
+from .utils import complete_html
 
 
 class Category(models.Model):
@@ -35,7 +36,7 @@ class Article(models.Model):
         if self.summary:
             return self.summary
         else:
-            return self.text[:200]
+            return complete_html(self.text[:300])
 
     def comments(self):
         """
@@ -53,6 +54,9 @@ class Article(models.Model):
         if not self.id:
             self.slug = slugify(self.title)
         super(Article, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
 
 
 class ArticleInCategory(models.Model):
