@@ -20,7 +20,9 @@
                         </div>
                     {% endif %}
                     <div class="pull-left inherit-padding-left-right">
-                        <h2>{{ article.title }}</h2>
+                        <h4>
+                            <a class="h3" href="{{ article.get_absolute_url }}">{{ article.title }}</a>
+                        </h4>
                     </div>
                 </div>
             </div>
