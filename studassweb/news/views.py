@@ -16,16 +16,13 @@ ARTICLES_PER_PAGE = 10
 
 
 def home(request, page=1, category_name=None):
-    logger.debug("Viewing category \"%s\"" % category_name)
     category = None
     if category_name is not None:
         try:
-            logger.debug("fetching category %s", category_name)
             category = Category.objects.get(name=category_name)
             articles = category.article_set.all()
-            logger.debug("got articles: %s", articles)
         except Category.DoesNotExist:
-            logger.warning("Unable to find category %s")
+            raise Http404(_("The category does not exist!"))
     if not category:
         articles = Article.objects.all()
         category = None
