@@ -1,8 +1,15 @@
 {% extends 'news/base.html' %}
 {% load i18n %}
 {% load sawp %}
+{% load navigator %}
 
 {% block main_content %}
+    {% url "news_home" as news_url %}
+    {% if category %}
+        {% display_navigator news_url "News" category.get_absolute_url category.name %}
+    {% else %}
+        {% display_navigator news_url "News" %}
+    {% endif %}
     {% for article in articles %}
         <div class="panel panel-primary">
             <div class="panel-heading">
