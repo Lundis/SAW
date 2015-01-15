@@ -2,32 +2,40 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.utils.translation import ugettext as _
+from django.core.paginator import Paginator
 from users.decorators import has_permission
 from .models import Article, Category
 from .forms import ArticleForm, CategoryForm
 from .register import EDIT
 import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 ARTICLES_PER_PAGE = 10
 
 
-def home(request, page=0, category_id=None):
-    page = int(page)
-    if category_id is not None:
+def home(request, page=1, category_name=None):
+    logger.debug("Viewing category \"%s\"" % category_name)
+    category = None
+    if category_name is not None:
         try:
-            category = Category.objects.get(id=category_id)
+            logger.debug("fetching category %s", category_name)
+            category = Category.objects.get(name=category_name)
+            articles = category.article_set.all()
+            logger.debug("got articles: %s", articles)
         except Category.DoesNotExist:
-            pass
-        articles = Article.objects.filter(categories__id=category_id)
-    else:
+            logger.warning("Unable to find category %s")
+    if not category:
         articles = Article.objects.all()
         category = None
-
-    articles = articles[page*ARTICLES_PER_PAGE:(page + 1)*ARTICLES_PER_PAGE]
+    paginator = Paginator(articles, ARTICLES_PER_PAGE)
+    current_page = paginator.page(page)
     categories = Category.objects.all()
-    context = {'articles': articles,
+    context = {'articles': current_page.object_list,
                'categories': categories,
-               'category': category}
+               'category': category,
+               'page': current_page}
     return render(request, "news/view_news.html", context)
 
 
@@ -83,4 +91,4 @@ def edit_category(request, category_id=None):
     else:
         context = {'category': category,
                    'form': form}
-        return render(request, 'news/edit_category.html', context)
+        return render(request, 'news/add_edit_category.html', context)

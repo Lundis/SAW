@@ -14,6 +14,9 @@ class ArticleForm(forms.ModelForm):
             article.author = user
         if commit:
             article.save()
+            # https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#the-save-method
+            # So we need this method because we used commit=False earlier
+            self.save_m2m()
         return article
 
 

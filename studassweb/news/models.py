@@ -8,10 +8,16 @@ from .utils import complete_html
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
 
     class Meta:
         ordering = ["name"]
+
+    def get_absolute_url(self):
+        return reverse("news_view_category", kwargs={'category_id': self.id})
+
+    def __str__(self):
+        return self.name
 
 
 class Article(models.Model):
@@ -19,14 +25,14 @@ class Article(models.Model):
     summary = models.TextField(max_length=300, blank=True, null=True)
     slug = models.SlugField(editable=False)
     text = RichTextField()
-    # split the
+    # split the date and time in order to make fetching articles based on date easier
     created_date = models.DateField(auto_now_add=True)
     created_time = models.TimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     # A small thumbnail used in the news feed
     picture = models.ImageField(upload_to="news/article_thumbnails", blank=True, null=True)
     author = models.ForeignKey(User)
-    categories = models.ManyToManyField(Category, through="ArticleInCategory", blank=True)
+    categories = models.ManyToManyField(Category, blank=True)
 
     class Meta:
         ordering = ["-created_date", "-created_time"]
@@ -58,14 +64,3 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
-
-
-class ArticleInCategory(models.Model):
-    article = models.ForeignKey(Article)
-    category = models.ForeignKey(Category)
-
-    class Meta:
-        ordering = ["category", "article"]
-
-
-

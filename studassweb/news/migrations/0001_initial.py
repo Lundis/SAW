@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
+import ckeditor.fields
 from django.conf import settings
 
 
@@ -15,36 +16,27 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Article',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', primary_key=True, serialize=False, auto_created=True)),
+                ('id', models.AutoField(primary_key=True, auto_created=True, verbose_name='ID', serialize=False)),
                 ('title', models.CharField(max_length=100)),
-                ('summary', models.TextField(max_length=200)),
-                ('text', models.TextField()),
-                ('created', models.DateTimeField(auto_now_add=True)),
+                ('summary', models.TextField(null=True, blank=True, max_length=300)),
+                ('slug', models.SlugField(editable=False)),
+                ('text', ckeditor.fields.RichTextField()),
+                ('created_date', models.DateField(auto_now_add=True)),
+                ('created_time', models.TimeField(auto_now_add=True)),
                 ('updated', models.DateTimeField(auto_now=True)),
-                ('picture', models.ImageField(upload_to='news/article_thumbnails')),
+                ('picture', models.ImageField(null=True, blank=True, upload_to='news/article_thumbnails')),
                 ('author', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'ordering': ['-created'],
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='ArticleInCategory',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', primary_key=True, serialize=False, auto_created=True)),
-                ('article', models.ForeignKey(to='news.Article')),
-            ],
-            options={
-                'ordering': ['category', 'article'],
+                'ordering': ['-created_date', '-created_time'],
             },
             bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Category',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', primary_key=True, serialize=False, auto_created=True)),
-                ('name', models.CharField(max_length=100)),
+                ('id', models.AutoField(primary_key=True, auto_created=True, verbose_name='ID', serialize=False)),
+                ('name', models.CharField(unique=True, max_length=100)),
             ],
             options={
                 'ordering': ['name'],
@@ -52,15 +44,13 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.AddField(
-            model_name='articleincategory',
-            name='category',
-            field=models.ForeignKey(to='news.Category'),
-            preserve_default=True,
-        ),
-        migrations.AddField(
             model_name='article',
             name='categories',
-            field=models.ManyToManyField(to='news.Category', through='news.ArticleInCategory'),
+            field=models.ManyToManyField(blank=True, to='news.Category'),
             preserve_default=True,
+        ),
+        migrations.AlterUniqueTogether(
+            name='article',
+            unique_together=set([('slug', 'created_date')]),
         ),
     ]

@@ -52,6 +52,19 @@
         <div class="panel-body">
         </div>
     </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            {% trans "Categories" %}
+        </div>
+        <div class="panel-body">
+            {% for cat in categories %}
+                <a class="btn btn-default btn-block"
+                   href="{% url "news_home" category_name=cat.name %}">
+                    {{ cat.name }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
     {% has_perm "news" "EDIT" as show_edit_panel %}
     {% if show_edit_panel %}
         <div class="panel panel-primary">
@@ -62,6 +75,10 @@
                 <a class="btn btn-default btn-block"
                    href="{% url "news_add_article" %}">
                     {% trans "Create new article" %}
+                </a>
+                <a class="btn btn-default btn-block"
+                   href="{% url "news_add_category" %}">
+                    {% trans "Create new category" %}
                 </a>
             </div>
         </div>
