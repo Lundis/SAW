@@ -1,14 +1,40 @@
 {% extends 'news/base.html' %}
 {% load i18n %}
+{% load sawp %}
 
 {% block title %}
-{{ article.title }}
+    {{ article.title }}
 {% endblock %}
 
 {% block main_content %}
-
-
+    <h2>{{ article.title }}</h2>
+    <div>{{ article.text | safe }}</div>
 {% endblock %}
 
 {% block sidebar %}
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            {% trans "Categories" %}
+        </div>
+        <div class="panel-body">
+            {% for cat in categories %}
+                <a class="btn btn-default btn-block"
+                   href="{% url "news_home" category_name=cat.name %}">
+                    {{ cat.name }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            {% trans "Actions" %}
+        </div>
+        <div class="panel-body">
+            <a class="btn btn-default btn-block"
+               href="{% url "news_edit_article" article.id %}">
+                {% trans "Edit" %}
+            </a>
+        </div>
+    </div>
 {% endblock %}

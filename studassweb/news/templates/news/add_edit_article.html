@@ -1,12 +1,12 @@
 {% extends 'news/base.html' %}
 {% load i18n %}
 {% load bootstrap3 %}
-
+{% load sawp %}
 
 {% block main_content %}
     {% load navigator %}
     {% url "news_home" as news_url %}
-    {% if page %}
+    {% if article %}
         {% display_navigator news_url "News" article.get_absolute_url article.title %}
     {% else %}
         {% display_navigator news_url "News" "#" "New Article" %}
@@ -19,11 +19,6 @@
         <button type="submit" class="btn btn-primary">
             {% trans "Submit" %}
         </button>
-        {% if article %}
-            <a href="{% url "news_delete_news" page.id %}" class="btn btn-danger">
-                {% trans "Delete" %}
-            </a>
-        {% endif %}
     </form>
 {% endblock %}
 
@@ -33,10 +28,11 @@
             {% trans "Actions" %}
         </div>
         <div class="panel-body">
-            <a class="btn btn-default btn-block"
-               href="{% url "news_add_article" %}">
-                {% trans "Create new article" %}
-            </a>
+            {% if article %}
+                <a href="{% url "news_delete_article" article_id=article.id %}" class="btn btn-danger btn-block">
+                    {% trans "Delete" %}
+                </a>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

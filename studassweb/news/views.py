@@ -7,6 +7,8 @@ from users.decorators import has_permission
 from .models import Article, Category
 from .forms import ArticleForm, CategoryForm
 from .register import EDIT
+from base.forms import ConfirmationForm
+from base.views import delete_confirmation_view
 import datetime
 import logging
 
@@ -42,34 +44,42 @@ def view_article(request, year, month, day, slug):
         article = Article.objects.get(created_date=date, slug=slug)
     except Article.DoesNotExist:
         raise Http404(_("The requested article could not be found!"))
-    context = {'article': article}
+    context = {'article': article,
+               'categories': Category.objects.all()}
     return render(request, "news/view_article.html", context)
 
 
 @has_permission(EDIT)
-def edit_article(request, slug=None):
-    if slug is not None:
+def edit_article(request, article_id=None):
+    if article_id is not None:
         try:
-            member = Article.objects.get(slug=slug)
+            article = Article.objects.get(id=article_id)
         except Article.DoesNotExist:
             raise Http404(_("The requested article could not be found!"))
     else:
-        member = None
+        article = None
     form = ArticleForm(request.POST or None,
                        request.FILES or None,
-                       instance=member)
+                       instance=article)
     if form.is_valid():
         article = form.save(user=request.user)
         return HttpResponseRedirect(article.get_absolute_url())
     else:
-        context = {'member': member,
+        context = {'article': article,
                    'form': form}
         return render(request, 'news/add_edit_article.html', context)
 
 
 @has_permission(EDIT)
-def delete_article(request):
-    pass
+def delete_article(request, article_id):
+    try:
+        article = Article.objects.get(id=article_id)
+    except Article.DoesNotExist:
+        raise Http404(_("The requested article could not be found!"))
+    return delete_confirmation_view(request,
+                                    item=article,
+                                    form_url=reverse("news_delete_article", args=(article_id,)),
+                                    redirect_url=reverse("news_home"))
 
 
 @has_permission(EDIT)
