@@ -78,7 +78,7 @@ def view_profile(request, username):
         user_ext = UserExtension.create_for_user(user)
 
     try:
-        member = Member.objects.get(user=user)
+        member = Member.objects.get(user_ext=user_ext)
     except Member.DoesNotExist:
         member = None
     context = {'user_ext': user_ext,
