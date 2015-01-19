@@ -6,6 +6,7 @@ from .register import CAN_VIEW_BOARDS, CAN_EDIT_BOARDS, CAN_EDIT_ROLES, CAN_EDIT
 from .forms import RoleForm, BoardTypeForm, BoardForm, BoardMemberForm
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.contrib import messages
 import logging
 
 logger = logging.getLogger(__name__)
@@ -71,8 +72,10 @@ def delete_role(request, role_id):
         try:
             role = Role.objects.get(id=role_id)
             if permissions.has_user_perm(request.user, CAN_EDIT_ROLES):
+                name = str(role)
                 role.delete()
-                return HttpResponseRedirect(reverse("boards_main"))  # TODO give feedback to user
+                messages.success(request, "Role "+name+" was sucessfully deleted!")
+                return HttpResponseRedirect(reverse("boards_main"))
             else:
                 logger.warning('User %s tried to delete role %s', request.user, role)
                 return HttpResponseForbidden('You don\'t have permission to remove this!')
@@ -142,8 +145,10 @@ def delete_board(request, board_id):
         try:
             board = Board.objects.get(id=board_id)
             if permissions.has_user_perm(request.user, CAN_EDIT_BOARDS):
+                name = str(board)
                 board.delete()
-                return HttpResponseRedirect(reverse("boards_main"))  # TODO give feedback to user
+                messages.success(request, "Board "+name+" was sucessfully deleted!")
+                return HttpResponseRedirect(reverse("boards_main"))
             else:
                 logger.warning('User %s tried to delete board %s', request.user, board)
                 return HttpResponseForbidden('You don\'t have permission to remove this!')
@@ -213,8 +218,10 @@ def delete_boardtype(request, boardtype_id):
         try:
             boardtype = BoardType.objects.get(id=boardtype_id)
             if permissions.has_user_perm(request.user, CAN_EDIT_BOARDTYPES):
+                name = str(boardtype)
                 boardtype.delete()
-                return HttpResponseRedirect(reverse("boards_main"))  # TODO give feedback to user
+                messages.success(request, "Boardtype "+name+" was sucessfully deleted!")
+                return HttpResponseRedirect(reverse("boards_main"))
             else:
                 logger.warning('User %s tried to delete board type %s', request.user, boardtype)
                 return HttpResponseForbidden('You don\'t have permission to remove this!')
@@ -288,18 +295,16 @@ def delete_boardmember(request, boardmember_id):
         try:
             boardmember = BoardMember.objects.get(id=boardmember_id)
             if permissions.has_user_perm(request.user, CAN_EDIT_BOARDS):
+                name = str(boardmember)
                 boardmember.delete()
-                return HttpResponseRedirect(reverse("boards_main"))  # TODO give feedback to user
+                messages.success(request, "Board member "+name+" was sucessfully deleted!")
+                return HttpResponseRedirect(reverse("boards_main"))
             else:
                 logger.warning('User %s tried to delete board member %s', request.user, boardmember)
                 return HttpResponseForbidden('You don\'t have permission to remove this!')
         except BoardMember.DoesNotExist:
             logger.warning('User %s tried to delete nonexistant board member id %s', request.user, boardmember_id)
             return HttpResponseNotFound('No such board member!')
-        except models.ProtectedError:
-            #TODO remove this later when it is certain it is not needed
-            logger.warning('User %s tried to delete board member %s which is still in use THISSHOULDNEVERHAPPEN', request.user, boardmember)
-            return HttpResponseNotFound('You need to remove something first')
     else:
             logger.warning('Attempted to access delete_boardmember via other method than POST')
             return HttpResponseNotAllowed(['POST', ])

@@ -17,11 +17,26 @@ class Album(models.Model):
     def get_absolute_url(self):
         return reverse("gallery.views.view_album", kwargs={'album_id': self.id})
 
+    def __str__(self):
+        return str(self.name)
+
 
 class Photo(models.Model):
-    image = models.ImageField()
-    album_id = models.ForeignKey(Album)
-    author = models.ForeignKey(User)
+    album_id = models.ForeignKey(Album, on_delete=models.PROTECT)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     description = models.TextField(max_length=300)
     uploaded = models.DateTimeField(auto_now_add=True)
+
+    def get_absolute_url(self):
+        return reverse("gallery.views.view_picture", kwargs={'photo_id': self.id})
+
+    def __str__(self):
+        return self.uploaded.strftime("%Y-%m-%d") + " : " + str(self.photo_id)
+
+class PhotoFile(models.Model):
+    image = models.ImageField(upload_to='gallery_files')
+    photo_id = models.ForeignKey(Photo)
+
+    def __str__(self):
+        return self.image.name
 

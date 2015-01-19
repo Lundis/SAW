@@ -8,6 +8,7 @@ from users import permissions
 from .register import CAN_VIEW_EXAM_ARCHIVE, CAN_UPLOAD_EXAMS, CAN_EDIT_EXAMS
 from users.decorators import has_permission
 from django.core.urlresolvers import reverse
+from django.contrib import messages
 import logging
 
 logger = logging.getLogger(__name__)
@@ -169,10 +170,12 @@ def delete_exam(request, exam_id):
             try:
                 exam = SingleExam.objects.get(id=exam_id)
                 if permissions.has_user_perm(request.user, CAN_EDIT_EXAMS) or exam.created_by == request.user:
+                    name = str(exam)
                     images = ExamFile.objects.filter(exam_id=exam_id)
                     images.delete()
                     exam.delete()
-                    return HttpResponseRedirect(reverse("exams_main"))  # TODO give feedback to user
+                    messages.success(request, "Exam "+name+" was sucessfully deleted!")
+                    return HttpResponseRedirect(reverse("exams_main"))
                 else:
                     logger.warning('User %s tried to delete exam %s', request.user, exam_id)
                     return HttpResponseForbidden('You don\'t have permission to remove this!')
@@ -188,8 +191,10 @@ def delete_examinator(request, examinator_id):
         try:
             examinator = Examinator.objects.get(id=examinator_id)
             if permissions.has_user_perm(request.user, CAN_EDIT_EXAMS) or examinator.created_by == request.user:
+                name = str(examinator)
                 examinator.delete()
-                return HttpResponseRedirect(reverse("exams_main"))  # TODO give feedback to user
+                messages.success(request, "Examinator "+name+" was sucessfully deleted!")
+                return HttpResponseRedirect(reverse("exams_main"))
             else:
                 logger.warning('User %s tried to delete examinator %s', request.user, examinator_id)
                 return HttpResponseForbidden('You don\'t have permission to remove this!')
@@ -207,8 +212,10 @@ def delete_course(request, course_id):
         try:
             course = Course.objects.get(id=course_id)
             if permissions.has_user_perm(request.user, CAN_EDIT_EXAMS) or course.created_by == request.user:
+                name = str(course)
                 course.delete()
-                return HttpResponseRedirect(reverse("exams_main"))  # TODO give feedback to user
+                messages.success(request, "Course "+name+" was sucessfully deleted!")
+                return HttpResponseRedirect(reverse("exams_main"))
             else:
                 logger.warning('User %s tried to delete course %s', request.user, course_id)
                 return HttpResponseForbidden('You don\'t have permission to remove this!')
