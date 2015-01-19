@@ -45,7 +45,7 @@ class InfoCategory(models.Model):
 
     def delete(self, *args, **kwargs):
         MenuItem.delete_all_that_links_to(self)
-        super(InfoCategory, self, *args, **kwargs)
+        super(InfoCategory, self, *args, **kwargs).delete()
 
     def can_view(self, user):
         return has_user_perm(user, self.get_permission_str())
@@ -84,7 +84,7 @@ class InfoPage(models.Model):
 
     def delete(self, *args, **kwargs):
         MenuItem.delete_all_that_links_to(self)
-        super(InfoPage, self).delete(*args, **kwargs)
+        super(InfoPage, self).delete(*args, **kwargs).delete()
 
     def can_view(self, user):
         return has_user_perm(user, self.get_permission_str())
