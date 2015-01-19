@@ -1,0 +1,33 @@
+{% extends "polls/base.html" %}
+
+{% load i18n %}
+{% load bootstrap3 %}
+
+
+{% block main_content %}
+    {% load navigator %}
+    {% url "polls_home" as polls_url %}
+    {% if form.instance.pk %}
+        {% display_navigator polls_url "Polls" form.instance.get_absolute_url form.instance.name%}
+    {% else %}
+        {% display_navigator polls_url "Polls" "#" "New poll" %}
+    {% endif %}
+
+    {% if form.instance.pk %}
+        <h1>Edit {{ form.instance.name }}</h1>
+    {% else %}
+        <h1>Add board member</h1>
+    {% endif %}
+
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">
+                {% trans "Submit" %}
+            </button>
+        {% endbuttons %}
+    </form>
+{% endblock %}
+{% block sidebar %}
+{% endblock %}

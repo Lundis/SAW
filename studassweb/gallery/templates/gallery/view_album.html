@@ -4,22 +4,42 @@
 {% load bootstrap3 %}
 {% load thumbnail %}
 
-{% block inner_content %}
+{% block main_content %}
     {% load navigator %}
-    {% url "gallery_main" as gallery_url %}
-    {% display_navigator gallery_url "Gallery" album.name album.get_absolute_url%}
-    <h1>{{ album.name }}</h1>
-    {% for album in gallery %}
-		<p><a href="/gallery/album/{{ album.id }}"></a></p>
-    {% empty %}
-        <p>{% trans "No albums found!" %}</p>
-        <form action="{% url 'gallery.views.edit_album' album.id %}" method="post">
-            {% csrf_token %}
-            {% buttons %}
-                <button type="submit" class="btn btn-danger">
-                    {% trans "delete album" %}
-                </button>
-            {% endbuttons %}
-        </form>
-    {% endfor %}
+    {% url "gallery.views.view_gallery" as gallery_url %}
+    {% display_navigator gallery_url "Gallery" album.get_absolute_url album.name %}
+    <div class="row">
+        <div class="col-sm-6">
+            <h1>{{ album.name }}</h1>
+            <div class="list-group">
+
+                {% for photo in photos %}
+                    <a class="list-group-item" href="{% url 'gallery_view_photo' photo.id %}">
+                        {{ photo.uploaded|date:"Y-m-d" }}
+                    </a>
+                {% empty %}
+                    <p>{% trans "no photos in album" %}<p/>
+                    <form action="{% url 'gallery_delete_album' album.id %}" method="post">
+                       {% csrf_token %}
+                       {% buttons %}
+                           <button type="submit" class="btn btn-danger" onclick="return confirm('{% trans "Are you sure?" %}')">
+                               {% trans "Remove album" %}
+                           </button>
+                       {% endbuttons %}
+                    </form>
+                {% endfor %}
+            </div>
+
+            {% for album in gallery %}
+                <p><a href="/gallery/album/{{ album.id }}"></a></p>
+            {% empty %}
+                <form action="{% url 'gallery.views.edit_album' album.id %}" method="post">
+                    {% csrf_token %}
+                    {% buttons %}
+                        <button type="submit" class="btn btn-danger">
+                            {% trans "edit album" %}
+                        </button>
+                    {% endbuttons %}
+                </form>
+            {% endfor %}
 {% endblock %}

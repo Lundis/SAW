@@ -50,6 +50,7 @@ MIDDLEWARE_CLASSES = (
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
+    'django.contrib.messages.context_processors.messages',
 )
 
 ROOT_URLCONF = 'studassweb.urls'
@@ -189,3 +190,12 @@ local_logger_conf = {
 #Add to every module
 for app in get_all_modules():
     LOGGING['loggers'][app] = local_logger_conf
+
+#This makes django messages compatible with bootstrap3
+#http://ericsaupe.com/tag/bootstrap-messages-fix/
+from django.contrib.messages import constants as message_constants
+MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
+                message_constants.INFO: 'info',
+                message_constants.SUCCESS: 'success',
+                message_constants.WARNING: 'warning',
+                message_constants.ERROR: 'danger',}

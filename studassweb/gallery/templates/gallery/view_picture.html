@@ -1,9 +1,53 @@
 {% extends "gallery/base.html" %}
 
 {% load i18n %}
-{% load bootstrap3 %}
+{% load thumbnail %}
 
-{% block inner_content %}
-{% load navigator %}
-
+{% block main_content %}
+    {% load navigator %}
+    {% url "gallery_main" as gallery_url %}
+    {% display_navigator gallery_url "Gallery" photo.album_id.get_absolute_url photo.album_id photo.get_absolute_url photo %}
+    <h1>PHOTO</h1>
+    <ul class="list-group">
+        <li class="list-group-item">
+            {% for photofile in photos %}
+                <a href="{{ photofile.image.url }}"><img  class="img-thumbnail" src="{% thumbnail photofile.image 100x100 crop=scale %}"/></a>
+            {% endfor %}
+        </li>
+        <li class="list-group-item">{% trans "Name: " %}<a href="{% url 'gallery_view_picture' photo.album_id.id %}">{{ photo.album_id.name }}</a> </li>
+        <li class="list-group-item">{% trans "Uploaded: " %}{{ photo.uploaded|date:"Y-m-d" }}</li>
+    </ul>
+{% endblock %}
+{% block sidebar %}
+    {% if show_edit_buttons %}
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Edit" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <a href="{% url 'gallery_edit_picture' photo.id %}">
+                        <div class="btn list-group-item">{% trans "Edit picture" %}</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if show_add_buttons%}
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Add" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <a href="{% url 'gallery_add_picture' %}">
+                        <div class="btn list-group-item">{% trans "Add new picture" %}</div>
+                    </a>
+                    <a href="{% url 'exams_add_course' %}">
+                        <div class="btn list-group-item">{% trans "Add new album" %}</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

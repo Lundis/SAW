@@ -2,13 +2,10 @@
 {% load i18n %}
 
 {% block title %}
-{% trans "Polls" %}
+    {% trans "Polls" %}
 {%  endblock %}
 
-{% block content %}
+{% block menu %}
     {% load dynamic_menu %}
     {% display_menu "main_menu" "Polls" %}
-    <div class="container">
-        {% block inner_content %}{% endblock %}
-    </div>
-{% endblock %}
+{% endblock %}}
