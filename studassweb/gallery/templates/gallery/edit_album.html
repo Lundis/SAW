@@ -2,9 +2,18 @@
 
 {% load i18n %}
 {% load bootstrap3 %}
-{% load static %}
+{% load thumbnail %}
 
 
-{% block inner_content %}
+{% block main_content %}
 {% load navigator %}
+    {% url "gallery_main" as gallery_url %}
+    {% display_navigator gallery_url "Gallery" album.get_absolute_url album.name %}}
+    <h1>edit an album</h1>
+
+<form action="{% url "gallery_edit_album" %}" method="post" enctype="multipart/form-data" >
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <input type="submit" value="Submit" />
+</form>
 {% endblock %}
