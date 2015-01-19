@@ -233,14 +233,10 @@ def view_boardmember(request, boardmember_id):
     try:
         boardmember = BoardMember.objects.get(id=boardmember_id)
 
-        #TODO get all boards this member has been on
-        #1 Get all boardmembers with this member
-        #2 Get board from each of the boardmembers
-        #3 Put in array
-        #4 profit!!!
-
-        boards = {}
-
+        boards = []
+        all_boardmembers = BoardMember.objects.filter(member=boardmember.member)
+        for bm in all_boardmembers:
+            boards.append(bm.board)
 
         return render(request, 'boards/view_boardmember.html', {
             'boardmember': boardmember, 'boards': boards},)

@@ -129,10 +129,10 @@ LOGGING = {
     'disable_existing_loggers': True,
     'formatters': {
         'verbose': {
-            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
         },
         'simple': {
-            'format': 'ISNOTUSEDANYWHERE %(levelname)s %(message)s'
+            'format': '%(levelname)s [%(name)s:%(lineno)s] %(message)s'
         },
     },
     'handlers': {
@@ -155,24 +155,27 @@ LOGGING = {
             'formatter': 'verbose'
         },
         'console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
+            'formatter': 'simple'
+        },
+        'console-warnings': {
+            'level': 'WARNING',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['djangodebugfile', 'allwarnings', 'console'],
+            'handlers': ['djangodebugfile', 'allwarnings', 'console-warnings'],
             'level': 'DEBUG',
             'propagate': False,
         },
         'studassweb': {
-            'handlers': ['appdebugfile','allwarnings', 'console'],
+            'handlers': ['appdebugfile', 'allwarnings', 'console'],
             'level': 'DEBUG',
             'propagate': True,
         },
-
-
     },
 }
 

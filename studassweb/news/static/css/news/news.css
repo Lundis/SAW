@@ -1,0 +1,9 @@
+.news-picture {
+    max-height:80px;
+    max-width: 80px;
+}
+
+.inherit-padding-left-right {
+    padding-left:inherit;
+    padding-right:inherit;
+}

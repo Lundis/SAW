@@ -6,14 +6,17 @@
 
 {% block main_content %}
     {% load navigator %}
-    {% url "boards.views.boards_main" as boards_url %}
+    {% url "boards_main" as boards_url %}
     {% display_navigator boards_url "Boards" boardtype.get_absolute_url boardtype.name%}
     <h1>{{ boardtype.name }}</h1>
     <div class="list-group">
 
         {% for board in boards %}
             <a class="list-group-item" href="{{ board.get_absolute_url }}">
-                {{ board.year }} TODO getmembercount would be nice
+                {{ board.year }}
+                <span class="badge">
+                    {{ board.get_member_count }}
+                </span>
             </a>
         {% empty %}
             <p>{% trans "No boards with this board type found!" %}</p>

@@ -1,4 +1,4 @@
-{% extends 'base/base.html' %}
+{% extends 'members/base.html' %}
 {% load i18n %}
 {% load bootstrap3 %}
 
@@ -6,7 +6,7 @@
     {% trans "Apply for Membership" %}
 {%  endblock %}
 
-{% block  menu %}
+{% block menu %}
     {% load dynamic_menu %}
     {% display_menu "main_menu" "Register" %}
 {% endblock %}

@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from .models import UserExtension
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -33,7 +34,7 @@ class LoginForm(forms.Form):
             UserExtension.objects.get(user=user)
         except UserExtension.DoesNotExist:
             UserExtension.create_for_user(user)
-            logging.warning('UserExtension was created at login')
+            logging.warning('UserExtension for user %s was created at login' % user.username)
         login(request, user)
 
 

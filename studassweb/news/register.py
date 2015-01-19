@@ -2,6 +2,10 @@ from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, MEMBER, BOARD_MEMBER
 
+VIEW_PUBLIC = "can_view_public_news"
+VIEW_MEMBER = "can_view_member_news"
+EDIT = "can_create_news"
+
 
 def get_menu_items():
     """
@@ -10,7 +14,7 @@ def get_menu_items():
     item, created = MenuItem.get_or_create(__package__,
                                            "News",
                                            reverse_string="news_home",
-                                           permission=SAWPermission.get_or_create("can_view_public_news"))
+                                           permission=SAWPermission.get_or_create(VIEW_PUBLIC))
     return ([item],
             None,
             None)
@@ -28,8 +32,7 @@ def get_permissions():
     :return: a list of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_view_public_news", GUEST, "Access to most news articles"),
-        ("can_view_member_news", MEMBER, "Access to all news articles"),
-        ("can_create_news", BOARD_MEMBER, "Can create news articles"),
-        ("can_create_member_news", BOARD_MEMBER, "Can create news that are only visible to members"),
+        (VIEW_PUBLIC, GUEST, "Access to public news articles"),
+        (VIEW_MEMBER, MEMBER, "Access to all news articles"),
+        (EDIT, BOARD_MEMBER, "Can create news articles"),
     )
