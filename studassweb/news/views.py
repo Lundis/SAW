@@ -19,6 +19,12 @@ ARTICLES_PER_PAGE = 10
 
 def home(request, page=1, category_name=None):
     category = None
+    if not isinstance(page, int):
+        try:
+            page = int(page)
+        except TypeError:
+            page = 1
+
     if category_name is not None:
         try:
             category = Category.objects.get(name=category_name)
@@ -28,13 +34,32 @@ def home(request, page=1, category_name=None):
     if not category:
         articles = Article.objects.all()
         category = None
+    if request.GET.get('year', None) is not None:
+        try:
+            year = int(request.GET['year'])
+            articles = articles.filter(created_date__year=year)
+        except ValueError:
+            pass
+    if request.GET.get('month', None) is not None:
+        try:
+            month = int(request.GET['month'])
+            articles = articles.filter(created_date__month=month)
+        except ValueError:
+            pass
+    if request.GET.get('day', None) is not None:
+        try:
+            day = int(request.GET['day'])
+            articles = articles.filter(created_date__day=day)
+        except ValueError:
+            pass
     paginator = Paginator(articles, ARTICLES_PER_PAGE)
     current_page = paginator.page(page)
     categories = Category.objects.all()
     context = {'articles': current_page.object_list,
                'categories': categories,
                'category': category,
-               'page': current_page}
+               'page': current_page,
+               'paginator': paginator}
     return render(request, "news/view_news.html", context)
 
 

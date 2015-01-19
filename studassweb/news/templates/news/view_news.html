@@ -10,6 +10,48 @@
     {% else %}
         {% display_navigator news_url "News" %}
     {% endif %}
+
+    {% if paginator.num_pages > 0 %}
+        <nav class="center-block">
+            <ul class="pagination">
+                {% if page.has_previous %}
+                    {% if category %}
+                        {% url "news_home" category_name=category.name page=page.previous_page_number as previous_url %}
+                    {% else %}
+                        {% url "news_home" page=page.previous_page_number as previous_url %}
+                    {% endif %}
+                    <li>
+                        <a href="#" aria-label="Previous">
+                            <span aria-hidden="true" class="glyphicon glyphicon-backward"></span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% for page_number in paginator.page_range %}
+                    {% if category %}
+                        <li><a href="{% url "news_home" category_name=category.name page=page_number %}">
+                            {{ page_number }}
+                        </a></li>
+                    {% else %}
+                        <li><a href="{% url "news_home" page=page_number %}">
+                            {{ page_number }}
+                        </a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if page.has_next %}
+                    <li>
+                        {% if category %}
+                            {% url "news_home" category_name=category.name page=page.next_page_number as next_url %}
+                        {% else %}
+                            {% url "news_home" page=page.next_page_number as next_url %}
+                        {% endif %}
+                        <a href={{ next_url }} aria-label="Next">
+                            <span aria-hidden="true" class="glyphicon glyphicon-next"></span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
     {% for article in articles %}
         <div class="panel panel-primary">
             <div class="panel-heading">
