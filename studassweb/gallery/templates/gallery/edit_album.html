@@ -8,12 +8,16 @@
 {% block main_content %}
 {% load navigator %}
     {% url "gallery_main" as gallery_url %}
-    {% display_navigator gallery_url "Gallery" album.get_absolute_url album.name %}}
+    {% display_navigator gallery_url "Gallery" album.get_absolute_url album.name %}
     <h1>edit an album</h1>
 
-<form action="{% url "gallery_edit_album" %}" method="post" enctype="multipart/form-data" >
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    <input type="submit" value="Submit" />
-</form>
+    <form action="{% url 'gallery.views.edit_album' album.id %}"method="post" enctype="multipart/form-data" >
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">
+                {% trans "Submit" %}
+            </button>
+        {% endbuttons %}
+    </form>
 {% endblock %}

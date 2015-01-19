@@ -9,13 +9,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 def view_gallery(request):
-    return render(request, 'gallery/view_gallery.html')
+    albums = Album.objects.filter().order_by('name')
+    pictures = Photo.objects.filter().order_by('-uploaded')
+
+    return render(request, 'gallery/view_gallery.html', {
+        'albums': albums, 'pictures': pictures},)
 
 def create_album(request, album_id=None):
     try:
         album = Album.objects.get(id=album_id)
     except Album.DoesNotExist:
-
         album = None
 
     form = AlbumForm(instance=album)
@@ -40,10 +43,15 @@ def view_album(request, album_id):
 def edit_album(request, album_id):
     try:
         album = Album.objects.get(id=album_id)
-        return render(request, 'gallery/edit_album.html', {
-            'album': album},)
     except Album.DoesNotExist:
         return HttpResponseNotFound('error')
+    form = AlbumForm(instance=album)
+    if request.method == 'POST':
+        if form.is_valid():
+            tmp = form.save()
+            return HttpResponseRedirect(reverse('gallery_view_album', kwargs={'album_id': tmp.id}))
+    context = {'album' : album ,'form': form}
+    return render(request, 'gallery/edit_album.html', context)
 
 def delete_album(request, album_id):
     if request.method == 'POST':
