@@ -108,12 +108,17 @@
             {% trans "Categories" %}
         </div>
         <div class="panel-body">
+            <a class="btn btn-default btn-block {% if not category %}active{% endif %}"
+               href="{% url "news_home" %}">
+                {% trans "Show all" %}
+            </a>
             {% for cat in categories %}
-                <a class="btn btn-default btn-block"
+                <a class="btn btn-default btn-block {% if cat.name == category.name %}active{% endif %}"
                    href="{% url "news_home" category_name=cat.name %}">
                     {{ cat.name }}
                 </a>
             {% endfor %}
+
         </div>
     </div>
     {% has_perm "news" "EDIT" as show_edit_panel %}

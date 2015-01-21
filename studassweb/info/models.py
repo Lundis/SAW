@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from ckeditor.fields import RichTextField
 from menu.models import MenuItem, Menu
-from users.permissions import has_user_perm, get_readable_perm
+from users.permissions import has_user_perm
 from .register import VIEW_BOARD, VIEW_MEMBER, VIEW_PUBLIC, EDIT
 
 PERMISSION_CHOICES = (
