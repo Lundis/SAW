@@ -12,7 +12,7 @@
     {% endif %}
 
     {% if paginator.num_pages > 0 %}
-        <nav class="center-block">
+        <nav>
             <ul class="pagination">
                 {% if page.has_previous %}
                     {% if category %}
@@ -20,35 +20,35 @@
                     {% else %}
                         {% url "news_home" page=page.previous_page_number as previous_url %}
                     {% endif %}
-                    <li>
-                        <a href="#" aria-label="Previous">
-                            <span aria-hidden="true" class="glyphicon glyphicon-backward"></span>
-                        </a>
-                    </li>
                 {% endif %}
+                <li {% if not page.has_previous %} class="disabled" {% endif %}>
+                    <a href="{% if previous_url %} {{ previous_url  }} {% else %} # {% endif %}" aria-label="Previous">
+                        <span aria-hidden="true" class="glyphicon glyphicon-backward"></span>
+                    </a>
+                </li>
                 {% for page_number in paginator.page_range %}
-                    {% if category %}
-                        <li><a href="{% url "news_home" category_name=category.name page=page_number %}">
+                    <li {% if page_number == page.number %} class="active" {% endif %}>
+                        <a {% if category %}
+                            href="{% url "news_home" category_name=category.name page=page_number %}"
+                        {% else %}
+                            href="{% url "news_home" page=page_number %}"
+                        {% endif %}>
                             {{ page_number }}
                         </a></li>
-                    {% else %}
-                        <li><a href="{% url "news_home" page=page_number %}">
-                            {{ page_number }}
-                        </a></li>
-                    {% endif %}
+
                 {% endfor %}
-                {% if page.has_next %}
-                    <li>
+                <li {% if not page.has_next %} class="disabled" {% endif %}>
+                    {% if page.has_next %}
                         {% if category %}
                             {% url "news_home" category_name=category.name page=page.next_page_number as next_url %}
                         {% else %}
                             {% url "news_home" page=page.next_page_number as next_url %}
                         {% endif %}
-                        <a href={{ next_url }} aria-label="Next">
-                            <span aria-hidden="true" class="glyphicon glyphicon-next"></span>
-                        </a>
-                    </li>
-                {% endif %}
+                    {% endif %}
+                    <a href="{% if next_url %} {{ next_url  }} {% else %} # {% endif %}" aria-label="Next">
+                        <span aria-hidden="true" class="glyphicon glyphicon-forward"></span>
+                    </a>
+                </li>
             </ul>
         </nav>
     {% endif %}
