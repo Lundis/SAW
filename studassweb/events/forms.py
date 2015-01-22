@@ -1,18 +1,19 @@
-__author__ = 'Olujuwon'
 from django import forms
-from django.forms import ModelForm
-from events.models import EventSignup
+from .models import Event, EventSignup
 
 
-class Eventsignup(forms.ModelForm):
+#TODO do we want to ask for name of logged-in users?
+#Easiest would maybe be to autofill text field with username but allow user to change
+class EventSignupForm(forms.ModelForm):
 
     class Meta:
         model = EventSignup
-        fields = ('title', 'body', 'creation', 'author')
+        fields = ('name', 'email', 'matricle', 'association', 'diet', 'other')
 
 
-class BlogeditForm(ModelForm):
+class EventForm(forms.ModelForm):
 
     class Meta:
-        model = Blog
-        fields = ('title', 'body')
+        model = Event
+        fields = ('title', 'text', 'start', 'stop', 'author', 'signup_deadline')
+

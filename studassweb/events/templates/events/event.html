@@ -1,10 +1,53 @@
-{% extends "base/base.html" %}
+{% extends "events/base.html" %}
 
-{% block content %}
-    {% load dynamic_menu %}
-    {% display_menu "main_menu" "Info" %}
-    <div class="container">
-        {% block inner_content %}
-        {% endblock %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% load sawp %}
+{% load thumbnail %}
+
+{% block main_content %}
+    {% load navigator %}
+    {% url "events_home" as events_url %}
+    {% display_navigator events_url "Events" event.get_absolute_url event%}
+    <h1>{{ event }}</h1>
+    <div class="list-group">
+        <ul class="list-group">
+            <li class="list-group-item">
+                {{ event.text }}
+            </li>
+            <li class="list-group-item">{% trans "Start date: " %}{{ event.start|date:"Y-m-d H:i" }}</li>
+            <li class="list-group-item">{% trans "Stop date: " %}{{ event.stop|date:"Y-m-d H:i" }}</li>
+
+
+            <li class="list-group-item">TODO show signup form</li>
+            <li class="list-group-item">TODO show who is signed up to this event</li>
+        </ul>
     </div>
+{% endblock %}
+{% block sidebar %}
+    {% has_perm "events" "CAN_CREATE_EVENTS" as can_create_events %}
+    {% if can_create_events%}
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Edit" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <a href="{% url 'events_edit_event' event.id%}">
+                        <div class="btn list-group-item">{% trans "Edit this event" %}</div>
+                    </a>
+                </div>
+            </div>
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Add" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <a href="{% url 'events_add_event' %}">
+                        <div class="btn list-group-item">{% trans "Add new event" %}</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
