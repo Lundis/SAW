@@ -11,4 +11,4 @@ then
     cp ./studassweb/settings_local.py.template ./studassweb/settings_local.py
 fi
 
-rm -f db.sqlite3 && python manage.py makemigrations && python manage.py migrate && python manage.py createsuperuser && python manage.py runserver
+rm -f db.sqlite3 && python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py createsuperuser && python3 manage.py runserver
