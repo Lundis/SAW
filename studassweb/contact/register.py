@@ -1,6 +1,10 @@
 from menu.models import MenuItem
 from users.models import SAWPermission
-from users.groups import GUEST
+from users.groups import GUEST, BOARD_MEMBER
+
+CAN_VIEW_CONTACT_INFO = "can_view_contact_info"
+CAN_USE_CONTACT_FORM = "can_use_contact_form"
+CAN_VIEW_MESSAGES = "can_view_messages"
 
 
 def get_menu_items():
@@ -26,6 +30,7 @@ def get_permissions():
     :return: a list of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_view_contact_form", GUEST, "Can view the contact form"),
-        ("can_use_contact_form", GUEST, "Can use the contact form"),
+        (CAN_VIEW_CONTACT_INFO, GUEST, "Can view the contact info"),
+        (CAN_USE_CONTACT_FORM, GUEST, "Can use the contact form to send messages"),
+        (CAN_VIEW_MESSAGES, BOARD_MEMBER, "Can view all sent messages"),
     )

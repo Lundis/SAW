@@ -1,4 +1,3 @@
-{# THIS IS ONLY A PLACEHOLDER FOR THE BUSINESS PITCH! #}
 {% extends 'base/base.html' %}
 {% load i18n %}
 
@@ -6,10 +5,7 @@
     {% trans "Contact" %}
 {%  endblock %}
 
-{% block content %}
+{% block menu %}
     {% load dynamic_menu %}
     {% display_menu "main_menu" "Contact" %}
-    <div class="container">
-        {% block inner_content %}Not yet implemented.{% endblock %}
-    </div>
 {% endblock %}
