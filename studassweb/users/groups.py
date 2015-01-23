@@ -70,7 +70,7 @@ def get_permissions_in_group(group):
     return [perm for perm in all_perms if perm.permission in perms_in_group]
 
 
-def put_user_in_default_group(user, new_group_name):
+def put_user_in_standard_group(user, new_group_name):
     """
     This function puts the user in one of the default groups
     :param new_group_name: one of the default groups

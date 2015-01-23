@@ -8,7 +8,7 @@ from studassweb.urls import urlpatterns
 from django.contrib.auth.models import AnonymousUser, User
 from users.models import UserExtension
 from users.groups import setup_default_groups
-from users.groups import put_user_in_default_group, MEMBER
+from users.groups import put_user_in_standard_group, MEMBER
 from unittest import skip
 
 from django.conf.urls import include, patterns, url
@@ -34,7 +34,7 @@ class ExamsHttpTests(TestCase):
         user_ext = UserExtension.create_for_user(self.memberuser)
         user_ext.email_verified = True
         user_ext.save()
-        put_user_in_default_group(self.memberuser, MEMBER)
+        put_user_in_standard_group(self.memberuser, MEMBER)
         self.factory = RequestFactory()
 
     def test_anonymous_can_not_add_course(self):

@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import ValidationError
 from django.utils.translation import ugettext as _
-from users.groups import put_user_in_default_group, MEMBER
+from users.groups import put_user_in_standard_group, MEMBER
 from users.models import UserExtension
 from base.models import SiteConfiguration
 
@@ -27,9 +27,9 @@ class Member(models.Model):
         self.confirmed = True
         self.applying = False
         self.save()
-        # give additional rights to user if he doesn't already have them.
+        # Give additional rights to user if he doesn't already have them.
         if not self.user_ext.user.groups.filter(name=MEMBER).exists():
-            put_user_in_default_group(self.user_ext.user, MEMBER)
+            put_user_in_standard_group(self.user_ext.user, MEMBER)
 
     def deny(self):
         self.confirmed = False

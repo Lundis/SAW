@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from members.models import Member
 from .forms import LoginForm, RegisterForm
 from .models import UserExtension
-from .groups import put_user_in_default_group, LOGGED_ON
+from .groups import put_user_in_standard_group, LOGGED_ON
 
 
 def login_view(request):
@@ -46,7 +46,7 @@ def register(request):
 
     if form.is_valid():
         user_ext = form.save()
-        put_user_in_default_group(user_ext.user, LOGGED_ON)
+        put_user_in_standard_group(user_ext.user, LOGGED_ON)
         user = authenticate(username=form.cleaned_data['user_name'],
                             password=form.cleaned_data['password'])
         login(request, user)

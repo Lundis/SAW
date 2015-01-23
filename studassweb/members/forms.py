@@ -1,6 +1,6 @@
 from django import forms
 from .models import Member, PaymentPurpose
-from users.groups import GROUP_CHOICES, get_user_group, put_user_in_default_group
+from users.groups import GROUP_CHOICES, get_user_group, put_user_in_standard_group
 from django.utils.translation import ugettext as _
 
 
@@ -46,7 +46,7 @@ class MemberEditForm(forms.ModelForm):
         # update permissions if this user
         if instance.user_ext is not None:
             user = instance.user_ext.user
-            put_user_in_default_group(user, self.cleaned_data['group'])
+            put_user_in_standard_group(user, self.cleaned_data['group'])
             if commit:
                 user.save()
         return instance
