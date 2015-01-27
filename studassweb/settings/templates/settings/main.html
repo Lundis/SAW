@@ -1,0 +1,35 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}
+    {% trans "Settings" %}
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/settings/settings.css" %}" />
+{% endblock %}
+
+{% block menu %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Settings" %}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            {% for section in sections %}
+                <div class="col-xs-6 col-sm-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            {{ section.title }}
+                        </div>
+                        <div class="panel-body">
+                            {{ section.description }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
