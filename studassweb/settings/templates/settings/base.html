@@ -1,4 +1,4 @@
-{% extends 'base/base.html' %}
+{% extends 'base/base_full_width.html' %}
 {% load i18n %}
 {% load static %}
 
@@ -15,14 +15,6 @@
     {% display_menu "main_menu" "Settings" %}
 {% endblock %}
 
-{% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-9 col-md-10">
-                {% block inner_content %}
-                    <h3>{% trans "Welcome to the settings page. Choose a category in the menu to the left." %}</h3>
-                {% endblock %}
-            </div>
-        </div>
-    </div>
+{% block breadcrumb1 %}
+    <li><a href="{% url "settings_main" %}">{% trans "Settings" %}</a></li>
 {% endblock %}

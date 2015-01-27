@@ -1,4 +1,4 @@
-{% extends "base/base.html" %}
+{% extends "settings/base.html" %}
 {% load i18n %}
 {% load static %}
 
@@ -16,20 +16,25 @@
 {% endblock %}
 
 {% block main_content %}
-    <h1>{% trans "Choose an item from the list to the right" %}</h1>
-{% endblock %}
-
-{% block sidebar %}
-<div class="panel panel-default">
-    <div class="panel-heading">
-        {% trans section.title %}
-    </div>
-    <div class="panel-body">
+    <h1>{% trans "Choose an item!" %}</h1>
+    <div class="row">
         {% for page in section.pages %}
-            <a class="btn btn-primary btn-block" href="{{ page.url }}">
-                {{ page.title }}
-            </a>
+            <div class="col-xs-6 col-sm-4">
+                <a href="{{ page.url }}">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            {{ page.title }}
+                        </div>
+                        <div class="panel-body">
+                            {{ section.description }}
+                        </div>
+                    </div>
+                </a>
+            </div>
         {% endfor %}
     </div>
-</div>
+{% endblock %}
+
+{% block breadcrumb2 %}
+    <li class="active">{{ section.title }}</li>
 {% endblock %}
