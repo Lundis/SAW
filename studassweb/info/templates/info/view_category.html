@@ -2,10 +2,13 @@
 {% load i18n %}
 {% load sawp %}
 
+{% block breadcrumb2 %}
+    <li class="active">
+        {{ category.name }}
+    </li>
+{% endblock %}
+
 {% block main_content %}
-    {% load navigator %}
-    {% url "info.views.main" as info_url %}
-    {% display_navigator info_url "Info" category.get_absolute_url category.name %}
     <h1>{{ category.name }}</h1>
     {% if category.pages %}
         <div class="list-group">

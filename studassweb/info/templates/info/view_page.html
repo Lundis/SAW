@@ -2,10 +2,21 @@
 {% load sawp %}
 {% load i18n %}
 
+{% block breadcrumb2 %}
+    <li>
+        <a href="{{ category.get_absolute_url }}">
+            {{ category.name }}
+        </a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb3 %}
+    <li class="active">
+        {{ page.title }}
+    </li>
+{% endblock %}
+
 {% block main_content %}
-    {% load navigator %}
-    {% url "info.views.main" as info_url %}
-    {% display_navigator info_url "Info" category.get_absolute_url category.name page.get_absolute_url page.title %}
     <div class="container">
         <div class="row">
             <h1>{{ page.title }}</h1>
