@@ -8,7 +8,7 @@ from .groups import group_names, get_permissions_in_group
 from .register import EDIT_LOGIN_SETTINGS, EDIT_PROFILE, EDIT_PERMISSIONS
 from .forms import UserBaseForm, ProfileForm
 from .models import UserExtension
-from settings.sections import SECTION_PERSONAL_SETTINGS, SECTION_USERS
+from settings.sections import SECTION_PERSONAL_SETTINGS, SECTION_USERS, Section
 
 urlpatterns = patterns('',
     url(r'^%s/permissions/$' % SECTION_USERS,
@@ -25,16 +25,20 @@ urlpatterns = patterns('',
 
 @has_permission(EDIT_PERMISSIONS)
 def edit_permissions(request):
+    section = Section.get_section(SECTION_USERS)
     groups = Group.objects.filter(name__in=group_names)
     group_list = []
     for group in groups:
         group_list += [{'name': group,
                         'permissions': get_permissions_in_group(group)}]
-    return render(request, "users/permission_settings.html", {'groups': group_list})
+    context = {'section': section,
+               'groups': group_list}
+    return render(request, "users/permission_settings.html", context)
 
 
 @has_permission(EDIT_PROFILE)
 def edit_user(request):
+    section = Section.get_section(SECTION_PERSONAL_SETTINGS)
     user = request.user
     user_ext = UserExtension.objects.get(user=user)
 
@@ -45,11 +49,14 @@ def edit_user(request):
         profile_form.save()
         return HttpResponseRedirect(reverse("users_view_profile", kwargs={"username":user.username}))
     context = {'user_form': user_form,
-               'profile_form': profile_form}
+               'profile_form': profile_form,
+               'section': section}
     return render(request, "users/user_settings.html", context)
 
 
 @has_permission(EDIT_LOGIN_SETTINGS)
 def edit_login(request):
-    return render(request, "users/login_settings.html", {})
+    section = Section.get_section(SECTION_USERS)
+    context = {'section': section}
+    return render(request, "users/login_settings.html", context)
 
