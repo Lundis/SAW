@@ -9,14 +9,25 @@
     {% url "contact_home" as contact_url %}
     {% display_navigator contact_url "Contact" "#" "View messages" %}
     <h1>{% trans "View messages" %}</h1>
-    <div class="list-group">
+    <dl class="dl-horizontal">
 
         {% for message in msgs %}
-            {{ message.title }} : {{ message.message }} TODO format this and show all fields, also add delete button
+            <dt>{% trans "Date:" %}</dt>
+            <dl>{{ message.date_and_time }}</dl>
+
+            <dt>{% trans "From (name):" %}</dt>
+            <dl>{{ message.from_person }}</dl>
+
+            <dt>{% trans "From (email):" %}</dt>
+            <dl>{{ message.from_email }}</dl>
+
+            <dt>{% trans "Message:" %}</dt>
+            <dl>{{ message.message }}</dl>
+
         {% empty %}
             <p>{% trans "No messages found!" %}</p>
         {% endfor %}
-    </div>
+    </dl>
 {% endblock %}
 {% block sidebar %}
     {% has_perm "contact" "CAN_VIEW_CONTACT_INFO" as can_view_contact_info %}
