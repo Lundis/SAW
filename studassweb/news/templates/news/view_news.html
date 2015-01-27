@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load sawp %}
 {% load navigator %}
+{% load thumbnail %}
 
 {% block main_content %}
     {% url "news_home" as news_url %}
@@ -58,7 +59,7 @@
                 <div class="row inherit-padding-left-right">
                     {% if article.picture %}
                         <div class="pull-left news-picture">
-                            <img src="{{ article.picture.url }}" class="img-responsive img-rounded" />
+                            <img src="{% thumbnail article.picture 80x80 crop=scale %}" class="img-responsive img-rounded" />
                         </div>
                     {% endif %}
                     <div class="pull-left inherit-padding-left-right">

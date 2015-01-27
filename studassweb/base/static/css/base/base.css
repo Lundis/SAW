@@ -44,3 +44,7 @@ body {
     text-align: center;
 }
 
+.inherit-padding-left-right {
+    padding-left:inherit;
+    padding-right:inherit;
+}

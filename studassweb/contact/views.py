@@ -49,3 +49,22 @@ def read_messages(request):
     msgs = Message.objects.filter().order_by('-date_and_time')
 
     return render(request, "contact/view_messages.html",{'msgs': msgs,})
+
+
+def delete_message(request, message_id):
+    if request.method == 'POST':
+        try:
+            msg = Message.objects.get(id=message_id)
+            if permissions.has_user_perm(request.user, CAN_VIEW_MESSAGES):
+                title = msg.title
+                msg.delete()
+                messages.success(request, "Message \""+title+"\" was sucessfully deleted!")
+                return HttpResponseRedirect(reverse("contact_read_messages"))
+            else:
+                logger.warning('User %s tried to delete message %s', request.user, message_id)
+                return HttpResponseForbidden('You don\'t have permission to remove this!')
+        except Message.DoesNotExist:
+            return HttpResponseNotFound('No such message!')
+    else:
+            logger.warning('Attempted to access delete_message via GET')
+            return HttpResponseNotAllowed(['POST', ])
