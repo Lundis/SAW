@@ -9,3 +9,7 @@
     {% load dynamic_menu %}
     {% display_menu "main_menu" "Exams" %}
 {% endblock %}
+
+{% block breadcrumb1 %}
+    <li><a href="{% url "exams_main" %}">{% trans "Exams" %}</a></li>
+{% endblock %}

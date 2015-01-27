@@ -3,10 +3,21 @@
 {% load i18n %}
 {% load thumbnail %}
 
+{% block breadcrumb2 %}
+    <li>
+        <a href="{{ exam.course_id.get_absolute_url }}">
+        {{ exam.course_id.name }}
+        </a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb3 %}
+    <li class="active">
+        {{ exam.exam_date |date:"Y-m-d"}}
+    </li>
+{% endblock %}
+
 {% block main_content %}
-    {% load navigator %}
-    {% url "exams.views.main" as exams_url %}
-    {% display_navigator exams_url "Exams" exam.course_id.get_absolute_url exam.course_id exam.get_absolute_url exam %}
     <h1>Exam</h1>
     <ul class="list-group">
         <li class="list-group-item">

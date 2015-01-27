@@ -3,15 +3,17 @@
 {% load i18n %}
 {% load bootstrap3 %}
 
+{% block breadcrumb2 %}
+    <li class="active">
+        {% if form.instance.pk %}
+            {% trans "Editing" %} {{ form.instance }}
+        {% else %}
+            {% trans "New Examinator" %}
+        {% endif %}
+    </li>
+{% endblock %}
 
 {% block main_content %}
-    {% load navigator %}
-    {% url "exams.views.main" as exams_url %}
-    {% if form.instance.pk %}
-        {% display_navigator exams_url "Exams" form.instance.get_absolute_url form.instance.name%}
-    {% else %}
-        {% display_navigator exams_url "Exams" "#" "New examinator" %}
-    {% endif %}
     {% if form.instance.pk %}
         <h1>Edit {{ form.instance.name }}</h1>
     {% else %}

@@ -3,10 +3,13 @@
 {% load i18n %}
 {% load bootstrap3 %}
 
+{% block breadcrumb2 %}
+    <li class="active">
+        {{ course.name }}
+    </li>
+{% endblock %}
+
 {% block main_content %}
-    {% load navigator %}
-    {% url "exams.views.main" as exams_url %}
-    {% display_navigator exams_url "Exams" course.get_absolute_url course.name%}
     <h1>{{ course.name }}</h1>
     <div class="list-group">
 

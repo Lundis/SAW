@@ -2,10 +2,12 @@
 
 {% load i18n %}
 
+
+{% block breadcrumb1 %}
+    <li class="active">{% trans "Exams" %}</li>
+{% endblock %}
+
 {% block main_content %}
-    {% load navigator %}
-    {% url "exams.views.main" as exams_url %}
-    {% display_navigator exams_url "Exams" %}
     <h3>Courses</h3>
     <div class="list-group">
         {% for course in courses %}
