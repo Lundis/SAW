@@ -199,3 +199,7 @@ MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
                 message_constants.SUCCESS: 'success',
                 message_constants.WARNING: 'warning',
                 message_constants.ERROR: 'danger',}
+
+PRINT_EMAIL_TO_CONSOLE = True
+if PRINT_EMAIL_TO_CONSOLE:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

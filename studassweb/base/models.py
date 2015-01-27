@@ -92,6 +92,7 @@ THEME_DEFAULT_CSS_MOD = "css/themes/bootstrap-theme.min.css"
 
 class SiteConfiguration(SingletonModel):
     association_name = models.CharField(max_length=100, default='Site name')
+    association_contact_email = models.EmailField(max_length=254, default='example@example.com')
     association_founded = models.IntegerField(default=1900)
     # main bootstrap theme css file
     bootstrap_theme_url = models.CharField(max_length=200, default=THEME_DEFAULT_CSS)
