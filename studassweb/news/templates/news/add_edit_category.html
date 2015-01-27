@@ -2,15 +2,19 @@
 {% load i18n %}
 {% load bootstrap3 %}
 
+{% block breadcrumb2 %}
+    <li class="active">
+        {% if category %}
+            {% trans "Editing" %} {{ category.name }}
+        {% else %}
+            {% trans "New Category" %}
+        {% endif %}
+    </li>
+{% endblock %}
 
 {% block main_content %}
     {% load navigator %}
     {% url "news_home" as news_url %}
-    {% if category %}
-        {% display_navigator news_url "News" category.get_absolute_url category.name %}
-    {% else %}
-        {% display_navigator news_url "News" "#" "New Category" %}
-    {% endif %}
     <form action="" method="post">
         {% csrf_token %}
         {% bootstrap_form form %}

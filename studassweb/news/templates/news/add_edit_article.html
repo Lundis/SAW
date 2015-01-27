@@ -3,14 +3,19 @@
 {% load bootstrap3 %}
 {% load sawp %}
 
+{% block breadcrumb2 %}
+    <li class="active">
+        {% if article %}
+            {% trans "Editing" %} {{ article.title }}
+        {% else %}
+            {% trans "New Article" %}
+        {% endif %}
+    </li>
+{% endblock %}
+
 {% block main_content %}
     {% load navigator %}
     {% url "news_home" as news_url %}
-    {% if article %}
-        {% display_navigator news_url "News" article.get_absolute_url article.title %}
-    {% else %}
-        {% display_navigator news_url "News" "#" "New Article" %}
-    {% endif %}
     <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.media }}

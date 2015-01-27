@@ -6,6 +6,9 @@
     {{ article.title }}
 {% endblock %}
 
+{% block breadcrumb2 %}
+    <li class="active">{{ article.title }}</li>
+{% endblock %}
 {% block main_content %}
     <h2>{{ article.title }}</h2>
     <div>{{ article.text | safe }}</div>
