@@ -6,6 +6,9 @@ from .models import Message
 from .register import CAN_VIEW_CONTACT_INFO, CAN_USE_CONTACT_FORM, CAN_VIEW_MESSAGES
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from django.core.mail import send_mail, BadHeaderError
+from django.utils.translation import ugettext
+from base.models import SiteConfiguration
 import logging
 
 logger = logging.getLogger(__name__)
@@ -33,6 +36,17 @@ def write_message(request):
             temp = form.save(commit=False)
             temp.from_person = request.user
             temp.save()
+
+            try:
+                send_mail(
+                    ugettext("Site message from ")+" \"" + str(temp.from_person) +
+                    "\" Title: " + form.cleaned_data['title'], form.cleaned_data['message'],
+                    form.cleaned_data['from_email'], [SiteConfiguration.instance().association_contact_email])
+
+            except BadHeaderError:
+                messages.error(request, "Bad header, message not sent!")
+                return HttpResponseRedirect(reverse("contact_write_message"))
+
             messages.success(request,"Message succesfully sent!")
             return HttpResponseRedirect(reverse("contact_write_message"))
 

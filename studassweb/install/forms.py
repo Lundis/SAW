@@ -10,11 +10,13 @@ import datetime
 
 class AssociationForm(forms.Form):
     name = forms.CharField(label=_('Association name'))
+    contact_email = forms.EmailField(label=_('Association contact email'))
     founded = forms.IntegerField(label=_('Founded year'), min_value=0, max_value=datetime.datetime.now().year)
 
     def __init__(self, *args, **kwargs):
         super(AssociationForm, self).__init__(*args, **kwargs)
         self.fields['name'].initial = SiteConfiguration.instance().association_name
+        self.fields['contact_email'].initial = SiteConfiguration.instance().association_contact_email
         self.fields['founded'].initial = SiteConfiguration.founded()
 
     def clean(self):
@@ -29,6 +31,7 @@ class AssociationForm(forms.Form):
         """
         site_config = SiteConfiguration.instance()
         site_config.association_name = self.cleaned_data['name']
+        site_config.association_contact_email = self.cleaned_data['contact_email']
         site_config.association_founded = self.cleaned_data['founded']
         site_config.save()
 
