@@ -1,3 +1,5 @@
 from django.contrib import admin
+from solo.admin import SingletonModelAdmin
+from .models import InstallProgress
 
-# Register your models here.
+admin.site.register(InstallProgress, SingletonModelAdmin)

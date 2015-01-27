@@ -17,14 +17,12 @@ if settings.MEDIA_DJANGO:
 
 
 if not InstallProgress.is_finished():
-    urlpatterns += (
-        url(r'^install/', include("install.urls")),
-        url(r'^$', "install.views.welcome"),
-    )
-    for pat in urlpatterns:
-        print(pat)
-else:
-    for mod, url_func in get_modules_with("register", "get_urls"):
-        if DisabledModule.is_enabled(mod):
-            for url_pattern in url_func():
-                urlpatterns += (url(url_pattern, include(mod + ".urls")),)
+    # Disable all modules to make sure that the pages aren't accessed before installed
+    for module in settings.OPTIONAL_APPS:
+        DisabledModule.disable(module)
+
+# Add the urlpatterns of all modules
+for mod, url_func in get_modules_with("register", "get_urls"):
+    if DisabledModule.is_enabled(mod):
+        for url_pattern in url_func():
+            urlpatterns += (url(url_pattern, include(mod + ".urls")),)

@@ -1,5 +1,6 @@
 from django.core.urlresolvers import reverse
 from base.utils import get_modules_with
+from base.models import DisabledModule
 from users.permissions import has_user_perm
 
 
@@ -22,13 +23,6 @@ class Section:
                 return True
         return False
 
-    def pages(self):
-        """
-        Returns the pages in this section
-        :return:
-        """
-        return self.pages
-
     def populate(self, pages):
         self.pages = Page.filter_for_section(pages, self.id)
 
@@ -42,7 +36,7 @@ class Section:
         existing_ids = [obj.id for obj in sections]
         for mod, section_func in mod_funcs:
             section = section_func()
-            if section.id not in existing_ids:
+            if section.id not in existing_ids and DisabledModule.is_enabled(mod):
                 sections += (section,)
                 existing_ids.append(section.id)
         return sections
@@ -82,13 +76,15 @@ class Page:
         pages = ()
         mod_funcs = get_modules_with("register", "register_settings_pages")
         for mod, func in mod_funcs:
-            pages_from_mod = func()
-            pages += pages_from_mod
+            if DisabledModule.is_enabled(mod):
+                pages_from_mod = func()
+                pages += pages_from_mod
         return pages
 
     @staticmethod
     def filter_for_section(pages, section_id):
         return [p for p in pages if p.section_id == section_id]
+
 
 SECTION_PERSONAL_SETTINGS = "personal"
 SECTION_APPEARANCE = "appearance"
