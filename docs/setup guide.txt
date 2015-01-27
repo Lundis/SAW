@@ -7,13 +7,13 @@ If you're running Windows 7 or earlier, you need to restart the computer now.
 Other OSs: pip might not be installed along with Python. You then need to install it manually using some OS-specific method
 
 
-===== Install Django 1.7.3 =====
+===== Install Django 1.7.4 =====
 
 After installing python 3.4 and pip (comes bundled with it on windows):
-    > pip install django==1.7.3
+    > pip install django==1.7.4
 
 To upgrade from a previous version, run:
-    > pip install django==1.7.3 --upgrade
+    > pip install django==1.7.4 --upgrade
 
 ===== Install Dependencies =====
 
