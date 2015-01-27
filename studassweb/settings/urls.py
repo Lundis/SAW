@@ -1,7 +1,8 @@
 from django.conf.urls import patterns, url, include
 from menu.models import Menu
 urlpatterns = patterns('',
-    url(r'^$', 'settings.views.main', name='settings_main'),
+    url(r'^$', 'settings.views.view_sections', name='settings_main'),
+    url(r'^$', 'settings.views.view_section', name='settings_view_section'),
 )
 
 # Here comes the tricky part. We will get the possible settings URLs by looking at the URLs of the menu items.
