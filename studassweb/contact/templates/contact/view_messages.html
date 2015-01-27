@@ -9,25 +9,45 @@
     {% url "contact_home" as contact_url %}
     {% display_navigator contact_url "Contact" "#" "View messages" %}
     <h1>{% trans "View messages" %}</h1>
-    <dl class="dl-horizontal">
-
+    <div>
         {% for message in msgs %}
-            <dt>{% trans "Date:" %}</dt>
-            <dl>{{ message.date_and_time }}</dl>
-
-            <dt>{% trans "From (name):" %}</dt>
-            <dl>{{ message.from_person }}</dl>
-
-            <dt>{% trans "From (email):" %}</dt>
-            <dl>{{ message.from_email }}</dl>
-
-            <dt>{% trans "Message:" %}</dt>
-            <dl>{{ message.message }}</dl>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row inherit-padding-left-right">
+                        <div class="pull-left inherit-padding-left-right">
+                            <h4>
+                                {{ message.title }}
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {{ message.message}}
+                    <form action="{% url 'contact_delete_message' message.id %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
+                        {% csrf_token %}
+                        {% buttons %}
+                            <button type="submit" class="pull-right btn btn-danger">
+                                {% trans "Delete this message" %}
+                            </button>
+                        {% endbuttons %}
+                    </form>
+                </div>
+                <div class="panel-footer">
+                    <div class="row inherit-padding-left-right">
+                        <div class="pull-left">
+                            {% trans "From" %} {{ message.from_person }} {{ message.from_email }}
+                        </div>
+                        <div class="pull-right text-right">
+                            {{ message.date_and_time }}
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         {% empty %}
             <p>{% trans "No messages found!" %}</p>
         {% endfor %}
-    </dl>
+    </div>
 {% endblock %}
 {% block sidebar %}
     {% has_perm "contact" "CAN_VIEW_CONTACT_INFO" as can_view_contact_info %}
