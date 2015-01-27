@@ -4,13 +4,20 @@
 {% load navigator %}
 {% load thumbnail %}
 
-{% block main_content %}
-    {% url "news_home" as news_url %}
+{% block breadcrumb2 %}
     {% if category %}
-        {% display_navigator news_url "News" category.get_absolute_url category.name %}
-    {% else %}
-        {% display_navigator news_url "News" %}
+        <li class="active">{{ category.name }}</li>
     {% endif %}
+{% endblock %}
+{% block breadcrumb1 %}
+    {% if category %}
+        <li class="active"><a href="{% url "news_home" %}">{% trans "News" %}</a></li>
+    {% else %}
+        <li class="active">{% trans "News" %}</li>
+    {% endif %}
+{% endblock %}
+
+{% block main_content %}
 
     {% if paginator.num_pages > 0 %}
         <nav>

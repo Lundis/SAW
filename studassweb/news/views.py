@@ -18,6 +18,7 @@ ARTICLES_PER_PAGE = 10
 
 
 def home(request, page=1, category_name=None):
+    context = {}
     category = None
     if not isinstance(page, int):
         try:
@@ -31,9 +32,10 @@ def home(request, page=1, category_name=None):
             articles = category.article_set.all()
         except Category.DoesNotExist:
             raise Http404(_("The category does not exist!"))
-    if not category:
+    if category is None:
         articles = Article.objects.all()
-        category = None
+    else:
+        context['category'] = category
     if request.GET.get('year', None) is not None:
         try:
             year = int(request.GET['year'])
@@ -55,11 +57,10 @@ def home(request, page=1, category_name=None):
     paginator = Paginator(articles, ARTICLES_PER_PAGE)
     current_page = paginator.page(page)
     categories = Category.objects.all()
-    context = {'articles': current_page.object_list,
-               'categories': categories,
-               'category': category,
-               'page': current_page,
-               'paginator': paginator}
+    context['articles'] = current_page.object_list,
+    context['categories'] = categories,
+    context['page'] = current_page,
+    context['paginator'] = paginator
     return render(request, "news/view_news.html", context)
 
 

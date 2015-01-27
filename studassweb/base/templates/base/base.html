@@ -39,6 +39,15 @@
             <div class="container">
                 <div class="row">
                     <div class="col-sm-8 col-md-9">
+                        {% block breadcrumb %}
+                            <ol class="breadcrumb">
+                                {% block breadcrumb1 %}{% endblock %}
+                                {% block breadcrumb2 %}{% endblock %}
+                                {% block breadcrumb3 %}{% endblock %}
+                                {% block breadcrumb4 %}{% endblock %}
+                                {% block breadcrumb5 %}{% endblock %}
+                            </ol>
+                        {% endblock %}
                         {% block  main_content %}
                         {% endblock main_content %}
                     </div>
