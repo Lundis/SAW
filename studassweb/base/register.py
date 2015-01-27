@@ -1,6 +1,6 @@
+from django.core.urlresolvers import reverse_lazy
 from users.groups import GUEST, BOARD_MEMBER, LOGGED_ON, WEBMASTER
-from menu.models import MenuItem
-from users.models import SAWPermission
+from settings.sections import Page, SECTION_APPEARANCE
 
 VIEW_PUBLIC_COMMENTS = "can_view_public_comments"
 VIEW_MEMBER_COMMENTS = "can_view_member_comments"
@@ -22,9 +22,10 @@ def get_permissions():
     )
 
 
-def get_settings_items():
-    item, created = MenuItem.get_or_create(__package__,
-                                           'Theme',
-                                           reverse_string='base_settings_edit_theme',
-                                           permission=SAWPermission.get_or_create(EDIT_THEME))
-    return [item]
+def register_settings_pages():
+    theme_editor = Page("Theme editor",
+                        "Change the overall looks of the site",
+                        SECTION_APPEARANCE,
+                        reverse_lazy('base_settings_edit_theme'),
+                        EDIT_THEME)
+    return theme_editor,

@@ -1,21 +1,15 @@
 from django.conf.urls import patterns, url, include
-from menu.models import Menu
+from base.utils import get_modules_with
+
 urlpatterns = patterns('',
     url(r'^$', 'settings.views.view_sections', name='settings_main'),
     url(r'^(?P<section_id>[a-zA-Z_]+)$', 'settings.views.view_section', name='settings_view_section'),
 )
 
-# Here comes the tricky part. We will get the possible settings URLs by looking at the URLs of the menu items.
-
-# At this point the settings menu has been set up. If not, something is very wrong and this will fail.
-modules = ()
-for menu_item in Menu.get("settings_menu").items():
-    module = menu_item.app_name
-    # Make sure that we only add each module once.
-    if module not in modules:
-        pattern = ""
+# link all modules that have registered settings pages
+for module, get_pages in get_modules_with("register", "register_settings_pages"):
+    if len(get_pages()) > 0:
         settings_url = module + ".settings_pages"
         urlpatterns += (
-            url(pattern, include(settings_url)),
+            url(r'', include(settings_url)),
         )
-        modules += (module,)

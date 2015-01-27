@@ -67,8 +67,9 @@ class Section:
 
 class Page:
 
-    def __init__(self, title, section_id, url, permission):
+    def __init__(self, title, description, section_id, url, permission):
         self.title = title
+        self.description = description
         self.section_id = section_id
         self.url = url
         self.permission = permission

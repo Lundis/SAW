@@ -33,14 +33,17 @@ def get_permissions():
 
 def register_settings_pages():
     profile = Page("Personal Settings",
+                   "Edit your contact details and other personal information",
                    SECTION_PERSONAL_SETTINGS,
                    reverse_lazy("users_settings_edit_user"),
                    EDIT_PROFILE)
     permissions = Page("Groups and Permissions",
+                       "Change which groups have which permissions",
                        SECTION_USERS,
                        reverse_lazy("users_settings_edit_permissions"),
                        EDIT_PERMISSIONS)
-    login = Page("User settings",
+    login = Page("Login settings",
+                 "Change how users can log in",
                  SECTION_USERS,
                  reverse_lazy("users_settings_edit_login"),
                  EDIT_LOGIN_SETTINGS)
