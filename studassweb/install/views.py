@@ -11,7 +11,6 @@ from menu.setup import setup_menu_module
 from .models import InstallProgress
 from users.decorators import has_permission
 from users.groups import setup_default_groups
-from settings.setup import setup_settings
 from .register import CAN_INSTALL
 import logging
 
@@ -53,8 +52,6 @@ def modules(request):
         form.apply()
         InstallProgress.modules_set()
         MenuItem.remove_disabled_items()
-        # create settings menu
-        setup_settings()
         logger.info('In modules, redirecting to menu')
         return HttpResponseRedirect('menu')
 

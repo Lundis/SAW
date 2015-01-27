@@ -1,0 +1,35 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}
+    {% trans "Settings" %} - {% trans section.title %}
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/settings/settings.css" %}" />
+{% endblock %}
+
+{% block menu %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Settings" %}
+{% endblock %}
+
+{% block main_content %}
+    <h1>{% trans "Choose an item from the list to the right" %}</h1>
+{% endblock %}
+
+{% block sidebar %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        {% trans section.title %}
+    </div>
+    <div class="panel-body">
+        {% for page in section.pages %}
+            <a class="btn btn-primary btn-block" href="{{ page.url }}">
+                {{ page.title }}
+            </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

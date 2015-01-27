@@ -18,16 +18,21 @@
 {% block content %}
     <div class="container">
         <div class="row">
+            <h1>{% trans "Choose a category" %}</h1>
+        </div>
+        <div class="row">
             {% for section in sections %}
                 <div class="col-xs-6 col-sm-4">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            {{ section.title }}
+                    <a href="{{ section.get_absolute_url }}">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                {{ section.title }}
+                            </div>
+                            <div class="panel-body">
+                                {{ section.description }}
+                            </div>
                         </div>
-                        <div class="panel-body">
-                            {{ section.description }}
-                        </div>
-                    </div>
+                    </a>
                 </div>
             {% endfor %}
         </div>

@@ -1,6 +1,8 @@
+from django.core.urlresolvers import reverse_lazy
 from users.groups import MEMBER, LOGGED_ON, WEBMASTER
 from menu.models import MenuItem
 from users.models import SAWPermission
+from settings.sections import Page, SECTION_PERSONAL_SETTINGS, SECTION_USERS
 
 
 def get_urls():
@@ -29,19 +31,17 @@ def get_permissions():
     )
 
 
-def get_settings_items():
-    profile, created = MenuItem.get_or_create(__package__,
-                                              "User",
-                                              reverse_string="users_settings_edit_user",
-                                              permission=SAWPermission.get_or_create(EDIT_PROFILE))
-    permissions, created = MenuItem.get_or_create(__package__,
-                                                  "Permissions",
-                                                  reverse_string="users_settings_edit_permissions",
-                                                  permission=SAWPermission.get_or_create(EDIT_PERMISSIONS))
-    login, created = MenuItem.get_or_create(__package__,
-                                            "Login",
-                                            reverse_string="users_settings_edit_login",
-                                            permission=SAWPermission.get_or_create(EDIT_LOGIN_SETTINGS))
-    return [profile, permissions, login]
-
-
+def register_settings_pages():
+    profile = Page("Personal Settings",
+                   SECTION_PERSONAL_SETTINGS,
+                   reverse_lazy("users_settings_edit_user"),
+                   EDIT_PROFILE)
+    permissions = Page("Groups and Permissions",
+                       SECTION_USERS,
+                       reverse_lazy("users_settings_edit_permissions"),
+                       EDIT_PERMISSIONS)
+    login = Page("User settings",
+                 SECTION_USERS,
+                 reverse_lazy("users_settings_edit_login"),
+                 EDIT_LOGIN_SETTINGS)
+    return profile, permissions, login

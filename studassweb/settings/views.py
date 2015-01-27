@@ -4,10 +4,6 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from .sections import Section
 
-@login_required()
-def main(request):
-    return render(request, "settings/base.html")
-
 
 @login_required()
 def view_sections(request):
@@ -21,6 +17,7 @@ def view_sections(request):
 
 
 @login_required()
-def view_section(request, section):
+def view_section(request, section_id):
+    section = Section.get_section(section_id)
     context = {'section': section}
     return render(request, "settings/view_section.html", context)

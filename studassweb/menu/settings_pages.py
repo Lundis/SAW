@@ -8,38 +8,39 @@ from .register import EDIT_MENUS
 from .forms import MenuForm, MenuCreationForm, MenuItemForm, MainMenuForm
 from .models import MainMenuSettings
 from base.forms import ConfirmationForm
+from settings.sections import SECTION_MENU, SECTION_APPEARANCE
 
 
 urlpatterns = patterns('',
-    url(r'^$',
+    url(r'^%s/select_menu$' % SECTION_MENU,
         'menu.settings_pages.select_menu',
         name='menu_settings_select_menu'),
 
-    url(r'^edit_menu_item/(?P<item_id>\d+)$',
+    url(r'^%s/edit_menu_item/(?P<item_id>\d+)$' % SECTION_MENU,
         'menu.settings_pages.edit_menu_item',
         name='menu_settings_edit_menu_item'),
 
-    url(r'^new_menu_item$',
+    url(r'^%s/new_menu_item$' % SECTION_MENU,
         'menu.settings_pages.edit_menu_item',
         name='menu_settings_new_menu_item'),
 
-    url(r'^delete_menu_item/(?P<item_id>\d+)$',
+    url(r'^%s/delete_menu_item/(?P<item_id>\d+)$' % SECTION_MENU,
         'menu.settings_pages.delete_menu_item',
         name='menu_settings_delete_menu_item'),
 
-    url(r'^new_menu$',
+    url(r'^%s/new_menu$' % SECTION_MENU,
         'menu.settings_pages.new_menu',
         name='menu_settings_new_menu'),
 
-    url(r'^delete_menu/(?P<menu_id>\d+)$',
+    url(r'^%s/delete_menu/(?P<menu_id>\d+)$' % SECTION_MENU,
         'menu.settings_pages.delete_menu',
         name='menu_settings_delete_menu'),
 
-    url(r'^edit/(?P<menu_id>\d+)$',
+    url(r'^%s/edit_menu/(?P<menu_id>\d+)$' % SECTION_MENU,
         'menu.settings_pages.edit_menu',
         name='menu_settings_edit_menu'),
 
-    url(r'^edit_layout$',
+    url(r'^%s/edit_layout$' % SECTION_APPEARANCE,
         'menu.settings_pages.edit_menu_layout',
         name='menu_settings_edit_menu_layout')
 )

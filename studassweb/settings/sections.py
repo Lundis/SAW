@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from base.utils import get_modules_with
 from users.permissions import has_user_perm
 
@@ -30,6 +31,9 @@ class Section:
 
     def populate(self, pages):
         self.pages = Page.filter_for_section(pages, self.id)
+
+    def get_absolute_url(self):
+        return reverse("settings_view_section", kwargs={'section_id': self.id})
 
     @staticmethod
     def _get_sections():
@@ -78,20 +82,26 @@ class Page:
         mod_funcs = get_modules_with("register", "register_settings_pages")
         for mod, func in mod_funcs:
             pages_from_mod = func()
-            pages += (pages_from_mod,)
+            pages += pages_from_mod
         return pages
 
     @staticmethod
-    def filter_for_section(pages, section):
-        return [p for p in pages if p.section_id == section.id]
+    def filter_for_section(pages, section_id):
+        return [p for p in pages if p.section_id == section_id]
 
 SECTION_PERSONAL_SETTINGS = "personal"
-SECTION_LAYOUT = "layout"
+SECTION_APPEARANCE = "appearance"
 SECTION_ADVANCED = "advanced"
+SECTION_OTHER = "other"
+SECTION_MENU = "menu"
+SECTION_USERS = "users"
 
 STANDARD_SECTIONS = (
     Section(SECTION_PERSONAL_SETTINGS, "Personal", "Personal settings"),
-    Section(SECTION_LAYOUT, "Theme and Layout", "Personal settings"),
-    Section(SECTION_ADVANCED, "Advanced", "Personal settings"),
+    Section(SECTION_APPEARANCE, "Appearance", "Customize the visuals of the site"),
+    Section(SECTION_MENU, "Menus", "Add, delete or change the order of items in any menu on the site"),
+    Section(SECTION_USERS, "Users", "Login, Group and permission settings"),
+    Section(SECTION_ADVANCED, "Advanced", "Settings that you rarely need"),
+    Section(SECTION_OTHER, "Other settings", "The things that don't fit anywhere else"),
 )
 

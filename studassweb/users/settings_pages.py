@@ -8,11 +8,18 @@ from .groups import group_names, get_permissions_in_group
 from .register import EDIT_LOGIN_SETTINGS, EDIT_PROFILE, EDIT_PERMISSIONS
 from .forms import UserBaseForm, ProfileForm
 from .models import UserExtension
+from settings.sections import SECTION_PERSONAL_SETTINGS, SECTION_USERS
 
 urlpatterns = patterns('',
-    url(r'^permissions/$', 'users.settings_pages.edit_permissions', name='users_settings_edit_permissions'),
-    url(r'^user/$',        'users.settings_pages.edit_user',        name='users_settings_edit_user'),
-    url(r'^login/$',       'users.settings_pages.edit_login',       name='users_settings_edit_login'),
+    url(r'^%s/permissions/$' % SECTION_USERS,
+        'users.settings_pages.edit_permissions',
+        name='users_settings_edit_permissions'),
+    url(r'^%s/user/$' % SECTION_PERSONAL_SETTINGS,
+        'users.settings_pages.edit_user',
+        name='users_settings_edit_user'),
+    url(r'^%s/login/$' % SECTION_USERS,
+        'users.settings_pages.edit_login',
+        name='users_settings_edit_login'),
 )
 
 
