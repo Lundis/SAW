@@ -34,22 +34,35 @@
     </ul>
 {% endblock %}
 {% block sidebar %}
-    {% has_perm "polls" "CAN_CREATE_POLLS" as can_create_polls %}
-    {% if can_create_polls%}
-        <div class="panel panel-info">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Edit" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    {% if can_create_polls%}
-                        <a href="{% url 'polls_edit_poll' poll.id %}">
-                            <div class="btn list-group-item">{% trans "Edit poll" %}</div>
-                        </a>
-                    {% endif %}
+{% has_perm "polls" "CAN_CREATE_POLLS" as can_edit_polls %}
+{% has_perm "polls" "CAN_CREATE_POLLS" as can_delete_polls %}
+{% if can_edit_polls%}
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h2 class="panel-title">{% trans "Edit" %}</h2>
+        </div>
+        <div class="panel-body">
+            <div class="list-group">
+                {% if can_edit_polls%}
+                    <a href="{% url 'polls_edit_poll' poll.id %}">
+                        <div class="btn list-group-item">{% trans "Edit poll" %}</div>
+                    </a>
+                {% endif %}
 
-                </div>
             </div>
         </div>
-    {% endif %}
+    </div>
+{% endif %}
+{% if can_delete_polls %}
+    <form action="{% url 'polls_delete_poll' poll.id %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
+        {% csrf_token %}
+        {% buttons %}
+            <button type="submit" class="btn btn-danger">
+                {% trans "Remove this poll" %}
+            </button>
+        {% endbuttons %}
+    </form>
+{% endif %}
+
 {% endblock %}
+

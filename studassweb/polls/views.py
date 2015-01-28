@@ -4,8 +4,9 @@ from django.http import HttpResponseNotFound
 from polls.forms import *
 from users import permissions
 from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseRedirect, HttpResponseNotAllowed
-from .register import CAN_CREATE_POLLS
+from .register import CAN_CREATE_POLLS, CAN_DELETE_ALL_POLLS
 from django.forms.models import inlineformset_factory
+from django.contrib import messages
 import logging
 
 
@@ -14,7 +15,7 @@ logger = logging.getLogger(__name__)
 def home(request):
     all_polls = Poll.objects.filter().order_by('-publication')
     return render(request, "polls/view_main.html",
-                {'all_polls':all_polls},)
+                  {'all_polls':all_polls},)
 
 
 def view_poll(request, poll_id):
@@ -57,8 +58,24 @@ def add_poll(request):
     context = {'form': form,'choicesformset':choiceformset}
     return render(request, 'polls/add_edit_poll.html', context)
 
-def remove_poll(request,poll_id):
-    pass
+def delete_poll(request,poll_id):
+    if request.method == 'POST':
+        try:
+            poll = Poll.objects.get(id=poll_id)
+            if permissions.has_user_perm(request.user, CAN_DELETE_ALL_POLLS) or poll.created_by == request.user:
+                name = str(poll)
+
+                poll.delete()
+                messages.success(request, "Poll "+name+" was sucessfully deleted!")
+                return HttpResponseRedirect(reverse("polls_home"))
+            else:
+                logger.warning('User %s tried to delete exam %s', request.user, poll_id)
+                return HttpResponseForbidden('You don\'t have permission to remove this!')
+        except Poll.DoesNotExist:
+            return HttpResponseNotFound('No such poll!')
+    else:
+        logger.warning('Attempted to access delete_poll via GET')
+        return HttpResponseNotAllowed(['POST', ])
 
 def edit_poll(request,poll_id):
     if not permissions.has_user_perm(request.user, CAN_CREATE_POLLS):
@@ -98,6 +115,6 @@ def remove_choice(request,choice_id):
 
 
 def set_user_choice(request, choice_id=-1):
-   pass
+    pass
 
 
