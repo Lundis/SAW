@@ -32,7 +32,7 @@
         </div>
         <div class="panel-body">
             {% if category %}
-                <a href="{% url "news_delete_category" category.id %}" class="btn btn-danger">
+                <a href="{% url "news_delete_category" category_id=category.id %}" class="btn btn-danger">
                     {% trans "Delete" %}
                 </a>
             {% endif %}

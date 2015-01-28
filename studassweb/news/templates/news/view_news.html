@@ -122,7 +122,7 @@
             </a>
             {% for cat in categories %}
                 <a class="btn btn-default btn-block {% if cat.name == category.name %}active{% endif %}"
-                   href="{% url "news_home" category_name=cat.name %}">
+                   href="{{ cat.get_absolute_url }}">
                     {{ cat.name }}
                 </a>
             {% endfor %}
@@ -144,6 +144,12 @@
                    href="{% url "news_add_category" %}">
                     {% trans "Create new category" %}
                 </a>
+                {% if category %}
+                    <a class="btn btn-default btn-block"
+                       href="{% url "news_edit_category" category_id=category.id %}">
+                        {% trans "Edit Category" %}
+                    </a>
+                {% endif %}
             </div>
         </div>
     {% endif %}

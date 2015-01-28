@@ -12,7 +12,8 @@ urlpatterns = patterns('',
     url(r'^add_article$', 'news.views.edit_article', name='news_add_article'),
     url(r'^edit_article/(?P<article_id>\d+)', 'news.views.edit_article', name='news_edit_article'),
     url(r'^delete_article/(?P<article_id>\d+)$', 'news.views.delete_article', name='news_delete_article'),
-    url(r'^category/(?P<category_id>\d+)$', 'news.views.home', name='news_view_category'),
     url(r'^add_category$', 'news.views.edit_category', name='news_add_category'),
     url(r'^edit_category/(?P<category_id>\d+)$', 'news.views.edit_category', name='news_edit_category'),
+    url(r'^delete_category/(?P<category_id>\d+)$', 'news.views.delete_category', name='news_delete_category'),
+
 )

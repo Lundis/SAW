@@ -23,12 +23,12 @@ class Poll(models.Model):
     expiration = models.DateTimeField('Poll closes')
     created_by = models.ForeignKey(User)
 
-    permission = models.CharField(max_length=15, choices=PERMISSION_CHOICES, default="VIEW_PUBLIC")
+    permission = models.CharField(max_length=30, choices=PERMISSION_CHOICES, default="CAN_VIEW_PUBLIC_POLLS")
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse("polls.views.view_polls", kwargs={'poll_id': self.id})
+        return reverse("polls_view_poll", kwargs={'poll_id': self.id})
 
 
     def can_view(self, user):

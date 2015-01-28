@@ -1,7 +1,9 @@
 {% load i18n %}
 {% load static %}
 {% load solo_tags %}
+{% load setvar %}
 {% get_solo 'base.SiteConfiguration' as site_config %}
+{% get_solo 'menu.MainMenuSettings' as menu_settings %}
 <!DOCTYPE html >
 <html lang="en">
 <head>
@@ -60,8 +62,15 @@
         {% endblock content %}
     </div>
 
+
+    {% if menu_settings.inverted_style %}
+        {% setvar "navbar-inverse" as nav_style %}
+    {% else %}
+        {% setvar "navbar-default" as nav_style %}
+    {% endif %}
+
     <div id="footer-container">
-        <div class="navbar navbar-default no-margin no-bottom-border " >
+        <div class="navbar {{ nav_style }} no-margin no-bottom-border " >
             <div class="container">
                 <div class="col-xs-12 footer text-center navbar-brand">
                     <span class="glyphicon glyphicon-copyright-mark"></span>
