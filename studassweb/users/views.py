@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect, HttpResponseBadRequest, Http404
+from django.http import HttpResponseRedirect, HttpResponseBadRequest, Http404, HttpResponseServerError
 from django.contrib.auth import logout, login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -8,6 +8,9 @@ from members.models import Member
 from .forms import LoginForm, RegisterForm
 from .models import UserExtension
 from .groups import put_user_in_standard_group, LOGGED_ON
+from django.core.mail import send_mail, BadHeaderError
+from django.utils.translation import ugettext
+from base.models import SiteConfiguration
 
 
 def login_view(request):
@@ -64,6 +67,18 @@ def register_thanks(request):
         raise Http404
     context = {'code': user_ext.email_verification_code}
 
+    try:
+        send_mail(
+            ugettext("Confirmation email from ") + SiteConfiguration.instance().association_name,
+            ugettext("Hello! Please visit this link: ") +
+            request.scheme + "://" + request.get_host() +
+            reverse("users_verify_email", kwargs={'code': user_ext.email_verification_code, }) +
+            ugettext(" to confirm your email."),
+            [SiteConfiguration.instance().association_contact_email], [request.user.email, ])
+
+    except BadHeaderError:
+        #TODO add logging
+        return HttpResponseServerError("BadHeaderError, newlines in email adress?")
     return render(request, 'users/register/register_thanks.html', context)
 
 
