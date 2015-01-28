@@ -243,7 +243,7 @@ def view_boardmember(request, boardmember_id):
         boards = []
         all_boardmembers = BoardMember.objects.filter(member=boardmember.member)
         for bm in all_boardmembers:
-            boards.append(bm.board)
+            boards.append({'role': bm.role, 'board': bm.board})
 
         return render(request, 'boards/view_boardmember.html', {
             'boardmember': boardmember, 'boards': boards},)

@@ -5,11 +5,23 @@
 {% load sawp %}
 {% load thumbnail %}
 
+{% block breadcrumb2 %}
+    <li>
+        <a href="{{ board.boardtype.get_absolute_url }}">
+            {{ board.boardtype.name }}
+        </a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb3 %}
+    <li class="active">
+        {{ board }}
+    </li>
+{% endblock %}
+
 {% block main_content %}
     {% load navigator %}
-    {% url "boards_main" as boards_url %}
-    {% display_navigator boards_url "Boards" board.get_absolute_url board%}
-    <h1><a href="{% url 'boards_view_boardtype' board.boardtype.id %}">{{ board.boardtype }}</a> {{ board.year }}</h1>
+    <h1>{{ board.boardtype }} {{ board.year }}</h1>
     <div class="list-group">
         {% if board.photo %}
             <li class="list-group-item">

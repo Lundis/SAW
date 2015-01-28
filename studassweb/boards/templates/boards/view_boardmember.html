@@ -5,18 +5,26 @@
 {% load sawp %}
 {% load thumbnail %}
 
+{% block breadcrumb2 %}
+    <li>
+        <a href="{{ boardmember.get_absolute_url }}">
+            {{ boardmember }}
+        </a>
+    </li>
+{% endblock %}
+
 {% block main_content %}
     {% load navigator %}
-    {% url "boards_main" as boards_url %}
-    {% display_navigator boards_url "Boards" boardmember.get_absolute_url boardmember%}
     <h1>{{ boardmember }}</h1>
     <div class="list-group">
         {% if boardmember.photo %}
             <a href="{{ boardmember.photo.url }}"><img  class="img-thumbnail" src="{% thumbnail boardmember.photo 100x100 crop=scale %}"/></a>
         {% endif %}
         <br>{% trans "Member of the following boards:" %}
-        {% for board in boards %}
-            <a class="list-group-item" href="{{ board.get_absolute_url }}">{{ board }}</a>
+        {% for role_board in boards %}
+            <a class="list-group-item" href="{{ role_board.board.get_absolute_url }}">
+                {{ role_board.board }}, {{ role_board.role }}
+            </a>
         {% empty %}
             <p>{% trans "This member is not in any boards!" %}</p>
         {% endfor %}

@@ -62,7 +62,7 @@ class BoardMember(models.Model):
         unique_together = ("board", "role", "member")
 
     def __str__(self):
-        return str(self.role.name) + " " + str(self.member.get_full_name())
+        return str(self.member.get_full_name())
 
     def get_absolute_url(self):
         return reverse("boards_view_boardmember", kwargs={'boardmember_id': self.id})
