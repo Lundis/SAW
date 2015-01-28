@@ -1,0 +1,41 @@
+{% extends "polls/base.html" %}
+
+{% load i18n %}
+{% load bootstrap3 %}
+{% load sawp %}
+{% load thumbnail %}
+
+{% block main_content %}
+    {% load navigator %}
+    {% url "polls_home" as polls_url %}
+    {% display_navigator polls_url "Polls" %}
+    <h3>Pollpage PERKELE!</h3>
+
+    {% for p in all_polls %}
+            <a class="list-group-item" href="{% url 'polls_view_poll' p.id %}">{{ p.name }}
+
+            </a>
+        {% empty %}
+            <p>{% trans "No polls found!" %}</p>
+        {% endfor %}
+{% endblock %}
+{% block sidebar %}
+    {% has_perm "polls" "CAN_CREATE_POLLS" as can_create_polls %}
+    {% if can_create_polls%}
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Add" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    {% if can_create_polls%}
+                        <a href="{% url 'polls_add_poll' %}">
+                            <div class="btn list-group-item">{% trans "Add new poll" %}</div>
+                        </a>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
