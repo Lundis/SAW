@@ -23,6 +23,5 @@ if not InstallProgress.is_finished():
 
 # Add the urlpatterns of all modules
 for mod, url_func in get_modules_with("register", "get_urls"):
-    if DisabledModule.is_enabled(mod):
-        for url_pattern in url_func():
-            urlpatterns += (url(url_pattern, include(mod + ".urls")),)
+    for url_pattern in url_func():
+        urlpatterns += (url(url_pattern, include(mod + ".urls")),)
