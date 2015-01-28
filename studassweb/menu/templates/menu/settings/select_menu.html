@@ -1,7 +1,21 @@
 {% extends "settings/base.html" %}
 {% load i18n %}
 
-{% block inner_content %}
+{% block breadcrumb2 %}
+    <li>
+        <a href="{{ section.get_absolute_url }}">
+            {% trans section.title %}
+        </a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb3 %}
+    <li class="active">
+        {% trans "Menu Editor" %}
+    </li>
+{% endblock %}
+
+{% block main_content %}
     <div class="row">
         <div class="col-sm-5">
             <div class="panel panel-default">

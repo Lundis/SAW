@@ -6,15 +6,19 @@ from users.decorators import has_permission
 from .models import SiteConfiguration, BootswatchTheme, THEME_DEFAULT_CSS, THEME_DEFAULT_CSS_MOD
 from .register import EDIT_THEME
 from .forms import BootswatchThemeSelectForm
+from settings.sections import SECTION_APPEARANCE, Section
+import logging
+
+logger = logging.getLogger(__name__)
 
 urlpatterns = patterns('',
-    url(r'^edit_themes$',
+    url(r'^%s/edit_themes$' % SECTION_APPEARANCE,
         'base.settings_pages.edit_theme',
         name='base_settings_edit_theme'),
-    url(r'^set_bootswatch_theme$',
+    url(r'^%s/set_bootswatch_theme$' % SECTION_APPEARANCE,
         'base.settings_pages.set_bootswatch_theme',
         name='base_settings_set_bootswatch_theme'),
-    url(r'^set_theme$',
+    url(r'^%s/set_theme$' % SECTION_APPEARANCE,
         'base.settings_pages.set_default_theme',
         name='base_settings_set_default_theme'),
 )
@@ -23,8 +27,9 @@ urlpatterns = patterns('',
 @has_permission(EDIT_THEME)
 def edit_theme(request):
     SiteConfiguration.update_bootswatch()
-
-    context = {'themes': BootswatchTheme.objects.all()}
+    section = Section.get_section(SECTION_APPEARANCE)
+    context = {'themes': BootswatchTheme.objects.all(),
+               'section': section}
     return render(request, 'base/settings/theme_editor.html', context)
 
 
@@ -37,7 +42,7 @@ def set_bootswatch_theme(request):
         if form.is_valid():
             form.save()
         else:
-            print("applying theme failed")
+            logger.warn("Setting Bootswatch theme failed!")
         return HttpResponseRedirect(reverse('base_settings_edit_theme'))
 
 @has_permission(EDIT_THEME)
