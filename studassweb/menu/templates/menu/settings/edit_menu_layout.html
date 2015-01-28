@@ -1,8 +1,23 @@
 {% extends "settings/base.html" %}
 {% load i18n %}
 {% load bootstrap3 %}
-{% block inner_content %}
-    <h1>{% trans "Menu layout editor" %}</h1>
+
+{% block breadcrumb2 %}
+    <li>
+        <a href="{{ section.get_absolute_url }}">
+            {% trans section.title %}
+        </a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb3 %}
+    <li class="active">
+        {% trans "Menu Visual Settings" %}
+    </li>
+{% endblock %}
+
+{% block main_content %}
+    <h1>{% trans "Menu Visual Settings" %}</h1>
 
     <form action="{% url "menu_settings_edit_menu_layout" %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}

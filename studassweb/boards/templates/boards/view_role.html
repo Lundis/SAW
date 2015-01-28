@@ -5,10 +5,16 @@
 {% load sawp %}
 {% load thumbnail %}
 
+{% block breadcrumb2 %}
+    <li>
+        <a href="{{ role.get_absolute_url }}">
+            {{ role.name }}
+        </a>
+    </li>
+{% endblock %}
+
 {% block main_content %}
     {% load navigator %}
-    {% url "boards_main" as boards_url %}
-    {% display_navigator boards_url "Boards" role.get_absolute_url role.name%}
     <h1>{{ role.name }}</h1>
     <div class="list-group">
 

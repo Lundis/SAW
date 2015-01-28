@@ -3,15 +3,26 @@
 {% load i18n %}
 {% load bootstrap3 %}
 
+{% block breadcrumb2 %}
+    <li>
+        <a href="#">
+            {% trans "Roles" %}
+        </a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb3 %}
+    <li>
+        {% if form.instance.pk %}
+            Edit {{ form.instance.name }}
+        {% else %}
+            {% trans "Add role" %}
+        {% endif %}
+    </li>
+{% endblock %}
 
 {% block main_content %}
     {% load navigator %}
-    {% url "boards_main" as boards_url %}
-    {% if form.instance.pk %}
-        {% display_navigator boards_url "Boards" form.instance.get_absolute_url form.instance.name%}
-    {% else %}
-        {% display_navigator boards_url "Boards" "#" "New role" %}
-    {% endif %}
 
     {% if form.instance.pk %}
         <h1>Edit {{ form.instance.name }}</h1>

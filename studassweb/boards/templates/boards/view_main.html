@@ -7,8 +7,6 @@
 
 {% block main_content %}
     {% load navigator %}
-    {% url "boards_main" as boards_url %}
-    {% display_navigator boards_url "Boards" %}
     <h3>Boards</h3>
     <div class="list-group">
         {% for board in boards %}

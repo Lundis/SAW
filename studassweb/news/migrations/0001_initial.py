@@ -2,8 +2,8 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import ckeditor.fields
 from django.conf import settings
+import ckeditor.fields
 
 
 class Migration(migrations.Migration):
@@ -16,15 +16,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Article',
             fields=[
-                ('id', models.AutoField(primary_key=True, auto_created=True, verbose_name='ID', serialize=False)),
+                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
                 ('title', models.CharField(max_length=100)),
-                ('summary', models.TextField(null=True, blank=True, max_length=300)),
+                ('summary', models.TextField(max_length=300, null=True, blank=True)),
                 ('slug', models.SlugField(editable=False)),
                 ('text', ckeditor.fields.RichTextField()),
                 ('created_date', models.DateField(auto_now_add=True)),
                 ('created_time', models.TimeField(auto_now_add=True)),
                 ('updated', models.DateTimeField(auto_now=True)),
-                ('picture', models.ImageField(null=True, blank=True, upload_to='news/article_thumbnails')),
+                ('picture', models.ImageField(null=True, upload_to='news/article_thumbnails', blank=True)),
                 ('author', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
             options={
@@ -35,8 +35,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Category',
             fields=[
-                ('id', models.AutoField(primary_key=True, auto_created=True, verbose_name='ID', serialize=False)),
-                ('name', models.CharField(unique=True, max_length=100)),
+                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
+                ('name', models.CharField(max_length=100, unique=True)),
             ],
             options={
                 'ordering': ['name'],
@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='article',
             name='categories',
-            field=models.ManyToManyField(blank=True, to='news.Category'),
+            field=models.ManyToManyField(to='news.Category', blank=True),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(

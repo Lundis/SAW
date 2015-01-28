@@ -1,5 +1,7 @@
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponseRedirect
+from django.core.urlresolvers import reverse
 from base.models import DisabledModule
+from install.models import InstallProgress
 
 
 class VerifyModuleEnabled:
@@ -10,5 +12,8 @@ class VerifyModuleEnabled:
         # The frontpage is a special case
         if module == "":
             module = "frontpage"
+
+        if not InstallProgress.is_finished() and module != "install":
+            return HttpResponseRedirect(reverse("install_welcome"))
         if DisabledModule.is_disabled(module):
             return HttpResponseNotFound("The requested module is disabled")
