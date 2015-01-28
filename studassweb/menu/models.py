@@ -38,6 +38,11 @@ class MenuTemplate(models.Model):
 
 class MainMenuSettings(SingletonModel):
     image = models.ImageField(upload_to="menu/images", null=True, blank=True)
+    inverted_style = models.BooleanField(default=False, blank=True)
+
+    @classmethod
+    def is_menu_inverted(cls):
+        return cls.instance().inverted_style
 
     @classmethod
     def instance(cls):

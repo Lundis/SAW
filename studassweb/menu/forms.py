@@ -193,7 +193,11 @@ class MainMenuForm(forms.ModelForm):
 
     class Meta():
         model = MainMenuSettings
-        fields = ('image',)
+        fields = ('image', 'inverted_style')
+        labels = {
+            'image': _("Header image"),
+            'inverted_style': _("Invert the colors of the menu")
+        }
 
     def __init__(self, *args, **kwargs):
         kwargs['initial'] = {'template': Menu.get("main_menu").template}
@@ -203,7 +207,7 @@ class MainMenuForm(forms.ModelForm):
         super(MainMenuForm, self).clean()
         template = self.cleaned_data['template']
         if template.uses_image:
-            if not 'image' in self.cleaned_data:
+            if 'image' not in self.cleaned_data:
                 raise forms.ValidationError(_("You need to specify an image for the requested layout"))
 
     def save(self, commit=True):
