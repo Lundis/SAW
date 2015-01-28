@@ -16,7 +16,10 @@
     <p>
         {% trans "A confirmation email has been sent to the address you specified" %}.
         {% trans "After confirming it you can apply for a members account" %}.
-        {% trans "Unfortunately emailing hasn't been implemented yet, so just use " %}
+        <br>
+        {% trans "Check your email," %}
+
+        {% trans "or use " %}
         <a href="{% url "users_verify_email" code=code %}">{% trans "this link" %}.</a>
     </p>
     <p>
