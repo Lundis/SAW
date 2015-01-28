@@ -50,6 +50,12 @@ To upgrade from a previous version, run:
         > pip install easy-thumbnails
 		> python manage.py migrate easy_thumbnails
 
+* django-captcha
+    * Recaptcha one-liner support
+    * url: https://github.com/praekelt/django-recaptcha
+    * install instructions:
+        > pip install django-captcha
+
 
 ===== Install Pycharm pro edition =====
 

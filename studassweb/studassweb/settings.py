@@ -24,6 +24,7 @@ EXTERNAL_APPS = (
     'bootstrap3',  # bootstrap templates
     'ckeditor',
     'easy_thumbnails',  # you need to run "python manage.py migrate easy_thumbnails" after installing
+    'captcha',
 )
 
 NON_OPTIONAL_APPS = (

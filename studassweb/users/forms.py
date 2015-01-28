@@ -3,6 +3,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from .models import UserExtension
+from captcha.fields import ReCaptchaField
 import logging
 
 logger = logging.getLogger(__name__)
@@ -45,6 +46,8 @@ class RegisterForm(forms.Form):
     first_name = forms.CharField(label=_("First name"), max_length=50)
     last_name = forms.CharField(label=_("Last name"), max_length=50)
     email = forms.EmailField(label=_("Email"))
+
+    captcha = ReCaptchaField()
 
     def clean(self):
         super(RegisterForm, self).clean()
