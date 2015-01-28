@@ -2,10 +2,54 @@
 
 {% load i18n %}
 {% load bootstrap3 %}
+{% load sawp %}
 
-{% block inner_content %}
+{% block breadcrumb1 %}
+    <li>
+        <a href={% url "polls_home" %}>{% trans "Polls" %}</a>
+    </li>
+{% endblock %}
+
+{% block main_content %}
     {% load navigator %}
     {% url "polls.views.home" as polls_url %}
-    {% display_navigator polls_url "Polls" poll.get_absolute_url poll.name%}
+
     <h1>{{ poll.name }}</h1>
+    <ul class="list-group">
+
+
+        <li class="list-group-item">{% trans "Name: " %} {{ poll.name }}</li>
+        <li class="list-group-item">{% trans "Description: " %} {{ poll.description }}</li>
+        <li class="list-group-item">{% trans "Publication date: " %} {{ poll.publication }}</li>
+        <li class="list-group-item">{% trans "Expiration date: " %} {{ poll.expiration }}</li>
+        <li class="list-group-item">{% trans "Created by: " %} {{ poll.created_by }}</li>
+
+        {% for c in choices %}
+            <li class="list-group-item">
+                {{ c.name }}
+            </li>
+        {% endfor %}
+
+
+    </ul>
+{% endblock %}
+{% block sidebar %}
+    {% has_perm "polls" "CAN_CREATE_POLLS" as can_create_polls %}
+    {% if can_create_polls%}
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Edit" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    {% if can_create_polls%}
+                        <a href="{% url 'polls_edit_poll' poll.id %}">
+                            <div class="btn list-group-item">{% trans "Edit poll" %}</div>
+                        </a>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
