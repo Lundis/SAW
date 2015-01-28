@@ -9,3 +9,9 @@
     {% load dynamic_menu %}
     {% display_menu "main_menu" "Contact" %}
 {% endblock %}
+
+{% block breadcrumb1 %}
+    <li><a href="{% url "contact_home" %}">
+        {% trans "Contact" %}
+    </a></li>
+{% endblock %}

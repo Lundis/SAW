@@ -4,12 +4,13 @@
 {% load bootstrap3 %}
 {% load sawp %}
 
+{% block breadcrumb2 %}
+    <li class="active">
+        {% trans "Write Message" %}
+    </li>
+{% endblock %}
 
 {% block main_content %}
-    {% load navigator %}
-    {% url "contact_home" as contact_url %}
-    {% display_navigator contact_url "Contact" "#" "Write message" %}
-
     <h1>{% trans "Contact us!" %}</h1>
 
     <form action="" method="post">

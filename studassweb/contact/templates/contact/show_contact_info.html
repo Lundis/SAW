@@ -4,12 +4,13 @@
 {% load bootstrap3 %}
 {% load sawp %}
 
+{% block breadcrumb1 %}
+    <li class="active">
+        {% trans "Contact" %}
+    </li>
+{% endblock %}
 
 {% block main_content %}
-    {% load navigator %}
-    {% url "contact_home" as contact_url %}
-    {% display_navigator contact_url "Contact" "#" "Write message" %}
-
     <h1>{% trans "Contact us!" %}</h1>
 
     email dix@infa.fi<br> todo load this from db

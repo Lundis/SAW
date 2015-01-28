@@ -4,10 +4,13 @@
 {% load bootstrap3 %}
 {% load sawp %}
 
+{% block breadcrumb2 %}
+    <li class="active">
+        {% trans "View Messages" %}
+    </li>
+{% endblock %}
+
 {% block main_content %}
-    {% load navigator %}
-    {% url "contact_home" as contact_url %}
-    {% display_navigator contact_url "Contact" "#" "View messages" %}
     <h1>{% trans "View messages" %}</h1>
     <div>
         {% for message in msgs %}

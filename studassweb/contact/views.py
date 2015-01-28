@@ -48,7 +48,7 @@ def write_message(request):
                 return HttpResponseRedirect(reverse("contact_write_message"))
 
             messages.success(request,"Message succesfully sent!")
-            return HttpResponseRedirect(reverse("contact_write_message"))
+            return HttpResponseRedirect(reverse("contact_home"))
 
     context = {'form': form}
 
