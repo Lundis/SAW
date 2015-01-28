@@ -57,9 +57,9 @@ def home(request, page=1, category_name=None):
     paginator = Paginator(articles, ARTICLES_PER_PAGE)
     current_page = paginator.page(page)
     categories = Category.objects.all()
-    context['articles'] = current_page.object_list,
-    context['categories'] = categories,
-    context['page'] = current_page,
+    context['articles'] = current_page.object_list
+    context['categories'] = categories
+    context['page'] = current_page
     context['paginator'] = paginator
     return render(request, "news/view_news.html", context)
 
@@ -112,9 +112,9 @@ def delete_article(request, article_id):
 def edit_category(request, category_id=None):
     if category_id is not None:
         try:
-            category = Article.objects.get(id=category_id)
+            category = Category.objects.get(id=category_id)
         except Category.DoesNotExist:
-            raise Http404(_("Category does not exist"))
+            raise Http404(_("The requested category does not exist"))
     else:
         category = None
     form = CategoryForm(request.POST or None, instance=category)
@@ -125,3 +125,15 @@ def edit_category(request, category_id=None):
         context = {'category': category,
                    'form': form}
         return render(request, 'news/add_edit_category.html', context)
+
+
+@has_permission(EDIT)
+def delete_category(request, category_id):
+    try:
+        article = Category.objects.get(id=category_id)
+    except Article.DoesNotExist:
+        raise Http404(_("The requested article could not be found!"))
+    return delete_confirmation_view(request,
+                                    item=article,
+                                    form_url=reverse("news_delete_category", args=(category_id,)),
+                                    redirect_url=reverse("news_home"))

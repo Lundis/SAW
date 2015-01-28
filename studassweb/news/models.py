@@ -14,7 +14,7 @@ class Category(models.Model):
         ordering = ["name"]
 
     def get_absolute_url(self):
-        return reverse("news_view_category", kwargs={'category_id': self.id})
+        return reverse("news_home", kwargs={'category_name': self.name})
 
     def __str__(self):
         return self.name
