@@ -85,6 +85,9 @@ class Page:
     def filter_for_section(pages, section_id):
         return [p for p in pages if p.section_id == section_id]
 
+    def get_absolute_url(self):
+        return self.url
+
 
 SECTION_PERSONAL_SETTINGS = "personal"
 SECTION_APPEARANCE = "appearance"

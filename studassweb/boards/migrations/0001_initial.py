@@ -2,14 +2,12 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-from django.conf import settings
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('gallery', '0001_initial'),
     ]
 
     operations = [
@@ -18,8 +16,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
                 ('year', models.IntegerField()),
-                ('name', models.CharField(max_length=300)),
-                ('photo', models.ForeignKey(to='gallery.Photo')),
+                ('photo', models.ImageField(upload_to='boards/photos', blank=True)),
             ],
             options={
             },
@@ -29,9 +26,18 @@ class Migration(migrations.Migration):
             name='BoardMember',
             fields=[
                 ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
-                ('board', models.ForeignKey(to='boards.Board')),
-                ('person_id', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
-                ('photo', models.ForeignKey(to='gallery.Photo')),
+                ('photo', models.ImageField(upload_to='boards/photos', blank=True)),
+                ('board', models.ForeignKey(to='boards.Board', on_delete=django.db.models.deletion.PROTECT)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='BoardType',
+            fields=[
+                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
+                ('name', models.CharField(max_length=100)),
             ],
             options={
             },
@@ -42,16 +48,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
                 ('name', models.CharField(max_length=100)),
-                ('board', models.ForeignKey(to='boards.Board')),
             ],
             options={
             },
             bases=(models.Model,),
-        ),
-        migrations.AddField(
-            model_name='boardmember',
-            name='role',
-            field=models.ForeignKey(to='boards.Role'),
-            preserve_default=True,
         ),
     ]
