@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load bootstrap3 %}
+{% load static %}
 
 
 {% block main_content %}
@@ -16,12 +17,23 @@
     {% if form.instance.pk %}
         <h1>Edit {{ form.instance.name }}</h1>
     {% else %}
-        <h1>Add board member</h1>
+        <h1>Add Poll</h1>
     {% endif %}
 
     <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% bootstrap_form form %}
+        <hr>
+        <div id="choicesformset_all">
+            {% for f in choicesformset.forms %}
+                <div class="choicesformset_single">
+                    {{ f.id }}
+                    {% bootstrap_field f.name%}
+                    {% if f.instance.pk %}{{ f.DELETE}}{% endif %}{# Note! removing this fucks with functionality #}
+                </div>
+            {% endfor %}
+        </div>
+        {{ choicesformset.management_form }}
         {% buttons %}
             <button type="submit" class="btn btn-primary">
                 {% trans "Submit" %}
@@ -30,4 +42,22 @@
     </form>
 {% endblock %}
 {% block sidebar %}
+{% endblock %}
+{% block scripts %}
+    <script src="{% static "js/base/jquery.formset.js" %}"></script>
+    <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+    <script type="text/javascript">
+        $(function () {
+            //Set up dynamic adding of images
+            $('.choicesformset_single').formset({
+                prefix: '{{ choicesformset.prefix }}',
+                formCssClass: 'dynamic-formasdf',
+                addText: '{% trans "Add another choice" %}',
+                deleteText: '{% trans "Remove choice" %}'
+            });
+
+
+        })
+    </script>
 {% endblock %}

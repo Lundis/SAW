@@ -4,10 +4,16 @@
 {% load bootstrap3 %}
 {% load sawp %}
 
+{% block breadcrumb2 %}
+    <li>
+        <a href="{{ boardtype.get_absolute_url }}">
+            {{ boardtype.name }}
+        </a>
+    </li>
+{% endblock %}
+
 {% block main_content %}
     {% load navigator %}
-    {% url "boards_main" as boards_url %}
-    {% display_navigator boards_url "Boards" boardtype.get_absolute_url boardtype.name%}
     <h1>{{ boardtype.name }}</h1>
     <div class="list-group">
 

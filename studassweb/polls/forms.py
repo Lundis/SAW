@@ -3,6 +3,8 @@ from django import forms
 # Google for inline formset https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#inline-formsets
 # or look at install/forms.py, maybe easier
 from polls.models import *
+from django.utils.translation import ugettext_lazy as _
+
 
 
 class PollForm(forms.ModelForm):
@@ -27,4 +29,7 @@ class ChoiceForm(forms.ModelForm):
 
     class Meta:
         model = Choice
-        fields = ('id_to_poll','name')
+        fields = ('name',)
+        labels = {
+            'name': _('Choice'),
+        }

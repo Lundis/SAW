@@ -53,7 +53,7 @@ def attend_status(request):
 
 def edit_event(request, event_id):
     if not permissions.has_user_perm(request.user, CAN_CREATE_EVENTS):
-            logger.warning('User %s tried to edit event %s', request.user, role_id)
+            logger.warning('User %s tried to edit event %s', request.user, event_id)
             return HttpResponseForbidden('You don\'t have permission to edit this event!')
     try:
         event = Event.objects.get(id=event_id)
