@@ -47,7 +47,7 @@ def write_message(request):
                 messages.error(request, "Bad header, message not sent!")
                 return HttpResponseRedirect(reverse("contact_write_message"))
 
-            messages.success(request,"Message succesfully sent!")
+            messages.success(request, "Message successfully sent!")
             return HttpResponseRedirect(reverse("contact_home"))
 
     context = {'form': form}
