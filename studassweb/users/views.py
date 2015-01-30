@@ -74,7 +74,7 @@ def register_thanks(request):
             request.scheme + "://" + request.get_host() +
             reverse("users_verify_email", kwargs={'code': user_ext.email_verification_code, }) +
             ugettext(" to confirm your email."),
-            [SiteConfiguration.instance().association_contact_email],
+            SiteConfiguration.instance().association_contact_email,
             [request.user.email])
 
     except BadHeaderError:
