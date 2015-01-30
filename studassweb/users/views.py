@@ -12,6 +12,9 @@ from .groups import put_user_in_standard_group, LOGGED_ON
 from django.core.mail import send_mail, BadHeaderError
 from django.utils.translation import ugettext
 from base.models import SiteConfiguration
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def login_view(request):
@@ -72,6 +75,7 @@ def register_thanks(request):
         from_email = "noreply@%s" % request.get_host()
         to_emails = [request.user.email]
         title = ugettext("Confirmation email from ") + SiteConfiguration.instance().association_name
+        logger.info("sending verification email from %s to %s" % (from_email, to_emails[0]))
         send_mail(
             title,
             ugettext("Hello! Please visit this link: ") +
