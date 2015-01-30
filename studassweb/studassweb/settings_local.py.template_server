@@ -5,6 +5,10 @@ ADMINS = (
     ("admin", "admin@admin234531.com"),
 )
 
+ALLOWED_HOSTS = (
+    "your.website.com",
+)
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 

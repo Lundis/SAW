@@ -17,8 +17,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
-ALLOWED_HOSTS = []
-
 EXTERNAL_APPS = (
     'solo',  # singleton models. pip install django-solo
     'bootstrap3',  # bootstrap templates
@@ -202,6 +200,5 @@ MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
                 message_constants.WARNING: 'warning',
                 message_constants.ERROR: 'danger',}
 
-PRINT_EMAIL_TO_CONSOLE = True
-if PRINT_EMAIL_TO_CONSOLE:
+if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
