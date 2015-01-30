@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect, HttpResponseBadRequest, Http404, H
 from django.contrib.auth import logout, login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from members.models import Member
 from .forms import LoginForm, RegisterForm
 from .models import UserExtension
@@ -68,14 +69,17 @@ def register_thanks(request):
     context = {'code': user_ext.email_verification_code}
 
     try:
+        from_email = "noreply@%s" % request.get_host()
+        to_emails = [request.user.email]
+        title = ugettext("Confirmation email from ") + SiteConfiguration.instance().association_name
         send_mail(
-            ugettext("Confirmation email from ") + SiteConfiguration.instance().association_name,
+            title,
             ugettext("Hello! Please visit this link: ") +
             request.scheme + "://" + request.get_host() +
             reverse("users_verify_email", kwargs={'code': user_ext.email_verification_code, }) +
             ugettext(" to confirm your email."),
-            SiteConfiguration.instance().association_contact_email,
-            [request.user.email])
+            from_email,
+            to_emails)
 
     except BadHeaderError:
         #TODO add logging
