@@ -7,7 +7,7 @@ from base.models import SiteConfiguration
 
 
 class Member(models.Model):
-    user_ext = models.ForeignKey(UserExtension, null=True, blank=True, unique=True, on_delete=models.PROTECT)
+    user_ext = models.ForeignKey(UserExtension, null=True, blank=True, unique=True, on_delete=models.SET_NULL)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField(null=True, blank=True)
