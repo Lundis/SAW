@@ -1,8 +1,9 @@
 from django.shortcuts import render
-from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseRedirect, HttpResponseNotAllowed
+from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseRedirect,\
+    HttpResponseNotAllowed, HttpResponseServerError
 from users import permissions
 from .forms import MessageForm
-from .models import Message
+from .models import Message, Settings
 from .register import CAN_VIEW_CONTACT_INFO, CAN_USE_CONTACT_FORM, CAN_VIEW_MESSAGES
 from django.core.urlresolvers import reverse
 from django.contrib import messages
@@ -17,12 +18,21 @@ logger = logging.getLogger(__name__)
 def home(request):
     if not permissions.has_user_perm(request.user, CAN_VIEW_CONTACT_INFO):
         logger.warning('User %s tried to view contact info', request.user)
-        return HttpResponseForbidden('You don\'t have permission to view contact info!')
+        return HttpResponseServerError('You don\'t have permission to view contact info!')
 
-    return render(request, "contact/show_contact_info.html")
+    settings = Settings.get_solo()
+    return render(request, "contact/show_contact_info.html",{'settings': settings,})
 
 
 def write_message(request):
+    settings = Settings.get_solo()
+    if not (settings.save_to_db or settings.send_email):
+        logger.warning('Messages in contact module are neither saved to db nor sent as email.'
+                       'It is thus not functional')
+        return HttpResponseForbidden(
+            'Messages in contact module are neither saved to db nor sent as email.'
+            'It is thus not functional'
+        )
     if not permissions.has_user_perm(request.user, CAN_USE_CONTACT_FORM):
         logger.warning('User %s tried to write a message', request.user)
         return HttpResponseForbidden('You don\'t have permission to write message!')
@@ -32,20 +42,22 @@ def write_message(request):
     if request.method == 'POST':
         form = MessageForm(request.POST)
         if form.is_valid():
-            form.save()
-            temp = form.save(commit=False)
-            temp.from_person = request.user
-            temp.save()
+            if settings.save_to_db:
+                form.save()
+                temp = form.save(commit=False)
+                temp.from_person = request.user
+                temp.save()
 
-            try:
-                send_mail(
-                    ugettext("Site message from ")+" \"" + str(temp.from_person) +
-                    "\" Title: " + form.cleaned_data['title'], form.cleaned_data['message'],
-                    form.cleaned_data['from_email'], [SiteConfiguration.instance().association_contact_email])
+            if settings.send_email:
+                try:
+                    send_mail(
+                        ugettext("Site message from ")+" \"" + str(temp.from_person) +
+                        "\" Title: " + form.cleaned_data['title'], form.cleaned_data['message'],
+                        form.cleaned_data['from_email'], [SiteConfiguration.instance().association_contact_email])
 
-            except BadHeaderError:
-                messages.error(request, "Bad header, message not sent!")
-                return HttpResponseRedirect(reverse("contact_write_message"))
+                except BadHeaderError:
+                    messages.error(request, "Bad header, message not sent!")
+                    return HttpResponseRedirect(reverse("contact_write_message"))
 
             messages.success(request, "Message successfully sent!")
             return HttpResponseRedirect(reverse("contact_home"))
