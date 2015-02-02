@@ -1,10 +1,13 @@
 from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, BOARD_MEMBER
+from settings.sections import Page, SECTION_OTHER
+from django.core.urlresolvers import reverse_lazy
 
 CAN_VIEW_CONTACT_INFO = "can_view_contact_info"
 CAN_USE_CONTACT_FORM = "can_use_contact_form"
 CAN_VIEW_MESSAGES = "can_view_messages"
+CAN_EDIT_CONTACT_SETTINGS = "can_edit_contact_settings"
 
 
 def get_menu_items():
@@ -33,4 +36,16 @@ def get_permissions():
         (CAN_VIEW_CONTACT_INFO, GUEST, "Can view the contact info"),
         (CAN_USE_CONTACT_FORM, GUEST, "Can use the contact form to send messages"),
         (CAN_VIEW_MESSAGES, BOARD_MEMBER, "Can view all sent messages"),
+        (CAN_EDIT_CONTACT_SETTINGS, BOARD_MEMBER, "Can edit settings for contact module"),
     )
+
+
+def register_settings_pages():
+    contact_mod = Page(
+        "Contact module",
+        "Settings for contact module",
+        SECTION_OTHER,
+        reverse_lazy("contact_settings_edit_settings"),
+        CAN_EDIT_CONTACT_SETTINGS)
+
+    return contact_mod,

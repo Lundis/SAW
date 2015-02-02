@@ -11,9 +11,7 @@
 {% endblock %}
 
 {% block main_content %}
-    <h1>{% trans "Contact us!" %}</h1>
-
-    email dix@infa.fi<br> todo load this from db
+    {{ settings.info_text | safe }}
 {% endblock %}
 {% block sidebar %}
     {% has_perm "contact" "CAN_VIEW_CONTACT_INFO" as can_view_contact_info %}
