@@ -1,7 +1,7 @@
 from menu.models import MenuItem, Menu
 from users.models import SAWPermission
 from users.groups import GUEST, MEMBER, BOARD_MEMBER
-from .models import InfoPage
+import info.models
 from .frontpage import InfoFrontPageItem
 
 
@@ -46,7 +46,7 @@ def get_permissions():
 
 
 def get_front_page_items():
-    pages = InfoPage.objects.filter(for_front_page=True)
+    pages = info.models.InfoPage.objects.filter(for_front_page=True)
     items = ()
     for page in pages:
         items += InfoFrontPageItem(page),
