@@ -40,7 +40,9 @@ def add_event(request):
     if request.method == 'POST':
         form = EventForm(request.POST)
         if form.is_valid():
-            form.save()
+            temp = form.save(commit=False)
+            temp.author = request.user
+            temp.save()
             return HttpResponseRedirect(reverse("events_view_event", args=[form.instance.id]))
 
     context = {'form': form}

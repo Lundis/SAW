@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load bootstrap3 %}
+{% load static %}
 
 
 {% block main_content %}
@@ -16,7 +17,6 @@
         <h1>Edit {{ form.instance }}</h1>
     {% else %}
         <h1>Add event</h1>
-         <h6>The Date and Time are in the format : YY-MM-DD HH:MM:SS</h6>
     {% endif %}
 
     {% if form.instance.pk %}
@@ -39,4 +39,27 @@
             </button>
         {% endbuttons %}
     </form>
+{% endblock %}
+
+{% block scripts %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/base/jquery.datetimepicker.css" %}"/>
+    <script src="{% static "js/base/jquery.datetimepicker.js" %}"></script>
+    <script type="text/javascript">
+        $(function () {
+
+            //Set up datetimepicker
+            $( "#id_start" ).datetimepicker({
+                dayOfWeekStart: 1,
+                format: "d.n.Y H:m"
+            });
+            $( "#id_stop" ).datetimepicker({
+                dayOfWeekStart: 1,
+                format: "d.n.Y H:m"
+            });
+            $( "#id_signup_deadline" ).datetimepicker({
+                dayOfWeekStart: 1,
+                format: "d.n.Y H:m"
+            });
+        })
+    </script>
 {% endblock %}
