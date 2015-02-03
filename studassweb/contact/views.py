@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError
 from django.utils.translation import ugettext
 from base.models import SiteConfiguration
+from django.utils.translation import ugettext as _
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,8 +21,12 @@ def home(request):
         logger.warning('User %s tried to view contact info', request.user)
         return HttpResponseServerError('You don\'t have permission to view contact info!')
 
-    settings = Settings.get_solo()
-    return render(request, "contact/show_contact_info.html",{'settings': settings,})
+    info_text = Settings.get_solo().info_text
+    #If no custom contact page is specified we show a sane page instead of a blank page
+    if not len(info_text) > 0:
+        contact_email = SiteConfiguration.instance().association_contact_email
+        info_text = _("Please contact us at %s" % contact_email)
+    return render(request, "contact/show_contact_info.html", {'info_text': info_text,})
 
 
 def write_message(request):
