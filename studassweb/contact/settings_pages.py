@@ -39,7 +39,7 @@ def list_contacts(request):
 
 
 @has_permission(CAN_EDIT_CONTACT_SETTINGS)
-def edit_contact(request, contact_id):
+def edit_contact(request, contact_id=None):
     section = Section.get_section(SECTION_OTHER)
     try:
         contact = ContactInfo.objects.get(id=contact_id)

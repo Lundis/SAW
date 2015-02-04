@@ -39,7 +39,7 @@ def write_message(request, contact_id):
     form = MessageForm(request.POST or None)
     if form.is_valid():
         if contact.save_to_db:
-            temp = form.save(commit=False, contact=contact, from_person=request.user)
+            form.save(commit=False, contact=contact, from_person=request.user)
 
         if contact.send_email:
             try:

@@ -17,7 +17,7 @@ class MessageForm(forms.ModelForm):
         """
         obj = super(MessageForm, self).save(commit=False)
         obj.contact = contact
-        if from_person:
+        if from_person and from_person.is_authenticated():
             obj.from_person = from_person
         super(MessageForm, self).save(commit=commit)
 

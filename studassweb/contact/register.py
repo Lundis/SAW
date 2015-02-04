@@ -17,7 +17,7 @@ def get_menu_items():
     item, created = MenuItem.get_or_create(__package__,
                                            "Contact",
                                            reverse_string="contact_home",
-                                           permission=SAWPermission.get_or_create("can_view_contact_form"))
+                                           permission=SAWPermission.get_or_create(CAN_VIEW_CONTACT_INFO))
     return [item], None, None
 
 
