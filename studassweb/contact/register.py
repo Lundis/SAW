@@ -33,8 +33,8 @@ def get_permissions():
     :return: a list of tuples containing the permissions of this module and their default group
     """
     return (
-        (CAN_VIEW_CONTACT_INFO, GUEST, "Can view the contact info"),
-        (CAN_USE_CONTACT_FORM, GUEST, "Can use the contact form to send messages"),
+        (CAN_VIEW_CONTACT_INFO, GUEST, "Can view the contact page"),
+        (CAN_USE_CONTACT_FORM, GUEST, "Can send messages using the contact forms"),
         (CAN_VIEW_MESSAGES, BOARD_MEMBER, "Can view all sent messages"),
         (CAN_EDIT_CONTACT_SETTINGS, BOARD_MEMBER, "Can edit settings for contact module"),
     )
