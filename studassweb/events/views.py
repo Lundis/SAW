@@ -1,13 +1,15 @@
 from django.shortcuts import render
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponseNotAllowed
 from .models import Event, EventSignup
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseServerError
 from users import permissions
 from .register import CAN_VIEW_EVENTS, CAN_CREATE_EVENTS, CAN_SIGNUP_FOR_EVENTS, CAN_VIEW_SIGNUP_INFO
 from .forms import EventForm, EventSignupForm
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.utils.translation import ugettext as _
+from base.models import SiteConfiguration
+from django.core.mail import send_mail, BadHeaderError
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,7 +20,6 @@ def home(request):
     return render(request, 'events/view_events.html', {'events':events})
 
 
-#TODO get signups as well
 def event_detail(request, event_id):
     try:
         event = Event.objects.get(id=event_id)
@@ -31,6 +32,31 @@ def event_detail(request, event_id):
                 temp.user = request.user
             temp.save()
             signupform = None
+
+            try:
+                from_email = "noreply@%s" % request.get_host()
+                to_emails = [temp.email]
+                title = _("{0}: You are now registered to {1}").format(
+                    SiteConfiguration.instance().association_name,
+                    event.title
+                )
+                logger.info("Sending event notification email from %s to %s" % (from_email, to_emails[0]))
+                send_mail(
+                    title,
+                    _("You are now registered to the event {0}."
+                      " If you want to unregister from event, please click this link {1} ."
+                      " Note that the last date to unregister is {2}").
+                    format(
+                        event.title,
+                        "http://TODO_LINK",#TODO create a page for this
+                        event.signup_deadline
+                    ),
+                    from_email,
+                    to_emails)
+
+            except BadHeaderError:
+                return HttpResponseServerError("BadHeaderError, newlines in email adress?")
+
             messages.success(request, _("Succesfully signed up to event!"))
 
         signups = EventSignup.objects.filter(event=event)
