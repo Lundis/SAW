@@ -2,6 +2,8 @@ from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, BOARD_MEMBER
 
+CAN_VIEW_FRONTPAGE = "can_view_frontpage"
+CAN_EDIT_FRONTPAGE = "can_edit_frontpage"
 
 def get_menu_items():
     """
@@ -10,7 +12,7 @@ def get_menu_items():
     item, created = MenuItem.get_or_create(__package__,
                                            "Home",
                                            reverse_string="frontpage_home",
-                                           permission=SAWPermission.get_or_create("can_view_frontpage"))
+                                           permission=SAWPermission.get_or_create(CAN_VIEW_FRONTPAGE))
     return ([item],
             None,
             None)
@@ -28,6 +30,6 @@ def get_permissions():
     :return: a list of tuples containing the permissions of this module and their default group
     """
     return (
-        ("can_view_frontpage", GUEST, "Can view the frontpage"),
-        ("can_edit_frontpage", BOARD_MEMBER, "Can edit what’s visible on the front page"),
+        (CAN_VIEW_FRONTPAGE, GUEST, "Can view the frontpage"),
+        (CAN_EDIT_FRONTPAGE, BOARD_MEMBER, "Can edit what’s visible on the front page"),
     )

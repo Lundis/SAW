@@ -10,7 +10,7 @@ def get_menu_items():
     item, created = MenuItem.get_or_create(__package__,
                                            "Member Registry",
                                            reverse_string="members_home",
-                                           permission=SAWPermission.get_or_create("can_view_member_registry"))
+                                           permission=SAWPermission.get_or_create(CAN_VIEW))
     return (None,
             [item],
             None)

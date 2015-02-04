@@ -14,7 +14,7 @@ def get_menu_items():
     item, created = MenuItem.get_or_create(__package__,
                                            "Events",
                                            reverse_string="events_home",
-                                           permission=SAWPermission.get_or_create("can_view_events"))
+                                           permission=SAWPermission.get_or_create(CAN_VIEW_EVENTS))
     return ([item],
             None,
             None)
