@@ -7,7 +7,7 @@ import random
 import users.groups
 import logging
 
-logger = logging.Logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def _generate_email_ver_code():
@@ -117,6 +117,7 @@ class SAWPermission(models.Model):
         """
         guest_group, created = Group.objects.get_or_create(name=users.groups.GUEST)
         is_guest_permission = guest_group.permissions.filter(pk=self.permission.pk).exists()
+        logger.debug("%s is guest permission? %s" % (self.permission, is_guest_permission))
         return user.is_superuser or is_guest_permission or \
                user.has_perm(self.permission.content_type.app_label + "." + self.permission.codename)
 
