@@ -15,14 +15,64 @@
             <li class="list-group-item">
                 {{ event.text }}
             </li>
+            <li class="list-group-item">{% trans "Deadline for signing up: " %}{{ event.start|date:"Y-m-d H:i" }}</li>
             <li class="list-group-item">{% trans "Start date: " %}{{ event.start|date:"Y-m-d H:i" }}</li>
             <li class="list-group-item">{% trans "Stop date: " %}{{ event.stop|date:"Y-m-d H:i" }}</li>
-
-
-            <li class="list-group-item">TODO show signup form</li>
-            <li class="list-group-item">TODO show who is signed up to this event</li>
         </ul>
     </div>
+    {% if signupform %}
+        <form action="" method="post">
+            {% csrf_token %}
+            {% bootstrap_form signupform %}
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">
+                    {% trans "Submit" %}
+                </button>
+            {% endbuttons %}
+        </form>
+    {% endif %}
+
+    {% has_perm "events" "CAN_VIEW_SIGNUP_INFO" as can_view_signup_info %}
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <tbody>
+            <tr>
+                <th>{% trans "Signed up" %}</th>
+                <th>{% trans "Name" %}</th>
+                <th>{% trans "Association" %}</th>
+                {% if can_view_signup_info %}
+                    <th>{% trans "Email" %}</th>
+                    <th>{% trans "Diet" %}</th>
+                    <th>{% trans "Other" %}</th>
+                    <th>{% trans "Matricle" %}</th>
+                    <th>{% trans "User account" %}</th>
+                    <th>{% trans "Delete" %}</th>
+                {% endif %}
+            </tr>
+            {% for signup in signups %}
+                <tr>
+                    <td>{{ signup.created|date:"Y-m-d H:i" }}</td>
+                    <td>{{ signup.name }}</td>
+                    <td>{{ signup.association }}</td>
+                    {% if can_view_signup_info %}
+                        <td>{{ signup.email }}</td>
+                        <td>{{ signup.diet }}</td>
+                        <td>{{ signup.other }}</td>
+                        <td>{{ signup.matricle }}</td>
+                        <td>{{ signup.user }}</td>
+                        <td>DELETE BUTTON</td>
+                    {% endif %}
+                </tr>
+
+            {% empty %}
+
+            {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+
 {% endblock %}
 {% block sidebar %}
     {% has_perm "events" "CAN_CREATE_EVENTS" as can_create_events %}
