@@ -72,7 +72,7 @@ def register_thanks(request):
     context = {}
 
     try:
-        from_email = "noreply@%s" % request.get_host()
+        from_email = settings.NO_REPLY_EMAIL
         to_emails = [request.user.email]
         title = ugettext("Confirmation email from ") + SiteConfiguration.instance().association_name
         logger.info("sending verification email from %s to %s" % (from_email, to_emails[0]))
