@@ -14,7 +14,7 @@ class InfoFrontPageItem():
     @staticmethod
     def show_in_side_bar():
         return True
-    
+
     @staticmethod
     def show_in_main_bar():
         return True

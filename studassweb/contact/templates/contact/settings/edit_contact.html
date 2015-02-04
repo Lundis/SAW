@@ -9,7 +9,17 @@
 {% endblock %}
 
 {% block breadcrumb3 %}
-    <li class="active">{% trans "Contact settings" %}</li>
+    <li class="active"><a href="{% url "contact_settings_list_contacts" %}">
+        {% trans "Contact Settings" %}
+    </a></li>
+{% endblock %}
+
+{% block breadcrumb4 %}
+    {% if contact %}
+        <li class="active">{% trans "Editing" %} {{ contact.name }}</li>
+    {% else %}
+        <li class="active">{% trans "New contact" %}</li>
+    {% endif %}
 {% endblock %}
 
 {% block main_content %}
