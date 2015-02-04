@@ -13,7 +13,8 @@ import shutil
 import os
 import datetime
 from concurrent import futures
-from .utils import get_all_modules
+from .utils import get_all_modules, get_modules_with
+
 import logging
 
 logger = logging.Logger(__name__)
@@ -179,6 +180,18 @@ class DisabledModule(models.Model):
     def get_all_enabled_modules(cls):
         all_modules = get_all_modules()
         return [mod for mod in all_modules if cls.is_enabled(mod)]
+
+    @classmethod
+    def execute_for_all_enabled(cls, module, func_name):
+        """
+        execute the specified function from the specified module in all enabled apps where it exists
+        :return:
+        """
+        mod_funcs = get_modules_with(module, func_name)
+
+        for mod, func in mod_funcs:
+            if cls.is_enabled(mod):
+                func()
 
 
 class Comment(models.Model):

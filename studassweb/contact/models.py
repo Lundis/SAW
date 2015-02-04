@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
 from ckeditor.fields import RichTextField
+from solo.models import SingletonModel
 
 
 class ContactInfo(models.Model):
@@ -39,4 +40,9 @@ class Message(models.Model):
     contact = models.ForeignKey(ContactInfo)
 
 
+class ContactSettings(SingletonModel):
+    _is_setup = models.BooleanField(default=False)
 
+    @classmethod
+    def is_setup(cls):
+        return cls.objects.get_or_create()[0]._is_setup

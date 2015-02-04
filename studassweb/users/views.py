@@ -5,12 +5,12 @@ from django.contrib.auth import logout, login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.utils.translation import ugettext as _
+from django.core.mail import send_mail, BadHeaderError
 from members.models import Member
 from .forms import LoginForm, RegisterForm
 from .models import UserExtension
 from .groups import put_user_in_standard_group, LOGGED_ON
-from django.core.mail import send_mail, BadHeaderError
-from django.utils.translation import ugettext
 from base.models import SiteConfiguration
 import logging
 
@@ -74,14 +74,14 @@ def register_thanks(request):
     try:
         from_email = settings.NO_REPLY_EMAIL
         to_emails = [request.user.email]
-        title = ugettext("Confirmation email from ") + SiteConfiguration.instance().association_name
+        title = _("Confirmation email from ") + SiteConfiguration.instance().association_name
         logger.info("sending verification email from %s to %s" % (from_email, to_emails[0]))
         send_mail(
             title,
-            ugettext("Hello! Please visit this link: ") +
+            _("Hello! Please visit this link: ") +
             request.scheme + "://" + request.get_host() +
             reverse("users_verify_email", kwargs={'code': user_ext.email_verification_code, }) +
-            ugettext(" to confirm your email."),
+            _(" to confirm your email."),
             from_email,
             to_emails)
 
