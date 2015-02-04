@@ -61,7 +61,16 @@
                         <td>{{ signup.other }}</td>
                         <td>{{ signup.matricle }}</td>
                         <td>{{ signup.user }}</td>
-                        <td>DELETE BUTTON</td>
+                        <td>
+                            <form action="{% url 'events_delete_event_signup' signup.id %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
+                                {% csrf_token %}
+                                {% buttons %}
+                                    <button type="submit" class="btn btn-danger">
+                                        {% trans "Delete" %}
+                                    </button>
+                                {% endbuttons %}
+                            </form>
+                        </td>
                     {% endif %}
                 </tr>
 

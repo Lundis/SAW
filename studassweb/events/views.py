@@ -101,25 +101,28 @@ def delete_event(request, event_id):
             logger.warning('Attempted to access delete_event via other method than POST')
             return HttpResponseNotAllowed(['POST', ])
 
-"""
+
 def delete_event_signup(request, event_signup_id):
     if request.method == 'POST':
         try:
             signup = EventSignup.objects.get(id=event_signup_id)
             if permissions.has_user_perm(request.user, CAN_VIEW_SIGNUP_INFO):
-                name = str(signup.name)
+                signup_name = str(signup.name)
                 event_id = str(signup.event.id)
+                event_name = str(Event.objects.get(id=event_id).title)
                 signup.delete()
-                messages.success(request, _("Event %s was sucessfully deleted!") % signup)
-                return HttpResponseRedirect(reverse("events_home"))
+                messages.success(
+                    request,
+                    _("Event signup for {0} from event {1} was sucessfully removed!").format(signup_name, event_name)
+                )
+                return HttpResponseRedirect(reverse("events_view_event", args=event_id))
             else:
                 logger.warning('User %s tried to delete signup id %s', request.user, event_signup_id)
                 return HttpResponseForbidden('You don\'t have permission to remove this!')
-        except Event.DoesNotExist:
+        except EventSignup.DoesNotExist:
             logger.warning('User %s tried to delete nonexistant signup id %s', request.user, event_signup_id)
-            return HttpResponseNotFound('No such event!')
+            return HttpResponseNotFound('No such EventSignup!')
     else:
             logger.warning('Attempted to access delete_event_signup via other method than POST')
             return HttpResponseNotAllowed(['POST', ])
 
-"""
