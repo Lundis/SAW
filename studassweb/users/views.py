@@ -69,7 +69,7 @@ def register_thanks(request):
         user_ext = UserExtension.objects.get(user=request.user)
     except UserExtension.DoesNotExist:
         raise Http404
-    context = {'code': user_ext.email_verification_code}
+    context = {}
 
     try:
         from_email = "noreply@%s" % request.get_host()
