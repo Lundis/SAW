@@ -1,85 +1,76 @@
 from django.shortcuts import render
 from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseRedirect,\
-    HttpResponseNotAllowed, HttpResponseServerError
-from users import permissions
-from .forms import MessageForm
-from .models import Message, Settings
-from .register import CAN_VIEW_CONTACT_INFO, CAN_USE_CONTACT_FORM, CAN_VIEW_MESSAGES
+    HttpResponseNotAllowed, HttpResponseServerError, Http404
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError
-from django.utils.translation import ugettext
-from base.models import SiteConfiguration
 from django.utils.translation import ugettext as _
+from users import permissions
+from users.decorators import has_permission
+from .forms import MessageForm
+from .models import Message, ContactInfo
+from .register import CAN_VIEW_CONTACT_INFO, CAN_USE_CONTACT_FORM, CAN_VIEW_MESSAGES
 import logging
 
 logger = logging.getLogger(__name__)
 
 
+@has_permission(CAN_VIEW_CONTACT_INFO)
 def home(request):
-    if not permissions.has_user_perm(request.user, CAN_VIEW_CONTACT_INFO):
-        logger.warning('User %s tried to view contact info', request.user)
-        return HttpResponseServerError('You don\'t have permission to view contact info!')
-
-    info_text = Settings.get_solo().info_text
-    #If no custom contact page is specified we show a sane page instead of a blank page
-    if not len(info_text) > 0:
-        contact_email = SiteConfiguration.instance().association_contact_email
-        info_text = _("Please contact us at %s" % contact_email)
-    return render(request, "contact/show_contact_info.html", {'info_text': info_text,})
+    contacts = ContactInfo.objects.all()
+    context = {'contacts': contacts}
+    return render(request, "contact/show_contact_info.html", context)
 
 
-def write_message(request):
-    settings = Settings.get_solo()
-    if not (settings.save_to_db or settings.send_email):
+@has_permission(CAN_USE_CONTACT_FORM)
+def write_message(request, contact_id):
+    try:
+        contact = ContactInfo.objects.get(id=contact_id)
+    except ContactInfo.DoesNotExist:
+        raise Http404("No such contact exists")
+
+    if not (contact.save_to_db or contact.send_email):
         logger.warning('Messages in contact module are neither saved to db nor sent as email.'
                        'It is thus not functional')
-        return HttpResponseForbidden(
+        return HttpResponseServerError(
             'Messages in contact module are neither saved to db nor sent as email.'
             'It is thus not functional'
         )
-    if not permissions.has_user_perm(request.user, CAN_USE_CONTACT_FORM):
-        logger.warning('User %s tried to write a message', request.user)
-        return HttpResponseForbidden('You don\'t have permission to write message!')
+    form = MessageForm(request.POST or None)
+    if form.is_valid():
+        if contact.save_to_db:
+            temp = form.save(commit=False, contact=contact, from_person=request.user)
 
-    form = MessageForm()
+        if contact.send_email:
+            try:
+                send_mail(
+                    _("Site message from ")+" \"" + str(request.user) +
+                    "\" Title: " + form.cleaned_data['title'], form.cleaned_data['message'],
+                    form.cleaned_data['from_email'],
+                    [contact.email])
 
-    if request.method == 'POST':
-        form = MessageForm(request.POST)
-        if form.is_valid():
-            if settings.save_to_db:
-                form.save()
-                temp = form.save(commit=False)
-                temp.from_person = request.user
-                temp.save()
+            except BadHeaderError:
+                messages.error(request, "Bad header, message not sent!")
+                return HttpResponseRedirect(reverse("contact_write_message"))
 
-            if settings.send_email:
-                try:
-                    send_mail(
-                        ugettext("Site message from ")+" \"" + str(temp.from_person) +
-                        "\" Title: " + form.cleaned_data['title'], form.cleaned_data['message'],
-                        form.cleaned_data['from_email'], [SiteConfiguration.instance().association_contact_email])
-
-                except BadHeaderError:
-                    messages.error(request, "Bad header, message not sent!")
-                    return HttpResponseRedirect(reverse("contact_write_message"))
-
-            messages.success(request, "Message successfully sent!")
-            return HttpResponseRedirect(reverse("contact_home"))
+        messages.success(request, "Message successfully sent!")
+        return HttpResponseRedirect(reverse("contact_home"))
 
     context = {'form': form}
 
     return render(request, "contact/write_message.html", context)
 
+@has_permission(CAN_VIEW_MESSAGES)
+def read_messages(request, contact_id):
+    try:
+        contact = ContactInfo.objects.get(id=contact_id)
+    except ContactInfo.DoesNotExist:
+        raise Http404("The Specified contact was not found")
 
-def read_messages(request):
-    if not permissions.has_user_perm(request.user, CAN_VIEW_MESSAGES):
-        logger.warning('User %s tried to read messages', request.user)
-        return HttpResponseForbidden('You don\'t have permission to read messages!')
+    msgs = Message.objects.filter(contact__id=contact.id).order_by('-date_and_time')
 
-    msgs = Message.objects.filter().order_by('-date_and_time')
-
-    return render(request, "contact/view_messages.html",{'msgs': msgs,})
+    return render(request, "contact/view_messages.html",
+                  {'msgs': msgs})
 
 
 def delete_message(request, message_id):
@@ -97,5 +88,5 @@ def delete_message(request, message_id):
         except Message.DoesNotExist:
             return HttpResponseNotFound('No such message!')
     else:
-            logger.warning('Attempted to access delete_message via GET')
-            return HttpResponseNotAllowed(['POST', ])
+        logger.warning('Attempted to access delete_message via GET')
+        return HttpResponseNotAllowed(['POST', ])

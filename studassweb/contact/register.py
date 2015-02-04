@@ -45,7 +45,7 @@ def register_settings_pages():
         "Contact module",
         "Settings for contact module",
         SECTION_OTHER,
-        reverse_lazy("contact_settings_edit_settings"),
+        reverse_lazy("contact_settings_list_contacts"),
         CAN_EDIT_CONTACT_SETTINGS)
 
     return contact_mod,
