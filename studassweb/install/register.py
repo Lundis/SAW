@@ -10,7 +10,7 @@ def get_menu_items():
     item, created = MenuItem.get_or_create(__package__,
                                            "Install",
                                            reverse_string="install_welcome",
-                                           permission=SAWPermission.get_or_create("can_install"))
+                                           permission=SAWPermission.get_or_create(CAN_INSTALL))
     return (None,
             [item],
             None)

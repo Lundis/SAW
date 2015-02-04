@@ -18,7 +18,7 @@ def get_menu_items():
     item, created = MenuItem.get_or_create(__package__,
                                            "Polls",
                                            reverse_string="polls_home",
-                                           permission=SAWPermission.get_or_create("can_view_polls"))
+                                           permission=SAWPermission.get_or_create(CAN_VIEW_PUBLIC_POLLS))
     return ([item],
             None,
             None)
