@@ -57,13 +57,13 @@ edges = ""
 
 output = "digraph techdef {\n"
 #Preserves the overall geometric relationships in the layout, can require high scale factors
-output += "overlap=scale\n"
+#output += "overlap=scale\n"
 #Magic bounded Voronoi diagram voodoo
-#output += "overlap=false\n"
+output += "overlap=false\n"
 #no overlapping edges (EXPENSIVE!)
-#output += "splines=true\n"
-
-#TODO create a legend, maybe just a box with fixed size fixed location (pixelwise)
+output += "splines=true\n"
+#"weight" makes more distance between nodes, penwidth creates wider edges 
+output += "edge[weight=0.5,penwidth=1.5]" 
 
 #Splitting input into different cards
 cards = data.split("Requirement ID")
@@ -169,7 +169,7 @@ for card in cards:
 				if card_id not in specializes_checklist[special_kid]:
 					print "INCONSISTENCY: Add specializes " + card_id + " to " + special_kid + " !"
 			
-		
+		#TODO put into constants
 		#Pick out module from card_id and specify color
 		if card_priority == 1:
 			node_color = "color = crimson,"
@@ -193,15 +193,16 @@ for card in cards:
 		
 		#Start adding to "edges" variable
 		for perjantai in card_depends_on:
-			edges += "\"" + card_id + "\" -> \"" + perjantai + "\" [color=blue];\n"
+			edges += "\"" + card_id + "\" -> \"" + perjantai + "\" [color=blue,tooltip=\"" + card_id + " depends on " + perjantai + "\"];\n"
 			
 		for perjantai in card_specializes:
-			edges += "\"" + card_id + "\" -> \"" + perjantai + "\" [color=red];\n"
-			
-		for perjantai in card_specialized_by:
-			edges += "\"" + card_id + "\" -> \"" + perjantai + "\" [color=green];\n"
+			edges += "\"" + card_id + "\" -> \"" + perjantai + "\" [color=green,tooltip=\"" + card_id + " specializes " + perjantai + "\"];\n"
+		
+		#Actually, we don't want an arrow back.		
+		#for perjantai in card_specialized_by:
+		#	edges += "\"" + card_id + "\" -> \"" + perjantai + "\" [color=green];\n"
 
-print "Done processing cards"			
+print "Done processing cards"
 output += nodes + edges
 output += "}\n"
 
