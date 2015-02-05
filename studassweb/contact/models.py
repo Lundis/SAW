@@ -6,7 +6,7 @@ from solo.models import SingletonModel
 
 
 class ContactInfo(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     info_text = RichTextField()
     save_to_db = models.BooleanField(default=True)
     send_email = models.BooleanField(default=True)
@@ -29,6 +29,9 @@ class ContactInfo(models.Model):
             old_with_index.ordering_index += 1
             old_with_index.save()
         super(ContactInfo, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
 
 
 class Message(models.Model):
