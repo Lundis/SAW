@@ -1,0 +1,40 @@
+{% extends "contact/base.html" %}
+
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block breadcrumb1 %}
+    <li class="active">
+        {% trans "Contact" %}
+    </li>
+{% endblock %}
+
+{% block main_content %}
+    {% for contact in contacts %}
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <div class="row inherit-padding-left-right">
+                    <div class="pull-left inherit-padding-left-right">
+                        <h4>
+                            {{ contact.name }}
+                        </h4>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                {{ contact.info_text | safe }}
+            </div>
+            <div class="panel-footer">
+                <div class="row inherit-padding-left-right">
+                    <div class="pull-right text-right">
+                        <a href="{% url "contact_write_message" contact_id=contact.id %}" class="btn btn-primary">
+                            {% trans "Send message" %}
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock %}

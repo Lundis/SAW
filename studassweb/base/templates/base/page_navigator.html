@@ -1,0 +1,7 @@
+<ol class="breadcrumb">
+    {% for item in items %}
+        <li>
+            <a href="{{ item.url }}">{{ item.name }}</a>
+        </li>
+    {% endfor %}
+</ol>

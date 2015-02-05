@@ -1,0 +1,12 @@
+{% extends "polls/base.html" %}
+
+{% load i18n %}
+
+{% block inner_content %}
+<div>
+	<p>{% trans "Poll question" %}?</p>
+	{% for choice in choices %}
+		<a href="{{ forloop.counter0 }}">{{ choice }}</a>
+	{% endfor %}
+</div>
+{% endblock%}

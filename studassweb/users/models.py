@@ -1,21 +1,37 @@
 from django.db import models
-from django.contrib.auth.models import User, Permission, ContentType
+from django.contrib.auth.models import User, Permission, ContentType, Group
 from solo.models import SingletonModel
-from members.models import Member
+from base.models import DisabledModule
+from importlib import import_module
+import random
+import users.groups
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def _generate_email_ver_code():
+        code = ""
+        alphabet = "qwertyuiopasdfghjklzxcvbnm1234567890"
+        for i in range(32):
+            code += alphabet[random.randint(0, len(alphabet)-1)]
+        return code
+
 
 class UserExtension(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    avatar = models.ImageField(upload_to='users/avatars', default='users/avatars/default_avatar.png')
     # A field where the user can write a short text about themselves
     description = models.TextField(max_length=1000, blank=True, default="")
     link_to_homepage = models.URLField(blank=True, default="")
-    member = models.ForeignKey(Member, null=True, blank=True, unique=True)
+    email_verified = models.BooleanField(default=False)
+    email_verification_code = models.CharField(max_length=32, unique=True)
 
     def __str__(self):
         return self.user.username
 
     @classmethod
-    def create_user(cls, username, password, first_name, last_name, email,
-                    member=False, enrollment_year=None, graduation_year=None):
+    def create_user(cls, username, password, first_name, last_name, email):
         """
         :return:
         """
@@ -23,15 +39,41 @@ class UserExtension(models.Model):
         user.first_name = first_name
         user.last_name = last_name
         user.save()
+        return cls.create_for_user(user)
+
+    @classmethod
+    def create_for_user(cls, user):
         user_ext = UserExtension(user=user)
-        if member:
-            _member = Member(enrollment_year=enrollment_year, graduation_year=graduation_year)
-            _member.save()
-            user_ext.member = _member
+        # make sure the verification code is unique
+        user_ext.email_verification_code = _generate_email_ver_code()
+        while cls.objects.filter(email_verification_code=user_ext.email_verification_code).exists():
+            user_ext = _generate_email_ver_code()
         user_ext.save()
+        # Create a member object for superusers if the members module is enabled
+        if DisabledModule.is_enabled("members"):
+            # dynamic import to get rid of dependency
+            members = import_module("members.models")
+            members.Member.create_from_user_ext(user_ext)
+            logger.warning('Member for user %s was created at login' % user.username)
         return user_ext
 
+    @classmethod
+    def verify_email(cls, code):
+        try:
+            user_ext = cls.objects.get(email_verification_code=code)
+            user_ext.email_verified = True
+            user_ext.save()
+            return True
+        except cls.DoesNotExist:
+            return False
 
+    def groups(self):
+        """
+        Returns any groups this user is in. Only the most import default group is returned.
+        TODO: also return custom groups
+        :return:
+        """
+        return users.groups.get_user_group(self.user),
 
 
 class LdapLink(models.Model):
@@ -58,31 +100,26 @@ class SAWPermission(models.Model):
         """
         :return: The requested SAWPermission
         """
-        permission, created = Permission.objects.get_or_create(name=perm_name,
-                                                                    codename=perm_name,
-                                                                    content_type=DummyPermissionBase.get_content_type())
+        fancy_name = perm_name[0].upper() + perm_name[1:].replace("_", " ")
+        permission, created = Permission.objects.get_or_create(name=fancy_name,
+                                                               codename=perm_name,
+                                                               content_type=DummyPermissionBase.get_content_type())
         saw_permission, created = cls.objects.get_or_create(permission=permission)
-        # if the description is empty of the object was created, add the description
+        # if the description isn't "" and the object was created or it doesn't have a description, add the description
         if description and (created or not saw_permission.description):
             saw_permission.description = description
             saw_permission.save()
         return saw_permission
 
-    def _has_user_perm(self, user):
+    def has_user_perm(self, user):
         """
         :return: True if the user has this permission
         """
-        return user.is_superuser or \
+        guest_group, created = Group.objects.get_or_create(name=users.groups.GUEST)
+        is_guest_permission = guest_group.permissions.filter(pk=self.permission.pk).exists()
+        logger.debug("%s is guest permission? %s" % (self.permission, is_guest_permission))
+        return user.is_superuser or is_guest_permission or \
                user.has_perm(self.permission.content_type.app_label + "." + self.permission.codename)
-
-    @classmethod
-    def has_user_perm(cls, user, perm_name):
-        """
-        :param user: User object
-        :param perm_name: permission string
-        """
-        sawp = cls.get_or_create(perm_name)
-        return sawp._has_user_perm(user)
 
 
 class DummyPermissionBase(SingletonModel):

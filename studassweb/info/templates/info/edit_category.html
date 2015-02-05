@@ -1,0 +1,28 @@
+{% extends "info/base.html" %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block breadcrumb2 %}
+    <li class="active">
+    {% if category %}
+        {% trans "Editing" %} {{ category.name }}
+    {% else %}
+        {% trans "New Category" %}
+    {% endif %}
+    </li>
+{% endblock %}
+
+{% block main_content %}
+    <form action="" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button type="submit" class="btn btn-primary">
+            {% trans "Submit" %}
+        </button>
+        {% if category %}
+            <a href="{% url "info_delete_category" category_id=category.id %}" class="btn btn-danger">
+                {% trans "Delete" %}
+            </a>
+        {% endif %}
+    </form>
+{% endblock %}

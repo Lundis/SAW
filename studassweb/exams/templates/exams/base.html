@@ -1,0 +1,15 @@
+{% extends 'base/base.html' %}
+{% load i18n %}
+
+{% block title %}
+    {% trans "Exams" %}
+{%  endblock %}
+
+{% block menu %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Exams" %}
+{% endblock %}
+
+{% block breadcrumb1 %}
+    <li><a href="{% url "exams_main" %}">{% trans "Exams" %}</a></li>
+{% endblock %}

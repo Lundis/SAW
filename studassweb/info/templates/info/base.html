@@ -1,0 +1,11 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block menu %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Info" %}
+{% endblock menu %}
+
+{% block breadcrumb1 %}
+    <li class="active"><a href="{% url "info_view_categories" %}">{% trans "Pages" %}</a></li>
+{% endblock %}

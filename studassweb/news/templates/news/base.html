@@ -1,0 +1,20 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/news/news.css" %}" />
+{% endblock %}
+
+{% block title %}
+    {% trans "News" %}
+{% endblock %}
+
+{% block menu %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "News" %}
+{% endblock %}
+
+{% block breadcrumb1 %}
+    <li><a href="{% url "news_home" %}">News</a></li>
+{% endblock %}

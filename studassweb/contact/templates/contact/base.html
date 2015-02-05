@@ -1,0 +1,41 @@
+{% extends 'base/base.html' %}
+{% load i18n %}
+{% load sawp %}
+
+{% block title %}
+    {% trans "Contact" %}
+{%  endblock %}
+
+{% block menu %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Contact" %}
+{% endblock %}
+
+{% block breadcrumb1 %}
+    <li><a href="{% url "contact_home" %}">
+        {% trans "Contact" %}
+    </a></li>
+{% endblock %}
+
+{% block sidebar %}
+    {% has_perm "contact" "CAN_VIEW_CONTACT_INFO" as can_view_contact_info %}
+    {% has_perm "contact" "CAN_USE_CONTACT_FORM" as can_use_contact_form %}
+    {% has_perm "contact" "CAN_VIEW_MESSAGES" as can_view_messages %}
+    {% has_perm "contact" "CAN_EDIT_CONTACT_SETTINGS" as can_edit_contact_settings %}
+    {% if can_view_contact_info or can_use_contact_form or can_view_messages or can_edit_contact_settings %}
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Settings" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    {% if can_view_messages%}
+                        <a href="{% url 'contact_settings_list_contacts' %}">
+                            <div class="btn list-group-item">{% trans "Settings" %}</div>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

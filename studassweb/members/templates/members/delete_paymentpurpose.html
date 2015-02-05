@@ -1,0 +1,20 @@
+{% extends 'members/base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% load setvar %}
+
+{% block main_content %}
+    <div class="container">
+        <h1>{% trans "Delete Payment purpose" %}</h1>
+        <p>{% trans "Are you sure you want to delete this Payment purpose?" %}</p>
+        <form action="" method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">
+                    {% trans "Submit" %}
+                </button>
+            {% endbuttons %}
+        </form>
+    </div>
+{% endblock %}

@@ -1,5 +1,10 @@
 from django.shortcuts import render
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
+from install.models import InstallProgress
 
-# Create your views here.
+
 def frontpage(request):
-	return render(request, 'frontpage/frontpage.html')
+    if not InstallProgress.is_finished():
+        return HttpResponseRedirect(reverse("install_welcome"))
+    return render(request, 'frontpage/frontpage.html')

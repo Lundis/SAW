@@ -1,0 +1,31 @@
+<script>
+    function updateHiddenFormFields() {
+        var old_fields = document.getElementsByClassName("hidden-menu-field");
+        for (i = 0; i < old_fields.length; i++) {
+            old_fields[i].parentNode.removeChild(old_fields[i]);
+        }
+        {% for menu in menu_strings %}
+            var new_{{ menu }}_items = document.getElementById("{{ menu }}-menu-container").childNodes;
+            var index = 0;
+            for ( var i = 0; i < new_{{ menu }}_items.length; i++) {
+                try {
+                    var menu_id = "{{ menu }}-" + new_{{ menu }}_items[i].getAttribute("id");
+                    add_hidden_input(menu_id, index);
+                    index++;
+                } catch(e) {
+                    // ignore error because it is weird and sucks and shouldn't exist
+                }
+            }
+        {% endfor %}
+    }
+
+    function add_hidden_input(menu_id, order) {
+        var input_field = document.createElement("input");
+        input_field.setAttribute("name", menu_id);
+        input_field.setAttribute("value", order);
+        input_field.setAttribute("type", "hidden");
+        input_field.setAttribute("class","hidden-menu-field");
+        var form = document.getElementById("{{ form_name }}");
+        form.appendChild(input_field);
+    }
+</script>

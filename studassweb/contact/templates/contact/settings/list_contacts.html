@@ -1,0 +1,60 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block breadcrumb2 %}
+    <li class="active"><a href="{{ section.get_absolute_url }}">
+        {% trans section.title %}
+    </a></li>
+{% endblock %}
+
+{% block breadcrumb3 %}
+    <li class="active">
+        {% trans "Contact settings" %}
+    </li>
+{% endblock %}
+
+{% block main_content %}
+    {% for contact in contacts %}
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <div class="row inherit-padding-left-right">
+                    <div class="pull-left inherit-padding-left-right">
+                        <h4>
+                            {{ contact.name }}
+                        </h4>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                {{ contact.info_text | safe }}
+            </div>
+            <div class="panel-footer">
+                <div class="pull-left inherit-padding-left-right">
+                    {{ contact.email }}
+                </div>
+                <div class="row inherit-padding-left-right">
+                    <div class="pull-right text-right">
+                        <a href="{% url "contact_settings_edit_contact" contact_id=contact.id %}" class="btn btn-primary">
+                            {% trans "Edit" %}
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
+
+{% block sidebar %}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            {% trans "Actions" %}
+        </div>
+        <div class="panel-body">
+            <a class="btn btn-primary btn-block" href="{% url "contact_settings_new_contact" %}">
+                {% trans "Create new contact" %}
+            </a>
+        </div>
+    </div>
+{% endblock %}

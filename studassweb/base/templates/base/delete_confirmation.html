@@ -1,0 +1,21 @@
+{% extends "base/base.html" %}
+
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block main_content %}
+    {% if form %}
+        <p>{% trans "Are you sure you want to delete" %}
+            <a href={{ item.get_absolute_url }}>{{ item }}</a>?
+        </p>
+        <form action="{{ form_url }}" method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button type="submit" class="btn btn-primary">
+                {% trans "Confirm" %}
+            </button>
+        </form>
+    {% else %}
+        <p>{{ item_name }} {% trans "was deleted successfully!" %}</p>
+    {% endif %}
+{% endblock %}

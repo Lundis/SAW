@@ -1,0 +1,48 @@
+{% extends "boards/base.html" %}
+
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block breadcrumb2 %}
+    <li>
+        <a href="#">
+            {% trans "Board types" %}
+        </a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb3 %}
+    <li>
+        {% if form.instance.pk %}
+            Edit {{ form.instance.name }}
+        {% else %}
+            {% trans "Add board type" %}
+        {% endif %}
+    </li>
+{% endblock %}
+
+{% block main_content %}
+    {% load navigator %}
+
+    {% if form.instance.pk %}
+        <h1>Edit {{ form.instance.name }}</h1>
+    {% else %}
+        <h1>Add board type</h1>
+    {% endif %}
+
+    {% if form.instance.pk %}
+        <p>{% trans "Note: If you want to remove this board type you first have to remove all boards of this type." %}</p>
+    {% endif %}
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">
+                {% trans "Submit" %}
+            </button>
+        {% endbuttons %}
+    </form>
+{% endblock %}
+{% block sidebar %}
+{% endblock %}

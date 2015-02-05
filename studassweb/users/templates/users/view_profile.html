@@ -1,0 +1,108 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load setvar %}
+{% load bootstrap3 %}
+{% load sawp %}
+
+{% block menu %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "" %}
+{% endblock %}
+
+{% block main_content %}
+    <div class="row">
+        <div class="col-sm-5">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <small>{% trans "User" %} </small><strong>{{ user_ext.user.username }}</strong>
+                </div>
+                <div class="panel-body">
+                    <img src="{{ user_ext.avatar.url }}" width="200px" height="200px" alt="User avatar" class="center-block img-responsive"/>
+
+                    <div class="small center-block">
+                        {% trans "Member since" %} {{ user_ext.user.date_joined }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-7">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <strong>{% trans "General Information" %}</strong>
+                </div>
+                <div class="panel-body">
+                    <table class="table">
+                        <tr>
+                            <td>
+                                {% trans "Real name" %}
+                            </td>
+                            <td>
+                                {{ user_ext.user.first_name }}
+                                {{ user_ext.user.last_name }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Member</td>
+                            <td>
+                                {% setvar user_ext.member as member %}
+                                {% if member %}
+                                    {% if member.confirmed %}
+                                        <span class="glyphicon glyphicon-ok"></span>
+                                    {% elif user_ext.can_apply_for_membership %}
+                                        <span class="glyphicon glyphicon-question-sign" title="{% trans "Status pending" %}"></span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                    {% if user_ext.user == user and user_ext.email_verified %}
+                                        <a href="{% url "members_apply_membership" %}">
+                                            {% trans "Apply" %}
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        {% if user_ext.user == user %}
+                            <tr>
+                                <td>{% trans "Email verified" %}</td>
+                                <td>
+                                    {% if user_ext.email_verified %}
+                                        <span class="glyphicon glyphicon-ok"></span>
+                                    {% else %}
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+
+                    </table>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <strong>{% trans "About me" %}</strong>
+                </div>
+                <div class="panel-body">
+                    <p>{{ user_ext.description }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block sidebar %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <strong>{% trans "Actions" %}</strong>
+        </div>
+        <div class="panel-body">
+            {% has_perm "users" "EDIT_PERMISSIONS" as show_group_edit %}
+            {% if show_group_edit %}
+                group settings goes here
+            {% endif %}
+            {% if user_ext.user == user %}
+                <a class="button" href="{% url "users_settings_edit_user" %}">Edit Profile</a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

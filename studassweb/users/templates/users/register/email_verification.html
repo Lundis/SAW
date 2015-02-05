@@ -1,0 +1,23 @@
+{% extends 'base/base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block title %}
+    {% trans "Register" %}
+{%  endblock %}
+
+{% block menu %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Register" %}
+{% endblock %}
+
+{% block main_content %}
+    {% if success %}
+        <h2>{% trans "Thanks for verifying your email" %}! </h2>
+        <p>{% trans "If you are a member of this association you can now apply for a member account" %}
+            <a href="{% url "members_apply_membership" %}">{% trans "here" %}.</a>
+        </p>
+    {% else %}
+        <h2>{% trans "Error: Your verification code did not match any user" %}!</h2>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "exams/base.html" %}
+
+{% load i18n %}
+
+
+{% block breadcrumb1 %}
+    <li class="active">{% trans "Exams" %}</li>
+{% endblock %}
+
+{% block main_content %}
+    <h3>Courses</h3>
+    <div class="list-group">
+        {% for course in courses %}
+            <a class="list-group-item" href="{% url 'exams_view_course' course.id %}">{{ course.name }}
+                        <span class="badge">
+                            {{ course.get_exam_count }}
+                        </span>
+            </a>
+        {% empty %}
+            <p>{% trans "No courses found!" %}</p>
+        {% endfor %}
+    </div>
+    <h3>Examinators</h3>
+    <div class="list-group">
+        {% for examinator in examinators %}
+            <a class="list-group-item" href="{% url 'exams_view_examinator' examinator.id %}">{{ examinator.name }}
+                        <span class="badge">
+                                {{ examinator.get_exam_count }}
+                        </span>
+            </a>
+        {% empty %}
+            <p>{% trans "No examinators found!" %}</p>
+        {% endfor %}
+    </div>
+{% endblock %}
+{% block sidebar %}
+    {% if show_add_buttons %}
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Add" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <a href="{% url 'exams_add_exam' %}">
+                        <div class="btn list-group-item">{% trans "Add new exam" %}</div>
+                    </a>
+                    <a href="{% url 'exams_add_course' %}">
+                        <div class="btn list-group-item">{% trans "Add new course" %}</div>
+                    </a>
+                    <a href="{% url 'exams_add_examinator' %}">
+                        <div class="btn list-group-item">{% trans "Add new examinator" %}</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

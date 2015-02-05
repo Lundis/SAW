@@ -1,0 +1,41 @@
+{% extends 'news/base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block breadcrumb2 %}
+    <li class="active">
+        {% if category %}
+            {% trans "Editing" %} {{ category.name }}
+        {% else %}
+            {% trans "New Category" %}
+        {% endif %}
+    </li>
+{% endblock %}
+
+{% block main_content %}
+    {% load navigator %}
+    {% url "news_home" as news_url %}
+    <form action="" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+
+        <button type="submit" class="btn btn-primary">
+            {% trans "Submit" %}
+        </button>
+    </form>
+{% endblock %}
+
+{% block sidebar %}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            {% trans "Actions" %}
+        </div>
+        <div class="panel-body">
+            {% if category %}
+                <a href="{% url "news_delete_category" category_id=category.id %}" class="btn btn-danger">
+                    {% trans "Delete" %}
+                </a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "events/base.html" %}
+
+{% load i18n %}
+{% load bootstrap3 %}
+{% load static %}
+
+
+{% block main_content %}
+    {% load navigator %}
+    {% url "events_home" as events_url %}
+    {% if form.instance.pk %}
+        {% display_navigator events_url "Events" form.instance.get_absolute_url form.instance%}
+    {% else %}
+        {% display_navigator events_url "Events" "#" "New event" %}
+    {% endif %}
+    {% if form.instance.pk %}
+        <h1>Edit {{ form.instance }}</h1>
+    {% else %}
+        <h1>Add event</h1>
+    {% endif %}
+
+    {% if form.instance.pk %}
+        <form action="{% url 'events_delete_event' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
+            {% csrf_token %}
+            {% buttons %}
+                <button type="submit" class="btn btn-danger">
+                    {% trans "Remove this event" %}
+                </button>
+            {% endbuttons %}
+        </form>
+    {% endif %}
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">
+                {% trans "Submit" %}
+            </button>
+        {% endbuttons %}
+    </form>
+{% endblock %}
+
+{% block scripts %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/base/jquery.datetimepicker.css" %}"/>
+    <script src="{% static "js/base/jquery.datetimepicker.js" %}"></script>
+    <script type="text/javascript">
+        $(function () {
+
+            //Set up datetimepicker
+            $( "#id_start" ).datetimepicker({
+                dayOfWeekStart: 1,
+                format: "d.n.Y H:m"
+            });
+            $( "#id_stop" ).datetimepicker({
+                dayOfWeekStart: 1,
+                format: "d.n.Y H:m"
+            });
+            $( "#id_signup_deadline" ).datetimepicker({
+                dayOfWeekStart: 1,
+                format: "d.n.Y H:m"
+            });
+        })
+    </script>
+{% endblock %}

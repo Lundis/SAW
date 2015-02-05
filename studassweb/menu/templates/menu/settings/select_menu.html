@@ -1,0 +1,85 @@
+{% extends "settings/base.html" %}
+{% load i18n %}
+
+{% block breadcrumb2 %}
+    <li>
+        <a href="{{ section.get_absolute_url }}">
+            {% trans section.title %}
+        </a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb3 %}
+    <li class="active">
+        {% trans "Menu Editor" %}
+    </li>
+{% endblock %}
+
+{% block main_content %}
+    <div class="row">
+        <div class="col-sm-5">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    {% trans "Menu preview" %}
+                </div>
+                <div class="panel-body">
+                    {% for menu in menus %}
+                        <div id="menu-items-{{ menu.id }}" class="menu-items hidden">
+                            <div class="list-group">
+                                {% for item in menu.items %}
+                                    <div class="btn list-group-item">{{ item.display_name }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3>{% trans "Select a menu to edit." %}</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="list-group">
+                        {% for menu in menus %}
+                            <a href="{% url "menu_settings_edit_menu" menu.id %}" >
+                                <div class="btn list-group-item menu" id="menu-{{ menu.id }}">{{ menu.menu_name }}</div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-1">
+            <a href="{% url "menu_settings_new_menu" %}" class="btn btn-primary">{% trans "Create a new menu" %}</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                {% trans "Click on a custom menu item to edit it or " %}
+                <a href="{% url "menu_settings_new_menu_item" %}">{% trans "create a new one" %}</a>
+            </div>
+            <div class="panel-body">
+                {% for item in custom_menu_items %}
+                    <a href="{% url "menu_settings_edit_menu_item" item_id=item.id %}" title="{{ item.get_absolute_url }}">
+                        {{ item.display_name }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(".menu").mouseover(function(event) {
+            var menu_id = event.target.getAttribute("id").split("-")[1];
+            $(".menu-items").addClass("hidden");
+            $("#menu-items-" + menu_id).removeClass("hidden");
+
+        });
+    </script>
+{% endblock %}

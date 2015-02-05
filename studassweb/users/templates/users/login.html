@@ -1,0 +1,26 @@
+{% extends 'base/base.html' %}
+{% load i18n %}
+
+{% block title %}
+    {% trans "Login" %}
+{%  endblock %}
+
+{% block menu %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Login" %}
+{% endblock %}
+
+{% block main_content %}
+    {% if not user.is_authenticated %}
+        <form action="{% url "users_login" %}" method="post">
+            {% csrf_token %}
+            {% load bootstrap3 %}
+            {% bootstrap_form form %}
+            <input type="submit" value="Submit" />
+
+        </form>
+        <p>{% trans "Don't have an account? Register"%} <a href="{% url "users_register" %}">{% trans "here" %}</a></p>
+    {% else %}
+        <p>You are already logged on!</p>
+    {% endif %}
+{% endblock %}

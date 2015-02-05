@@ -1,0 +1,24 @@
+{% extends "gallery/base.html" %}
+
+{% load i18n %}
+{% load thumbnail %}
+
+{% block main_content %}
+    {% load navigator %}
+    {% url "gallery_main" as gallery_url %}
+    {% display_navigator gallery_url "Gallery" %}
+    <div class="row">
+        <div class="col-sm-6">
+            <h1>GALLERY</h1>
+            <div class="list-group">
+                {% for album in albums %}
+                    <a class="list-group-item" href="{% url 'gallery_view_album' album.id %}">{{ album.name }}
+                    </a>
+                {% empty %}
+                    <p>{% trans "No albums found!" %}</p>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

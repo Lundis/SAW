@@ -9,7 +9,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('auth', '0001_initial'),
-        ('members', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -39,7 +38,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='SAWPermission',
             fields=[
-                ('permission', models.ForeignKey(primary_key=True, serialize=False, to='auth.Permission')),
+                ('permission', models.ForeignKey(to='auth.Permission', serialize=False, primary_key=True)),
                 ('description', models.CharField(max_length=200)),
             ],
             options={
@@ -50,9 +49,11 @@ class Migration(migrations.Migration):
             name='UserExtension',
             fields=[
                 ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
-                ('description', models.TextField(blank=True, default='', max_length=1000)),
-                ('link_to_homepage', models.URLField(blank=True, default='')),
-                ('member', models.ForeignKey(blank=True, unique=True, null=True, to='members.Member')),
+                ('avatar', models.ImageField(default='users/avatars/default_avatar.png', upload_to='users/avatars')),
+                ('description', models.TextField(default='', max_length=1000, blank=True)),
+                ('link_to_homepage', models.URLField(default='', blank=True)),
+                ('email_verified', models.BooleanField(default=False)),
+                ('email_verification_code', models.CharField(max_length=32, unique=True)),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
             options={

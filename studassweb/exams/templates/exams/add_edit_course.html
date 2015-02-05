@@ -1,0 +1,36 @@
+{% extends "exams/base.html" %}
+
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block breadcrumb2 %}
+    <li class="active">
+        {% if form.instance.pk %}
+            {% trans "Editing" %} {{ form.instance }}
+        {% else %}
+            {% trans "New Course" %}
+        {% endif %}
+    </li>
+{% endblock %}
+
+{% block main_content %}
+    {% if form.instance.pk %}
+        <h1>Edit {{ form.instance.name }}</h1>
+    {% else %}
+        <h1>Add course</h1>
+    {% endif %}
+
+    {% if form.instance.pk %}
+        <p>{% trans "Note: If you want to remove this course you first have to remove all associated exams." %}</p>
+    {% endif %}
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">
+                {% trans "Submit" %}
+            </button>
+        {% endbuttons %}
+    </form>
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends 'news/base.html' %}
+{% load i18n %}
+{% load sawp %}
+{% load navigator %}
+{% load thumbnail %}
+
+{% block breadcrumb2 %}
+    {% if category %}
+        <li class="active">{{ category.name }}</li>
+    {% endif %}
+{% endblock %}
+{% block breadcrumb1 %}
+    {% if category %}
+        <li class="active"><a href="{% url "news_home" %}">{% trans "News" %}</a></li>
+    {% else %}
+        <li class="active">{% trans "News" %}</li>
+    {% endif %}
+{% endblock %}
+
+{% block main_content %}
+
+    {% if paginator.num_pages > 0 %}
+        <nav>
+            <ul class="pagination">
+                {% if page.has_previous %}
+                    {% if category %}
+                        {% url "news_home" category_name=category.name page=page.previous_page_number as previous_url %}
+                    {% else %}
+                        {% url "news_home" page=page.previous_page_number as previous_url %}
+                    {% endif %}
+                {% endif %}
+                <li {% if not page.has_previous %} class="disabled" {% endif %}>
+                    <a href="{% if previous_url %} {{ previous_url  }} {% else %} # {% endif %}" aria-label="Previous">
+                        <span aria-hidden="true" class="glyphicon glyphicon-backward"></span>
+                    </a>
+                </li>
+                {% for page_number in paginator.page_range %}
+                    <li {% if page_number == page.number %} class="active" {% endif %}>
+                        <a {% if category %}
+                            href="{% url "news_home" category_name=category.name page=page_number %}"
+                        {% else %}
+                            href="{% url "news_home" page=page_number %}"
+                        {% endif %}>
+                            {{ page_number }}
+                        </a></li>
+
+                {% endfor %}
+                <li {% if not page.has_next %} class="disabled" {% endif %}>
+                    {% if page.has_next %}
+                        {% if category %}
+                            {% url "news_home" category_name=category.name page=page.next_page_number as next_url %}
+                        {% else %}
+                            {% url "news_home" page=page.next_page_number as next_url %}
+                        {% endif %}
+                    {% endif %}
+                    <a href="{% if next_url %} {{ next_url  }} {% else %} # {% endif %}" aria-label="Next">
+                        <span aria-hidden="true" class="glyphicon glyphicon-forward"></span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    {% endif %}
+    {% for article in articles %}
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <div class="row inherit-padding-left-right">
+                    {% if article.picture %}
+                        <div class="pull-left news-picture">
+                            <img src="{% thumbnail article.picture 80x80 crop=scale %}" class="img-responsive img-rounded" />
+                        </div>
+                    {% endif %}
+                    <div class="pull-left inherit-padding-left-right">
+                        <h4>
+                            <a class="h3" href="{{ article.get_absolute_url }}">{{ article.title }}</a>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                {{ article.get_summary | safe }}
+            </div>
+            <div class="panel-footer">
+                <div class="row inherit-padding-left-right">
+                    <div class="pull-left">
+                        {% if article.comments.count > 0 %}
+                            {{ article.comments.count }}
+                        {% else %}
+                            {% trans "No" %}
+                        {% endif %}
+                        {% if article.comments.count == 1 %}
+                            {% trans "comment" %}
+                        {% else %}
+                            {% trans "comments" %}
+                        {% endif %}
+                    </div>
+                    <div class="pull-right text-right">
+                        {% trans "By" %} {{ article.author }}
+                        {{ article.created_date }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
+
+{% block sidebar %}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            {% trans "search/sort" %}
+        </div>
+        <div class="panel-body">
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            {% trans "Categories" %}
+        </div>
+        <div class="panel-body">
+            <a class="btn btn-default btn-block {% if not category %}active{% endif %}"
+               href="{% url "news_home" %}">
+                {% trans "Show all" %}
+            </a>
+            {% for cat in categories %}
+                <a class="btn btn-default btn-block {% if cat.name == category.name %}active{% endif %}"
+                   href="{{ cat.get_absolute_url }}">
+                    {{ cat.name }}
+                </a>
+            {% endfor %}
+
+        </div>
+    </div>
+    {% has_perm "news" "EDIT" as show_edit_panel %}
+    {% if show_edit_panel %}
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                {% trans "Actions" %}
+            </div>
+            <div class="panel-body">
+                <a class="btn btn-default btn-block"
+                   href="{% url "news_add_article" %}">
+                    {% trans "Create new article" %}
+                </a>
+                <a class="btn btn-default btn-block"
+                   href="{% url "news_add_category" %}">
+                    {% trans "Create new category" %}
+                </a>
+                {% if category %}
+                    <a class="btn btn-default btn-block"
+                       href="{% url "news_edit_category" category_id=category.id %}">
+                        {% trans "Edit Category" %}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -43,6 +43,11 @@ class InstallProgress(SingletonModel):
         progress.save()
 
     @classmethod
+    def is_menu_set(cls):
+        progress, created = cls.objects.get_or_create()
+        return progress.menu_ok
+
+    @classmethod
     def finish(cls):
         """
         Checks that all parts of the installation are completed, then marks it as installed

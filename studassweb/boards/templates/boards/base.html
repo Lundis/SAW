@@ -1,0 +1,15 @@
+{% extends 'base/base.html' %}
+{% load i18n %}
+
+{% block title %}
+    {% trans "Boards" %}
+{%  endblock %}
+
+{% block menu %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Boards" %}
+{% endblock %}
+
+{% block breadcrumb1 %}
+    <li><a href="{% url "boards_main" %}">{% trans "Boards" %}</a></li>
+{% endblock %}

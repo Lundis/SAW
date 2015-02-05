@@ -1,0 +1,21 @@
+{% extends 'base/base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block title %}
+    {% trans "Register" %}
+{%  endblock %}
+
+{% block menu %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "Register" %}
+{% endblock %}
+
+{% block main_content %}
+    <p>{% trans "Please note that we currently do not support SSL, so we recommend that that you use a random password created specifically for this site" %}</p>
+    <form action="{% url "users_register" %}" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <input type="submit" value="Submit" />
+    </form>
+{% endblock %}

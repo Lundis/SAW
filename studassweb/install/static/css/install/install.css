@@ -17,11 +17,3 @@
     padding-right: 30px;
     margin-bottom: 30px;
 }
-
-.connected-sort {
-    min-height: 40px;
-    min-width: 200px;
-    border: 1px solid;
-    padding: 5px;
-    border-color: grey;
-}

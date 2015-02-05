@@ -1,36 +1,105 @@
 {% load i18n %}
 {% load static %}
 {% load solo_tags %}
+{% load setvar %}
 {% get_solo 'base.SiteConfiguration' as site_config %}
+{% get_solo 'menu.MainMenuSettings' as menu_settings %}
 <!DOCTYPE html >
 <html lang="en">
 <head>
-	<title>{% block title %}{% endblock %}</title>
-	<!-- viewport for Bootstrap -->
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="{% static "css/base/base.css" %}" />
+    <title>{% block title %}{% endblock %}</title>
+    <!-- viewport for Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{% static site_config.bootstrap_theme_url %}" rel="stylesheet">
+    {% if site_config.bootstrap_theme_mod_url %}
+        <link href="{% static site_config.bootstrap_theme_mod_url %}" rel="stylesheet">
+    {% endif %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/base/base.css" %}" />
+    {% block head %}
+    {% endblock %}
 </head>
 
 <body>
-{% block content %}
-    {% load dynamic_menu %}
-    {% display_menu "main_menu" "" %}
-{% endblock content %}
+<div id="site-wrapper">
+    <div id="statusmessages">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    {% block menu %}
+        {% load dynamic_menu %}
+        {% display_menu "main_menu" "" %}
+    {% endblock menu %}
+
+    <div id="content-wrapper">
+        {% block content %}
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-8 col-md-9">
+                        {% block breadcrumb %}
+                            <ol class="breadcrumb">
+                                {% block breadcrumb1 %}{% endblock %}
+                                {% block breadcrumb2 %}{% endblock %}
+                                {% block breadcrumb3 %}{% endblock %}
+                                {% block breadcrumb4 %}{% endblock %}
+                                {% block breadcrumb5 %}{% endblock %}
+                            </ol>
+                        {% endblock %}
+                        {% block  main_content %}
+                        {% endblock main_content %}
+                    </div>
+                    <div class="col-sm-4 col-md-3">
+                        {% block sidebar %}
+                        {% endblock sidebar %}
+                    </div>
+                </div>
+            </div>
+        {% endblock content %}
+    </div>
 
 
-<div class="container footer"><span class="glyphicon glyphicon-copyright-mark"></span> {% now "Y" %} {{ site_config.association_name }} </div>
+    {% if menu_settings.inverted_style %}
+        {% setvar "navbar-inverse" as nav_style %}
+    {% else %}
+        {% setvar "navbar-default" as nav_style %}
+    {% endif %}
 
+    <div id="footer-container">
+        <div class="navbar {{ nav_style }} no-margin no-bottom-border " >
+            <div class="container">
+                <div class="col-xs-12 footer text-center navbar-brand">
+                    <span class="glyphicon glyphicon-copyright-mark"></span>
+                    {% now "Y" %} {{ site_config.association_name }}
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <div class="container">
+        <div class="row">
+            <noscript class="container noscript-warning">
+                <div class="row text-center">
+                    <strong>You have disabled Javascript.
+                        To view this site properly, please turn it on,
+                        or switch to a browser that supports Javascript.
+                    </strong>
+                </div>
+            </noscript>
+        </div>
+    </div>
+</div>
 <!-- Placed last to improve loading times -->
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="{% static "js/bootstrap.min.js" %}"></script>
-<script src="{% static "js/base.js" %}"></script>
+<script src="{% static "js/base/base.js" %}"></script>
 {% block scripts %}{% endblock %}
+
 </body>
-
-
-
 </html>

@@ -1,0 +1,97 @@
+{% extends "boards/base.html" %}
+
+{% load i18n %}
+{% load bootstrap3 %}
+{% load sawp %}
+{% load thumbnail %}
+
+{% block breadcrumb2 %}
+    <li>
+        <a href="{{ board.boardtype.get_absolute_url }}">
+            {{ board.boardtype.name }}
+        </a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb3 %}
+    <li class="active">
+        {{ board }}
+    </li>
+{% endblock %}
+
+{% block main_content %}
+    {% load navigator %}
+    <h1>{{ board.boardtype }} {{ board.year }}</h1>
+    <div class="list-group">
+        {% if board.photo %}
+            <li class="list-group-item">
+                <a href="{{ board.photo.url }}"><img  class="img-thumbnail" src="{% thumbnail board.photo 300x200 crop=scale %}"/></a>
+            </li>
+        {% endif %}
+        <li class="list-group-item">{% trans "Board members:" %}</li>
+        {% for boardmember in boardmembers %}
+            <li class="list-group-item"><a class="list-group-item" href="{{ boardmember.get_absolute_url }}">
+                {% if boardmember.photo %}
+                    <img  class="img-thumbnail" src="{% thumbnail boardmember.photo 100x100 crop=scale %}"/>
+                {% endif %}
+                {{ boardmember }}
+            </a></li>
+        {% empty %}
+            <li class="list-group-item">{% trans "No members added to this board!" %}</li>
+            <form action="{% url 'boards_delete_board' board.id %}" method="post">
+                {% csrf_token %}
+                {% buttons %}
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('{% trans "Are you sure?" %}')">
+                        {% trans "Remove this board" %}
+                    </button>
+                {% endbuttons %}
+            </form>
+        {% endfor %}
+    </div>
+{% endblock %}
+{% block sidebar %}
+    {% has_perm "boards" "CAN_EDIT_BOARDS" as can_edit_boards %}
+    {% has_perm "boards" "CAN_EDIT_ROLES" as can_edit_roles %}
+    {% has_perm "boards" "CAN_EDIT_BOARDTYPES" as can_edit_boardtypes %}
+    {% if can_edit_boards or can_edit_roles or can_edit_boardtypes%}
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Edit" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    {% if can_edit_boards%}
+                        <a href="{% url 'boards_edit_board' board.id %}">
+                            <div class="btn list-group-item">{% trans "Edit this board" %}</div>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Add" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    {% if can_edit_boards%}
+                        <a href="{% url 'boards_add_boardmember' %}">
+                            <div class="btn list-group-item">{% trans "Add new board member" %}</div>
+                        </a>
+                        <a href="{% url 'boards_add_board' %}">
+                            <div class="btn list-group-item">{% trans "Add new board" %}</div>
+                        </a>
+                    {% endif %}
+                    {% if can_edit_boardtypes%}
+                        <a href="{% url 'boards_add_boardtype' %}">
+                            <div class="btn list-group-item">{% trans "Add new boardtype" %}</div>
+                        </a>
+                    {% endif %}
+                    {% if can_edit_roles%}
+                        <a href="{% url 'boards_add_role' %}">
+                            <div class="btn list-group-item">{% trans "Add new role" %}</div>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

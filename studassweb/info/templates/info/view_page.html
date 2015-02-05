@@ -1,0 +1,66 @@
+{% extends "info/base.html" %}
+{% load sawp %}
+{% load i18n %}
+
+{% block breadcrumb2 %}
+    <li>
+        <a href="{{ category.get_absolute_url }}">
+            {{ category.name }}
+        </a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb3 %}
+    <li class="active">
+        {{ page.title }}
+    </li>
+{% endblock %}
+
+{% block main_content %}
+    <div class="container">
+        <div class="row">
+            <h1>{{ page.title }}</h1>
+        </div>
+        <div class="row">
+            {{ page.text | safe}}
+        </div>
+    </div>
+{% endblock main_content %}
+{% block sidebar %}
+    {% if category.pages %}
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h2 class="panel-title">{{ category.name }}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    {% for page_ in category.pages %}
+                        {% can_view_object page_ as show_page %}
+                        {% if show_page %}
+                            <a href="{{ page_.get_absolute_url}}" class="list-group-item">
+                                {{ page_.title }}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+        {% can_edit_object page as show_edit_buttons %}
+        {% if show_edit_buttons %}
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h2 class="panel-title">{% trans "Edit" %}</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="list-group">
+                        <a href="{% url "info_edit_page" page.id %}">
+                            <div class="btn list-group-item">{% trans "Edit this page" %}</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        {% endif %}
+    {% endif %}
+{% endblock %}

@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import InfoPage, InfoCategory, InfoPageEdit
 
-# Register your models here.
+admin.site.register(InfoCategory)
+admin.site.register(InfoPage)
+admin.site.register(InfoPageEdit)
