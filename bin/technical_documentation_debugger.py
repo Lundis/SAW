@@ -229,7 +229,7 @@ for card in cards:
 		if card_priority == 1:
 			node_color = "color = crimson,"
 		elif card_priority == 2:
-			node_color = "color = darkmagenta,"
+			node_color = "color = purple,"
 		elif card_priority == 3:
 			node_color = "color = dodgerblue,"
 		elif card_priority == 4:

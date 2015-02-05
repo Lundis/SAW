@@ -9,6 +9,8 @@ ALLOWED_HOSTS = (
     "your.website.com",
 )
 
+NO_REPLY_EMAIL = "noreply@yourhost.com"
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 

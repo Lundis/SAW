@@ -101,6 +101,9 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 )
 
+# Default no-reply to use.
+NO_REPLY_EMAIL = "noreply@localhost"
+
 # load local settings
 exec(open(os.path.join(os.path.dirname(__file__), 'settings_local.py')).read(), globals())
 
