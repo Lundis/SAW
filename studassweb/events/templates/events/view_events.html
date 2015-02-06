@@ -4,10 +4,13 @@
 {% load bootstrap3 %}
 {% load sawp %}
 
+{% block breadcrumb1 %}
+    <li class="active">
+        {% trans "Events" %}
+    </li>
+{% endblock %}
+
 {% block main_content %}
-    {% load navigator %}
-    {% url "events_home" as events_url %}
-    {% display_navigator events_url "Events" %}
     <h3>Events</h3>
     <div class="list-group">
         {% for event in events %}

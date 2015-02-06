@@ -4,21 +4,18 @@
 {% load bootstrap3 %}
 {% load static %}
 
+{% block breadcrumb2 %}
+    <li class="active">
+        {% if form.instance.pk %}
+            {% trans "Editing" %}
+            {{ form.instance.title }}
+        {% else %}
+            {% trans "New Event" %}
+        {% endif %}
+    </li>
+{% endblock %}
 
 {% block main_content %}
-    {% load navigator %}
-    {% url "events_home" as events_url %}
-    {% if form.instance.pk %}
-        {% display_navigator events_url "Events" form.instance.get_absolute_url form.instance%}
-    {% else %}
-        {% display_navigator events_url "Events" "#" "New event" %}
-    {% endif %}
-    {% if form.instance.pk %}
-        <h1>Edit {{ form.instance }}</h1>
-    {% else %}
-        <h1>Add event</h1>
-    {% endif %}
-
     {% if form.instance.pk %}
         <form action="{% url 'events_delete_event' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
             {% csrf_token %}

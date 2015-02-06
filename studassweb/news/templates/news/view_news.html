@@ -1,14 +1,8 @@
 {% extends 'news/base.html' %}
 {% load i18n %}
 {% load sawp %}
-{% load navigator %}
 {% load thumbnail %}
 
-{% block breadcrumb2 %}
-    {% if category %}
-        <li class="active">{{ category.name }}</li>
-    {% endif %}
-{% endblock %}
 {% block breadcrumb1 %}
     {% if category %}
         <li class="active"><a href="{% url "news_home" %}">{% trans "News" %}</a></li>
@@ -17,8 +11,13 @@
     {% endif %}
 {% endblock %}
 
-{% block main_content %}
+{% block breadcrumb2 %}
+    {% if category %}
+        <li class="active">{{ category.name }}</li>
+    {% endif %}
+{% endblock %}
 
+{% block main_content %}
     {% if paginator.num_pages > 0 %}
         <nav>
             <ul class="pagination">

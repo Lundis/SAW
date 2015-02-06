@@ -5,10 +5,13 @@
 {% load sawp %}
 {% load thumbnail %}
 
+{% block breadcrumb2 %}
+    <li class="active">
+        {{ event.title }}
+    </li>
+{% endblock %}
+
 {% block main_content %}
-    {% load navigator %}
-    {% url "events_home" as events_url %}
-    {% display_navigator events_url "Events" event.get_absolute_url event%}
     <h1>{{ event }}</h1>
     <div class="list-group">
         <ul class="list-group">

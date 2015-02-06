@@ -4,16 +4,13 @@
 {% load bootstrap3 %}
 {% load sawp %}
 
-{% block breadcrumb1 %}
-    <li>
-        <a href={% url "polls_home" %}>{% trans "Polls" %}</a>
+{% block breadcrumb2 %}
+    <li class="active">
+        {{ poll.name }}
     </li>
 {% endblock %}
 
 {% block main_content %}
-    {% load navigator %}
-    {% url "polls.views.home" as polls_url %}
-
     <h1>{{ poll.name }}</h1>
     <ul class="list-group">
 

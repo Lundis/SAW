@@ -3,10 +3,21 @@
 {% load i18n %}
 {% load thumbnail %}
 
+{% block breadcrumb2 %}
+    <li class="active">
+        <a href="{{ photo.album_id.get_absolute_url }}">
+            {{ photo.album_id }}
+        </a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb3 %}
+    <li class="active">
+        {{ photo }}
+    </li>
+{% endblock %}
+
 {% block main_content %}
-    {% load navigator %}
-    {% url "gallery_main" as gallery_url %}
-    {% display_navigator gallery_url "Gallery" photo.album_id.get_absolute_url photo.album_id photo.get_absolute_url photo %}
     <h1>PHOTO</h1>
     <ul class="list-group">
         <li class="list-group-item">

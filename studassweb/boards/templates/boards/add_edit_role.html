@@ -22,8 +22,6 @@
 {% endblock %}
 
 {% block main_content %}
-    {% load navigator %}
-
     {% if form.instance.pk %}
         <h1>Edit {{ form.instance.name }}</h1>
     {% else %}
