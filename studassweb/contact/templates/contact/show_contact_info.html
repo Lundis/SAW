@@ -11,38 +11,63 @@
 {% endblock %}
 
 {% block main_content %}
-    <h1>{% trans "Contact us!" %}</h1>
-
-    email dix@infa.fi<br> todo load this from db
-{% endblock %}
-{% block sidebar %}
-    {% has_perm "contact" "CAN_VIEW_CONTACT_INFO" as can_view_contact_info %}
-    {% has_perm "contact" "CAN_USE_CONTACT_FORM" as can_use_contact_form %}
-    {% has_perm "contact" "CAN_VIEW_MESSAGES" as can_view_messages %}
-    {% if can_view_contact_info or can_use_contact_form or can_view_messages%}
-        <div class="panel panel-info">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Menu" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    {% if can_view_messages%}
-                        <a href="{% url 'contact_read_messages' %}">
-                            <div class="btn list-group-item">{% trans "View messages" %}</div>
+    {% if contacts %}
+        {% for contact in contacts %}
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row inherit-padding-left-right">
+                        <div class="pull-left inherit-padding-left-right">
+                            <h4>
+                                {{ contact.name }}
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {{ contact.info_text | safe }}
+                    <div class="pull-right text-right">
+                        <a href="{% url "contact_view_messages" contact_id=contact.id %}" class="btn btn-primary">
+                            {% trans "View Messages" %}
                         </a>
-                    {% endif %}
-                    {% if can_use_contact_form%}
-                        <a href="{% url 'contact_write_message' %}">
-                            <div class="btn list-group-item">{% trans "Write message" %}</div>
+                    </div>
+                    <div class="pull-right text-right">
+                        <a href="{% url "contact_write_message" contact_id=contact.id %}" class="btn btn-primary">
+                            {% trans "Send message" %}
                         </a>
-                    {% endif %}
-                    {% if can_view_contact_info%}
-                        <a href="{% url 'contact_show_contact_info' %}">
-                            <div class="btn list-group-item">{% trans "Show contact information" %}</div>
-                        </a>
-                    {% endif %}
+                    </div>
                 </div>
             </div>
-        </div>
+        {% endfor %}
+    {% else %}
+        <h2>{% trans "No contacts have been added!" %}</h2>
     {% endif %}
+{% endblock %}
+
+{% block sidebar %}
+    {% has_perm "contact" "CAN_USE_CONTACT_FORM" as can_use_contact_form %}
+    {% has_perm "contact" "CAN_EDIT_CONTACT_SETTINGS" as can_edit_contact_settings %}
+    <div class="panel panel-info">
+        {% if can_edit_contact_settings %}
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Settings" %}</h2>
+            </div>
+            <div class="panel-body">
+                <a href="{% url 'contact_settings_list_contacts' %}" class="btn btn-primary btn-block">
+                    {% trans "Go to the settings page" %}
+                </a>
+            </div>
+        {% endif %}
+        <div class="panel-heading">
+            <h2 class="panel-title">{% trans "Help" %}</h2>
+        </div>
+        <div class="panel-body">
+            <p>
+                {% if can_use_contact_form %}
+                    {% trans "Select who you want to contact!" %}
+                {% else %}
+                    {% trans "You do not have permission to use the built-in messaging system." %}
+                {% endif %}
+            </p>
+        </div>
+    </div>
 {% endblock %}

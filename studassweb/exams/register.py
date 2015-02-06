@@ -13,7 +13,7 @@ def get_menu_items():
     item, created = MenuItem.get_or_create(__package__,
                                            "Exams",
                                            reverse_string="exams_main",
-                                           permission=SAWPermission.get_or_create("can_view_events"))
+                                           permission=SAWPermission.get_or_create(CAN_VIEW_EXAM_ARCHIVE))
     return ([item],
             None,
             None)

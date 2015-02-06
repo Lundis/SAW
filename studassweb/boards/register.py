@@ -15,7 +15,7 @@ def get_menu_items():
     item, created = MenuItem.get_or_create(__package__,
                                            "Board",
                                            reverse_string="boards_main",
-                                           permission=SAWPermission.get_or_create("can_view_board"))
+                                           permission=SAWPermission.get_or_create(CAN_VIEW_BOARDS))
     return ([item],
             None,
             None)

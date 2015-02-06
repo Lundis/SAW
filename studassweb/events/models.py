@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from datetime import datetime
 
 
 #This is an actual event, for example a Christmas party
@@ -23,13 +24,14 @@ class Event(models.Model):
 #We need both user and name as we need to allow non-signed in users to sign up
 class EventSignup(models.Model):
     event = models.ForeignKey(Event)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, blank=True, null=True)
     name = models.CharField(max_length=100)
     email = models.EmailField()
     matricle = models.CharField(max_length=20)
     association = models.CharField(max_length=200)
-    diet = models.CharField(max_length=200)
-    other = models.CharField(max_length=200)
+    diet = models.CharField(max_length=200, null=True, blank=True)
+    other = models.CharField(max_length=200, null=True, blank=True)
+    created = models.DateTimeField(default=datetime.now, blank=True)
 
 
 class EventItem(models.Model):

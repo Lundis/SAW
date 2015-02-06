@@ -2,17 +2,15 @@
 
 {% load i18n %}
 {% load bootstrap3 %}
-{% load sawp %}
 
 {% block breadcrumb2 %}
     <li class="active">
-        {% trans "Write Message" %}
+        {% trans "Writing a Message to " %}
+        {{ contact.name }}
     </li>
 {% endblock %}
 
 {% block main_content %}
-    <h1>{% trans "Contact us!" %}</h1>
-
     <form action="" method="post">
         {% csrf_token %}
         {% bootstrap_form form %}
@@ -22,35 +20,4 @@
             </button>
         {% endbuttons %}
     </form>
-{% endblock %}
-{% block sidebar %}
-    {% has_perm "contact" "CAN_VIEW_CONTACT_INFO" as can_view_contact_info %}
-    {% has_perm "contact" "CAN_USE_CONTACT_FORM" as can_use_contact_form %}
-    {% has_perm "contact" "CAN_VIEW_MESSAGES" as can_view_messages %}
-    {% if can_view_contact_info or can_use_contact_form or can_view_messages%}
-        <div class="panel panel-info">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Menu" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    {% if can_view_messages%}
-                        <a href="{% url 'contact_read_messages' %}">
-                            <div class="btn list-group-item">{% trans "View messages" %}</div>
-                        </a>
-                    {% endif %}
-                    {% if can_use_contact_form%}
-                        <a href="{% url 'contact_write_message' %}">
-                            <div class="btn list-group-item">{% trans "Write message" %}</div>
-                        </a>
-                    {% endif %}
-                    {% if can_view_contact_info%}
-                        <a href="{% url 'contact_show_contact_info' %}">
-                            <div class="btn list-group-item">{% trans "Show contact information" %}</div>
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    {% endif %}
 {% endblock %}

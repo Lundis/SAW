@@ -63,6 +63,7 @@ class InfoPage(models.Model):
     text = RichTextField()
     category = models.ForeignKey(InfoCategory, null=True)
     permission = models.CharField(max_length=100, choices=PERMISSION_CHOICES, default="VIEW_PUBLIC")
+    for_frontpage = models.BooleanField(default=False, blank=True)
 
     def __str__(self):
         return self.title

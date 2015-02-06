@@ -14,13 +14,9 @@
 {% block main_content %}
     <h1>{% trans "Thanks for registering" %}!</h1>
     <p>
-        {% trans "A confirmation email has been sent to the address you specified" %}.
-        {% trans "After confirming it you can apply for a members account" %}.
-        <br>
-        {% trans "Check your email," %}
-
-        {% trans "or use " %}
-        <a href="{% url "users_verify_email" code=code %}">{% trans "this link" %}.</a>
+        {% trans "A confirmation email has been sent to" %}
+        {{ user.email }}.
+        {% trans "After confirming it you can apply for a members account" %}!
     </p>
     <p>
         {% trans "You can edit additional profile settings " %}

@@ -28,3 +28,11 @@ def register_settings_pages():
                        reverse_lazy("menu_settings_edit_menu_layout"),
                        EDIT_MENUS)
     return item, menu_layout
+
+
+def setup():
+    """
+    Removes all disabled menu items.
+    :return:
+    """
+    MenuItem.remove_disabled_items()

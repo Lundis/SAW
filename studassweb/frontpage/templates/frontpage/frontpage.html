@@ -1,4 +1,5 @@
 {% extends "base/base.html" %}
+{% load i18n %}
 
 {% block title %}
     StudAssWeb Frontpage!
@@ -10,7 +11,6 @@
 {% endblock %}
 
 {% block main_content %}
-    <div class="container">
-        <h1>Welcome!</h1>
-    </div>
+    <h1>{% trans "Welcome!" %}</h1>
+    <p>{% trans "This site is under heavy development. Don't worry if it's hard to understand right now, it will get better!" %}</p>
 {% endblock %}

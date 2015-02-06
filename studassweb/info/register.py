@@ -1,6 +1,8 @@
 from menu.models import MenuItem, Menu
 from users.models import SAWPermission
 from users.groups import GUEST, MEMBER, BOARD_MEMBER
+import info.models
+from .frontpage import InfoFrontPageItem
 
 
 def get_menu_items():
@@ -41,3 +43,11 @@ def get_permissions():
         (VIEW_BOARD, BOARD_MEMBER, "Access to board-only information pages"),
         (EDIT, BOARD_MEMBER, "Can create and edit info pages"),
     )
+
+
+def get_front_page_items():
+    pages = info.models.InfoPage.objects.filter(for_front_page=True)
+    items = ()
+    for page in pages:
+        items += InfoFrontPageItem(page),
+    return items

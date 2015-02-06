@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.conf import settings
+from base.models import DisabledModule
 from install.forms import AssociationForm, ModulesForm
 from users.forms import LoginForm
 from users.models import SAWPermission
 from menu.logic import get_all_menu_items
-from menu.models import Menu, MenuItem, MenuTemplate
+from menu.models import Menu
 from menu.forms import MenuForm
 from menu.setup import setup_menu_module
 from .models import InstallProgress
@@ -51,7 +52,7 @@ def modules(request):
     if form.is_valid():
         form.apply()
         InstallProgress.modules_set()
-        MenuItem.remove_disabled_items()
+        DisabledModule.execute_for_all_enabled("register", "setup")
         logger.info('In modules, redirecting to menu')
         return HttpResponseRedirect('menu')
 
