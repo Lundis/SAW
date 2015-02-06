@@ -1,0 +1,52 @@
+{% load i18n %}
+
+{% if id %}
+    <div id="feedback_wrapper_{{ id }}">
+        <form id="feedback_form_{{ id }}" method="post" action="{% url "base_ajax_give_feedback" %}">
+            {% csrf_token %}
+            {% trans "Did you find this text helpful?" %}
+            <input id="feedback_form_{{ id }}_value" type="hidden" name="response" value="">
+            <div id="feedback_yes_button_{{ id }}"
+                 class="btn btn-primary btn-sm btn-block feedback_button_{{ id }}">
+                {% trans "Yes" %}
+            </div>
+            <div id="feedback_no_button_{{ id }}"
+                 class="btn btn-primary btn-sm btn-block feedback_button_{{ id }}">
+                {% trans "No" %}
+            </div>
+            <div id="feedback_unnecessary_button_{{ id }}"
+                 class="btn btn-primary btn-sm btn-block feedback_button_{{ id }}">
+                {% trans "It's unnecessary" %}
+            </div>
+        </form>
+
+    </div>
+    <div id="feedback_form_{{ id }}_thanks_message" class="hidden">
+        {% trans "Thanks for your feedback!" %}
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script>
+
+        $(".feedback_button_{{ id }}").click(function(event) {
+            var input = $("#feedback_form_{{ id }}_value").get(0);
+            if (event.target.getAttribute("id") == feedback_yes_button_{{ id }}) {
+                input.setAttribute("name", "{{ yes_response }}");
+            } else if (event.target.getAttribute("id") == feedback_no_button_{{ id }}) {
+                input.setAttribute("name", "{{ no_response }}");
+            } else if (event.target.getAttribute("id") == feedback_unnecessary_button_{{ id }}) {
+                input.setAttribute("name", "{{ unnecessary_response }}");
+            }
+            $.ajax({
+                type: "POST",
+                url: "{% url "base_ajax_give_feedback" %}",
+                data: $("feedback_form_{{ id }}").serialize(), // serializes the form's elements.
+                success: function(data) {
+                    $("#feedback_form_{{ id }}_thanks_message").get(0).removeClass("hidden");
+                }
+            });
+            $("#feedback_form_{{ id }}").remove();
+        });
+    </script>
+{% else %}
+    kuk
+{% endif %}

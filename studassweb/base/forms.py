@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ValidationError
-from .models import SiteConfiguration, BootswatchTheme
+from .models import SiteConfiguration, BootswatchTheme, Feedback
 
 
 class ConfirmationForm(forms.Form):
@@ -29,3 +29,20 @@ class BootswatchThemeSelectForm(forms.Form):
         settings.bootstrap_theme_url = theme.theme_path
         settings.bootstrap_theme_mod_url = None
         settings.save()
+
+
+class FeedbackForm(forms.ModelForm):
+
+    class Meta:
+        model = Feedback
+        fields = ("response", "url",)
+
+    def is_valid(self):
+        if super(FeedbackForm, self).is_valid():
+            return Feedback.can_user_give_feedback()
+
+    def save(self, commit=True, request=None):
+        feedback = super(FeedbackForm, self).save(commit=False)
+        if request.user.is_authenticated:
+            feedback.user = request.user
+        feedback.ip_address = request.META['REMOTE_ADDR']

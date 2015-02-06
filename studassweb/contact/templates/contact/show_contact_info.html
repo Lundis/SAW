@@ -68,6 +68,8 @@
                     {% trans "You do not have permission to use the built-in messaging system." %}
                 {% endif %}
             </p>
+            {% load feedback %}
+            {% helptext_feedback %}
         </div>
     </div>
 {% endblock %}
