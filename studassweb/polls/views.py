@@ -23,8 +23,23 @@ def view_poll(request, poll_id):
         poll = Poll.objects.get(id=poll_id)
         choices = Choice.objects.filter(id_to_poll=poll_id)
 
-        return render(request, 'polls/view_poll.html', {
-            'poll': poll,'choices':choices},)
+
+
+        if poll.can_vote_on_many:
+             pass
+
+        else:
+             form = ChoiceFormSingle(request.POST or None, poll_choices=choices)
+
+        if form.is_valid():
+             form.save(request.user)
+             form = None
+
+
+
+
+        context = {'form': form,'poll': poll,'choices':choices}
+        return render(request, 'polls/view_poll.html', context)
     except Poll.DoesNotExist:
         return HttpResponseNotFound('No poll with that id found')
 
@@ -108,13 +123,6 @@ def edit_poll(request,poll_id):
     return render(request, 'polls/add_edit_poll.html',context)
 
 
-def remove_choice(request,choice_id):
-    pass
 
-
-
-
-def set_user_choice(request, choice_id=-1):
-    pass
 
 
