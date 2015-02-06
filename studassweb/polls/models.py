@@ -22,6 +22,7 @@ class Poll(models.Model):
     publication = models.DateTimeField('Date published')
     expiration = models.DateTimeField('Poll closes')
     created_by = models.ForeignKey(User)
+    can_vote_on_many = models.BooleanField(default=False)
 
     permission = models.CharField(max_length=30, choices=PERMISSION_CHOICES, default="CAN_VIEW_PUBLIC_POLLS")
     def __str__(self):
@@ -52,8 +53,11 @@ class Choice(models.Model):
 
     def get_absolute_url(self):
         return reverse("polls.views.set_user_choice", kwargs={'choice_id': self.id})
+    def count_votes(self):
+        return Votes.objects.filter(choice_id=self.id).count()
+
 
 class Votes(models.Model):
     choice_id = models.ForeignKey(Choice)
-    members_choice = models.ForeignKey(User)
+    user = models.ForeignKey(User)
 
