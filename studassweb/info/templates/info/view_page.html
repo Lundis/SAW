@@ -28,7 +28,7 @@
 {% endblock main_content %}
 {% block sidebar %}
     {% if category.pages %}
-        <div class="panel panel-info">
+        <div class="panel panel-primary">
             <div class="panel-heading">
                 <h2 class="panel-title">{{ category.name }}</h2>
             </div>
@@ -48,7 +48,7 @@
         </div>
         {% can_edit_object page as show_edit_buttons %}
         {% if show_edit_buttons %}
-            <div class="panel panel-info">
+            <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h2 class="panel-title">{% trans "Edit" %}</h2>
                 </div>

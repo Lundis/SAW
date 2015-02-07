@@ -89,7 +89,7 @@
 {% block sidebar %}
     {% has_perm "events" "CAN_CREATE_EVENTS" as can_create_events %}
     {% if can_create_events%}
-        <div class="panel panel-info">
+        <div class="panel panel-primary">
             <div class="panel-heading">
                 <h2 class="panel-title">{% trans "Edit" %}</h2>
             </div>
