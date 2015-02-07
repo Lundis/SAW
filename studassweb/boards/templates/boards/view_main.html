@@ -29,7 +29,7 @@
     {% has_perm "boards" "CAN_EDIT_ROLES" as can_edit_roles %}
     {% has_perm "boards" "CAN_EDIT_BOARDTYPES" as can_edit_boardtypes %}
     {% if can_edit_boards or can_edit_roles or can_edit_boardtypes%}
-        <div class="panel panel-info">
+        <div class="panel panel-primary">
             <div class="panel-heading">
                 <h2 class="panel-title">{% trans "Add" %}</h2>
             </div>
