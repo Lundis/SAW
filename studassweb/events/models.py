@@ -32,6 +32,7 @@ class EventSignup(models.Model):
     diet = models.CharField(max_length=200, null=True, blank=True)
     other = models.CharField(max_length=200, null=True, blank=True)
     created = models.DateTimeField(default=datetime.now, blank=True)
+    delete_confirmation_code = models.CharField(max_length=32, unique=True)
 
 
 class EventItem(models.Model):
