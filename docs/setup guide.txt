@@ -56,6 +56,12 @@ To upgrade from a previous version, run:
     * install instructions:
         > pip install django-recaptcha
 
+* djangoajax
+    * Ajax support for Django
+    * url: https://github.com/yceruto/django-ajax
+    * install instructions:
+        > pip install djangoajax
+
 
 ===== Install Pycharm pro edition =====
 

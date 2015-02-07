@@ -19,7 +19,7 @@ from solo.models import SingletonModel
 from .utils import get_all_modules, get_modules_with
 
 
-logger = logging.Logger(__name__)
+logger = logging.getLogger(__name__)
 
 THEME_DIR = os.path.join("css", "bootswatch_themes")
 
@@ -251,15 +251,18 @@ class Feedback(models.Model):
 
     class Meta:
         unique_together = (
-            ("user", "url", "ip_address"),
-            ("user", "url")
+            ("type", "user", "url", "ip_address"),
+            ("type", "user", "url")
         )
 
     @classmethod
     def can_user_give_feedback(cls, user, ip, type, url):
         url = cls.strip_url(url)
-        if user.is_authenticated() and cls.objects.filter(type=type, user=user, url=url).exists():
-            return False
+        if user.is_authenticated():
+            object = cls.objects.filter(type=type, user=user, url=url)
+            logger.debug("type: %s, user: %s, url: %s" % (type, user, url))
+            logger.debug(object)
+            return not object.exists()
         else:
             return not cls.objects.filter(type=type, ip_address=ip, url=url).exists()
 
@@ -273,6 +276,13 @@ class Feedback(models.Model):
         p = re.compile(r"(/\d+/)")
         url = p.sub("/<id?>/", url)
         # also remove any weird characters for security purposes
-        whitelist = re.compile(r"([^a-zA-Z0-9\-_<>])")
+        whitelist = re.compile(r"([^a-zA-Z0-9\-_<>/])")
         url = whitelist.sub("", url)
         return url
+
+    def clean(self):
+        """
+        Clean the URL
+        :return:
+        """
+        self.url = self.strip_url(self.url)

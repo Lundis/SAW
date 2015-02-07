@@ -37,12 +37,28 @@ class FeedbackForm(forms.ModelForm):
         model = Feedback
         fields = ("response", "url",)
 
-    def is_valid(self):
-        if super(FeedbackForm, self).is_valid():
-            return Feedback.can_user_give_feedback()
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request')
+        self.type = kwargs.pop('type')
+        super(FeedbackForm, self).__init__(*args, **kwargs)
 
-    def save(self, commit=True, request=None):
+    def is_valid(self):
+        super(FeedbackForm, self).is_valid()
+        if Feedback.can_user_give_feedback(user=self.request.user,
+                                           ip=self.request.META.get('REMOTE_ADDR'),
+                                           type=self.type,
+                                           url=self.cleaned_data['url']):
+
+            return True
+        else:
+            raise ValidationError("You cannot give feedback on this element")
+
+    def save(self, commit=True):
         feedback = super(FeedbackForm, self).save(commit=False)
-        if request.user.is_authenticated:
-            feedback.user = request.user
-        feedback.ip_address = request.META['REMOTE_ADDR']
+        feedback.type = self.type
+        if self.request.user.is_authenticated:
+            feedback.user = self.request.user
+        feedback.ip_address = self.request.META['REMOTE_ADDR']
+        if commit:
+            feedback.save()
+        return feedback
