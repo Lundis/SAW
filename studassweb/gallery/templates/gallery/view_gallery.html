@@ -3,10 +3,13 @@
 {% load i18n %}
 {% load thumbnail %}
 
+{% block breadcrumb1 %}
+    <li class="active">
+        {% trans "Gallery" %}
+    </li>
+{% endblock %}
+
 {% block main_content %}
-    {% load navigator %}
-    {% url "gallery_main" as gallery_url %}
-    {% display_navigator gallery_url "Gallery" %}
     <div class="row">
         <div class="col-sm-6">
             <h1>GALLERY</h1>

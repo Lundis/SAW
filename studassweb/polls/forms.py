@@ -11,7 +11,7 @@ class PollForm(forms.ModelForm):
 
     class Meta:
         model = Poll
-        fields = ('name','description','publication','expiration')
+        fields = ('name','description','publication','expiration','can_vote_on_many')
 
     def save(self, commit=True, user=None):
         poll = super(PollForm, self).save(commit=False)
@@ -24,8 +24,44 @@ class PollForm(forms.ModelForm):
             self.save_m2m()
         return poll
 
-
 class ChoiceForm(forms.ModelForm):
+    class Meta:
+        model = Choice
+        fields = ('name',)
+        labels = {
+            'name': _('Choice'),
+        }
+
+class ChoiceFormSingle(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        poll_choices = kwargs.pop("poll_choices")
+        super(ChoiceFormSingle, self).__init__(*args, **kwargs)
+        choices = ()
+        for choice in poll_choices:
+            choices += (str(choice.id), choice.name),
+        self.fields["choices"] = forms.ChoiceField(choices=choices,
+                                                   widget=forms.RadioSelect)
+
+    def save(self, user, commit=True):   #TODO CHANGE USER TO CURRENT TO SEE WHO HAS MADE CHOICE
+        if self.is_valid():
+            choice_id = self.cleaned_data['choices']
+            choice = Choice.objects.get(id=int(choice_id))
+            vote = Votes(choice_id=choice,
+                         user=user)
+            if commit:
+                vote.save()
+            return vote
+
+    class Meta:
+        model = Choice
+        fields = ('name',)
+        labels = {
+            'name': _('Choice'),
+        }
+
+
+class ChoiceFormMultiple(forms.ModelForm):
 
     class Meta:
         model = Choice

@@ -1,23 +1,25 @@
-from solo.models import SingletonModel
 from django.contrib.auth.models import User
 from django.db import models
-from urllib.request import urlopen
-from urllib.parse import urlparse
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.utils.translation import ugettext as _
 import json
 from io import BytesIO
 import shutil
 import os
 import datetime
+import re
 from concurrent import futures
+from urllib.request import urlopen
+from urllib.parse import urlparse
+import logging
+from solo.models import SingletonModel
 from .utils import get_all_modules, get_modules_with
 
-import logging
 
-logger = logging.Logger(__name__)
+logger = logging.getLogger(__name__)
 
 THEME_DIR = os.path.join("css", "bootswatch_themes")
 
@@ -101,6 +103,8 @@ class SiteConfiguration(SingletonModel):
     bootstrap_theme_mod_url = models.CharField(max_length=200, null=True, blank=True, default=THEME_DEFAULT_CSS_MOD)
     bootswatch_version = models.CharField(max_length=50, default=None, null=True)
     bootswatch_last_checked = models.DateTimeField(default=timezone.datetime(year=2000, month=1, day=1))
+
+    show_feedback_helptext = models.BooleanField(default=True)
 
     @classmethod
     def instance(cls):
@@ -223,3 +227,62 @@ class Comment(models.Model):
     def __str__(self):
         return "%s#%s" % (self.target, self.id)
 
+
+class Feedback(models.Model):
+    FEEDBACK_HELPTEXT = "HELPTEXT"
+    FEEDBACK_CHOICES = (
+        (FEEDBACK_HELPTEXT, "Help text feedback"),
+    )
+    RESPONSE_GOOD = "GOOD"
+    RESPONSE_BAD = "BAD"
+    RESPONSE_UNNECESSARY = "UNNE"
+    RESPONSE_CHOICES = (
+        (RESPONSE_GOOD, "Good"),
+        (RESPONSE_BAD, "Bad"),
+        (RESPONSE_UNNECESSARY, "Unnecessary"),
+    )
+
+    user = models.ForeignKey(User, blank=True, null=True)
+    url = models.CharField(max_length=300)
+    ip_address = models.IPAddressField()
+    type = models.CharField(max_length=10, choices=FEEDBACK_CHOICES)
+    response = models.CharField(max_length=10, choices=RESPONSE_CHOICES)
+    date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = (
+            ("type", "user", "url", "ip_address"),
+            ("type", "user", "url")
+        )
+
+    @classmethod
+    def can_user_give_feedback(cls, user, ip, type, url):
+        url = cls.strip_url(url)
+        if user.is_authenticated():
+            object = cls.objects.filter(type=type, user=user, url=url)
+            logger.debug("type: %s, user: %s, url: %s" % (type, user, url))
+            logger.debug(object)
+            return not object.exists()
+        else:
+            return not cls.objects.filter(type=type, ip_address=ip, url=url).exists()
+
+    @classmethod
+    def strip_url(cls, url):
+        """
+        Strip away stuff like page IDs. Does nothing for slugs.
+        :param url:
+        :return:
+        """
+        p = re.compile(r"(/\d+/)")
+        url = p.sub("/<id?>/", url)
+        # also remove any weird characters for security purposes
+        whitelist = re.compile(r"([^a-zA-Z0-9\-_<>/])")
+        url = whitelist.sub("", url)
+        return url
+
+    def clean(self):
+        """
+        Clean the URL
+        :return:
+        """
+        self.url = self.strip_url(self.url)

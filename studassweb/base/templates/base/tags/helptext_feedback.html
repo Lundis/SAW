@@ -1,0 +1,51 @@
+{% load i18n %}
+{% load static %}
+
+{% if id %}
+    <div id="feedback_wrapper_{{ id }}">
+        <form id="feedback_form_{{ id }}" method="post" action="{% url "base_ajax_give_feedback" %}">
+            {% csrf_token %}
+            {% trans "Did you find this text helpful?" %}
+            <div id="feedback_yes_button_{{ id }}"
+                 class="btn btn-primary btn-sm btn-block feedback_button_{{ id }}">
+                {% trans "Yes" %}
+            </div>
+            <div id="feedback_no_button_{{ id }}"
+                 class="btn btn-primary btn-sm btn-block feedback_button_{{ id }}">
+                {% trans "No" %}
+            </div>
+            <div id="feedback_unnecessary_button_{{ id }}"
+                 class="btn btn-primary btn-sm btn-block feedback_button_{{ id }}">
+                {% trans "It's unnecessary" %}
+            </div>
+        </form>
+
+    </div>
+    <div id="feedback_form_{{ id }}_thanks_message" class="hidden">
+        {% trans "Thanks for your feedback!" %}
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script type="text/javascript" src="{% static 'django_ajax/js/jquery.ajax.min.js' %}"></script>
+    <script>
+
+        $(".feedback_button_{{ id }}").click(function(event) {
+            var input = "ERROR";
+            var button_id = event.target.getAttribute("id");
+            if (button_id == "feedback_yes_button_{{ id }}") {
+                input = "{{ response_yes }}";
+            } else if (button_id == "feedback_no_button_{{ id }}") {
+                input = "{{ response_no }}";
+            } else if (button_id == "feedback_unnecessary_button_{{ id }}") {
+                input = "{{ response_unnecessary }}";
+            }
+            ajaxPost('{% url "base_ajax_give_feedback" %}',
+                    {'url': '{{ url }}', 'response': input},
+                    function(event) {
+                        thanks_message = document.getElementById("feedback_form_{{ id }}_thanks_message");
+                        thanks_message.setAttribute("class", "");
+                    }
+            );
+            $("#feedback_form_{{ id }}").remove();
+        });
+    </script>
+{% endif %}

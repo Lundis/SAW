@@ -1,4 +1,4 @@
-{% extends "settings/base.html" %}
+{% extends "base/base.html" %}
 {% load i18n %}
 {% load bootstrap3 %}
 
@@ -33,4 +33,19 @@
             </button>
         {% endbuttons %}
     </form>
+{% endblock %}
+
+{% block sidebar %}
+    {% if contact %}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            {% trans "Actions" %}
+        </div>
+        <div class="panel-body">
+            <a class="btn btn-danger btn-block" href="{% url "contact_settings_delete_contact" contact_id=contact.id %}">
+                {% trans "Delete" %}
+            </a>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}

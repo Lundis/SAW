@@ -40,6 +40,10 @@ class MemberEditForm(forms.ModelForm):
             if instance is not None and instance.user_ext is not None:
                 user = instance.user_ext.user
                 self.fields['group'].initial = get_user_group(user)
+        # Not required for validation
+        self.fields['enrollment_year'].required = False
+        # Should not add the required flag to the HTML
+        self.fields['enrollment_year'].widget.is_required = False
 
     def save(self, commit=True):
         instance = super(MemberEditForm, self).save(commit)

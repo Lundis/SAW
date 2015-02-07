@@ -1,11 +1,14 @@
 from django.shortcuts import render
 from django.http import Http404, HttpResponseRedirect
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 from users.decorators import has_permission
 from .models import InfoCategory, InfoPage
 from .forms import InfoPageForm, InfoCategoryForm
 from .register import EDIT, VIEW_PUBLIC
 from base.forms import ConfirmationForm
-from django.core.urlresolvers import reverse
+from base.views import delete_confirmation_view
+
 
 
 @has_permission(VIEW_PUBLIC)
@@ -107,35 +110,24 @@ def edit_category(request, category_id=None):
 
 
 @has_permission(EDIT)
-def delete(request, category_id=None, page_id=None):
-    if category_id and page_id:
-        raise ValueError('You cannot delete both a category and a page at once')
-    elif not category_id and not page_id:
-        raise ValueError('You must specify a category or page to delete')
-
-    category = None
+def delete_category(request, category_id):
     try:
         category = InfoCategory.objects.get(id=category_id)
     except InfoCategory.DoesNotExist:
-        pass
-    page = None
+        raise Http404(_("The requested object could not be found"))
+    return delete_confirmation_view(request,
+                                    item=category,
+                                    form_url=reverse("info_delete_category"),
+                                    redirect_url=reverse('info_view_categories'))
+
+
+@has_permission(EDIT)
+def delete_page(request, page_id):
     try:
-        page = InfoPage.objects.get(id=page_id)
+        category = InfoPage.objects.get(id=page_id)
     except InfoPage.DoesNotExist:
-        pass
-
-    form = ConfirmationForm(request.POST or None)
-    if form.is_valid():
-        if page:
-            cat = page.category
-            page.delete()
-            if cat:
-                return HttpResponseRedirect(cat.get_absolute_url())
-        else:
-            category.delete()
-            return HttpResponseRedirect(reverse('info_view_categories'))
-
-
-    return render(request, "info/delete.html", {'category': category,
-                                                'page': page,
-                                                'form': form})
+        raise Http404(_("The requested object could not be found"))
+    return delete_confirmation_view(request,
+                                    item=category,
+                                    form_url=reverse("info_delete_page"),
+                                    redirect_url=reverse('info_view_categories'))

@@ -5,13 +5,12 @@
 
 {% block breadcrumb2 %}
     <li class="active">
-        {% trans "Write Message" %}
+        {% trans "Writing a Message to " %}
+        {{ contact.name }}
     </li>
 {% endblock %}
 
 {% block main_content %}
-    <h1>{% trans "Contact us!" %}</h1>
-
     <form action="" method="post">
         {% csrf_token %}
         {% bootstrap_form form %}

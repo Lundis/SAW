@@ -4,10 +4,13 @@
 {% load bootstrap3 %}
 {% load thumbnail %}
 
+{% block breadcrumb2 %}
+    <li class="active">
+        {{ album.name }}
+    </li>
+{% endblock %}
+
 {% block main_content %}
-    {% load navigator %}
-    {% url "gallery.views.view_gallery" as gallery_url %}
-    {% display_navigator gallery_url "Gallery" album.get_absolute_url album.name %}
     <div class="row">
         <div class="col-sm-6">
             <h1>{{ album.name }}</h1>

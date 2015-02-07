@@ -7,6 +7,7 @@ CAN_SIGNUP_FOR_EVENTS = "can_signup_for_events"
 CAN_CREATE_EVENTS = "can_create_events"
 CAN_VIEW_SIGNUP_INFO = "can_view_signup_info"
 
+
 def get_menu_items():
     """
     :return: a tuple ([main menu items], [settings menu items], [others])

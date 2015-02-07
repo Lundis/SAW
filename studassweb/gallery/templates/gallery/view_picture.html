@@ -3,10 +3,21 @@
 {% load i18n %}
 {% load thumbnail %}
 
+{% block breadcrumb2 %}
+    <li class="active">
+        <a href="{{ photo.album_id.get_absolute_url }}">
+            {{ photo.album_id }}
+        </a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb3 %}
+    <li class="active">
+        {{ photo }}
+    </li>
+{% endblock %}
+
 {% block main_content %}
-    {% load navigator %}
-    {% url "gallery_main" as gallery_url %}
-    {% display_navigator gallery_url "Gallery" photo.album_id.get_absolute_url photo.album_id photo.get_absolute_url photo %}
     <h1>PHOTO</h1>
     <ul class="list-group">
         <li class="list-group-item">
@@ -20,7 +31,7 @@
 {% endblock %}
 {% block sidebar %}
     {% if show_edit_buttons %}
-        <div class="panel panel-info">
+        <div class="panel panel-primary">
             <div class="panel-heading">
                 <h2 class="panel-title">{% trans "Edit" %}</h2>
             </div>
@@ -34,7 +45,7 @@
         </div>
     {% endif %}
     {% if show_add_buttons%}
-        <div class="panel panel-info">
+        <div class="panel panel-primary">
             <div class="panel-heading">
                 <h2 class="panel-title">{% trans "Add" %}</h2>
             </div>

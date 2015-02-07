@@ -37,4 +37,4 @@ DATABASES = {
 }
 
 STATIC_DIR = os.path.join(os.path.dirname(SITE_ROOT), 'static')
-MEDIA_ROOT = os.path.join(os.path.dirname(SITE_ROOT), 'uploaded_media')
+MEDIA_ROOT = os.path.join(os.path.dirname(SITE_ROOT), 'media')
