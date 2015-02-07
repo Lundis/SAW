@@ -106,6 +106,9 @@ INSTALLED_APPS = (
 # Default no-reply to use.
 NO_REPLY_EMAIL = "noreply@localhost"
 
+#The directory in which log files should be created
+LOG_DIR = os.path.join(os.path.dirname(SITE_ROOT), 'logs')
+
 # load local settings
 exec(open(os.path.join(os.path.dirname(__file__), 'settings_local.py')).read(), globals())
 
@@ -145,19 +148,19 @@ LOGGING = {
         'djangodebugfile': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(os.path.join(os.path.dirname(SITE_ROOT), 'logs'), 'djangodebug.log'),
+            'filename': os.path.join(LOG_DIR, 'djangodebug.log'),
             'formatter': 'verbose'
         },
         'appdebugfile': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(os.path.join(os.path.dirname(SITE_ROOT), 'logs'), 'appdebug.log'),
+            'filename': os.path.join(LOG_DIR, 'appdebug.log'),
             'formatter': 'verbose'
         },
         'allwarnings': {
             'level': 'WARNING',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(os.path.join(os.path.dirname(SITE_ROOT), 'logs'), 'allwarnings.log'),
+            'filename': os.path.join(LOG_DIR, 'allwarnings.log'),
             'formatter': 'verbose'
         },
         'console': {
