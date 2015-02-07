@@ -1,4 +1,5 @@
 from django.conf.urls import patterns, url
+from .views import DeleteEventSignupByCodeView
 
 urlpatterns = patterns('',
 
@@ -10,7 +11,7 @@ urlpatterns = patterns('',
     url(r'^delete_signup/(?P<event_signup_id>\d+)/$',
         'events.views.delete_event_signup',
         name='events_delete_event_signup'),
-    url(r'^delete_signup/(?P<event_signup_id>\d+)/(?P<delete_confirmation_code_>[a-z0-9]{32})$',
-        'events.views.delete_event_signup',
-        name='events_delete_event_signup'),
+    url(r'^delete_signup/(?P<delete_confirmation_code>[a-z0-9]{32})$',
+        DeleteEventSignupByCodeView.as_view(),
+        name='events_delete_event_signup_by_code'),
 )

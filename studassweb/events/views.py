@@ -5,13 +5,14 @@ from django.http import HttpResponseRedirect
 from users import permissions
 from .register import CAN_VIEW_EVENTS, CAN_CREATE_EVENTS, CAN_SIGNUP_FOR_EVENTS, CAN_VIEW_SIGNUP_INFO
 from .forms import EventForm, EventSignupForm
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from base.utils import generate_email_ver_code
 from django.conf import settings
 from base.models import SiteConfiguration
 from django.core.mail import send_mail, BadHeaderError
+from django.views.generic import DeleteView
 import logging
 
 logger = logging.getLogger(__name__)
@@ -59,7 +60,7 @@ def event_detail(request, event_id):
                         request.scheme +
                         "://" +
                         request.get_host() +
-                        reverse("events_delete_event_signup", args=[temp.id, temp.delete_confirmation_code]),
+                        reverse("events_delete_event_signup_by_code", args=[temp.delete_confirmation_code]),
 
                         event.signup_deadline
                     ),
@@ -144,8 +145,7 @@ def delete_event(request, event_id):
             return HttpResponseNotAllowed(['POST', ])
 
 
-# TODO put the GET code in a different view since we want confirmation for it
-def delete_event_signup(request, event_signup_id, delete_confirmation_code_=None):
+def delete_event_signup(request, event_signup_id):
     try:
         signup = EventSignup.objects.get(id=event_signup_id)
 
@@ -153,24 +153,15 @@ def delete_event_signup(request, event_signup_id, delete_confirmation_code_=None
         logger.warning('User %s tried to delete nonexistant signup id %s', request.user, event_signup_id)
         return HttpResponseNotFound(_('No such EventSignup!'))
 
-    #POST is used for remove button on website
     if request.method == 'POST':
         if not permissions.has_user_perm(request.user, CAN_VIEW_SIGNUP_INFO):
 
             logger.warning('User %s tried to delete signup id %s', request.user, event_signup_id)
             return HttpResponseForbidden(_('You don\'t have permission to remove this!'))
 
-    #GET is used for remove link in email
-    elif request.method == 'GET':
-        if not signup.delete_confirmation_code == delete_confirmation_code_:
-            logger.warning('User %s tried to delete signup id %s with wrong delete_confirmation_code',
-                           request.user, event_signup_id
-            )
-            return HttpResponseForbidden(_('You don\'t have permission to remove this!'))
-
     else:
-            logger.warning('Attempted to access delete_event_signup via other method than POST or GET')
-            return HttpResponseNotAllowed(['POST', 'GET', ])
+            logger.warning('Attempted to access delete_event_signup via other method than POST')
+            return HttpResponseNotAllowed(['POST', ])
 
     # Checks completed, let's remove this!
     signup_name = str(signup.name)
@@ -179,6 +170,43 @@ def delete_event_signup(request, event_signup_id, delete_confirmation_code_=None
     signup.delete()
     messages.success(
         request,
-        _("Event signup for {0} from event {1} was sucessfully removed!").format(signup_name, event_name)
+        _("Event signup for {0} from event {1} was successfully removed!").format(signup_name, event_name)
     )
     return HttpResponseRedirect(reverse("events_view_event", args=event_id))
+
+
+class DeleteEventSignupByCodeView(DeleteView):
+    model = EventSignup
+
+    def get_object(self, *args, **kwargs):
+        try:
+            return EventSignup.objects.get(delete_confirmation_code=self.kwargs['delete_confirmation_code'])
+
+        except EventSignup.DoesNotExist:
+            logger.error("Wrong event delete_confirmation_code {0}".format(self.kwargs['delete_confirmation_code']))
+            messages.error(
+                self.request,
+                _("Could not unregister from event, maybe you are already unregistered?")
+            )
+            return None
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if not self.object:
+            return HttpResponseRedirect(reverse("events_home"))
+        return super(DeleteView, self).get(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if not self.object:
+            return HttpResponseRedirect(reverse("events_home"))
+
+        event = self.object.event
+        signup_name = self.object.name
+        self.object.delete()
+        messages.success(
+            request,
+            _("Event signup for {0} from event {1} was successfully removed!").format(signup_name, event.title)
+        )
+        return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
+
