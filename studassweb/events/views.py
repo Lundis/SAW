@@ -4,7 +4,7 @@ from .models import Event, EventSignup, EventItem
 from django.http import HttpResponseRedirect
 from users import permissions
 from .register import CAN_VIEW_EVENTS, CAN_CREATE_EVENTS, CAN_SIGNUP_FOR_EVENTS, CAN_VIEW_SIGNUP_INFO
-from .forms import EventForm, EventSignupForm
+from .forms import EventForm, EventSignupForm, EventItemsForm, SignupItemsForm
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib import messages
 from django.utils.translation import ugettext as _
@@ -13,10 +13,13 @@ from django.conf import settings
 from base.models import SiteConfiguration
 from django.core.mail import send_mail, BadHeaderError
 from django.views.generic import CreateView, UpdateView, ListView, DeleteView
-from users.decorators import has_permission
+import sys
 import logging
 
 logger = logging.getLogger(__name__)
+
+MAIN_PREFIX = "mainevent"
+ITEMS_PREFIX = "eventitems"
 
 
 def home(request):
@@ -29,8 +32,9 @@ def event_detail(request, event_id):
     try:
         event = Event.objects.get(id=event_id)
 
-        signupform = EventSignupForm(request.POST or None)
-        if signupform.is_valid():
+        signupform = EventSignupForm(request.POST or None, prefix=MAIN_PREFIX)
+        signupitemsform = SignupItemsForm(request.POST or None, event=event, prefix=ITEMS_PREFIX)
+        if signupform.is_valid() and signupitemsform.is_valid():
             temp = signupform.save(commit=False)
             temp.event = event
             temp.delete_confirmation_code = generate_email_ver_code()
@@ -41,6 +45,7 @@ def event_detail(request, event_id):
 
             # We need to save to db here to get id, but we should remove it if we couldn't send email
             temp.save()
+            signupitemsform.save(event=event)
 
             try:
                 from_email = settings.NO_REPLY_EMAIL
@@ -70,8 +75,15 @@ def event_detail(request, event_id):
             except BadHeaderError:
                 logger.error("BadHeaderError sending email to {0}".format(to_emails))
                 temp.delete()
-                return HttpResponseServerError("BadHeaderError, newlines in email adress?")
+                messages.error(request, _("BadHeaderError, newlines in email adress?"))
+                return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
+            except:
+                logger.error("Exception {0} sending email to {1}".format(sys.exc_info()[0], to_emails))
+                temp.delete()
+                messages.error(request, _("Error, please try again"))
+                return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
 
+            # Remove form after signing up
             signupform = None
 
             messages.success(request, _("Successfully signed up to event!"))
@@ -79,27 +91,32 @@ def event_detail(request, event_id):
         signups = EventSignup.objects.filter(event=event)
 
         return render(request, 'events/event.html', {
-            'event': event, 'signupform': signupform, 'signups': signups})
+            'event': event, 'signupform': signupform, 'signupitemsform': signupitemsform, 'signups': signups})
     except Event.DoesNotExist:
         logger.warning('Could not find event with id %s', event_id)
         return HttpResponseNotFound('No event with that id found')
 
 
 def add_event(request):
+
     if not permissions.has_user_perm(request.user, CAN_CREATE_EVENTS):
         logger.warning('User %s tried to add event', request.user)
         return HttpResponseForbidden('You don\'t have permission to add events!')
-    form = EventForm()
+    form = EventForm(prefix=MAIN_PREFIX)
+    form_items = EventItemsForm(prefix=ITEMS_PREFIX)
 
     if request.method == 'POST':
-        form = EventForm(request.POST)
-        if form.is_valid():
+        form = EventForm(request.POST, prefix=MAIN_PREFIX)
+        form_items = EventItemsForm(request.POST, prefix=ITEMS_PREFIX)
+        if form.is_valid() and form_items.is_valid():
             temp = form.save(commit=False)
             temp.author = request.user
             temp.save()
+
+            form_items.save(temp)
             return HttpResponseRedirect(reverse("events_view_event", args=[form.instance.id]))
 
-    context = {'form': form}
+    context = {'form': form, 'form_items': form_items}
     return render(request, 'events/add_edit_event.html', context)
 
 
@@ -113,15 +130,18 @@ def edit_event(request, event_id):
         logger.warning('User %s tried to edit nonexistant event id %s', request.user, event_id)
         return HttpResponseNotFound('No such role!')
 
-    form = EventForm(instance=event)
+    form = EventForm(instance=event, prefix=MAIN_PREFIX)
+    form_items = EventItemsForm(event=event, prefix=ITEMS_PREFIX)
 
     if request.method == 'POST':
-        form = EventForm(request.POST, instance=event)
-        if form.is_valid():
-            form.save()
+        form = EventForm(request.POST, instance=event, prefix=MAIN_PREFIX)
+        form_items = EventItemsForm(request.POST, prefix=ITEMS_PREFIX, event=event)
+        if form.is_valid() and form_items.is_valid:
+            tmp_event = form.save()
+            form_items.save(tmp_event)
             return HttpResponseRedirect(reverse("events_view_event", args=[form.instance.id]))
 
-    context = {'form': form}
+    context = {'form': form, 'form_items': form_items}
     return render(request, 'events/add_edit_event.html', context)
 
 
