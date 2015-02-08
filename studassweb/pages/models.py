@@ -4,12 +4,12 @@ from django.core.urlresolvers import reverse
 from ckeditor.fields import RichTextField
 from menu.models import MenuItem, Menu
 from users.permissions import has_user_perm
-from .register import VIEW_BOARD, VIEW_MEMBER, VIEW_PUBLIC, EDIT
+import pages.register as pregister
 
 PERMISSION_CHOICES = (
-    ("VIEW_PUBLIC", VIEW_PUBLIC),
-    ("VIEW_MEMBER", VIEW_MEMBER),
-    ("VIEW_BOARD", VIEW_BOARD),
+    ("VIEW_PUBLIC", pregister.VIEW_PUBLIC),
+    ("VIEW_MEMBER", pregister.VIEW_MEMBER),
+    ("VIEW_BOARD", pregister.VIEW_BOARD),
 )
 
 
@@ -52,7 +52,7 @@ class InfoCategory(models.Model):
 
     @staticmethod
     def can_edit(user):
-        return has_user_perm(user, EDIT)
+        return has_user_perm(user, pregister.EDIT)
 
     def get_permission_str(self):
         return dict(PERMISSION_CHOICES)[self.permission]
@@ -92,7 +92,7 @@ class InfoPage(models.Model):
 
     @staticmethod
     def can_edit(user):
-        return has_user_perm(user, EDIT)
+        return has_user_perm(user, pregister.EDIT)
 
     def get_permission_str(self):
         return dict(PERMISSION_CHOICES)[self.permission]
