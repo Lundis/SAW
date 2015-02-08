@@ -1,0 +1,25 @@
+{% extends "events/base.html" %}
+
+{% load i18n %}
+{% load bootstrap3 %}
+{% load sawp %}
+
+{% block breadcrumb2 %}
+    <li class="active">
+    <a href="{% url "events_list_eventitems" %}">{% trans "List items " %}</a>
+    </li>
+{% endblock %}
+
+{% block main_content %}
+
+    <ul class="list-group">
+        {% for eitem in object_list %}
+            <li class="list-item">
+                {{ eitem.name }}
+                <a href="{% url "events_edit_eventitem" eitem.id %}">Edit</a>
+                <a href="{% url "events_delete_eventitem" eitem.id %}">Delete</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url "events_add_eventitem" %}">add eventitemTODO</a>
+{% endblock %}

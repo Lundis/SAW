@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseServerError
-from .models import Event, EventSignup
+from .models import Event, EventSignup, EventItem
 from django.http import HttpResponseRedirect
 from users import permissions
 from .register import CAN_VIEW_EVENTS, CAN_CREATE_EVENTS, CAN_SIGNUP_FOR_EVENTS, CAN_VIEW_SIGNUP_INFO
@@ -12,7 +12,8 @@ from base.utils import generate_email_ver_code
 from django.conf import settings
 from base.models import SiteConfiguration
 from django.core.mail import send_mail, BadHeaderError
-from django.views.generic import DeleteView
+from django.views.generic import CreateView, UpdateView, ListView, DeleteView
+from users.decorators import has_permission
 import logging
 
 logger = logging.getLogger(__name__)
@@ -24,7 +25,6 @@ def home(request):
 
 
 # TODO we shouldn't have all this code in the view
-# TODO Also we need to have a confirm mechanism on the unregister url. Maybe implement that magic delete view?
 def event_detail(request, event_id):
     try:
         event = Event.objects.get(id=event_id)
@@ -165,16 +165,16 @@ def delete_event_signup(request, event_signup_id):
 
     # Checks completed, let's remove this!
     signup_name = str(signup.name)
-    event_id = str(signup.event.id)
-    event_name = str(Event.objects.get(id=event_id).title)
+    event = signup.event
     signup.delete()
     messages.success(
         request,
-        _("Event signup for {0} from event {1} was successfully removed!").format(signup_name, event_name)
+        _("Event signup for {0} from event {1} was successfully removed!").format(signup_name, event.title)
     )
-    return HttpResponseRedirect(reverse("events_view_event", args=event_id))
+    return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
 
 
+# This view is used when deleting a view using delete_confirmation_code
 class DeleteEventSignupByCodeView(DeleteView):
     model = EventSignup
 
@@ -210,3 +210,62 @@ class DeleteEventSignupByCodeView(DeleteView):
         )
         return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
 
+
+class AddEventItemView(CreateView):
+    model = EventItem
+    fields = ['name']
+    success_url = reverse_lazy("events_list_eventitems")
+
+    def dispatch(self, request, *args, **kwargs):
+        if permissions.has_user_perm(request.user, CAN_CREATE_EVENTS):
+            return super(AddEventItemView, self).dispatch(request, *args, **kwargs)
+        messages.error(request, _("You don't have permission to add event items"))
+        return HttpResponseRedirect(reverse("events_home"))
+
+    def form_valid(self, form):
+        # This method is called when valid form data has been POSTed.
+        messages.success(self.request, _("Succesfully added event item"))
+        return super(AddEventItemView, self).form_valid(form)
+
+
+class EditEventItemView(UpdateView):
+    model = EventItem
+    fields = ['name']
+    success_url = reverse_lazy("events_list_eventitems")
+
+    def dispatch(self, request, *args, **kwargs):
+        if permissions.has_user_perm(request.user, CAN_CREATE_EVENTS):
+            return super(EditEventItemView, self).dispatch(request, *args, **kwargs)
+        messages.error(request, _("You don't have permission to edit event items"))
+        return HttpResponseRedirect(reverse("events_home"))
+
+    def form_valid(self, form):
+        # This method is called when valid form data has been POSTed.
+        messages.success(self.request, _("Succesfully updated event item"))
+        return super(EditEventItemView, self).form_valid(form)
+
+
+class DeleteEventItemView(DeleteView):
+    model = EventItem
+    success_url = reverse_lazy("events_list_eventitems")
+
+    def dispatch(self, request, *args, **kwargs):
+        if permissions.has_user_perm(request.user, CAN_CREATE_EVENTS):
+            return super(DeleteEventItemView, self).dispatch(request, *args, **kwargs)
+        messages.error(request, _("You don't have permission to add event items"))
+        return HttpResponseRedirect(reverse("events_home"))
+
+    def form_valid(self, form):
+        # This method is called when valid form data has been POSTed.
+        messages.success(self.request, _("Succesfully removed event item"))
+        return super(DeleteEventItemView, self).form_valid(form)
+
+
+class ListEventItemsView(ListView):
+    model = EventItem
+
+    def dispatch(self, request, *args, **kwargs):
+        if permissions.has_user_perm(request.user, CAN_CREATE_EVENTS):
+            return super(ListEventItemsView, self).dispatch(request, *args, **kwargs)
+        messages.error(request, _("You don't have permission to list event items"))
+        return HttpResponseRedirect(reverse("events_home"))

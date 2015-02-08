@@ -32,21 +32,30 @@ class EventSignup(models.Model):
     diet = models.CharField(max_length=200, null=True, blank=True)
     other = models.CharField(max_length=200, null=True, blank=True)
     created = models.DateTimeField(default=datetime.now, blank=True)
-    delete_confirmation_code = models.CharField(max_length=32, unique=True)
+    delete_confirmation_code = models.CharField(max_length=32, unique=True)# TODO rename this as we will use it for editing as well
 
 
 class EventItem(models.Model):
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return str(self.name)
 
-#Things you can choose in event? examples?
+
+# This is for setting which items can be set when signing up to event
 class ItemInEvent(models.Model):
     event = models.ForeignKey(Event)
     item = models.ForeignKey(EventItem)
 
+    def __str__(self):
+        return str("{0} is enabled in {1}".format(self.item.name, self.event.title))
 
-#Things you can choose in signup? examples?
+
+# Things you can choose in signup? Example: amount of specific liqueur
 class ItemInSignup(models.Model):
     signup = models.ForeignKey(EventSignup)
     item = models.ForeignKey(EventItem)
     amount = models.IntegerField()
+
+    def __str__(self):
+        return str("{0} signed up for {1} {2}".format(self.event.signup.name, self.amount, self.item.name))
