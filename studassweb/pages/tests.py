@@ -16,7 +16,7 @@ class InfoCategoryTest(TestCase):
         self.assertTrue(menu_item.count() == 1, "A single Menu item wasn't created")
 
         # Check that the item was added to the top info menu
-        menu = Menu.get_or_none("info_top_menu")
+        menu = Menu.get_or_none("pages_top_menu")
         self.assertIsNotNone(menu, "Info menu doesn't exist")
         self.assertTrue(menu.contains(menu_item), "Category item isn't in the info menu")
 

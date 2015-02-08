@@ -20,7 +20,7 @@
             {% trans "Submit" %}
         </button>
         {% if category %}
-            <a href="{% url "info_delete_category" category_id=category.id %}" class="btn btn-danger">
+            <a href="{% url "pages_delete_category" category_id=category.id %}" class="btn btn-danger">
                 {% trans "Delete" %}
             </a>
         {% endif %}
