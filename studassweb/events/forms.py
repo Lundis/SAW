@@ -34,12 +34,10 @@ class EventForm(forms.ModelForm):
 class EventItemsForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
-        event1 = kwargs.pop("event", None)
+        event = kwargs.pop("event", None)
         selected_eitems = []
-        print(event1)
-        if event1:
-            selected_event_items = ItemInEvent.objects.filter(event=event1)
-            print(selected_event_items)
+        if event:
+            selected_event_items = ItemInEvent.objects.filter(event=event)
             for tmp in selected_event_items:
                 selected_eitems.append(tmp.item.id)
         super(EventItemsForm, self).__init__(*args, **kwargs)
@@ -47,8 +45,6 @@ class EventItemsForm(forms.Form):
         eitems = ()
         for eitem in all_event_items:
             eitems += (str(eitem.id), eitem.name),
-        print("huora")
-        print(selected_eitems)
         self.fields["eitems"] = forms.MultipleChoiceField(choices=eitems, initial=selected_eitems)
 
     def save(self, event):
@@ -66,3 +62,33 @@ class EventItemsForm(forms.Form):
                 except EventItem.DoesNotExist:
                     raise  # TODO something
             return None
+
+
+class SignupItemsForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        event = kwargs.pop("event")
+        signup = kwargs.pop("signup", None)
+        selected_eitems = []
+        #if signup:
+        #    selected_event_items = ItemInSignup.objects.filter(signup=signup)
+        #    for tmp in selected_event_items:
+        #        selected_eitems.append(tmp.item.id)
+        super(SignupItemsForm, self).__init__(*args, **kwargs)
+        this_event_items = []
+        this_event_iteminevents = ItemInEvent.objects.filter(event=event)
+        for iteminevent in this_event_iteminevents:
+            this_event_items.append(iteminevent.item)
+        eitems = ()
+        i = 0
+        for eitem in this_event_items:
+            eitems += (str(eitem.id), eitem.name),
+            self.fields["eitems-"+str(i)] = forms.CharField(label=eitem.name)
+            i += 1
+
+    def save(self, event):
+        if self.is_valid():
+            pass
+            # TODO loop through everything starting with "eitems"
+            # this should by the way be a constant
+            # save every textfield as a ItemInSignup

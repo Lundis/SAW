@@ -27,6 +27,7 @@
         <form action="" method="post">
             {% csrf_token %}
             {% bootstrap_form signupform %}
+            {% bootstrap_form signupitemsform %}
             {% buttons %}
                 <button type="submit" class="btn btn-primary">
                     {% trans "Submit" %}

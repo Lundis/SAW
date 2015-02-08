@@ -4,7 +4,7 @@ from .models import Event, EventSignup, EventItem
 from django.http import HttpResponseRedirect
 from users import permissions
 from .register import CAN_VIEW_EVENTS, CAN_CREATE_EVENTS, CAN_SIGNUP_FOR_EVENTS, CAN_VIEW_SIGNUP_INFO
-from .forms import EventForm, EventSignupForm, EventItemsForm
+from .forms import EventForm, EventSignupForm, EventItemsForm, SignupItemsForm
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib import messages
 from django.utils.translation import ugettext as _
@@ -13,12 +13,14 @@ from django.conf import settings
 from base.models import SiteConfiguration
 from django.core.mail import send_mail, BadHeaderError
 from django.views.generic import CreateView, UpdateView, ListView, DeleteView
+import sys
 import logging
 
 logger = logging.getLogger(__name__)
 
 MAIN_PREFIX = "mainevent"
 ITEMS_PREFIX = "eventitems"
+
 
 def home(request):
     events = Event.objects.filter().order_by('start')
@@ -30,8 +32,9 @@ def event_detail(request, event_id):
     try:
         event = Event.objects.get(id=event_id)
 
-        signupform = EventSignupForm(request.POST or None)
-        if signupform.is_valid():
+        signupform = EventSignupForm(request.POST or None, prefix=MAIN_PREFIX)
+        signupitemsform = SignupItemsForm(request.POST or None, event=event, prefix=ITEMS_PREFIX)
+        if signupform.is_valid() and signupitemsform.is_valid():
             temp = signupform.save(commit=False)
             temp.event = event
             temp.delete_confirmation_code = generate_email_ver_code()
@@ -42,6 +45,7 @@ def event_detail(request, event_id):
 
             # We need to save to db here to get id, but we should remove it if we couldn't send email
             temp.save()
+            signupitemsform.save(event=event)
 
             try:
                 from_email = settings.NO_REPLY_EMAIL
@@ -71,8 +75,15 @@ def event_detail(request, event_id):
             except BadHeaderError:
                 logger.error("BadHeaderError sending email to {0}".format(to_emails))
                 temp.delete()
-                return HttpResponseServerError("BadHeaderError, newlines in email adress?")
+                messages.error(request, _("BadHeaderError, newlines in email adress?"))
+                return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
+            except:
+                logger.error("Exception {0} sending email to {1}".format(sys.exc_info()[0], to_emails))
+                temp.delete()
+                messages.error(request, _("Error, please try again"))
+                return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
 
+            # Remove form after signing up
             signupform = None
 
             messages.success(request, _("Successfully signed up to event!"))
@@ -80,7 +91,7 @@ def event_detail(request, event_id):
         signups = EventSignup.objects.filter(event=event)
 
         return render(request, 'events/event.html', {
-            'event': event, 'signupform': signupform, 'signups': signups})
+            'event': event, 'signupform': signupform, 'signupitemsform': signupitemsform, 'signups': signups})
     except Event.DoesNotExist:
         logger.warning('Could not find event with id %s', event_id)
         return HttpResponseNotFound('No event with that id found')
