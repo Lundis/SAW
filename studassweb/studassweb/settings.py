@@ -163,11 +163,6 @@ LOGGING = {
             'filename': os.path.join(LOG_DIR, 'allwarnings.log'),
             'formatter': 'verbose'
         },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        },
         'console-warnings': {
             'level': 'WARNING',
             'class': 'logging.StreamHandler',
@@ -188,12 +183,25 @@ LOGGING = {
     },
 }
 
+if DEBUG:
+    LOGGING['handlers']['console'] = {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'}
+
 #This is the logger added to every module
-local_logger_conf = {
-    'handlers': ['allwarnings', 'appdebugfile', 'console'],
-    'level': 'DEBUG',
-    'propagate': True,
-}
+if DEBUG:
+    local_logger_conf = {
+        'handlers': ['allwarnings', 'appdebugfile', 'console'],
+        'level': 'DEBUG',
+        'propagate': True,
+    }
+else:
+    local_logger_conf = {
+        'handlers': ['allwarnings', 'appdebugfile'],
+        'level': 'DEBUG',
+        'propagate': True,
+    }
 
 #Add to every module
 for app in get_all_modules():
@@ -206,7 +214,7 @@ MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
                 message_constants.INFO: 'info',
                 message_constants.SUCCESS: 'success',
                 message_constants.WARNING: 'warning',
-                message_constants.ERROR: 'danger',}
+                message_constants.ERROR: 'danger'}
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
