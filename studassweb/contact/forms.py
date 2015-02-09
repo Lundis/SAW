@@ -13,7 +13,7 @@ class MessageForm(forms.ModelForm):
         else:
             user = None
         super(MessageForm, self).__init__(*args, **kwargs)
-        if user is not None:
+        if user is not None and user.is_authenticated():
             logger.debug("MessageForm user: \"%s\"" % user)
             logger.debug("MessageForm user email: \"%s\"" % user.email)
             self.fields["from_email"].initial = user.email
