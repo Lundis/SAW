@@ -1,0 +1,71 @@
+{% extends "gallery/base.html" %}
+
+{% load i18n %}
+{% load bootstrap3 %}
+{% load static %}
+
+{% block main_content %}
+    {% load navigator %}
+    {% url "gallery.views.view_gallery" as gallery_url %}
+    {% if form.instance.pk %}
+        {% display_navigator gallery_url "Photos" form.instance.get_absolute_url form.instance %}
+    {% else %}
+        {% display_navigator exams_url "Photos" "#" "New photo" %}
+    {% endif %}
+    {% if form.instance.pk %}
+        <h1>Edit photo {{ form.instance.name }}</h1>
+    {% endif %}
+
+    {% if form.instance.pk %}
+        <form action="{% url 'gallery_delete_picture' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
+            {% csrf_token %}
+            {% buttons %}
+                <button type="submit" class="btn btn-danger">
+                    {% trans "Remove this photo" %}
+                </button>
+            {% endbuttons %}
+        </form>
+    {% endif %}
+
+    <form id="addEditPhotoForm" action="" method="post" enctype="multipart/form-data" >
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <div id="photofilesformset_all">
+            {% for f in filesformset.forms %}
+                    {{ f.id }}
+                    {% bootstrap_field f.image%}
+                    {% if f.instance.pk %}{{ f.DELETE}}{% endif %}{# Note! removing this fucks with functionality #}
+                </div>
+            {% endfor %}
+        </div>
+        {{ filesformset.management_form }}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">
+                {% trans "Submit" %}
+            </button>
+        {% endbuttons %}
+    </form>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static "js/base/jquery.formset.js" %}"></script>
+    <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+    <script type="text/javascript">
+        $(function () {
+            //Set up dynamic adding of images
+            $('.examfilesformset_single').formset({
+                prefix: '{{ filesformset.prefix }}',
+                formCssClass: 'dynamic-formasdf',
+                addText: '{% trans "Add another image" %}',
+                deleteText: '{% trans "Remove image" %}'
+            });
+
+            //Set up datepicker
+            $( "#id_exam_date" ).datepicker({
+                firstDay: 1,
+                dateFormat: "dd.mm.yy"
+            });
+        })
+    </script>
+{% endblock %}
