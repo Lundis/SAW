@@ -58,18 +58,23 @@
             </div>
         {% endif %}
         <div class="panel-heading">
-            <h2 class="panel-title">{% trans "Help" %}</h2>
+            <h2 class="panel-title" data-toggle="collapse" data-target="#helptext">
+                {% trans "Help" %}
+                <span class="glyphicon caret pull-right"></span>
+            </h2>
         </div>
-        <div class="panel-body">
-            <p>
-                {% if can_use_contact_form %}
-                    {% trans "Select who you want to contact!" %}
-                {% else %}
-                    {% trans "You do not have permission to use the built-in messaging system." %}
-                {% endif %}
-            </p>
-            {% load feedback %}
-            {% helptext_feedback %}
+        <div id="helptext" class="panel-collapse helptext-collapse">
+            <div class="panel-body">
+                <p>
+                    {% if can_use_contact_form %}
+                        {% trans "Select who you want to contact!" %}
+                    {% else %}
+                        {% trans "You do not have permission to use the built-in messaging system." %}
+                    {% endif %}
+                </p>
+                {% load feedback %}
+                {% helptext_feedback %}
+            </div>
         </div>
     </div>
 {% endblock %}
