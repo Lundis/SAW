@@ -14,8 +14,6 @@
 {% endblock %}
 
 {% block main_content %}
-    {% load navigator %}
-    {% url "news_home" as news_url %}
     <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.media }}

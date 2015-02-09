@@ -9,3 +9,7 @@
     {% load dynamic_menu %}
     {% display_menu "main_menu" "Polls" %}
 {% endblock %}}
+
+{% block breadcrumb1 %}
+    <li class="active"><a href="{% url "polls_home" %}">{% trans "Polls" %}</a></li>
+{% endblock %}

@@ -13,8 +13,6 @@
 {% endblock %}
 
 {% block main_content %}
-    {% load navigator %}
-    {% url "news_home" as news_url %}
     <form action="" method="post">
         {% csrf_token %}
         {% bootstrap_form form %}

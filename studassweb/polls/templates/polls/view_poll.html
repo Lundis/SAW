@@ -4,16 +4,13 @@
 {% load bootstrap3 %}
 {% load sawp %}
 
-{% block breadcrumb1 %}
-    <li>
-        <a href={% url "polls_home" %}>{% trans "Polls" %}</a>
+{% block breadcrumb2 %}
+    <li class="active">
+        {{ poll.name }}
     </li>
 {% endblock %}
 
 {% block main_content %}
-    {% load navigator %}
-    {% url "polls.views.home" as polls_url %}
-
     <h1>{{ poll.name }}</h1>
     <ul class="list-group">
 
@@ -60,7 +57,7 @@
     {% has_perm "polls" "CAN_CREATE_POLLS" as can_edit_polls %}
     {% has_perm "polls" "CAN_CREATE_POLLS" as can_delete_polls %}
     {% if can_edit_polls%}
-        <div class="panel panel-info">
+        <div class="panel panel-primary">
             <div class="panel-heading">
                 <h2 class="panel-title">{% trans "Edit" %}</h2>
             </div>

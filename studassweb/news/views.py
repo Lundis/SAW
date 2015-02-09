@@ -7,7 +7,6 @@ from users.decorators import has_permission
 from .models import Article, Category
 from .forms import ArticleForm, CategoryForm
 from .register import EDIT
-from base.forms import ConfirmationForm
 from base.views import delete_confirmation_view
 import datetime
 import logging

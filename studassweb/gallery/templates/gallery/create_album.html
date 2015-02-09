@@ -4,11 +4,13 @@
 {% load bootstrap3 %}
 {% load static %}
 
+{% block breadcrumb2 %}
+    <li class="active">
+        {% trans "New Album" %}
+    </li>
+{% endblock %}
 
 {% block main_content %}
-    {% load navigator %}
-    {% url "gallery_main" as gallery_url %}
-    {% display_navigator gallery_url "Gallery" "#" "New album" %}
     <h1>create an album</h1>
 
 <form action="{% url "gallery_create_album" %}" method="post" enctype="multipart/form-data" >

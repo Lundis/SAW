@@ -5,10 +5,13 @@
 {% load sawp %}
 {% load thumbnail %}
 
+{% block breadcrumb2 %}
+    <li class="active">
+        {{ event.title }}
+    </li>
+{% endblock %}
+
 {% block main_content %}
-    {% load navigator %}
-    {% url "events_home" as events_url %}
-    {% display_navigator events_url "Events" event.get_absolute_url event%}
     <h1>{{ event }}</h1>
     <div class="list-group">
         <ul class="list-group">
@@ -24,6 +27,7 @@
         <form action="" method="post">
             {% csrf_token %}
             {% bootstrap_form signupform %}
+            {% bootstrap_form signupitemsform %}
             {% buttons %}
                 <button type="submit" class="btn btn-primary">
                     {% trans "Submit" %}
@@ -86,7 +90,7 @@
 {% block sidebar %}
     {% has_perm "events" "CAN_CREATE_EVENTS" as can_create_events %}
     {% if can_create_events%}
-        <div class="panel panel-info">
+        <div class="panel panel-primary">
             <div class="panel-heading">
                 <h2 class="panel-title">{% trans "Edit" %}</h2>
             </div>

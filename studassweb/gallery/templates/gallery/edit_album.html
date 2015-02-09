@@ -4,11 +4,14 @@
 {% load bootstrap3 %}
 {% load thumbnail %}
 
+{% block breadcrumb2 %}
+    <li class="active">
+        {% trans "Editing " %}
+        {{ album.name }}
+    </li>
+{% endblock %}
 
 {% block main_content %}
-{% load navigator %}
-    {% url "gallery_main" as gallery_url %}
-    {% display_navigator gallery_url "Gallery" album.get_absolute_url album.name %}
     <h1>edit an album</h1>
 
     <form action="{% url 'gallery.views.edit_album' album.id %}"method="post" enctype="multipart/form-data" >

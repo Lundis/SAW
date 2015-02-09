@@ -14,7 +14,7 @@
 {% block content %}
     {% setvar form.rendered_menu_editors as menu_items %}
     <div class="install-content">
-        <div class="panel panel-default">
+        <div class="panel panel-primary">
             <div class="panel-heading">{% trans "Main Menu" %}!</div>
             <div class="panel-body">
                 {{ menu_items.main_menu }}
@@ -22,7 +22,7 @@
         </div>
 
 
-    <div class="panel panel-default">
+    <div class="panel panel-primary">
         <div class="panel-heading">
             {% trans "Login menu items. These will be visible in a dropdown menu after the user has logged on." %}
         </div>
@@ -31,7 +31,7 @@
         </div>
     </div>
 
-    <div class="panel panel-default">
+    <div class="panel panel-primary">
         <div class="panel-heading">
             {% trans "Available menu items. Click or drag them above to add them to the menu." %}
         </div>
