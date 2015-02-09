@@ -3,19 +3,11 @@ from django.contrib.auth.models import User, Permission, ContentType, Group
 from solo.models import SingletonModel
 from base.models import DisabledModule
 from importlib import import_module
-import random
 import users.groups
 import logging
+from base.utils import generate_email_ver_code
 
 logger = logging.getLogger(__name__)
-
-
-def _generate_email_ver_code():
-        code = ""
-        alphabet = "qwertyuiopasdfghjklzxcvbnm1234567890"
-        for i in range(32):
-            code += alphabet[random.randint(0, len(alphabet)-1)]
-        return code
 
 
 class UserExtension(models.Model):
@@ -45,9 +37,9 @@ class UserExtension(models.Model):
     def create_for_user(cls, user):
         user_ext = UserExtension(user=user)
         # make sure the verification code is unique
-        user_ext.email_verification_code = _generate_email_ver_code()
+        user_ext.email_verification_code = generate_email_ver_code()
         while cls.objects.filter(email_verification_code=user_ext.email_verification_code).exists():
-            user_ext = _generate_email_ver_code()
+            user_ext = generate_email_ver_code()
         user_ext.save()
         # Create a member object for superusers if the members module is enabled
         if DisabledModule.is_enabled("members"):
@@ -117,7 +109,7 @@ class SAWPermission(models.Model):
         """
         guest_group, created = Group.objects.get_or_create(name=users.groups.GUEST)
         is_guest_permission = guest_group.permissions.filter(pk=self.permission.pk).exists()
-        logger.debug("%s is guest permission? %s" % (self.permission, is_guest_permission))
+        logger.debug("\"%s\" is guest permission? %s" % (self.permission.codename, is_guest_permission))
         return user.is_superuser or is_guest_permission or \
                user.has_perm(self.permission.content_type.app_label + "." + self.permission.codename)
 

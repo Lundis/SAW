@@ -23,6 +23,7 @@ EXTERNAL_APPS = (
     'ckeditor',
     'easy_thumbnails',  # you need to run "python manage.py migrate easy_thumbnails" after installing
     'captcha',
+    'django_ajax',
 )
 
 NON_OPTIONAL_APPS = (
@@ -51,6 +52,7 @@ MIDDLEWARE_CLASSES = (
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     'django.contrib.messages.context_processors.messages',
+    'django.core.context_processors.request',
 )
 
 ROOT_URLCONF = 'studassweb.urls'
@@ -104,6 +106,9 @@ INSTALLED_APPS = (
 # Default no-reply to use.
 NO_REPLY_EMAIL = "noreply@localhost"
 
+#The directory in which log files should be created
+LOG_DIR = os.path.join(os.path.dirname(SITE_ROOT), 'logs')
+
 # load local settings
 exec(open(os.path.join(os.path.dirname(__file__), 'settings_local.py')).read(), globals())
 
@@ -143,25 +148,20 @@ LOGGING = {
         'djangodebugfile': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(os.path.join(os.path.dirname(SITE_ROOT), 'logs'), 'djangodebug.log'),
+            'filename': os.path.join(LOG_DIR, 'djangodebug.log'),
             'formatter': 'verbose'
         },
         'appdebugfile': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(os.path.join(os.path.dirname(SITE_ROOT), 'logs'), 'appdebug.log'),
+            'filename': os.path.join(LOG_DIR, 'appdebug.log'),
             'formatter': 'verbose'
         },
         'allwarnings': {
             'level': 'WARNING',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(os.path.join(os.path.dirname(SITE_ROOT), 'logs'), 'allwarnings.log'),
+            'filename': os.path.join(LOG_DIR, 'allwarnings.log'),
             'formatter': 'verbose'
-        },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
         },
         'console-warnings': {
             'level': 'WARNING',
@@ -183,12 +183,25 @@ LOGGING = {
     },
 }
 
+if DEBUG:
+    LOGGING['handlers']['console'] = {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'}
+
 #This is the logger added to every module
-local_logger_conf = {
-    'handlers': ['allwarnings', 'appdebugfile', 'console'],
-    'level': 'DEBUG',
-    'propagate': True,
-}
+if DEBUG:
+    local_logger_conf = {
+        'handlers': ['allwarnings', 'appdebugfile', 'console'],
+        'level': 'DEBUG',
+        'propagate': True,
+    }
+else:
+    local_logger_conf = {
+        'handlers': ['allwarnings', 'appdebugfile'],
+        'level': 'DEBUG',
+        'propagate': True,
+    }
 
 #Add to every module
 for app in get_all_modules():
@@ -201,7 +214,7 @@ MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
                 message_constants.INFO: 'info',
                 message_constants.SUCCESS: 'success',
                 message_constants.WARNING: 'warning',
-                message_constants.ERROR: 'danger',}
+                message_constants.ERROR: 'danger'}
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

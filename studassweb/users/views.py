@@ -86,7 +86,7 @@ def register_thanks(request):
             to_emails)
 
     except BadHeaderError:
-        #TODO add logging
+        logger.info("BadHeaderError when sending verification email from %s to %s" % (from_email, to_emails[0]))
         return HttpResponseServerError("BadHeaderError, newlines in email adress?")
     return render(request, 'users/register/register_thanks.html', context)
 

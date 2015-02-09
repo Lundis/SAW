@@ -21,7 +21,7 @@
     <h3>{% trans "Drag the items to reorder them" %}</h3>
     <div class="row">
         <div class="col-sm-8">
-            <div class="panel panel-default">
+            <div class="panel panel-primary">
                 <div class="panel-heading">{{ menu.menu_name }}</div>
                 <div class="panel-body">
                     {% for menu_html in form.rendered_menu_editors.values %}
@@ -29,7 +29,7 @@
                     {% endfor %}
                 </div>
             </div>
-            <div class="panel panel-default">
+            <div class="panel panel-primary">
                 <div class="panel-heading">
                     {% trans "Available items. Drag items here to remove them from the menu"  %}
                 </div>

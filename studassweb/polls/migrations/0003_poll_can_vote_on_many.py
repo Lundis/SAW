@@ -7,13 +7,13 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('info', '0002_infocategory_menu_item'),
+        ('polls', '0002_auto_20150128_1502'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='infopage',
-            name='for_frontpage',
+            model_name='poll',
+            name='can_vote_on_many',
             field=models.BooleanField(default=False),
             preserve_default=True,
         ),

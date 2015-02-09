@@ -2,6 +2,7 @@ import os
 from django.conf import settings
 from inspect import isfunction
 from importlib import import_module
+import random
 
 
 def get_modules_with(file_name, function_name):
@@ -65,3 +66,11 @@ def get_str_from_module(app, module, var_name):
 
 def get_all_modules():
     return [mod for mod, f in get_modules_with(None, None)]
+
+
+def generate_email_ver_code():
+        code = ""
+        alphabet = "qwertyuiopasdfghjklzxcvbnm1234567890"
+        for i in range(32):
+            code += alphabet[random.randint(0, len(alphabet)-1)]
+        return code

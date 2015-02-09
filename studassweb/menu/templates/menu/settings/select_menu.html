@@ -18,7 +18,7 @@
 {% block main_content %}
     <div class="row">
         <div class="col-sm-5">
-            <div class="panel panel-default">
+            <div class="panel panel-primary">
                 <div class="panel-heading">
                     {% trans "Menu preview" %}
                 </div>
@@ -36,7 +36,7 @@
             </div>
         </div>
         <div class="col-sm-4">
-            <div class="panel panel-default">
+            <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h3>{% trans "Select a menu to edit." %}</h3>
                 </div>
@@ -56,7 +56,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="panel panel-default">
+        <div class="panel panel-primary">
             <div class="panel-heading">
                 {% trans "Click on a custom menu item to edit it or " %}
                 <a href="{% url "menu_settings_new_menu_item" %}">{% trans "create a new one" %}</a>

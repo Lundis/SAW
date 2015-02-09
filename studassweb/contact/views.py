@@ -36,10 +36,10 @@ def write_message(request, contact_id):
             'Messages in contact module are neither saved to db nor sent as email.'
             'It is thus not functional'
         )
-    form = MessageForm(request.POST or None)
+    form = MessageForm(request.POST or None, user=request.user)
     if form.is_valid():
         if contact.save_to_db:
-            form.save(commit=False, contact=contact, from_person=request.user)
+            form.save(contact=contact, from_person=request.user)
 
         if contact.send_email:
             try:
@@ -50,15 +50,18 @@ def write_message(request, contact_id):
                     [contact.email])
 
             except BadHeaderError:
+                # TODO: use a message that the user can understand
                 messages.error(request, "Bad header, message not sent!")
                 return HttpResponseRedirect(reverse("contact_write_message"))
 
         messages.success(request, "Message successfully sent!")
         return HttpResponseRedirect(reverse("contact_home"))
 
-    context = {'form': form}
+    context = {'form': form,
+               'contact': contact}
 
     return render(request, "contact/write_message.html", context)
+
 
 @has_permission(CAN_VIEW_MESSAGES)
 def read_messages(request, contact_id):
@@ -67,10 +70,10 @@ def read_messages(request, contact_id):
     except ContactInfo.DoesNotExist:
         raise Http404("The Specified contact was not found")
 
-    msgs = Message.objects.filter(contact__id=contact.id).order_by('-date_and_time')
-
-    return render(request, "contact/view_messages.html",
-                  {'msgs': msgs})
+    msgs = Message.objects.filter(contact=contact).order_by('-date_and_time')
+    context = {'msgs': msgs,
+               'contact': contact}
+    return render(request, "contact/view_messages.html", context)
 
 
 def delete_message(request, message_id):

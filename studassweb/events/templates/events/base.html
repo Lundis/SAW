@@ -9,3 +9,9 @@
     {% load dynamic_menu %}
     {% display_menu "main_menu" "Events" %}
 {% endblock %}
+
+{% block breadcrumb1 %}
+    <li><a href="{% url "events_home" %}">
+        {% trans "Events" %}
+    </a></li>
+{% endblock %}

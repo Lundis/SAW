@@ -24,22 +24,19 @@
                             {{ contact.name }}
                         </h4>
                     </div>
+                    <div class="pull-right inherit-padding-left-right text-right">
+                        <h5>
+                            {{ contact.email }}
+                        </h5>
+                    </div>
                 </div>
             </div>
             <div class="panel-body">
                 {{ contact.info_text | safe }}
-            </div>
-            <div class="panel-footer">
-                <div class="pull-left inherit-padding-left-right">
-                    {{ contact.email }}
-                </div>
-                <div class="row inherit-padding-left-right">
-                    <div class="pull-right text-right">
-                        <a href="{% url "contact_settings_edit_contact" contact_id=contact.id %}" class="btn btn-primary">
-                            {% trans "Edit" %}
-                        </a>
-                    </div>
-
+                <div class="pull-right text-right">
+                    <a href="{% url "contact_settings_edit_contact" contact_id=contact.id %}" class="btn btn-primary">
+                        {% trans "Edit" %}
+                    </a>
                 </div>
             </div>
         </div>
@@ -54,6 +51,9 @@
         <div class="panel-body">
             <a class="btn btn-primary btn-block" href="{% url "contact_settings_new_contact" %}">
                 {% trans "Create new contact" %}
+            </a>
+            <a class="btn btn-primary btn-block" href="{% url "contact_home" %}">
+                {% trans "Go to the contact page" %}
             </a>
         </div>
     </div>

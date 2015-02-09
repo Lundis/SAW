@@ -4,16 +4,18 @@
 {% load bootstrap3 %}
 {% load static %}
 
+{% block breadcrumb2 %}
+    <li class="active">
+        {% if form.instance.pk %}
+            {% trans "Editing " %}
+            {{ form.instance.name }}
+        {% else %}
+            {% trans "New poll" %}
+        {% endif %}
+    </li>
+{% endblock %}
 
 {% block main_content %}
-    {% load navigator %}
-    {% url "polls_home" as polls_url %}
-    {% if form.instance.pk %}
-        {% display_navigator polls_url "Polls" form.instance.get_absolute_url form.instance.name%}
-    {% else %}
-        {% display_navigator polls_url "Polls" "#" "New poll" %}
-    {% endif %}
-
     {% if form.instance.pk %}
         <h1>Edit {{ form.instance.name }}</h1>
     {% else %}

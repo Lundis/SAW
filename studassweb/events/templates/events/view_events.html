@@ -4,10 +4,13 @@
 {% load bootstrap3 %}
 {% load sawp %}
 
+{% block breadcrumb1 %}
+    <li class="active">
+        {% trans "Events" %}
+    </li>
+{% endblock %}
+
 {% block main_content %}
-    {% load navigator %}
-    {% url "events_home" as events_url %}
-    {% display_navigator events_url "Events" %}
     <h3>Events</h3>
     <div class="list-group">
         {% for event in events %}
@@ -22,7 +25,7 @@
 {% block sidebar %}
     {% has_perm "events" "CAN_CREATE_EVENTS" as can_create_events %}
     {% if can_create_events%}
-        <div class="panel panel-info">
+        <div class="panel panel-primary">
             <div class="panel-heading">
                 <h2 class="panel-title">{% trans "Add" %}</h2>
             </div>

@@ -1,8 +1,22 @@
 from django import forms
 from .models import Message, ContactInfo
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class MessageForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        if 'user' in kwargs:
+            user = kwargs.pop('user')
+        else:
+            user = None
+        super(MessageForm, self).__init__(*args, **kwargs)
+        if user is not None:
+            logger.debug("MessageForm user: \"%s\"" % user)
+            logger.debug("MessageForm user email: \"%s\"" % user.email)
+            self.fields["from_email"].initial = user.email
 
     class Meta:
         model = Message
@@ -10,7 +24,7 @@ class MessageForm(forms.ModelForm):
 
     def save(self, commit=True, contact=None, from_person=None):
         """
-        Note: You MUST specifiy the contact
+        Note: You MUST specify the contact
         :param commit:
         :param contact:
         :return:

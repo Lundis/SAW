@@ -13,7 +13,7 @@ class VerifyModuleEnabled:
         if module == "":
             module = "frontpage"
 
-        if not InstallProgress.is_finished() and module != "install":
+        if not InstallProgress.is_finished() and module != "install" and module != "admin":
             return HttpResponseRedirect(reverse("install_welcome"))
         if DisabledModule.is_disabled(module):
             return HttpResponseNotFound("The requested module is disabled")
