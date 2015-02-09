@@ -30,11 +30,13 @@
                             {% trans "View Messages" %}
                         </a>
                     </div>
-                    <div class="pull-right text-right">
-                        <a href="{% url "contact_write_message" contact_id=contact.id %}" class="btn btn-primary">
-                            {% trans "Send message" %}
-                        </a>
-                    </div>
+                    {% if contact.has_recipients %}
+                        <div class="pull-right text-right">
+                            <a href="{% url "contact_write_message" contact_id=contact.id %}" class="btn btn-primary">
+                                {% trans "Send message" %}
+                            </a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}

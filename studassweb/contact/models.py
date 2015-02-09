@@ -24,6 +24,9 @@ class ContactInfo(models.Model):
         except cls.DoesNotExist:
             return None
 
+    def has_recipients(self):
+        return self.save_to_db or self.send_email
+
     def save(self, *args, **kwargs):
         old_with_index = self._get_by_index(self.ordering_index)
         if old_with_index and old_with_index.id != self.id:
