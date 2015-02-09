@@ -17,11 +17,9 @@
 {% endblock %}
 
 {% block main_content %}
-    <div class="container">
-        <div class="row">
-            <h1>{{ page.title }}</h1>
-        </div>
-        <div class="row">
+    <h1>{{ page.title }}</h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
             {{ page.text | safe}}
         </div>
     </div>
@@ -30,19 +28,18 @@
     <div class="panel panel-primary">
         {% if category.pages %}
             <div class="panel-heading">
-                <h2 class="panel-title">{{ category.name }}</h2>
+                <a href="{{ category.get_absolute_url }}" class="panel-title">{{ category.name }}</a>
             </div>
             <div class="panel-body">
-                <div class="list-group">
+                <div class="btn-group-vertical btn-block">
                     {% for page_ in category.pages %}
                         {% can_view_object page_ as show_page %}
                         {% if show_page %}
-                            <a href="{{ page_.get_absolute_url}}" class="list-group-item">
+                            <a href="{{ page_.get_absolute_url}}" class="btn btn-primary">
                                 {{ page_.title }}
                             </a>
                         {% endif %}
                     {% endfor %}
-
                 </div>
             </div>
         {% endif %}
@@ -52,10 +49,24 @@
                 <h2 class="panel-title">{% trans "Edit" %}</h2>
             </div>
             <div class="panel-body">
-                <div class="list-group">
-                    <a href="{% url "pages_edit_page" page.id %}">
-                        <div class="btn list-group-item">{% trans "Edit this page" %}</div>
+                <div class="btn-group-vertical btn-block">
+                    <a href="{% url "pages_edit_page" page.id %}" class="btn btn-primary">
+                        {% trans "Edit this page" %}
                     </a>
+                </div>
+            </div>
+        {% endif %}
+        {% if show_edit_buttons and page.revisions.count > 1 %}
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Revisions" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="btn-group-vertical btn-block">
+                    {% for revision in page.revisions %}
+                        <a href="{{ revision.get_absolute_url}}" class="btn btn-primary">
+                            {{ revision.date }}
+                        </a>
+                    {% endfor %}
                 </div>
             </div>
         {% endif %}
