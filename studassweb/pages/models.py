@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 from ckeditor.fields import RichTextField
 from menu.models import MenuItem, Menu
 from users.permissions import has_user_perm
@@ -61,9 +62,11 @@ class InfoCategory(models.Model):
 class InfoPage(models.Model):
     title = models.CharField(max_length=50)
     text = RichTextField()
-    category = models.ForeignKey(InfoCategory, null=True)
+    category = models.ForeignKey(InfoCategory, null=True, blank=True)
     permission = models.CharField(max_length=100, choices=PERMISSION_CHOICES, default="VIEW_PUBLIC")
-    for_frontpage = models.BooleanField(default=False, blank=True)
+    for_frontpage = models.BooleanField(default=False,
+                                        blank=True,
+                                        help_text=_("Is this meant to be shown on the front page?"))
     author = models.ForeignKey(User)
 
     def __str__(self):

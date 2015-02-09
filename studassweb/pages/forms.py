@@ -13,7 +13,7 @@ class InfoPageForm(forms.ModelForm):
 
     class Meta:
         model = InfoPage
-        fields = ("title", "text", "category", "permission")
+        fields = ("title", "text", "category", "permission", "for_frontpage")
 
     def __init__(self, *args, **kwargs):
         self.author = kwargs.pop('user')

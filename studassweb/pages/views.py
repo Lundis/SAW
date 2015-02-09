@@ -3,6 +3,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from users.decorators import has_permission
+from users.permissions import has_user_perm
 from .models import InfoCategory, InfoPage
 from .forms import InfoPageForm, InfoCategoryForm
 from .register import EDIT, VIEW_PUBLIC
@@ -18,9 +19,14 @@ def main(request):
     :return:
     """
     categories = InfoCategory.objects.all()
-    pages_without_parent = InfoPage.objects.filter(category=None)
+    pages_without_parent = InfoPage.objects.filter(category=None, for_frontpage=False)
+    if has_user_perm(request.user, EDIT):
+        frontpage_pages = InfoPage.objects.filter(for_frontpage=True)
+    else:
+        frontpage_pages = None
     return render(request, 'info/main.html', {'categories': categories,
-                                              'pages': pages_without_parent})
+                                              'orphans': pages_without_parent,
+                                              'frontpage_pages': frontpage_pages})
 
 
 @has_permission(VIEW_PUBLIC)
