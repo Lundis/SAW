@@ -1,0 +1,40 @@
+{% extends "events/base.html" %}
+
+{% load i18n %}
+{% load bootstrap3 %}
+{% load sawp %}
+
+{% block breadcrumb2 %}
+    <li class="active">
+    <a href="{% url "events_list_eventitems" %}">{% trans "List items " %}</a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb3 %}
+    <li class="inactive">
+        {% if form.instance.pk %}
+            {% trans "Edit event item" %}
+        {% else %}
+            {% trans "Add event item" %}
+        {% endif %}
+    </li>
+{% endblock %}
+
+{% block main_content %}
+
+    <form action="" method="post">{% csrf_token %}
+
+        {% bootstrap_form form %}
+
+        {% buttons %}
+            <button type="submit" class="btn btn-confirm">
+                {% if form.instance.pk %}
+                    {% trans "Update" %}
+                {% else %}
+                    {% trans "Add" %}
+                {% endif %}
+            </button>
+        {% endbuttons %}
+    </form>
+
+{% endblock %}

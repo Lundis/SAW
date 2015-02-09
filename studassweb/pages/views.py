@@ -117,8 +117,8 @@ def delete_category(request, category_id):
         raise Http404(_("The requested object could not be found"))
     return delete_confirmation_view(request,
                                     item=category,
-                                    form_url=reverse("info_delete_category"),
-                                    redirect_url=reverse('info_view_categories'))
+                                    form_url=reverse("pages_delete_category"),
+                                    redirect_url=reverse('pages_view_categories'))
 
 
 @has_permission(EDIT)
@@ -129,5 +129,5 @@ def delete_page(request, page_id):
         raise Http404(_("The requested object could not be found"))
     return delete_confirmation_view(request,
                                     item=category,
-                                    form_url=reverse("info_delete_page"),
-                                    redirect_url=reverse('info_view_categories'))
+                                    form_url=reverse("pages_delete_page"),
+                                    redirect_url=reverse('pages_view_categories'))

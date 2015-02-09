@@ -4,12 +4,12 @@ from django.core.urlresolvers import reverse
 from ckeditor.fields import RichTextField
 from menu.models import MenuItem, Menu
 from users.permissions import has_user_perm
-from .register import VIEW_BOARD, VIEW_MEMBER, VIEW_PUBLIC, EDIT
+import pages.register as pregister
 
 PERMISSION_CHOICES = (
-    ("VIEW_PUBLIC", VIEW_PUBLIC),
-    ("VIEW_MEMBER", VIEW_MEMBER),
-    ("VIEW_BOARD", VIEW_BOARD),
+    ("VIEW_PUBLIC", pregister.VIEW_PUBLIC),
+    ("VIEW_MEMBER", pregister.VIEW_MEMBER),
+    ("VIEW_BOARD", pregister.VIEW_BOARD),
 )
 
 
@@ -24,7 +24,7 @@ class InfoCategory(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse("info.views.view_category", kwargs={'category_id': self.id})
+        return reverse("pages_view_category", kwargs={'category_id': self.id})
 
     def pages(self):
         return InfoPage.objects.filter(category=self)
@@ -40,7 +40,7 @@ class InfoCategory(models.Model):
             self.menu_item.submenu, created2 = Menu.get_or_create(__package__ + "_category_" + self.name)
             self.menu_item.save()
             self.save()
-            info_menu, created = Menu.get_or_create("info_top_menu")
+            info_menu, created = Menu.get_or_create("pages_top_menu")
             info_menu.add_item(self.menu_item)
 
     def delete(self, *args, **kwargs):
@@ -52,7 +52,7 @@ class InfoCategory(models.Model):
 
     @staticmethod
     def can_edit(user):
-        return has_user_perm(user, EDIT)
+        return has_user_perm(user, pregister.EDIT)
 
     def get_permission_str(self):
         return dict(PERMISSION_CHOICES)[self.permission]
@@ -69,7 +69,7 @@ class InfoPage(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse("info.views.view_page", kwargs={'page_id': self.id})
+        return reverse("pages_view_page", kwargs={'page_id': self.id})
 
     def save(self, *args, **kwargs):
         super(InfoPage, self).save(*args, **kwargs)
@@ -92,7 +92,7 @@ class InfoPage(models.Model):
 
     @staticmethod
     def can_edit(user):
-        return has_user_perm(user, EDIT)
+        return has_user_perm(user, pregister.EDIT)
 
     def get_permission_str(self):
         return dict(PERMISSION_CHOICES)[self.permission]

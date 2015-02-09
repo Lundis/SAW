@@ -1,7 +1,7 @@
 from menu.models import MenuItem, Menu
 from users.models import SAWPermission
 from users.groups import GUEST, MEMBER, BOARD_MEMBER
-import info.models
+import pages.models
 from .frontpage import InfoFrontPageItem
 
 
@@ -10,11 +10,11 @@ def get_menu_items():
     :return: a tuple ([main menu items], [settings menu items], [others])
     """
     item, created = MenuItem.get_or_create(__package__,
-                                           "Info",
-                                           reverse_string="info_view_categories",
+                                           "Pages",
+                                           reverse_string="pages_view_categories",
                                            permission=SAWPermission.get_or_create(VIEW_PUBLIC))
     if not item.submenu:
-        item.submenu, created = Menu.objects.get_or_create(menu_name="info_top_menu")
+        item.submenu, created = Menu.objects.get_or_create(menu_name="pages_top_menu")
         item.save()
 
     return [item], None, None
@@ -24,7 +24,7 @@ def get_urls():
     """
     :returns: A tuple of regexes describing what URLs the top-level URL dispatcher should associate with this module
     """
-    return r"^info/",
+    return r"^pages/",
 
 
 VIEW_PUBLIC = "can_view_public_info_pages"
@@ -46,8 +46,8 @@ def get_permissions():
 
 
 def get_front_page_items():
-    pages = info.models.InfoPage.objects.filter(for_front_page=True)
+    _pages = pages.models.InfoPage.objects.filter(for_front_page=True)
     items = ()
-    for page in pages:
+    for page in _pages:
         items += InfoFrontPageItem(page),
     return items

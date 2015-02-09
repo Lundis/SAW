@@ -24,7 +24,7 @@
                 {% trans "Submit" %}
             </button>
             {% if page %}
-                <a href="{% url "info_delete_page" page.id %}" class="btn btn-danger">
+                <a href="{% url "pages_delete_page" page.id %}" class="btn btn-danger">
                     {% trans "Delete" %}
                 </a>
             {% endif %}
