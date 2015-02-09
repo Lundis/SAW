@@ -44,6 +44,16 @@ class Poll(models.Model):
         return dict(PERMISSION_CHOICES)[self.permission]
 
 
+
+
+    def can_user_vote(self,request):
+        if request.user.is_authenticated():
+            object = Votes.objects.filter(choice_id__id_to_poll=self, user=request.user)
+            return not object.exists()
+        else:
+            return not Votes.objects.filter(choice_id__id_to_poll=self, ip_address=request.META['REMOTE_ADDR']).exists()
+
+
 class Choice(models.Model):
     name = models.CharField(max_length=200)
     id_to_poll = models.ForeignKey(Poll)
@@ -60,4 +70,5 @@ class Choice(models.Model):
 class Votes(models.Model):
     choice_id = models.ForeignKey(Choice)
     user = models.ForeignKey(User)
+    ip_address = models.IPAddressField(default=None)
 

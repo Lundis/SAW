@@ -24,16 +24,20 @@ def view_poll(request, poll_id):
         choices = Choice.objects.filter(id_to_poll=poll_id)
 
 
+        if poll.can_user_vote(request):
+            if poll.can_vote_on_many:
+                 pass
 
-        if poll.can_vote_on_many:
-             pass
+            else:
+                 form = ChoiceFormSingle(request.POST or None, poll_choices=choices)
+
+            if form.is_valid():
+                 form.save(request)
+                 form = None
+
 
         else:
-             form = ChoiceFormSingle(request.POST or None, poll_choices=choices)
-
-        if form.is_valid():
-             form.save(request.user)
-             form = None
+            form=None
 
 
 
