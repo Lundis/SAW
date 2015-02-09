@@ -3,8 +3,9 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from ckeditor.fields import RichTextField
 from django.template.defaultfilters import slugify
+
 from base.models import Comment
-from .utils import complete_html
+from base.html_tag_closer import complete_html
 
 
 class Category(models.Model):

@@ -64,6 +64,7 @@ class InfoPage(models.Model):
     category = models.ForeignKey(InfoCategory, null=True)
     permission = models.CharField(max_length=100, choices=PERMISSION_CHOICES, default="VIEW_PUBLIC")
     for_frontpage = models.BooleanField(default=False, blank=True)
+    author = models.ForeignKey(User)
 
     def __str__(self):
         return self.title
@@ -72,9 +73,21 @@ class InfoPage(models.Model):
         return reverse("pages_view_page", kwargs={'page_id': self.id})
 
     def save(self, *args, **kwargs):
+        if self.pk:
+            # This is an update, so we want to save the old text
+            old_page = InfoPage.objects.get(pk=self.pk)
+        else:
+            old_page = None
         super(InfoPage, self).save(*args, **kwargs)
+        # create an edit object if this is a new object of if the text has changed
+        if not old_page or old_page.text != self.text:
+            edit = InfoPageEdit(author=self.author, text=self.text, page=self)
+            edit.save()
         # create a menu item if it doesn't exist
-        menu_item, created = MenuItem.get_or_create(__package__, self.title, linked_object=self, permission=self.permission)
+        menu_item, created = MenuItem.get_or_create(__package__,
+                                                    self.title,
+                                                    linked_object=self,
+                                                    permission=self.permission)
         if self.category:
             menu = self.category.menu_item.submenu
             if not menu.contains(menu_item):
@@ -97,9 +110,21 @@ class InfoPage(models.Model):
     def get_permission_str(self):
         return dict(PERMISSION_CHOICES)[self.permission]
 
+    def revisions(self):
+        return InfoPageEdit.objects.filter(page=self)
+
+    def date(self):
+        return self.revisions().first().date
+
 
 class InfoPageEdit(models.Model):
     page = models.ForeignKey(InfoPage)
     author = models.ForeignKey(User)
-    date = models.DateTimeField('Date edited')
+    text = RichTextField()
+    date = models.DateTimeField('Date edited', auto_now_add=True)
 
+    class Meta:
+        ordering = ("-date",)
+
+    def __str__(self):
+        return "%s - %s" % (self.page.title, self.date)

@@ -6,7 +6,6 @@ from users.decorators import has_permission
 from .models import InfoCategory, InfoPage
 from .forms import InfoPageForm, InfoCategoryForm
 from .register import EDIT, VIEW_PUBLIC
-from base.forms import ConfirmationForm
 from base.views import delete_confirmation_view
 
 
@@ -59,11 +58,12 @@ def edit_page(request, category_id=None, page_id=None):
         except InfoCategory.DoesNotExist:
             pass
 
-    form = InfoPageForm(request.POST or None, instance=page, initial={'category': category})
+    form = InfoPageForm(request.POST or None,
+                        instance=page,
+                        initial={'category': category},
+                        user=request.user)
     if form.is_valid():
         new_page = form.save()
-        new_page.category = category
-        new_page.save()
         return HttpResponseRedirect(new_page.get_absolute_url())
     else:
         return render(request, 'info/edit_page.html', {'category': category,
@@ -117,7 +117,8 @@ def delete_category(request, category_id):
         raise Http404(_("The requested object could not be found"))
     return delete_confirmation_view(request,
                                     item=category,
-                                    form_url=reverse("pages_delete_category"),
+                                    form_url=reverse("pages_delete_category",
+                                                     kwargs={'category_id': category_id}),
                                     redirect_url=reverse('pages_view_categories'))
 
 
@@ -129,5 +130,6 @@ def delete_page(request, page_id):
         raise Http404(_("The requested object could not be found"))
     return delete_confirmation_view(request,
                                     item=category,
-                                    form_url=reverse("pages_delete_page"),
+                                    form_url=reverse("pages_delete_page",
+                                                     kwargs={'page_id': page_id}),
                                     redirect_url=reverse('pages_view_categories'))
