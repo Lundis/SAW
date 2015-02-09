@@ -22,6 +22,12 @@
         <div class="panel-body">
             {{ page.text | safe}}
         </div>
+        <div class="panel-body">
+            <div class="pull-right">
+                {% trans "Updated" %}
+                {{ page.date}}
+            </div>
+        </div>
     </div>
 {% endblock main_content %}
 {% block sidebar %}
