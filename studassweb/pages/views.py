@@ -30,13 +30,13 @@ def main(request):
 
 
 @has_permission(VIEW_PUBLIC)
-def view_page(request, page_id, revision_id=None):
+def view_page(request, slug, revision_id=None):
     """
     view a page
     :param request:
     :return:
     """
-    page = InfoPage.objects.get(id=page_id)
+    page = InfoPage.objects.get(slug=slug)
     category = page.category
     revisions = page.revisions()
     if revision_id is None:
@@ -87,14 +87,14 @@ def edit_page(request, category_id=None, page_id=None):
 
 
 @has_permission(VIEW_PUBLIC)
-def view_category(request, category_id):
+def view_category(request, slug):
     """
     renders a list of the pages in the specified category
     :param request:
     :return:
     """
     try:
-        category = InfoCategory.objects.get(id=category_id)
+        category = InfoCategory.objects.get(slug=slug)
     except InfoCategory.DoesNotExist:
         raise Http404
 

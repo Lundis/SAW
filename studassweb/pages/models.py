@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from django.template.defaultfilters import slugify
 from ckeditor.fields import RichTextField
 from menu.models import MenuItem, Menu
 from users.permissions import has_user_perm
@@ -16,6 +17,7 @@ PERMISSION_CHOICES = (
 
 class InfoCategory(models.Model):
     name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(editable=False)
     # an info category has an associated menu item, which in turn has a submenu
     menu_item = models.ForeignKey(MenuItem, null=True)
 
@@ -25,12 +27,14 @@ class InfoCategory(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse("pages_view_category", kwargs={'category_id': self.id})
+        return reverse("pages_view_category", kwargs={'slug': self.slug})
 
     def pages(self):
         return InfoPage.objects.filter(category=self)
 
     def save(self, *args, **kwargs):
+        if not self.pk:
+            self.slug = slugify(self.name)
         super(InfoCategory, self).save(*args, **kwargs)
         # create a menu item if it doesn't exist
         self.menu_item, created = MenuItem.get_or_create(__package__,
@@ -61,6 +65,7 @@ class InfoCategory(models.Model):
 
 class InfoPage(models.Model):
     title = models.CharField(max_length=50)
+    slug = models.SlugField(editable=False)
     text = RichTextField()
     category = models.ForeignKey(InfoCategory, null=True, blank=True)
     permission = models.CharField(max_length=100, choices=PERMISSION_CHOICES, default="VIEW_PUBLIC")
@@ -73,7 +78,7 @@ class InfoPage(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse("pages_view_page", kwargs={'page_id': self.id})
+        return reverse("pages_view_page", kwargs={'slug': self.slug})
 
     def save(self, *args, **kwargs):
         if self.pk:
@@ -81,6 +86,8 @@ class InfoPage(models.Model):
             old_page = InfoPage.objects.get(pk=self.pk)
         else:
             old_page = None
+            # Create a slug for new pages
+            self.slug = slugify(self.title)
         super(InfoPage, self).save(*args, **kwargs)
         # create an edit object if this is a new object of if the text has changed
         if not old_page or old_page.text != self.text:
@@ -133,5 +140,5 @@ class InfoPageEdit(models.Model):
         return "%s - %s" % (self.page.title, self.date)
 
     def get_absolute_url(self):
-        return reverse("pages_view_page", kwargs={'page_id': self.page.id,
+        return reverse("pages_view_page", kwargs={'slug': self.page.slug,
                                                   'revision_id': self.id})
