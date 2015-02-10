@@ -56,12 +56,16 @@ def write_message(request, contact_id):
                 return HttpResponseRedirect(reverse("contact_write_message"))
 
         messages.success(request, "Message successfully sent!")
-        return HttpResponseRedirect(reverse("contact_home"))
+        return HttpResponseRedirect(reverse("contact_send_confirmation"))
 
     context = {'form': form,
                'contact': contact}
 
     return render(request, "contact/write_message.html", context)
+
+
+def send_confirmation(request):
+    return render(request, "contact/message_confirmation.html")
 
 
 @has_permission(CAN_VIEW_MESSAGES)
