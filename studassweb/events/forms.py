@@ -46,7 +46,7 @@ class EventItemsForm(forms.Form):
         eitems = ()
         for eitem in all_event_items:
             eitems += (str(eitem.id), eitem.name),
-        self.fields[EITEMS] = forms.MultipleChoiceField(choices=eitems, initial=selected_eitems)
+        self.fields[EITEMS] = forms.MultipleChoiceField(choices=eitems, initial=selected_eitems, required=False)
 
     def save(self, event):
         if self.is_valid():
@@ -70,11 +70,11 @@ class SignupItemsForm(forms.Form):
     def __init__(self, *args, **kwargs):
         event = kwargs.pop("event")
         signup = kwargs.pop("signup", None)
-        selected_eitems = []
-        #if signup:
-        #    selected_event_items = ItemInSignup.objects.filter(signup=signup)
-        #    for tmp in selected_event_items:
-        #        selected_eitems.append(tmp.item.id)
+        selected_eitems = {}
+        if signup:
+            selected_event_items = ItemInSignup.objects.filter(signup=signup)
+            for tmp in selected_event_items:
+                selected_eitems[tmp.item.id] = tmp.amount
         super(SignupItemsForm, self).__init__(*args, **kwargs)
         this_event_items = []
         this_event_iteminevents = ItemInEvent.objects.filter(event=event)
@@ -83,7 +83,10 @@ class SignupItemsForm(forms.Form):
         eitems = ()
         for eitem in this_event_items:
             eitems += (str(eitem.id), eitem.name),
-            self.fields[EITEMS+str(eitem.id)] = forms.CharField(label=eitem.name)
+            self.fields[EITEMS+str(eitem.id)] = forms.CharField(
+                label=eitem.name,
+                initial=selected_eitems.get(eitem.id, 0)
+            )
 
     def save(self, event, signup):
         if self.is_valid():

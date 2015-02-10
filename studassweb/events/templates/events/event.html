@@ -4,6 +4,7 @@
 {% load bootstrap3 %}
 {% load sawp %}
 {% load thumbnail %}
+{% load events_templatetags %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -24,7 +25,7 @@
         </ul>
     </div>
     {% if signupform %}
-        <form action="" method="post">
+        <form action="{% url "events_view_event" event_id=event.id %}" method="post">
             {% csrf_token %}
             {% bootstrap_form signupform %}
             {% bootstrap_form signupitemsform %}
@@ -45,13 +46,13 @@
                 <th>{% trans "Signed up" %}</th>
                 <th>{% trans "Name" %}</th>
                 <th>{% trans "Association" %}</th>
+                <th>{% trans "Action" %}</th>
                 {% if can_view_signup_info %}
                     <th>{% trans "Email" %}</th>
                     <th>{% trans "Diet" %}</th>
                     <th>{% trans "Other" %}</th>
                     <th>{% trans "Matricle" %}</th>
                     <th>{% trans "User account" %}</th>
-                    <th>{% trans "Delete" %}</th>
                 {% endif %}
             </tr>
             {% for signup in signups %}
@@ -65,7 +66,15 @@
                         <td>{{ signup.other }}</td>
                         <td>{{ signup.matricle }}</td>
                         <td>{{ signup.user }}</td>
-                        <td>
+                    {% endif %}
+                    <td>
+                        {% user_can_edit signup user as can_edit_signup %}
+                        {% if can_edit_signup%}
+                            <a href="{% url 'events_view_event_edit_signup_by_id' event_id=event.id signup_id=signup.id %}">
+                                <button class="btn btn-primary">
+                                    {% trans "Edit" %}
+                                </button>
+                            </a>
                             <form action="{% url 'events_delete_event_signup' signup.id %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
                                 {% csrf_token %}
                                 {% buttons %}
@@ -74,8 +83,8 @@
                                     </button>
                                 {% endbuttons %}
                             </form>
-                        </td>
-                    {% endif %}
+                            </td>
+                        {% endif %}
                 </tr>
 
             {% empty %}

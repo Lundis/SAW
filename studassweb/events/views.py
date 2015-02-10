@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseServerError
-from .models import Event, EventSignup, EventItem
+from .models import Event, EventSignup, EventItem, ItemInSignup
 from django.http import HttpResponseRedirect
 from users import permissions
 from .register import CAN_VIEW_EVENTS, CAN_CREATE_EVENTS, CAN_SIGNUP_FOR_EVENTS, CAN_VIEW_SIGNUP_INFO
@@ -29,19 +29,38 @@ def home(request):
 
 # TODO we shouldn't have all this code in the view
 # A lot of these errors should simply invalidate the form so the user can correct it!
-def event_detail(request, event_id):
+def event_detail(request, event_id, signup_id=None, auth_code=None):
     try:
         event = Event.objects.get(id=event_id)
 
-        signupform = EventSignupForm(request.POST or None, prefix=MAIN_PREFIX)
-        signupitemsform = SignupItemsForm(request.POST or None, event=event, prefix=ITEMS_PREFIX)
+        db_event_signup = None
+        if auth_code:
+            try:
+                db_event_signup = EventSignup.objects.get(auth_code=auth_code)
+            except EventSignup.DoesNotExist:
+                messages.error(request, _("Invalid auth code! Cannot edit signup!"))
+                return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
+        elif signup_id:
+            try:
+                db_event_signup = EventSignup.objects.get(id=signup_id)
+                if not db_event_signup.user_can_edit(request.user):
+                    logger.warning('Unauthorized user %s tried to edit signup id %s', request.user, signup_id)
+                    messages.error(request, _("You don't have permission to change this!"))
+                    return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
+            except EventSignup.DoesNotExist:
+                logger.warning('Could not find signup_id %s', request.user, signup_id)
+                messages.error(request, _("Wrong signup id!"))
+                return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
+
+        signupform = EventSignupForm(request.POST or None, instance=db_event_signup, prefix=MAIN_PREFIX)
+        signupitemsform = SignupItemsForm(request.POST or None, signup=db_event_signup, event=event, prefix=ITEMS_PREFIX)
 
         if signupform.is_valid():
             temp_signup = signupform.save(commit=False)
             temp_signup.event = event
-            temp_signup.delete_confirmation_code = generate_email_ver_code()
-            while EventSignup.objects.filter(delete_confirmation_code=temp_signup.delete_confirmation_code).exists():
-                temp_signup.delete_confirmation_code = generate_email_ver_code()
+            temp_signup.auth_code = generate_email_ver_code()
+            while EventSignup.objects.filter(auth_code=temp_signup.auth_code).exists():
+                temp_signup.auth_code = generate_email_ver_code()
             if not request.user.is_anonymous():
                 temp_signup.user = request.user
 
@@ -63,22 +82,29 @@ def event_detail(request, event_id):
                 SiteConfiguration.instance().association_name,
                 event.title
             )
+            message = _(
+                "You are now registered to event {0}."
+                " You can still edit: {1} or cancel:{2} your registration"
+                " before the deadline, {3}").format(
+                    event.title,
+
+                    request.scheme +
+                    "://" +
+                    request.get_host() +
+                    reverse("events_view_event_edit_signup_by_code", kwargs={'event_id': event.id, 'auth_code': temp_signup.auth_code}),
+
+                    request.scheme +
+                    "://" +
+                    request.get_host() +
+                    reverse("events_delete_event_signup_by_code", kwargs={'auth_code': temp_signup.auth_code}),
+
+                    event.signup_deadline
+                )
             logger.info("Sending event email from %s to %s" % (from_email, to_emails[0]))
             try:
                 send_mail(
                     title,
-                    _("You are now registered to event {0}."
-                      " If you want to cancel you registration you can do so here: {1} before the deadline, {2}").
-                    format(
-                        event.title,
-
-                        request.scheme +
-                        "://" +
-                        request.get_host() +
-                        reverse("events_delete_event_signup_by_code", args=[temp_signup.delete_confirmation_code]),
-
-                        event.signup_deadline
-                    ),
+                    message,
                     from_email,
                     to_emails)
 
@@ -184,7 +210,7 @@ def delete_event_signup(request, event_signup_id):
         return HttpResponseNotFound(_('No such EventSignup!'))
 
     if request.method == 'POST':
-        if not permissions.has_user_perm(request.user, CAN_VIEW_SIGNUP_INFO):
+        if not signup.user_can_edit(request.user):
 
             logger.warning('User %s tried to delete signup id %s', request.user, event_signup_id)
             return HttpResponseForbidden(_('You don\'t have permission to remove this!'))
@@ -204,16 +230,16 @@ def delete_event_signup(request, event_signup_id):
     return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
 
 
-# This view is used when deleting a view using delete_confirmation_code
+# This view is used when deleting a view using auth_code
 class DeleteEventSignupByCodeView(DeleteView):
     model = EventSignup
 
     def get_object(self, *args, **kwargs):
         try:
-            return EventSignup.objects.get(delete_confirmation_code=self.kwargs['delete_confirmation_code'])
+            return EventSignup.objects.get(auth_code=self.kwargs['auth_code'])
 
         except EventSignup.DoesNotExist:
-            logger.error("Wrong event delete_confirmation_code {0}".format(self.kwargs['delete_confirmation_code']))
+            logger.error("Wrong event auth_code {0}".format(self.kwargs['auth_code']))
             messages.error(
                 self.request,
                 _("Could not unregister from event, maybe you are already unregistered?")
