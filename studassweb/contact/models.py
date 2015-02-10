@@ -60,6 +60,9 @@ class Message(models.Model):
     class Meta:
         ordering = "-date_and_time",
 
+    def __str__(self):
+        return self.title
+
 
 class ContactSettings(SingletonModel):
     _is_setup = models.BooleanField(default=False, help_text=_("Tells us if the first-time setup has been done"))

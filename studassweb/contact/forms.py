@@ -1,4 +1,6 @@
 from django import forms
+from django.core.validators import ValidationError
+from django.utils.translation import ugettext as _
 from captcha.fields import ReCaptchaField
 from .models import Message, ContactInfo
 import logging
@@ -44,3 +46,39 @@ class ContactSettingsForm(forms.ModelForm):
     class Meta:
         model = ContactInfo
         fields = ('name', 'info_text', 'save_to_db', 'send_email', 'email', "ordering_index")
+
+
+class MarkAsHandledForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        """
+        Takes a message when creating it
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        if 'message' in kwargs:
+            message = kwargs.pop('message')
+        else:
+            message = None
+        super(MarkAsHandledForm, self).__init__(*args, **kwargs)
+        if message is not None:
+            if message.handled:
+                raise ValueError("message %s has already been handled", message)
+            self.fields['message_id'] = forms.IntegerField(initial=message.id,
+                                                           widget=forms.HiddenInput())
+
+    def clean(self):
+        super(MarkAsHandledForm, self).clean()
+        try:
+            msg = Message.objects.get(id=self.cleaned_data['message_id'])
+            if msg.handled:
+                raise ValidationError(_("The specified message has already been marked as handled!"))
+        except Message.DoesNotExist:
+            raise ValidationError(_("The specified message does not exist"))
+
+    def save(self):
+        if self.is_valid():
+            msg = Message.objects.get(id=self.cleaned_data['message_id'])
+            msg.handled = True
+            msg.save()
