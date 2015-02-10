@@ -54,7 +54,7 @@ def setup():
                                       save_to_db=True,
                                       send_email=True,
                                       email=SiteConfiguration.instance().association_contact_email,
-                                      ordering_index=0
+                                      ordering_index=1
                                       )
         contact.save()
 

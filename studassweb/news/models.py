@@ -1,11 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from ckeditor.fields import RichTextField
 from django.template.defaultfilters import slugify
 
 from base.models import Comment
-from base.html_tag_closer import complete_html
+from base.fields import ValidatedRichTextField
 
 
 class Category(models.Model):
@@ -25,7 +24,7 @@ class Article(models.Model):
     title = models.CharField(max_length=100)
     summary = models.TextField(max_length=300, blank=True, null=True)
     slug = models.SlugField(editable=False)
-    text = RichTextField()
+    text = ValidatedRichTextField()
     # split the date and time in order to make fetching articles based on date easier
     created_date = models.DateField(auto_now_add=True)
     created_time = models.TimeField(auto_now_add=True)
@@ -43,8 +42,12 @@ class Article(models.Model):
         if self.summary:
             return self.summary
         else:
-            html, closing_tags = complete_html(self.text[:300])
-            return "%s<p><strong>...</strong></p>%s" % (html, closing_tags)
+            if len(self.text) > 300:
+                summary = ValidatedRichTextField.get_summary(self.text, 300)
+                return "%s<p><strong>...</strong></p>" % summary
+            else:
+                return self.text
+
 
     def comments(self):
         """

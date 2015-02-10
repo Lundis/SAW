@@ -3,13 +3,13 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from datetime import datetime
-from ckeditor.fields import RichTextField
+from base.fields import ValidatedRichTextField
 from solo.models import SingletonModel
 
 
 class ContactInfo(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    info_text = RichTextField(verbose_name=_("Contact details text"))
+    info_text = ValidatedRichTextField(verbose_name=_("Contact details text"))
     save_to_db = models.BooleanField(default=True, verbose_name=_("Should the message be saved to the database?"))
     send_email = models.BooleanField(default=True, verbose_name=_("Should the message be sent to the specified email?"))
     email = models.EmailField()

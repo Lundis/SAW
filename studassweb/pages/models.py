@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.template.defaultfilters import slugify
-from ckeditor.fields import RichTextField
+from base.fields import ValidatedRichTextField
 from menu.models import MenuItem, Menu
 from users.permissions import has_user_perm
 import pages.register as pregister
@@ -66,7 +66,7 @@ class InfoCategory(models.Model):
 class InfoPage(models.Model):
     title = models.CharField(max_length=50)
     slug = models.SlugField(editable=False)
-    text = RichTextField()
+    text = ValidatedRichTextField()
     category = models.ForeignKey(InfoCategory, null=True, blank=True)
     permission = models.CharField(max_length=100, choices=PERMISSION_CHOICES, default="VIEW_PUBLIC")
     for_frontpage = models.BooleanField(default=False,
@@ -130,7 +130,7 @@ class InfoPage(models.Model):
 class InfoPageEdit(models.Model):
     page = models.ForeignKey(InfoPage)
     author = models.ForeignKey(User)
-    text = RichTextField()
+    text = ValidatedRichTextField()
     date = models.DateTimeField('Date edited', auto_now_add=True)
 
     class Meta:
