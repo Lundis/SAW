@@ -89,7 +89,8 @@ def delete_message(request, message_id):
                 title = msg.title
                 msg.delete()
                 messages.success(request, "Message \""+title+"\" was sucessfully deleted!")
-                return HttpResponseRedirect(reverse("contact_read_messages"))
+                return HttpResponseRedirect(reverse("contact_view_messages",
+                                                    kwargs={'contact_id': msg.contact.id}))
             else:
                 logger.warning('User %s tried to delete message %s', request.user, message_id)
                 return HttpResponseForbidden('You don\'t have permission to remove this!')
