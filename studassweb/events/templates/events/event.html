@@ -25,7 +25,7 @@
         </ul>
     </div>
     {% if signupform %}
-        <form action="{% url  %}" method="post">
+        <form action="{% url "events_view_event" event_id=event.id %}" method="post">
             {% csrf_token %}
             {% bootstrap_form signupform %}
             {% bootstrap_form signupitemsform %}
