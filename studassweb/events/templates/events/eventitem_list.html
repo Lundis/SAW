@@ -19,6 +19,8 @@
                 <a href="{% url "events_edit_eventitem" eitem.id %}">Edit</a>
                 <a href="{% url "events_delete_eventitem" eitem.id %}">Delete</a>
             </li>
+            {% empty %}
+                <p>{% trans "No event items added yet!" %}</p>
         {% endfor %}
     </ul>
 {% endblock %}

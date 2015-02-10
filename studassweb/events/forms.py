@@ -2,6 +2,7 @@ from django import forms
 from .models import Event, EventSignup, EventItem, ItemInEvent, ItemInSignup
 from datetime import date
 
+EITEMS = "eitems"
 
 #TODO do we want to ask for name of logged-in users?
 #Easiest would maybe be to autofill text field with username but allow user to change
@@ -45,11 +46,11 @@ class EventItemsForm(forms.Form):
         eitems = ()
         for eitem in all_event_items:
             eitems += (str(eitem.id), eitem.name),
-        self.fields["eitems"] = forms.MultipleChoiceField(choices=eitems, initial=selected_eitems)
+        self.fields[EITEMS] = forms.MultipleChoiceField(choices=eitems, initial=selected_eitems)
 
     def save(self, event):
         if self.is_valid():
-            ids_of_event_items = self.cleaned_data['eitems']
+            ids_of_event_items = self.cleaned_data[EITEMS]
 
             # Let's remove all choices from this event
             ItemInEvent.objects.filter(event=event).delete()
@@ -80,15 +81,26 @@ class SignupItemsForm(forms.Form):
         for iteminevent in this_event_iteminevents:
             this_event_items.append(iteminevent.item)
         eitems = ()
-        i = 0
         for eitem in this_event_items:
             eitems += (str(eitem.id), eitem.name),
-            self.fields["eitems-"+str(i)] = forms.CharField(label=eitem.name)
-            i += 1
+            self.fields[EITEMS+str(eitem.id)] = forms.CharField(label=eitem.name)
 
-    def save(self, event):
+    def save(self, event, signup):
         if self.is_valid():
-            pass
+            #Remove old
+            ItemInSignup.objects.filter(signup=signup).delete()
+            #Add new
+            for index in self.cleaned_data:
+                if str(index).startswith(EITEMS):
+                    id = str(index)[len(EITEMS):]
+                    event_item = EventItem.objects.get(id=id)
+                    tmp = ItemInSignup()
+                    tmp.item = event_item
+                    tmp.signup = signup
+                    tmp.amount = self.cleaned_data[index]
+                    tmp.save()
+
+
             # TODO loop through everything starting with "eitems"
             # this should by the way be a constant
             # save every textfield as a ItemInSignup

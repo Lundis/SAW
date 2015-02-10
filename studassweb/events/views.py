@@ -28,33 +28,43 @@ def home(request):
 
 
 # TODO we shouldn't have all this code in the view
+# A lot of these errors should simply invalidate the form so the user can correct it!
 def event_detail(request, event_id):
     try:
         event = Event.objects.get(id=event_id)
 
         signupform = EventSignupForm(request.POST or None, prefix=MAIN_PREFIX)
         signupitemsform = SignupItemsForm(request.POST or None, event=event, prefix=ITEMS_PREFIX)
-        if signupform.is_valid() and signupitemsform.is_valid():
-            temp = signupform.save(commit=False)
-            temp.event = event
-            temp.delete_confirmation_code = generate_email_ver_code()
-            while EventSignup.objects.filter(delete_confirmation_code=temp.delete_confirmation_code).exists():
-                temp.delete_confirmation_code = generate_email_ver_code()
+
+        if signupform.is_valid():
+            temp_signup = signupform.save(commit=False)
+            temp_signup.event = event
+            temp_signup.delete_confirmation_code = generate_email_ver_code()
+            while EventSignup.objects.filter(delete_confirmation_code=temp_signup.delete_confirmation_code).exists():
+                temp_signup.delete_confirmation_code = generate_email_ver_code()
             if not request.user.is_anonymous():
-                temp.user = request.user
+                temp_signup.user = request.user
 
             # We need to save to db here to get id, but we should remove it if we couldn't send email
-            temp.save()
-            signupitemsform.save(event=event)
+            temp_signup.save()
 
+            signupitemsform = SignupItemsForm(request.POST or None, event=event, signup=temp_signup, prefix=ITEMS_PREFIX)
+            if signupitemsform.is_valid():
+                signupitemsform.save(event=event,signup=temp_signup)
+            else:
+                messages.error(request, _("Error in saving eventItems"))
+                temp_signup.delete()
+                return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
+
+
+            from_email = settings.NO_REPLY_EMAIL
+            to_emails = [temp_signup.email]
+            title = _("{0}: You are now signed up to {1}").format(
+                SiteConfiguration.instance().association_name,
+                event.title
+            )
+            logger.info("Sending event email from %s to %s" % (from_email, to_emails[0]))
             try:
-                from_email = settings.NO_REPLY_EMAIL
-                to_emails = [temp.email]
-                title = _("{0}: You are now signed up to {1}").format(
-                    SiteConfiguration.instance().association_name,
-                    event.title
-                )
-                logger.info("Sending event email from %s to %s" % (from_email, to_emails[0]))
                 send_mail(
                     title,
                     _("You are now registered to event {0}."
@@ -65,7 +75,7 @@ def event_detail(request, event_id):
                         request.scheme +
                         "://" +
                         request.get_host() +
-                        reverse("events_delete_event_signup_by_code", args=[temp.delete_confirmation_code]),
+                        reverse("events_delete_event_signup_by_code", args=[temp_signup.delete_confirmation_code]),
 
                         event.signup_deadline
                     ),
@@ -74,12 +84,12 @@ def event_detail(request, event_id):
 
             except BadHeaderError:
                 logger.error("BadHeaderError sending email to {0}".format(to_emails))
-                temp.delete()
+                temp_signup.delete()
                 messages.error(request, _("BadHeaderError, newlines in email adress?"))
                 return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
             except:
                 logger.error("Exception {0} sending email to {1}".format(sys.exc_info()[0], to_emails))
-                temp.delete()
+                temp_signup.delete()
                 messages.error(request, _("Error, please try again"))
                 return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
 

@@ -51,11 +51,11 @@ class ItemInEvent(models.Model):
         return str("{0} is enabled in {1}".format(self.item.name, self.event.title))
 
 
-# Things you can choose in signup? Example: amount of specific liqueur
+# This is for one specific signup
 class ItemInSignup(models.Model):
     signup = models.ForeignKey(EventSignup)
     item = models.ForeignKey(EventItem)
     amount = models.IntegerField()
 
     def __str__(self):
-        return str("{0} signed up for {1} {2}".format(self.event.signup.name, self.amount, self.item.name))
+        return str("{0} signed up for {1} {2}".format(self.signup.name, self.amount, self.item.name))

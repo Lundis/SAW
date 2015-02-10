@@ -15,7 +15,7 @@
     <div class="list-group">
         {% for event in events %}
             <a class="list-group-item" href="{% url 'events_view_event' event.id %}">
-               {{ event.start|date:"Y-m-d" }} {{ event.title }}
+                {{ event.start|date:"Y-m-d" }} {{ event.title }}
             </a>
         {% empty %}
             <p>{% trans "No events found!" %}</p>
@@ -31,9 +31,19 @@
             </div>
             <div class="panel-body">
                 <div class="list-group">
-                        <a href="{% url 'events_add_event' %}">
-                            <div class="btn list-group-item">{% trans "Add new event" %}</div>
-                        </a>
+                    <a href="{% url 'events_add_event' %}">
+                        <div class="btn list-group-item">{% trans "Add new event" %}</div>
+                    </a>
+                </div>
+            </div>
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Settings" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <a href="{% url 'events_list_eventitems' %}">
+                        <div class="btn list-group-item">{% trans "Configure event items" %}</div>
+                    </a>
                 </div>
             </div>
         </div>
