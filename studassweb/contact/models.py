@@ -1,6 +1,7 @@
 from django.utils.translation import ugettext as _
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator
 from datetime import datetime
 from ckeditor.fields import RichTextField
 from solo.models import SingletonModel
@@ -12,7 +13,8 @@ class ContactInfo(models.Model):
     save_to_db = models.BooleanField(default=True, verbose_name=_("Should the message be saved to the database?"))
     send_email = models.BooleanField(default=True, verbose_name=_("Should the message be sent to the specified email?"))
     email = models.EmailField()
-    ordering_index = models.IntegerField(verbose_name=_("The position of this contact in the list of contacts"))
+    ordering_index = models.IntegerField(verbose_name=_("The position of this contact in the list of contacts"),
+                                         validators=[MinValueValidator(1)])
 
     class Meta:
         ordering = "ordering_index",
@@ -37,6 +39,12 @@ class ContactInfo(models.Model):
     def __str__(self):
         return self.name
 
+    def messages(self):
+        return Message.objects.filter(contact=self)
+
+    def unread_messages(self):
+        return self.messages().filter(handled=False)
+
 
 class Message(models.Model):
     title = models.CharField(max_length=100, verbose_name=_("Subject"))
@@ -48,6 +56,9 @@ class Message(models.Model):
     handled = models.BooleanField(default=False,
                                   blank=True,
                                   verbose_name=_("Has this message been handled by someone?"))
+
+    class Meta:
+        ordering = "-date_and_time",
 
 
 class ContactSettings(SingletonModel):
