@@ -131,3 +131,7 @@ class InfoPageEdit(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.page.title, self.date)
+
+    def get_absolute_url(self):
+        return reverse("pages_view_page", kwargs={'page_id': self.page.id,
+                                                  'revision_id': self.id})

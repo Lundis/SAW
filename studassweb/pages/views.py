@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from users.decorators import has_permission
 from users.permissions import has_user_perm
-from .models import InfoCategory, InfoPage
+from .models import InfoCategory, InfoPage, InfoPageEdit
 from .forms import InfoPageForm, InfoCategoryForm
 from .register import EDIT, VIEW_PUBLIC
 from base.views import delete_confirmation_view
@@ -30,7 +30,7 @@ def main(request):
 
 
 @has_permission(VIEW_PUBLIC)
-def view_page(request, page_id):
+def view_page(request, page_id, revision_id=None):
     """
     view a page
     :param request:
@@ -38,8 +38,17 @@ def view_page(request, page_id):
     """
     page = InfoPage.objects.get(id=page_id)
     category = page.category
+    revisions = page.revisions()
+    if revision_id is None:
+        current_revision = page.revisions().first()
+    else:
+        try:
+            current_revision = revisions.get(id=revision_id)
+        except InfoPageEdit.DoesNotExist:
+            raise Http404(_("The requested revision could not be found"))
     return render(request, 'info/view_page.html', {'category': category,
-                                                   'page': page})
+                                                   'page': page,
+                                                   'current_revision': current_revision})
 
 
 @has_permission(EDIT)

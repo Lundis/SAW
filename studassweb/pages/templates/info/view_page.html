@@ -20,7 +20,7 @@
     <h1>{{ page.title }}</h1>
     <div class="panel panel-default">
         <div class="panel-body">
-            {{ page.text | safe}}
+            {{ current_revision.text | safe}}
         </div>
         <div class="panel-body">
             <div class="pull-right">
@@ -62,19 +62,27 @@
                 </div>
             </div>
         {% endif %}
-        {% if show_edit_buttons and page.revisions.count > 1 %}
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Revisions" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="btn-group-vertical btn-block">
-                    {% for revision in page.revisions %}
-                        <a href="{{ revision.get_absolute_url}}" class="btn btn-primary">
-                            {{ revision.date }}
-                        </a>
-                    {% endfor %}
+        {% with page.revisions as revisions %}
+            {% if show_edit_buttons and revisions.count > 1 %}
+                <div class="panel-heading">
+                    <h2 class="panel-title">{% trans "Revisions" %}</h2>
                 </div>
-            </div>
-        {% endif %}
+                <div class="panel-body">
+                    <div class="btn-group-vertical btn-block">
+                        {% for revision in revisions %}
+                            {% if revision == current_revision %}
+                                <a href="#" class="btn btn-primary active">
+                                    {{ revision.date }}
+                                </a>
+                            {% else %}
+                                <a href="{{ revision.get_absolute_url}}" class="btn btn-primary">
+                                    {{ revision.date }}
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endwith %}
     </div>
 {% endblock %}
