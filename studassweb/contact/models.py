@@ -12,7 +12,7 @@ class ContactInfo(models.Model):
     save_to_db = models.BooleanField(default=True, verbose_name=_("Should the message be saved to the database?"))
     send_email = models.BooleanField(default=True, verbose_name=_("Should the message be sent to the specified email?"))
     email = models.EmailField()
-    ordering_index = models.IntegerField(unique=True, verbose_name=_("The position of this contact in the list of contacts"))
+    ordering_index = models.IntegerField(verbose_name=_("The position of this contact in the list of contacts"))
 
     class Meta:
         ordering = "ordering_index",
@@ -45,6 +45,9 @@ class Message(models.Model):
     from_email = models.EmailField(verbose_name=_("Your email"))
     date_and_time = models.DateTimeField(default=datetime.now, blank=True)
     contact = models.ForeignKey(ContactInfo)
+    handled = models.BooleanField(default=False,
+                                  blank=True,
+                                  verbose_name=_("Has this message been handled by someone?"))
 
 
 class ContactSettings(SingletonModel):
