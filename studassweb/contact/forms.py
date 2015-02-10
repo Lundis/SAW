@@ -1,4 +1,5 @@
 from django import forms
+from captcha.fields import ReCaptchaField
 from .models import Message, ContactInfo
 import logging
 
@@ -17,6 +18,8 @@ class MessageForm(forms.ModelForm):
             logger.debug("MessageForm user: \"%s\"" % user)
             logger.debug("MessageForm user email: \"%s\"" % user.email)
             self.fields["from_email"].initial = user.email
+        else:
+            self.fields['captcha'] = ReCaptchaField()
 
     class Meta:
         model = Message
