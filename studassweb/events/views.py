@@ -29,9 +29,9 @@ def home(request):
 
 # TODO we shouldn't have all this code in the view
 # A lot of these errors should simply invalidate the form so the user can correct it!
-def event_detail(request, event_id, signup_id=None, auth_code=None):
+def event_detail(request, slug, signup_id=None, auth_code=None):
     try:
-        event = Event.objects.get(id=event_id)
+        event = Event.objects.get(slug=slug)
 
         db_event_signup = None
         if auth_code:
@@ -52,7 +52,11 @@ def event_detail(request, event_id, signup_id=None, auth_code=None):
                 messages.error(request, _("Wrong signup id!"))
                 return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
 
-        signupform = EventSignupForm(request.POST or None, instance=db_event_signup, prefix=MAIN_PREFIX)
+        initial_user_data = {}
+        if request.user.is_authenticated():
+            initial_user_data = {'name': request.user.get_full_name(), 'email': request.user.email}
+
+        signupform = EventSignupForm(request.POST or None, initial=initial_user_data, instance=db_event_signup, prefix=MAIN_PREFIX)
         signupitemsform = SignupItemsForm(request.POST or None, event=event, signup=db_event_signup, prefix=ITEMS_PREFIX)
 
         if signupform.is_valid():
@@ -129,7 +133,7 @@ def event_detail(request, event_id, signup_id=None, auth_code=None):
         return render(request, 'events/event.html', {
             'event': event, 'signupform': signupform, 'signupitemsform': signupitemsform, 'signups': signups})
     except Event.DoesNotExist:
-        logger.warning('Could not find event with id %s', event_id)
+        logger.warning('Could not find event with slug %s', slug)
         return HttpResponseNotFound('No event with that id found')
 
 

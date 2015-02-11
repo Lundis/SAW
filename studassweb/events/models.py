@@ -19,7 +19,6 @@ class MultiInputField(models.CharField):
 
 #This is an actual event, for example a Christmas party
 # TODO is it public, for members, or for board members only?
-# TODO slug for urls
 class Event(models.Model):
     title = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
@@ -34,7 +33,7 @@ class Event(models.Model):
         return str(self.title)
 
     def get_absolute_url(self):
-        return reverse("events_view_event", kwargs={'event_id': self.id})
+        return reverse("events_view_event", kwargs={'slug': self.slug})
 
     # https://keyerror.com/blog/automatically-generating-unique-slugs-in-django
     def save(self, *args, **kwargs):

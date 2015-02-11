@@ -1,5 +1,6 @@
 {% extends 'base/base.html' %}
 {% load i18n %}
+{% load sawp %}
 
 {% block title %}
     {% trans "Events" %}
@@ -14,4 +15,34 @@
     <li><a href="{% url "events_home" %}">
         {% trans "Events" %}
     </a></li>
+{% endblock %}
+
+{% block sidebar %}
+    {% has_perm "events" "CAN_CREATE_EVENTS" as can_create_events %}
+    {% if can_create_events%}
+        <div class="panel panel-primary">
+        {% block extrapanel %}
+        {% endblock %}
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Add" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="btn-group-vertical btn-block" >
+                    <a href="{% url 'events_add_event' %}" class="btn btn-primary">
+                        {% trans "Add new event" %}
+                    </a>
+                </div>
+            </div>
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Settings" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="btn-group-vertical btn-block" >
+                    <a href="{% url 'events_list_eventitems' %}" class="btn btn-primary">
+                        {% trans "Configure event items" %}
+                    </a>
+                </div>
+            </div>
+        </div>﻿
+    {% endif %}
 {% endblock %}

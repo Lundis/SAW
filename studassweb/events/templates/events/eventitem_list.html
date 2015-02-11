@@ -50,20 +50,18 @@
 
 {% endblock %}
 
+
 {% block sidebar %}
-    {% has_perm "events" "CAN_CREATE_EVENTS" as can_create_events %}
-    {% if can_create_events%}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Add" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    <a href="{% url 'events_add_eventitem' %}">
-                        <div class="btn list-group-item">{% trans "Add new event item" %}</div>
-                    </a>
-                </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h2 class="panel-title">{% trans "Add" %}</h2>
+        </div>
+        <div class="panel-body">
+            <div class="btn-group-vertical btn-block" >
+                <a href="{% url 'events_add_eventitem' %}" class="btn btn-primary">
+                    {% trans "Add new event item" %}
+                </a>
             </div>
         </div>
-    {% endif %}
+    </div>﻿
 {% endblock %}

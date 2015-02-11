@@ -4,8 +4,7 @@ from .models import Event, EventSignup, EventItem, ItemInEvent, ItemInSignup
 
 EITEMS = "eitems"
 
-#TODO do we want to ask for name of logged-in users?
-#Easiest would maybe be to autofill text field with username but allow user to change
+
 class EventSignupForm(forms.ModelForm):
 
     class Meta:
