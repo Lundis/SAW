@@ -6,23 +6,48 @@
 
 {% block breadcrumb2 %}
     <li class="active">
-    <a href="{% url "events_list_eventitems" %}">{% trans "List items " %}</a>
+        <a href="{% url "events_list_eventitems" %}">{% trans "List items " %}</a>
     </li>
 {% endblock %}
 
 {% block main_content %}
-
-    <ul class="list-group">
-        {% for eitem in object_list %}
-            <li class="list-item">
-                {{ eitem.name }}
-                <a href="{% url "events_edit_eventitem" eitem.id %}">Edit</a>
-                <a href="{% url "events_delete_eventitem" eitem.id %}">Delete</a>
-            </li>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <tbody>
+            <tr>
+                <th>{% trans "Name" %}</th>
+                <th>{% trans "Type" %}</th>
+                <th>{% trans "Required" %}</th>
+                <th>{% trans "Action" %}</th>
+            </tr>
+            {% for eitem in object_list %}
+                <tr>
+                    <td>
+                        {{ eitem.name }}
+                    </td>
+                    <td>
+                        {{ eitem.get_type_display }}
+                    </td>
+                    <td>
+                        {{ eitem.required }}
+                    </td>
+                    <td>
+                        <a class="btn btn-primary" href="{% url "events_edit_eventitem" eitem.id %}">Edit</a>
+                        <a class="btn btn-danger" href="{% url "events_delete_eventitem" eitem.id %}">Delete</a>
+                    </td>
+                </tr>
             {% empty %}
-                <p>{% trans "No event items added yet!" %}</p>
-        {% endfor %}
-    </ul>
+
+                <tr>
+                    <td>
+                        {% trans "No event items added yet!" %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
 {% endblock %}
 
 {% block sidebar %}

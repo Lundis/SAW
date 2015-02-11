@@ -53,7 +53,7 @@ def event_detail(request, event_id, signup_id=None, auth_code=None):
                 return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
 
         signupform = EventSignupForm(request.POST or None, instance=db_event_signup, prefix=MAIN_PREFIX)
-        signupitemsform = SignupItemsForm(request.POST or None, signup=db_event_signup, event=event, prefix=ITEMS_PREFIX)
+        signupitemsform = SignupItemsForm(request.POST or None, event=event, signup=db_event_signup, prefix=ITEMS_PREFIX)
 
         if signupform.is_valid():
             temp_signup = signupform.save(commit=False)
@@ -69,7 +69,7 @@ def event_detail(request, event_id, signup_id=None, auth_code=None):
 
             signupitemsform = SignupItemsForm(request.POST or None, event=event, signup=temp_signup, prefix=ITEMS_PREFIX)
             if signupitemsform.is_valid():
-                signupitemsform.save(event=event,signup=temp_signup)
+                signupitemsform.save(signup=temp_signup)
             else:
                 messages.error(request, _("Error in saving eventItems"))
                 temp_signup.delete()
@@ -269,7 +269,7 @@ class DeleteEventSignupByCodeView(DeleteView):
 
 class AddEventItemView(CreateView):
     model = EventItem
-    fields = ['name']
+    fields = ['name', 'type', 'required']
     success_url = reverse_lazy("events_list_eventitems")
 
     def dispatch(self, request, *args, **kwargs):
@@ -286,7 +286,7 @@ class AddEventItemView(CreateView):
 
 class EditEventItemView(UpdateView):
     model = EventItem
-    fields = ['name']
+    fields = ['name', 'type', 'required']
     success_url = reverse_lazy("events_list_eventitems")
 
     def dispatch(self, request, *args, **kwargs):
