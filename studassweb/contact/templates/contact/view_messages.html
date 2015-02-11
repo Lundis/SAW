@@ -15,14 +15,27 @@
     <h1>{% trans "View messages" %}</h1>
     <div>
         {% for message in msgs %}
-            <div class="panel panel-primary">
+            <div {% if message.handled %}
+                class="panel panel-default"
+            {% else %}
+                class="panel panel-primary"
+            {% endif %} >
                 <div class="panel-heading">
                     <div class="row inherit-padding-left-right">
                         <div class="pull-left inherit-padding-left-right">
                             <h4>
                                 {{ message.title }}
                             </h4>
+
                         </div>
+                        <div class="pull-right inherit-padding-left-right">
+                            {% if message.handled %}
+                                <span class="glyphicon glyphicon-ok"></span>
+                            {% else %}
+                                <span class="glyphicon glyphicon-remove"></span>
+                            {% endif %}
+                        </div>
+
                     </div>
                 </div>
                 <div class="panel-body">
@@ -44,7 +57,7 @@
                               action="{% url 'contact_mark_message_as_handled' %}" method="post">
                             {% csrf_token %}
                             {% buttons %}
-                                <button type="submit" class="pull-right btn btn-danger">
+                                <button type="submit" class="pull-right btn btn-primary">
                                     {% trans "Mark as handled" %}
                                 </button>
                             {% endbuttons %}
