@@ -14,38 +14,11 @@
     <h3>Events</h3>
     <div class="list-group">
         {% for event in events %}
-            <a class="list-group-item" href="{% url 'events_view_event' event.id %}">
+            <a class="list-group-item" href="{{ event.get_absolute_url }}">
                 {{ event.start|date:"Y-m-d" }} {{ event.title }}
             </a>
         {% empty %}
             <p>{% trans "No events found!" %}</p>
         {% endfor %}
     </div>
-{% endblock %}
-{% block sidebar %}
-    {% has_perm "events" "CAN_CREATE_EVENTS" as can_create_events %}
-    {% if can_create_events%}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Add" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    <a href="{% url 'events_add_event' %}">
-                        <div class="btn list-group-item">{% trans "Add new event" %}</div>
-                    </a>
-                </div>
-            </div>
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Settings" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    <a href="{% url 'events_list_eventitems' %}">
-                        <div class="btn list-group-item">{% trans "Configure event items" %}</div>
-                    </a>
-                </div>
-            </div>
-        </div>
-    {% endif %}
 {% endblock %}

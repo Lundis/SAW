@@ -1,16 +1,15 @@
 from django import forms
 from .models import Event, EventSignup, EventItem, ItemInEvent, ItemInSignup
-from datetime import date
+
 
 EITEMS = "eitems"
 
-#TODO do we want to ask for name of logged-in users?
-#Easiest would maybe be to autofill text field with username but allow user to change
+
 class EventSignupForm(forms.ModelForm):
 
     class Meta:
         model = EventSignup
-        fields = ('name', 'email', 'matricle', 'association', 'diet', 'other')
+        fields = ('name', 'email',)
 
 
 class EventForm(forms.ModelForm):
@@ -72,38 +71,69 @@ class SignupItemsForm(forms.Form):
         signup = kwargs.pop("signup", None)
         selected_eitems = {}
         if signup:
-            selected_event_items = ItemInSignup.objects.filter(signup=signup)
-            for tmp in selected_event_items:
-                selected_eitems[tmp.item.id] = tmp.amount
+            selected_signup_items = ItemInSignup.objects.filter(signup=signup)
+            for signup_item in selected_signup_items:
+                selected_eitems[signup_item.item.id] = signup_item.value
         super(SignupItemsForm, self).__init__(*args, **kwargs)
         this_event_items = []
         this_event_iteminevents = ItemInEvent.objects.filter(event=event)
         for iteminevent in this_event_iteminevents:
             this_event_items.append(iteminevent.item)
-        eitems = ()
         for eitem in this_event_items:
-            eitems += (str(eitem.id), eitem.name),
-            self.fields[EITEMS+str(eitem.id)] = forms.CharField(
-                label=eitem.name,
-                initial=selected_eitems.get(eitem.id, 0)
-            )
+            if eitem.type == EventItem.TYPE_BOOL:
+                self.fields[EITEMS+str(eitem.id)] = forms.BooleanField(
+                    label=eitem.name,
+                    initial=selected_eitems.get(eitem.id),
+                    required=eitem.required
+                )
+            elif eitem.type == EventItem.TYPE_STR:
+                self.fields[EITEMS+str(eitem.id)] = forms.CharField(
+                    label=eitem.name,
+                    initial=selected_eitems.get(eitem.id),
+                    required=eitem.required
+                )
+            elif eitem.type == EventItem.TYPE_TEXT:
+                self.fields[EITEMS+str(eitem.id)] = forms.CharField(
+                    widget=forms.Textarea,
+                    label=eitem.name,
+                    initial=selected_eitems.get(eitem.id),
+                    required=eitem.required
+                )
+            elif eitem.type == EventItem.TYPE_INT:
+                self.fields[EITEMS+str(eitem.id)] = forms.IntegerField(
+                    label=eitem.name,
+                    initial=selected_eitems.get(eitem.id),
+                    required=eitem.required
+                )
+            elif eitem.type == EventItem.TYPE_CHOICE:
+                # This will probably change...
+                # Anyway, strings are splitted by //
+                # First string is the label, rest is choices
+                items = ()
+                i = 0
+                strings = eitem.name.split("//")
+                for string in strings:
+                    if i != 0:
+                        items += (string, string),
+                    i += 1
+                self.fields[EITEMS+str(eitem.id)] = forms.ChoiceField(
+                    choices=items,
+                    label=strings[0],
+                    initial=selected_eitems.get(eitem.id),
+                    required=eitem.required
+                )
 
-    def save(self, event, signup):
+    def save(self, signup):
         if self.is_valid():
-            #Remove old
+            # Remove old
             ItemInSignup.objects.filter(signup=signup).delete()
-            #Add new
+            # Add new
             for index in self.cleaned_data:
                 if str(index).startswith(EITEMS):
-                    id = str(index)[len(EITEMS):]
-                    event_item = EventItem.objects.get(id=id)
+                    id1 = str(index)[len(EITEMS):]
+                    event_item = EventItem.objects.get(id=id1)
                     tmp = ItemInSignup()
                     tmp.item = event_item
                     tmp.signup = signup
-                    tmp.amount = self.cleaned_data[index]
+                    tmp.value = self.cleaned_data[index]
                     tmp.save()
-
-
-            # TODO loop through everything starting with "eitems"
-            # this should by the way be a constant
-            # save every textfield as a ItemInSignup

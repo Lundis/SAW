@@ -1,11 +1,17 @@
 from django.conf.urls import patterns, url
 from .views import AddEventItemView, EditEventItemView, DeleteEventItemView, ListEventItemsView, DeleteEventSignupByCodeView
 
+slug_pattern = '(?P<slug>[-\w\d]+)'
+
 urlpatterns = patterns('',
 
     url(r'^$', 'events.views.home', name='events_home'),
 
-    url(r'^event/(?P<event_id>\d+)/$',
+    # url(r'^event/(?P<event_id>\d+)/$',
+    #    'events.views.event_detail',
+    #    name='events_view_event'),
+
+    url(r'^event/%s/$' % slug_pattern,
         'events.views.event_detail',
         name='events_view_event'),
     url(r'^event/(?P<event_id>\d+)/edit_signup_by_id/(?P<signup_id>\d+)$',

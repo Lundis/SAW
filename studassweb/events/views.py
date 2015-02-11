@@ -29,31 +29,41 @@ def home(request):
 
 # TODO we shouldn't have all this code in the view
 # A lot of these errors should simply invalidate the form so the user can correct it!
-def event_detail(request, event_id, signup_id=None, auth_code=None):
+def event_detail(request, event_id=None, slug=None, signup_id=None, auth_code=None):
     try:
-        event = Event.objects.get(id=event_id)
-
+        if slug:
+            event = Event.objects.get(slug=slug)
+        elif event_id:
+            event = Event.objects.get(id=event_id)
+        else:
+            logger.error('event_detail was called without slug or event_id! This should never happen!')
+            messages.error(request, _("Error in url!? This should never happen."))
+            return HttpResponseRedirect(reverse("events_home"))
         db_event_signup = None
         if auth_code:
             try:
                 db_event_signup = EventSignup.objects.get(auth_code=auth_code)
             except EventSignup.DoesNotExist:
                 messages.error(request, _("Invalid auth code! Cannot edit signup!"))
-                return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
+                return HttpResponseRedirect(event.get_absolute_url())
         elif signup_id:
             try:
                 db_event_signup = EventSignup.objects.get(id=signup_id)
                 if not db_event_signup.user_can_edit(request.user):
                     logger.warning('Unauthorized user %s tried to edit signup id %s', request.user, signup_id)
                     messages.error(request, _("You don't have permission to change this!"))
-                    return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
+                    return HttpResponseRedirect(event.get_absolute_url())
             except EventSignup.DoesNotExist:
                 logger.warning('Could not find signup_id %s', request.user, signup_id)
                 messages.error(request, _("Wrong signup id!"))
-                return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
+                return HttpResponseRedirect(event.get_absolute_url())
 
-        signupform = EventSignupForm(request.POST or None, instance=db_event_signup, prefix=MAIN_PREFIX)
-        signupitemsform = SignupItemsForm(request.POST or None, signup=db_event_signup, event=event, prefix=ITEMS_PREFIX)
+        initial_user_data = {}
+        if request.user.is_authenticated() and not db_event_signup:
+            initial_user_data = {'name': request.user.get_full_name(), 'email': request.user.email}
+
+        signupform = EventSignupForm(request.POST or None, initial=initial_user_data, instance=db_event_signup, prefix=MAIN_PREFIX)
+        signupitemsform = SignupItemsForm(request.POST or None, event=event, signup=db_event_signup, prefix=ITEMS_PREFIX)
 
         if signupform.is_valid():
             temp_signup = signupform.save(commit=False)
@@ -69,11 +79,11 @@ def event_detail(request, event_id, signup_id=None, auth_code=None):
 
             signupitemsform = SignupItemsForm(request.POST or None, event=event, signup=temp_signup, prefix=ITEMS_PREFIX)
             if signupitemsform.is_valid():
-                signupitemsform.save(event=event,signup=temp_signup)
+                signupitemsform.save(signup=temp_signup)
             else:
                 messages.error(request, _("Error in saving eventItems"))
                 temp_signup.delete()
-                return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
+                return HttpResponseRedirect(event.get_absolute_url())
 
 
             from_email = settings.NO_REPLY_EMAIL
@@ -84,7 +94,7 @@ def event_detail(request, event_id, signup_id=None, auth_code=None):
             )
             message = _(
                 "You are now registered to event {0}."
-                " You can still edit: {1} or cancel:{2} your registration"
+                " You can still edit: {1} or cancel: {2} your registration"
                 " before the deadline, {3}").format(
                     event.title,
 
@@ -112,12 +122,12 @@ def event_detail(request, event_id, signup_id=None, auth_code=None):
                 logger.error("BadHeaderError sending email to {0}".format(to_emails))
                 temp_signup.delete()
                 messages.error(request, _("BadHeaderError, newlines in email adress?"))
-                return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
+                return HttpResponseRedirect(event.get_absolute_url())
             except:
                 logger.error("Exception {0} sending email to {1}".format(sys.exc_info()[0], to_emails))
                 temp_signup.delete()
                 messages.error(request, _("Error, please try again"))
-                return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
+                return HttpResponseRedirect(event.get_absolute_url())
 
             # Remove form after signing up
             signupform = None
@@ -129,7 +139,7 @@ def event_detail(request, event_id, signup_id=None, auth_code=None):
         return render(request, 'events/event.html', {
             'event': event, 'signupform': signupform, 'signupitemsform': signupitemsform, 'signups': signups})
     except Event.DoesNotExist:
-        logger.warning('Could not find event with id %s', event_id)
+        logger.warning('Could not find event with slug %s', slug)
         return HttpResponseNotFound('No event with that id found')
 
 
@@ -150,7 +160,7 @@ def add_event(request):
             temp.save()
 
             form_items.save(temp)
-            return HttpResponseRedirect(reverse("events_view_event", args=[form.instance.id]))
+            return HttpResponseRedirect(form.instance.get_absolute_url())
 
     context = {'form': form, 'form_items': form_items}
     return render(request, 'events/add_edit_event.html', context)
@@ -175,7 +185,7 @@ def edit_event(request, event_id):
         if form.is_valid() and form_items.is_valid:
             tmp_event = form.save()
             form_items.save(tmp_event)
-            return HttpResponseRedirect(reverse("events_view_event", args=[form.instance.id]))
+            return HttpResponseRedirect(form.instance.get_absolute_url())
 
     context = {'form': form, 'form_items': form_items}
     return render(request, 'events/add_edit_event.html', context)
@@ -227,7 +237,7 @@ def delete_event_signup(request, event_signup_id):
         request,
         _("Event signup for {0} from event {1} was successfully removed!").format(signup_name, event.title)
     )
-    return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
+    return HttpResponseRedirect(event.get_absolute_url())
 
 
 # This view is used when deleting a view using auth_code
@@ -264,12 +274,12 @@ class DeleteEventSignupByCodeView(DeleteView):
             request,
             _("Event signup for {0} from event {1} was successfully removed!").format(signup_name, event.title)
         )
-        return HttpResponseRedirect(reverse("events_view_event", args=str(event.id)))
+        return HttpResponseRedirect(event.get_absolute_url())
 
 
 class AddEventItemView(CreateView):
     model = EventItem
-    fields = ['name']
+    fields = ['name', 'type', 'required']
     success_url = reverse_lazy("events_list_eventitems")
 
     def dispatch(self, request, *args, **kwargs):
@@ -286,7 +296,7 @@ class AddEventItemView(CreateView):
 
 class EditEventItemView(UpdateView):
     model = EventItem
-    fields = ['name']
+    fields = ['name', 'type', 'required']
     success_url = reverse_lazy("events_list_eventitems")
 
     def dispatch(self, request, *args, **kwargs):
