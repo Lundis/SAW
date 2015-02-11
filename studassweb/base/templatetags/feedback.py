@@ -23,6 +23,4 @@ def helptext_feedback(context):
             template_context['response_unnecessary'] = Feedback.RESPONSE_UNNECESSARY
             template_context['id'] = str(random.randint(1, 10000000))
             template_context['url'] = request.path
-        else:
-            logger.warn("User %s has already voted on %s!" % (request.user, request.path))
     return template_context
