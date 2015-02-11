@@ -29,11 +29,48 @@
             </div>
             {% if edit_mode %}
                 <div class="panel-footer">
-                    <form method="post"
+                    <form id="item_form_{{ item.id }}" method="post" action="{% url "frontpage_move_item" %}">
+                        {% csrf_token %}
+                        <div id="item_move_up_button_{{ id }}"
+                             class="btn btn-primary item_move_up_button">
+                            {% trans "Yes" %}
+                        </div>
+                        <div id="item_move_down_button_{{ id }}"
+                             class="btn btn-primary item_move_down_button">
+                            {% trans "Yes" %}
+                        </div>
+                    </form>
                 </div>
             {% endif %}
         </div>
     {% endfor %}
+
+    {% if edit_mode %}
+        <h1>{% trans "Hidden items" %}</h1>
+        {% for item in hidden_items %}
+            <div id="item_{{ item.id }}" class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        {{ item.title }}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {{ item.content }}
+                </div>
+                {% if edit_mode %}
+                    <div class="panel-footer">
+                        <form id="item_form_{{ item.id }}" method="post" action="{% url "frontpage_move_item" %}">
+                            {% csrf_token %}
+                            <div id="item_move_up_button_{{ id }}"
+                                 class="btn btn-primary item_move_up_button">
+                                {% trans "Yes" %}
+                            </div>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endif %}
 {% endblock %}
 
 {% block sidebar %}
@@ -78,5 +115,23 @@
 
 {% block scripts %}
     {% if edit_mode %}
+        <script>
+            $(".event_item").submit(function(event) {
+                // TODO: this is just copy-pasted from another file
+                event.preventDefault()
+                var form_id = event.target.getAttribute("id");
+                var split_id = form_id.split("_");
+                var message_id = split_id[split_id.length - 1];
+                ajaxPost('{% url "contact_mark_message_as_handled" %}',
+                        {'message_id': message_id},
+                        function(event) {
+                            $("#" + form_id).remove();
+
+                        }
+                );
+            });
+
+
+        </script>
     {% endif %}
 {% endblock %}
