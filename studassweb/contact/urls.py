@@ -25,4 +25,7 @@ urlpatterns = patterns('',
     url(r'^delete_contact/(?P<contact_id>\d+)$',
         'contact.views.delete_contact',
         name='contact_delete'),
+    url(r'^mark_message_as_handled$',
+        'contact.ajax.mark_message_as_handled',
+        name='contact_mark_message_as_handled')
 )
