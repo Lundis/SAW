@@ -33,6 +33,7 @@ NON_OPTIONAL_APPS = (
     'install',
     'users',
     'settings',
+    'frontpage',
 )
 
 OPTIONAL_APPS = ()
