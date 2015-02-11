@@ -6,6 +6,7 @@ from .register import CAN_CREATE_EVENTS
 from users import permissions
 from django.template.defaultfilters import slugify
 import itertools
+from base.fields import ValidatedRichTextField
 
 
 # This should maybe be put in base or something
@@ -22,7 +23,7 @@ class MultiInputField(models.CharField):
 class Event(models.Model):
     title = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
-    text = models.TextField(max_length=500)
+    text = ValidatedRichTextField()
     start = models.DateTimeField()
     stop = models.DateTimeField()
     author = models.ForeignKey(User)

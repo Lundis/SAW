@@ -26,7 +26,7 @@
             </div>
         </div>
         <div class="panel-body">
-            {{ event.text }}
+            {{ event.text|safe }}
         </div>
         <div class="panel-footer">
             <div class="row inherit-padding-left-right">
@@ -52,7 +52,7 @@
         </div>
         <div class="panel-body">
             {% if signupform %}
-                <form action="{{ event.get_absolute_url  }}" method="post">
+                <form action="" method="post">
                     {% csrf_token %}
                     {% bootstrap_form signupform %}
                     {% bootstrap_form signupitemsform %}
