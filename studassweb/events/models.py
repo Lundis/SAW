@@ -1,12 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.template.loader import get_template
+from django.template import Context
 import django.utils.timezone as timezone
 from .register import CAN_CREATE_EVENTS
 from users import permissions
 from django.template.defaultfilters import slugify
 import itertools
 from base.fields import ValidatedRichTextField
+from frontpage.models import FrontPageItem
 
 
 # This should maybe be put in base or something
@@ -15,10 +18,10 @@ class MultiInputField(models.CharField):
 
     def __init__(self, *args, **kwargs):
         super(MultiInputField, self).__init__(*args, **kwargs)
-        #self.validators.append(validators.MaxLengthValidator(self.max_length))
+        # self.validators.append(validators.MaxLengthValidator(self.max_length))
 
 
-#This is an actual event, for example a Christmas party
+# This is an actual event, for example a Christmas party
 # TODO is it public, for members, or for board members only?
 class Event(models.Model):
     title = models.CharField(max_length=100)
@@ -52,11 +55,35 @@ class Event(models.Model):
 
             self.slug = temp_slug
         super(Event, self).save(*args, **kwargs)
+        self.update_frontpage_item()
+
+    def delete(self, using=None):
+        super(Event, self).delete(using)
+        self.update_frontpage_item()
+
+    @classmethod
+    def current_events(cls):
+        """
+        Returns all events that haven't ended yet
+        :return:
+        """
+        return cls.objects.filter(stop__gte=timezone.now())
+
+    @classmethod
+    def update_frontpage_item(cls):
+        event_item, created = FrontPageItem.objects.get_or_create(identifier="events/upcoming_events")
+        if created:
+            event_item.location = FrontPageItem.HIDDEN
+            event_item.title = "Upcoming Events"
+        context = Context({'events': cls.current_events().order_by("start")})
+        print(context)
+        template = get_template("events/frontpage_content.html")
+        event_item.content = template.render(context)
+        event_item.save()
 
 
-
-#Each user which signs up creates one of these
-#We need both user and name as we need to allow non-signed in users to sign up
+# Each user which signs up creates one of these
+# We need both user and name as we need to allow non-signed in users to sign up
 # TODO we need to save the auth_codes somehow, to ensure that a new signup doesn't get the same code as a delete one
 class EventSignup(models.Model):
     event = models.ForeignKey(Event)
