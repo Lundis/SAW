@@ -90,7 +90,9 @@
                             <th>{{ event_item.item.name }}</th>
                         {% endfor %}
                     {% endif %}
-                    <th>{% trans "Action" %}</th>
+                    {% if request.user.is_authenticated %}
+                        <th>{% trans "Action" %}</th>
+                    {% endif %}
                 </tr>
                 {% for signup in signups %}
                     <tr>
@@ -103,24 +105,26 @@
                                 <td>{{ event_item.value }}</td>
                             {% endfor %}
                         {% endif %}
-                        <td>
-                            {% user_can_edit signup user as can_edit_signup %}
-                            {% if can_edit_signup%}
-                                <a href="{% url 'events_view_event_edit_signup_by_id' event_id=event.id signup_id=signup.id %}">
-                                    <button class="btn btn-primary">
-                                        {% trans "Edit" %}
-                                    </button>
-                                </a>
-                                <form action="{% url 'events_delete_event_signup' signup.id %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
-                                    {% csrf_token %}
-                                    {% buttons %}
-                                        <button type="submit" class="btn btn-danger">
-                                            {% trans "Delete" %}
+                        {% if request.user.is_authenticated %}
+                            <td>
+                                {% user_can_edit signup user as can_edit_signup %}
+                                {% if can_edit_signup%}
+                                    <a href="{% url 'events_view_event_edit_signup_by_id' event_id=event.id signup_id=signup.id %}">
+                                        <button class="btn btn-primary">
+                                            {% trans "Edit" %}
                                         </button>
-                                    {% endbuttons %}
-                                </form>
-                                </td>
-                            {% endif %}
+                                    </a>
+                                    <form action="{% url 'events_delete_event_signup' signup.id %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
+                                        {% csrf_token %}
+                                        {% buttons %}
+                                            <button type="submit" class="btn btn-danger">
+                                                {% trans "Delete" %}
+                                            </button>
+                                        {% endbuttons %}
+                                    </form>
+                                {% endif %}
+                            </td>
+                        {% endif %}
                     </tr>
 
                 {% empty %}
