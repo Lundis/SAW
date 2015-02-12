@@ -1,4 +1,5 @@
 from django import forms
+from django.core.validators import ValidationError
 from .models import Event, EventSignup, EventItem, ItemInEvent, ItemInSignup
 from base.utils import generate_email_ver_code
 
@@ -7,15 +8,22 @@ EITEMS = "eitems"
 
 class EventSignupForm(forms.ModelForm):
 
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop("event")
+        super(EventSignupForm, self).__init__(*args, **kwargs)
+
     class Meta:
         model = EventSignup
         fields = ('name', 'email',)
 
-    def save(self, commit=True, user=None, event=None):
-        if event is None:
-            raise ValueError("EventSignupForm.save(): missing event")
+    def clean(self):
+        super(EventSignupForm, self).clean()
+        if self.event.is_past_signup_deadline():
+            raise ValidationError("It's already past the deadline!")
+
+    def save(self, commit=True, user=None,):
         temp_signup = super(EventSignupForm, self).save(commit=False)
-        temp_signup.event = event
+        temp_signup.event = self.event
         temp_signup.auth_code = generate_email_ver_code()
         while EventSignup.objects.filter(auth_code=temp_signup.auth_code).exists():
             temp_signup.auth_code = generate_email_ver_code()

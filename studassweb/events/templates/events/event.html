@@ -49,6 +49,7 @@
             </div>
         </div>
         <div class="panel-body">
+            {% if not event.is_past_signup_deadline %}
                 {% if signupform %}
                     <form action="" method="post">
                         {% csrf_token %}
@@ -61,8 +62,13 @@
                         {% endbuttons %}
                     </form>
                 {% endif %}
+            {% else %}
+                <p>
+                    {% trans "The signup ended at" %}
+                    {{ event.signup_deadline }}
+                </p>
+            {% endif %}
         </div>
-
         <div class="panel-footer">
         </div>
     </div>

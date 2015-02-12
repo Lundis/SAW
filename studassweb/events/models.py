@@ -12,6 +12,7 @@ from base.fields import ValidatedRichTextField
 from frontpage.models import FrontPageItem
 from operator import attrgetter
 
+
 # This should maybe be put in base or something
 class MultiInputField(models.CharField):
     description = "This is magic"
@@ -38,6 +39,9 @@ class Event(models.Model):
 
     def get_absolute_url(self):
         return reverse("events_view_event", kwargs={'slug': self.slug})
+
+    def is_past_signup_deadline(self):
+        return timezone.now() > self.signup_deadline
 
     # https://keyerror.com/blog/automatically-generating-unique-slugs-in-django
     def save(self, *args, **kwargs):

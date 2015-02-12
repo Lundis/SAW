@@ -69,12 +69,12 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
         initial_user_data = {'name': request.user.get_full_name(), 'email': request.user.email}
 
     signupform = EventSignupForm(request.POST or None, initial=initial_user_data,
-                                 instance=db_event_signup, prefix=MAIN_PREFIX)
+                                 instance=db_event_signup, prefix=MAIN_PREFIX, event=event)
     signupitemsform = SignupItemsForm(request.POST or None, event=event,
                                       signup=db_event_signup, prefix=ITEMS_PREFIX)
 
     if signupform.is_valid() and signupitemsform.is_valid():
-        temp_signup = signupform.save(user=request.user, event=event)
+        temp_signup = signupform.save(user=request.user)
         try:
             signupitemsform.save(signup=temp_signup)
         except Exception as e:
