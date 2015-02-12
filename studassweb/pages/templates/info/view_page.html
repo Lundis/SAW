@@ -3,11 +3,13 @@
 {% load i18n %}
 
 {% block breadcrumb2 %}
-    <li>
-        <a href="{{ category.get_absolute_url }}">
-            {{ category.name }}
-        </a>
-    </li>
+    {% if category %}
+        <li>
+            <a href="{{ category.get_absolute_url }}">
+                {{ category.name }}
+            </a>
+        </li>
+    {% endif %}
 {% endblock %}
 
 {% block breadcrumb3 %}
