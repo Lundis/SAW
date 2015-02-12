@@ -95,7 +95,7 @@
                     {% endif %}
                 </tr>
                 {% for signup in signups %}
-                    <tr>
+                    <tr {% if signup.is_reserve %} class="text-muted" {% endif %}>
                         <td>{{ signup.created|date:"Y-m-d H:i" }}</td>
                         <td>{{ signup.name }}</td>
                         {% if can_view_signup_info %}

@@ -1,20 +1,17 @@
 from django.shortcuts import render
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseServerError
-from .models import Event, EventSignup, EventItem, ItemInSignup
+from .models import Event, EventSignup, EventItem
 from django.http import HttpResponseRedirect, Http404
 from users import permissions
 from users.decorators import has_permission
-from .register import CAN_VIEW_EVENTS, CAN_CREATE_EVENTS, CAN_SIGNUP_FOR_EVENTS, CAN_VIEW_SIGNUP_INFO
+from .register import CAN_CREATE_EVENTS
 from .forms import EventForm, EventSignupForm, EventItemsForm, SignupItemsForm
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.conf import settings
-from base.models import SiteConfiguration
 from django.core.mail import send_mail, BadHeaderError
 from django.views.generic import CreateView, UpdateView, ListView, DeleteView
-from django.template.loader import get_template
-from django.template import Context
 import sys
 import logging
 

@@ -14,7 +14,7 @@ class EventSignupForm(forms.ModelForm):
 
     class Meta:
         model = EventSignup
-        fields = ('name', 'email',)
+        fields = ('name', 'email')
 
     def clean(self):
         super(EventSignupForm, self).clean()
@@ -50,7 +50,7 @@ class EventForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        fields = ('title', 'text', 'signup_deadline', 'start', 'stop')
+        fields = ('title', 'text', 'max_participants', 'signup_deadline', 'start', 'stop')
 
     def save(self, commit=True, user=None):
         if user is None:

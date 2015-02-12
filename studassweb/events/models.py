@@ -3,14 +3,23 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.template.loader import get_template
 from django.template import Context
+from django.core.validators import MinValueValidator
+from django.template.defaultfilters import slugify
+from django.utils.translation import ugettext as _
+from django.core.mail import send_mail
+from django.conf import settings
 import django.utils.timezone as timezone
 from .register import CAN_CREATE_EVENTS
 from users import permissions
-from django.template.defaultfilters import slugify
-import itertools
 from base.fields import ValidatedRichTextField
 from frontpage.models import FrontPageItem
+import itertools
+import logging
+
 from operator import attrgetter
+
+
+logger = logging.getLogger(__name__)
 
 
 # This should maybe be put in base or something
@@ -33,6 +42,7 @@ class Event(models.Model):
     author = models.ForeignKey(User)
     signup_deadline = models.DateTimeField(verbose_name="Deadline for signups")
     permission = models.CharField(max_length=100, blank=True, null=True)  # Permission needed to see and attend
+    max_participants = models.IntegerField(validators=[MinValueValidator(1)], default=50)
 
     def __str__(self):
         return str(self.title)
@@ -91,7 +101,6 @@ class Event(models.Model):
 
 # Each user which signs up creates one of these
 # We need both user and name as we need to allow non-signed in users to sign up
-# TODO we need to save the auth_codes somehow, to ensure that a new signup doesn't get the same code as a delete one
 class EventSignup(models.Model):
     event = models.ForeignKey(Event)
     user = models.ForeignKey(User, blank=True, null=True)
@@ -112,6 +121,28 @@ class EventSignup(models.Model):
     def __str__(self):
         return "{0}:{1} has registered to {2}".format(self.created, self.user, self.event)
 
+    def delete(self, using=None):
+        super(EventSignup, self).delete(using)
+        # Notify a user on the reserve list that they're in by email
+        # Can't allow delete() to throw an exception
+        try:
+            signups = EventSignup.objects.filter(event=self.event)
+            if self.event.max_participants >= signups.count():
+                # Get the signup that just got below the participant limit
+                reserve_signup = signups[self.event.max_participants - 1]
+                reserve_signup.send_reserve_email()
+        except Exception as e:
+            logger.error("Sending reserve email failed (%s)", e)
+
+    def send_reserve_email(self):
+        context = Context({'event': self.event})
+        template = get_template("events/emails/reserve_notify.html")
+        message = template.render(context)
+        title = _("Reserve notification for") + " " + self.event.title
+        from_email = settings.NO_REPLY_EMAIL
+        to_emails = [self.email]
+        send_mail(title, message, from_email, to_emails)
+
     def build_email_content(self, request):
         context = Context(
             {'request': request,
@@ -128,6 +159,13 @@ class EventSignup(models.Model):
 
         template = get_template("events/email.html")
         return template.render(context)
+
+    def is_reserve(self):
+        signups = EventSignup.objects.filter(event=self.event)
+        for index, item in enumerate(signups):
+            if item.pk == self.pk:
+                return index >= self.event.max_participants
+        logger.error("is_reserve couldn't find itself in the list")
 
     def get_items(self):
         return ItemInSignup.objects.filter(signup=self).order_by('item__id')
