@@ -20,7 +20,7 @@ class FrontPageItem(models.Model):
     )
 
     location = models.CharField(max_length=2, choices=LOCATION_CHOICES, default=HIDDEN)
-    ordering_index = models.IntegerField(validators=MinValueValidator(1))
+    ordering_index = models.IntegerField(validators=[MinValueValidator(1)])
 
     # These are used if the item corresponds to a specific model, such as a news article
     _content_type = models.ForeignKey(ContentType, null=True, blank=True)
@@ -28,7 +28,8 @@ class FrontPageItem(models.Model):
     target = GenericForeignKey('_content_type', '_object_id')
 
     class Meta:
-        unique_together = ("location", "ordering_index")
+        unique_together = (("location", "ordering_index"),
+                           ("_content_type", "_object_id"))
         ordering = "ordering_index",
 
     def save(self, *args, **kwargs):
@@ -54,7 +55,7 @@ class FrontPageItem(models.Model):
                 pass
 
         super(FrontPageItem, self).save(*args, **kwargs)
-        self._fix_indexing()
+        self._fix_indices()
 
     def delete(self, using=None):
         super(FrontPageItem, self).delete(using)
@@ -70,7 +71,7 @@ class FrontPageItem(models.Model):
                 page.save()
             i += 1
 
-    def _count_in_location(self, location):
+    def _count_in_location(self):
         return FrontPageItem.objects.filter(location=self.location).count()
 
     def set_target(self, target):
@@ -80,3 +81,11 @@ class FrontPageItem(models.Model):
         """
         self._content_type = ContentType.objects.get_for_model(target)
         self._object_id = target.id
+
+    @classmethod
+    def get_with_target(cls, target):
+        try:
+            return cls.objects.get(_content_type=ContentType.objects.get_for_model(target),
+                                   _object_id=target.id)
+        except cls.DoesNotExist:
+            return None

@@ -6,6 +6,7 @@ from django.template.defaultfilters import slugify
 from base.fields import ValidatedRichTextField
 from menu.models import MenuItem, Menu
 from users.permissions import has_user_perm
+from frontpage.models import FrontPageItem
 import pages.register as pregister
 
 PERMISSION_CHOICES = (
@@ -106,9 +107,13 @@ class InfoPage(models.Model):
                 # and add it last in the correct one
                 menu.add_item(menu_item, menu.count())
 
+        self.update_frontpage_item()
+
+
     def delete(self, *args, **kwargs):
         MenuItem.delete_all_that_links_to(self)
         super(InfoPage, self).delete(*args, **kwargs)
+        self.update_frontpage_item()
 
     def can_view(self, user):
         return has_user_perm(user, self.get_permission_str())
@@ -125,6 +130,30 @@ class InfoPage(models.Model):
 
     def date(self):
         return self.revisions().first().date
+
+    def update_frontpage_item(self):
+        old = FrontPageItem.get_with_target(self)
+        if self.for_frontpage:
+            # create or update
+            if old:
+                old.title = self.title
+                old.content = self.text
+                old.identifier = self.slug
+                old.save()
+            else:
+                new = FrontPageItem(title=self.title,
+                                    content=self.text,
+                                    identifier=self.slug,
+                                    location=FrontPageItem.HIDDEN
+                                    )
+                new.set_target(self)
+                new.save()
+
+        else:
+            # remove if it exists
+            old = FrontPageItem.get_with_target(self)
+            if old:
+                old.delete()
 
 
 class InfoPageEdit(models.Model):

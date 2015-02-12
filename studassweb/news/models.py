@@ -65,6 +65,18 @@ class Article(models.Model):
         if not self.pk:
             self.slug = slugify(self.title)
         super(Article, self).save(*args, **kwargs)
+        self.update_frontpage_items()
+
+    def delete(self, using=None):
+        super(Article, self).delete(using)
+        self.update_frontpage_items()
 
     def __str__(self):
         return self.title
+
+    def update_frontpage_items(self):
+        """
+        Makes sure the N latest items exist as frontpage items
+        :return:
+        """
+        pass
