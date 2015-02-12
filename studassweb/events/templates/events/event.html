@@ -92,6 +92,9 @@
                     {% if can_view_signup_info %}
                         <th>{% trans "Email" %}</th>
                         <th>{% trans "User account" %}</th>
+                        {% for event_item in event.get_items %}
+                            <th>{{ event_item.item.name }}</th>
+                        {% endfor %}
                     {% endif %}
                     <th>{% trans "Action" %}</th>
                 </tr>
@@ -102,6 +105,9 @@
                         {% if can_view_signup_info %}
                             <td>{{ signup.email }}</td>
                             <td>{{ signup.user }}</td>
+                            {% for event_item in signup.get_items_relevant %}
+                                <td>{{ event_item.value }}</td>
+                            {% endfor %}
                         {% endif %}
                         <td>
                             {% user_can_edit signup user as can_edit_signup %}

@@ -10,7 +10,7 @@ from django.template.defaultfilters import slugify
 import itertools
 from base.fields import ValidatedRichTextField
 from frontpage.models import FrontPageItem
-
+from operator import attrgetter
 
 # This should maybe be put in base or something
 class MultiInputField(models.CharField):
@@ -81,6 +81,9 @@ class Event(models.Model):
         event_item.content = template.render(context)
         event_item.save()
 
+    def get_items(self):
+        return ItemInEvent.objects.filter(event=self).order_by('item__id')
+
 
 # Each user which signs up creates one of these
 # We need both user and name as we need to allow non-signed in users to sign up
@@ -121,6 +124,36 @@ class EventSignup(models.Model):
 
         template = get_template("events/email.html")
         return template.render(context)
+
+    def get_items(self):
+        return ItemInSignup.objects.filter(signup=self).order_by('item__id')
+
+    # This function excludes items which has been removed from the event after signup was made
+    # It also adds "missing" items, which exists if item events are added to event after signup was created
+    def get_items_relevant(self):
+        # Only these items should be returned even if more are saved
+        items_in_event = ItemInEvent.objects.filter(event=self.event)
+        items_in_event_itemonly = ItemInEvent.objects.filter(event=self.event).values('item')
+
+        items_in_signup = ItemInSignup.objects.filter(signup=self).\
+            filter(item__in=items_in_event_itemonly).order_by('item__id')
+
+        items_in_signup_items = items_in_signup.values('item')
+        # Get all items which are configured for event but is not in signup
+        missing_items = items_in_event.exclude(item__in=items_in_signup_items)
+        result = list(items_in_signup)
+
+        # Add missing items
+        for item_in_event in missing_items:
+            fake_item_in_signup = ItemInSignup()
+            fake_item_in_signup.signup_id = self
+            fake_item_in_signup.value = 'not_set'
+            fake_item_in_signup.item = item_in_event.item
+            result.append(fake_item_in_signup)
+
+        # Needs to be sorted to get in right column
+        result.sort(key=attrgetter('item.id'))
+        return result
 
 
 class EventItem(models.Model):
