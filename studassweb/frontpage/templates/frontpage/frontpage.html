@@ -1,6 +1,7 @@
 {% extends "base/base.html" %}
 {% load i18n %}
 {% load sawp %}
+{% load frontpage_items %}
 
 {% block title %}
     StudAssWeb Frontpage!
@@ -18,73 +19,20 @@
     <h1>{% trans "Welcome!" %}</h1>
     <p>{% trans "This site is under heavy development. Don't worry if it's hard to understand right now, it will get better!" %}</p>
     {% for item in main_items %}
-        <div id="item_{{ item.id }}" class="panel panel-primary">
-            <div class="panel-heading">
-                <div class="panel-title">
-                    {{ item.title}}
-                </div>
-            </div>
-            <div class="panel-body">
-                {{ item.content | safe }}
-            </div>
-            {% if edit_mode %}
-                <div class="panel-footer">
-                    <form id="item_form_{{ item.id }}" method="post" action="{% url "frontpage_move_item" %}">
-                        {% csrf_token %}
-                        <div id="item_move_up_button_{{ id }}"
-                             class="btn btn-primary item_move_up_button">
-                            {% trans "Yes" %}
-                        </div>
-                        <div id="item_move_down_button_{{ id }}"
-                             class="btn btn-primary item_move_down_button">
-                            {% trans "Yes" %}
-                        </div>
-                    </form>
-                </div>
-            {% endif %}
-        </div>
+        {% display_frontpage_item item edit_mode "main" %}
     {% endfor %}
 
     {% if edit_mode %}
         <h1>{% trans "Hidden items" %}</h1>
         {% for item in hidden_items %}
-            <div id="item_{{ item.id }}" class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        {{ item.title }}
-                    </div>
-                </div>
-                <div class="panel-body">
-                    {{ item.content | safe }}
-                </div>
-                {% if edit_mode %}
-                    <div class="panel-footer">
-                        <form id="item_form_{{ item.id }}" method="post" action="{% url "frontpage_move_item" %}">
-                            {% csrf_token %}
-                            <div id="item_move_up_button_{{ id }}"
-                                 class="btn btn-primary item_move_up_button">
-                                {% trans "Yes" %}
-                            </div>
-                        </form>
-                    </div>
-                {% endif %}
-            </div>
+            {% display_frontpage_item item edit_mode "hidden" %}
         {% endfor %}
     {% endif %}
 {% endblock %}
 
 {% block sidebar %}
     {% for item in side_items %}
-        <div id="item_{{ item.id }}" class="panel panel-primary">
-            <div class="panel-heading">
-                <div class="panel-title">
-                    {{ item.title }}
-                </div>
-            </div>
-            <div class="panel-body">
-                {{ item.content | safe }}
-            </div>
-        </div>
+        {% display_frontpage_item item edit_mode "side" %}
     {% endfor %}
     {% has_perm "frontpage" "CAN_EDIT_FRONTPAGE" as show_edit_buttons %}
     {% if show_edit_buttons %}

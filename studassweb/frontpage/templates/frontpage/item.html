@@ -1,0 +1,31 @@
+{% load i18n %}
+
+<div id="item_{{ item.id }}" class="panel panel-primary">
+    <div class="panel-heading">
+        <div class="panel-title">
+            {{ item.title}}
+        </div>
+    </div>
+    <div class="panel-body">
+        {{ item.content | safe }}
+    </div>
+    {% if edit_mode %}
+        <div class="panel-footer">
+            <form id="item_form_{{ item.id }}" method="post" action="{% url "frontpage_move_item" %}">
+                {% csrf_token %}
+                <div id="move_up_button_{{ id }}"
+                     class="btn btn-primary item_move_up_button">
+                    {% trans "Move up" %}
+                </div>
+                <div id="move_down_button_{{ id }}"
+                     class="btn btn-primary item_move_down_button">
+                    {% trans "Move down" %}
+                </div>
+                <div id="move_to_hidden_button_{{ id }}"
+                     class="btn btn-primary item_move_down_button">
+                    {% trans "Remove" %}
+                </div>
+            </form>
+        </div>
+    {% endif %}
+</div>
