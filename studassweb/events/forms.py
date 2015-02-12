@@ -1,6 +1,6 @@
 from django import forms
 from .models import Event, EventSignup, EventItem, ItemInEvent, ItemInSignup
-
+from base.utils import generate_email_ver_code
 
 EITEMS = "eitems"
 
@@ -10,6 +10,20 @@ class EventSignupForm(forms.ModelForm):
     class Meta:
         model = EventSignup
         fields = ('name', 'email',)
+
+    def save(self, commit=True, user=None, event=None):
+        if event is None:
+            raise ValueError("EventSignupForm.save(): missing event")
+        temp_signup = super(EventSignupForm, self).save(commit=False)
+        temp_signup.event = event
+        temp_signup.auth_code = generate_email_ver_code()
+        while EventSignup.objects.filter(auth_code=temp_signup.auth_code).exists():
+            temp_signup.auth_code = generate_email_ver_code()
+        if not user.is_anonymous():
+            temp_signup.user = user
+        if commit:
+            temp_signup.save()
+        return temp_signup
 
 
 class EventForm(forms.ModelForm):

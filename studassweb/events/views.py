@@ -1,18 +1,19 @@
 from django.shortcuts import render
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseServerError
 from .models import Event, EventSignup, EventItem, ItemInSignup
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from users import permissions
 from .register import CAN_VIEW_EVENTS, CAN_CREATE_EVENTS, CAN_SIGNUP_FOR_EVENTS, CAN_VIEW_SIGNUP_INFO
 from .forms import EventForm, EventSignupForm, EventItemsForm, SignupItemsForm
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib import messages
 from django.utils.translation import ugettext as _
-from base.utils import generate_email_ver_code
 from django.conf import settings
 from base.models import SiteConfiguration
 from django.core.mail import send_mail, BadHeaderError
 from django.views.generic import CreateView, UpdateView, ListView, DeleteView
+from django.template.loader import get_template
+from django.template import Context
 import sys
 import logging
 
@@ -29,118 +30,99 @@ def home(request):
 
 # TODO we shouldn't have all this code in the view
 # A lot of these errors should simply invalidate the form so the user can correct it!
-def event_detail(request, event_id=None, slug=None, signup_id=None, auth_code=None):
+def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None):
     try:
         if slug:
             event = Event.objects.get(slug=slug)
         elif event_id:
             event = Event.objects.get(id=event_id)
         else:
-            logger.error('event_detail was called without slug or event_id! This should never happen!')
+            logger.error('view_event was called without slug or event_id! This should never happen!')
             messages.error(request, _("Error in url!? This should never happen."))
             return HttpResponseRedirect(reverse("events_home"))
-        db_event_signup = None
-        if auth_code:
-            try:
-                db_event_signup = EventSignup.objects.get(auth_code=auth_code)
-            except EventSignup.DoesNotExist:
-                messages.error(request, _("Invalid auth code! Cannot edit signup!"))
-                return HttpResponseRedirect(event.get_absolute_url())
-        elif signup_id:
-            try:
-                db_event_signup = EventSignup.objects.get(id=signup_id)
-                if not db_event_signup.user_can_edit(request.user):
-                    logger.warning('Unauthorized user %s tried to edit signup id %s', request.user, signup_id)
-                    messages.error(request, _("You don't have permission to change this!"))
-                    return HttpResponseRedirect(event.get_absolute_url())
-            except EventSignup.DoesNotExist:
-                logger.warning('Could not find signup_id %s', request.user, signup_id)
-                messages.error(request, _("Wrong signup id!"))
-                return HttpResponseRedirect(event.get_absolute_url())
-
-        initial_user_data = {}
-        if request.user.is_authenticated() and not db_event_signup:
-            initial_user_data = {'name': request.user.get_full_name(), 'email': request.user.email}
-
-        signupform = EventSignupForm(request.POST or None, initial=initial_user_data, instance=db_event_signup, prefix=MAIN_PREFIX)
-        signupitemsform = SignupItemsForm(request.POST or None, event=event, signup=db_event_signup, prefix=ITEMS_PREFIX)
-
-        if signupform.is_valid():
-            temp_signup = signupform.save(commit=False)
-            temp_signup.event = event
-            temp_signup.auth_code = generate_email_ver_code()
-            while EventSignup.objects.filter(auth_code=temp_signup.auth_code).exists():
-                temp_signup.auth_code = generate_email_ver_code()
-            if not request.user.is_anonymous():
-                temp_signup.user = request.user
-
-            # We need to save to db here to get id, but we should remove it if we couldn't send email
-            temp_signup.save()
-
-            signupitemsform = SignupItemsForm(request.POST or None, event=event, signup=temp_signup, prefix=ITEMS_PREFIX)
-            if signupitemsform.is_valid():
-                signupitemsform.save(signup=temp_signup)
-            else:
-                messages.error(request, _("Error in saving eventItems"))
-                temp_signup.delete()
-                return HttpResponseRedirect(event.get_absolute_url())
-
-
-            from_email = settings.NO_REPLY_EMAIL
-            to_emails = [temp_signup.email]
-            title = _("{0}: You are now signed up to {1}").format(
-                SiteConfiguration.instance().association_name,
-                event.title
-            )
-            message = _(
-                "You are now registered to event {0}."
-                " You can still edit: {1} or cancel: {2} your registration"
-                " before the deadline, {3}").format(
-                    event.title,
-
-                    request.scheme +
-                    "://" +
-                    request.get_host() +
-                    reverse("events_view_event_edit_signup_by_code", kwargs={'event_id': event.id, 'auth_code': temp_signup.auth_code}),
-
-                    request.scheme +
-                    "://" +
-                    request.get_host() +
-                    reverse("events_delete_event_signup_by_code", kwargs={'auth_code': temp_signup.auth_code}),
-
-                    event.signup_deadline
-                )
-            logger.info("Sending event email from %s to %s" % (from_email, to_emails[0]))
-            try:
-                send_mail(
-                    title,
-                    message,
-                    from_email,
-                    to_emails)
-
-            except BadHeaderError:
-                logger.error("BadHeaderError sending email to {0}".format(to_emails))
-                temp_signup.delete()
-                messages.error(request, _("BadHeaderError, newlines in email adress?"))
-                return HttpResponseRedirect(event.get_absolute_url())
-            except:
-                logger.error("Exception {0} sending email to {1}".format(sys.exc_info()[0], to_emails))
-                temp_signup.delete()
-                messages.error(request, _("Error, please try again"))
-                return HttpResponseRedirect(event.get_absolute_url())
-
-            # Remove form after signing up
-            signupform = None
-
-            messages.success(request, _("Successfully signed up to event!"))
-
-        signups = EventSignup.objects.filter(event=event)
-
-        return render(request, 'events/event.html', {
-            'event': event, 'signupform': signupform, 'signupitemsform': signupitemsform, 'signups': signups})
     except Event.DoesNotExist:
-        logger.warning('Could not find event with slug %s', slug)
-        return HttpResponseNotFound('No event with that id found')
+        logger.warning('Could not find event with slug %s or id %s', slug, event_id)
+        return HttpResponseNotFound('Event not found')
+
+    db_event_signup = None
+    if auth_code:
+        try:
+            db_event_signup = EventSignup.objects.get(auth_code=auth_code)
+        except EventSignup.DoesNotExist:
+            raise Http404(_("Invalid auth code!"))
+    elif signup_id:
+        try:
+            db_event_signup = EventSignup.objects.get(id=signup_id)
+            if not db_event_signup.user_can_edit(request.user):
+                logger.warning('Unauthorized user %s tried to edit signup id %s', request.user, signup_id)
+                messages.error(request, _("You don't have permission to change this!"))
+                return HttpResponseRedirect(event.get_absolute_url())
+        except EventSignup.DoesNotExist:
+            logger.warning('Could not find signup_id %s', request.user, signup_id)
+            messages.error(request, _("Wrong signup id!"))
+            return HttpResponseRedirect(event.get_absolute_url())
+
+    initial_user_data = {}
+    if request.user.is_authenticated() and not db_event_signup:
+        initial_user_data = {'name': request.user.get_full_name(), 'email': request.user.email}
+
+    signupform = EventSignupForm(request.POST or None, initial=initial_user_data, instance=db_event_signup, prefix=MAIN_PREFIX)
+    signupitemsform = SignupItemsForm(request.POST or None, event=event, signup=db_event_signup, prefix=ITEMS_PREFIX)
+
+    if signupform.is_valid() and signupitemsform.is_valid():
+        temp_signup = signupform.save(user=request.user, event=event)
+        try:
+            signupitemsform.save(signup=temp_signup)
+        except Exception as e:
+            logger.error("Failed to save signup items!? (%s)", e)
+            temp_signup.delete()
+
+        from_email = settings.NO_REPLY_EMAIL
+        to_emails = [temp_signup.email]
+        title = _("{0}: You are now signed up to {1}").format(
+            SiteConfiguration.instance().association_name,
+            event.title
+        )
+        context = Context({'request': request,
+                           'event': event,
+                           'signup': temp_signup,
+                           'signup_edit_url':
+                               request.build_absolute_uri(reverse("events_view_event_edit_signup_by_code",
+                                                                  kwargs={'event_id': event.id,
+                                                                          'auth_code': temp_signup.auth_code})),
+                           'signup_cancel_url':
+                               request.build_absolute_uri(reverse("events_delete_event_signup_by_code",
+                                                                  kwargs={'auth_code': temp_signup.auth_code}))})
+
+        template = get_template("events/email.html")
+        message = template.render(context)
+        logger.info("Sending event email from %s to %s" % (from_email, to_emails[0]))
+        try:
+            send_mail(
+                title,
+                message,
+                from_email,
+                to_emails)
+            return HttpResponseRedirect(reverse("events_view_event", kwargs={'slug': event.slug}))
+
+        except BadHeaderError:
+            logger.error("BadHeaderError sending email to {0}".format(to_emails))
+            temp_signup.delete()
+            messages.error(request, _("BadHeaderError, newlines in email adress?"))
+            return HttpResponseRedirect(event.get_absolute_url())
+        except:
+            logger.error("Exception {0} sending email to {1}".format(sys.exc_info()[0], to_emails))
+            temp_signup.delete()
+            messages.error(request, _("Error, please try again"))
+            return HttpResponseRedirect(event.get_absolute_url())
+
+        messages.success(request, _("Successfully signed up to event!"))
+
+    signups = EventSignup.objects.filter(event=event)
+
+    return render(request, 'events/event.html', {
+        'event': event, 'signupform': signupform, 'signupitemsform': signupitemsform, 'signups': signups})
+
 
 
 def add_event(request):
