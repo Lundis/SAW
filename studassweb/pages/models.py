@@ -142,7 +142,7 @@ class InfoPage(models.Model):
             else:
                 new = FrontPageItem(title=self.title,
                                     content=self.text,
-                                    identifier=self.slug,
+                                    identifier="pages/" + self.slug,
                                     location=FrontPageItem.HIDDEN
                                     )
                 new.set_target(self)
