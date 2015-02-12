@@ -23,12 +23,12 @@ MEMBER_PASSWORD = "examsmember"
 class ExamsHttpTests(TestCase):
 
     def setUp(self):
-        #Here we should run the whole install process...
-        #TODO we need to be able to run install from code
-        setup_default_groups() # Create default user groups
-        #get_menu_items() #Create default menu items... No we don't want to do this for every single application.fuck.
+        # Here we should run the whole install process...
+        # TODO we need to be able to run install from code
+        setup_default_groups()  # Create default user groups
+        # get_menu_items()  # Create default menu items... No we don't want to do this for every single application.fuck.
 
-        #Setup test members/users
+        # Setup test members/users
         self.superuser = User.objects.create_superuser(SUPERUSER_USERNAME, '', SUPERUSER_PASSWORD)
         self.memberuser = User.objects.create_user(MEMBER_USERNAME, '', MEMBER_PASSWORD)
         user_ext = UserExtension.create_for_user(self.memberuser)

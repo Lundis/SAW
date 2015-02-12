@@ -26,11 +26,11 @@ class MultiInputField(models.CharField):
 class Event(models.Model):
     title = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
-    text = ValidatedRichTextField()
-    start = models.DateTimeField()
-    stop = models.DateTimeField()
+    text = ValidatedRichTextField(verbose_name="Description")
+    start = models.DateTimeField(verbose_name="Event ends")
+    stop = models.DateTimeField(verbose_name="Event starts")
     author = models.ForeignKey(User)
-    signup_deadline = models.DateTimeField()
+    signup_deadline = models.DateTimeField(verbose_name="Deadline for signups")
     permission = models.CharField(max_length=100, blank=True, null=True)  # Permission needed to see and attend
 
     def __str__(self):
@@ -88,10 +88,13 @@ class Event(models.Model):
 class EventSignup(models.Model):
     event = models.ForeignKey(Event)
     user = models.ForeignKey(User, blank=True, null=True)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, verbose_name="Full name")
     email = models.EmailField()
-    created = models.DateTimeField(default=timezone.now, blank=True)
+    created = models.DateTimeField(auto_now_add=True, blank=True)
     auth_code = models.CharField(max_length=32, unique=True)  # Edit and delete for anonymous users
+
+    class Meta:
+        ordering = "created",
 
     def user_can_edit(self, user):
         if self.user == user or permissions.has_user_perm(user, CAN_CREATE_EVENTS):
@@ -102,6 +105,24 @@ class EventSignup(models.Model):
     def __str__(self):
         return "{0}:{1} has registered to {2}".format(self.created, self.user, self.event)
 
+    def build_email_content(self, request):
+        context = Context(
+            {'request': request,
+             'event': self.event,
+             'signup': self,
+             'signup_edit_url':
+                 request.build_absolute_uri(reverse("events_view_event_edit_signup_by_code",
+                                                    kwargs={'event_id': self.event.id,
+                                                            'auth_code': self.auth_code})),
+             'signup_cancel_url':
+                 request.build_absolute_uri(reverse("events_delete_event_signup_by_code",
+                                                    kwargs={'auth_code': self.auth_code}))
+            }
+        )
+
+        template = get_template("events/email.html")
+        return template.render(context)
+
 
 class EventItem(models.Model):
     TYPE_BOOL = 'B'
@@ -110,7 +131,7 @@ class EventItem(models.Model):
     TYPE_INT = 'I'
     TYPE_CHOICE = 'C'
     TYPE_CHOICES = (
-        (TYPE_BOOL, 'Boolean'),
+        (TYPE_BOOL, 'Checkbox'),
         (TYPE_STR, 'String'),
         (TYPE_TEXT, 'Text'),
         (TYPE_INT, 'Integer'),
@@ -118,8 +139,10 @@ class EventItem(models.Model):
     )
 
     name = models.CharField(max_length=100)
-    required = models.BooleanField(default=False)
-    type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=TYPE_INT)
+    required = models.BooleanField(default=False, verbose_name="Is this field mandatory")
+    type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=TYPE_INT,
+                            verbose_name="Data type",
+                            help_text="Decides what kind of data is allowed in this field")
 
     def __str__(self):
         return str(self.name)

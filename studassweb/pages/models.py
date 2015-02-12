@@ -109,7 +109,6 @@ class InfoPage(models.Model):
 
         self.update_frontpage_item()
 
-
     def delete(self, *args, **kwargs):
         MenuItem.delete_all_that_links_to(self)
         super(InfoPage, self).delete(*args, **kwargs)

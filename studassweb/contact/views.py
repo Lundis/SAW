@@ -100,6 +100,7 @@ def delete_message(request, message_id):
         logger.warning('Attempted to access delete_message via GET')
         return HttpResponseNotAllowed(['POST', ])
 
+
 @has_permission(CAN_EDIT_CONTACT_SETTINGS)
 def edit_contact(request, contact_id=None):
     try:

@@ -6,6 +6,7 @@ CAN_VIEW_EXAM_ARCHIVE = "can_view_exam_archive"
 CAN_UPLOAD_EXAMS = "can_upload_exams"
 CAN_EDIT_EXAMS = "can_edit_exams"
 
+
 def get_menu_items():
     """
     :return: a tuple ([main menu items], [settings menu items], [others])

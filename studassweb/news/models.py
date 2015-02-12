@@ -48,7 +48,6 @@ class Article(models.Model):
             else:
                 return self.text
 
-
     def comments(self):
         """
         :return: A QuerySet of the comments for this object

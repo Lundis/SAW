@@ -14,8 +14,8 @@ if len(sys.argv) < 3:
     sys.exit()
 
 print("Opening input file")
-with open (sys.argv[1], "r") as myfile:
-    data=myfile.read()
+with open(sys.argv[1], "r") as myfile:
+    data = myfile.read()
 
 #Sanity checking input
 #Each requiements card should have the same amount of delimiters
@@ -75,67 +75,66 @@ for card in cards:
     if card.split("Requirement Description")[0].strip() != "":
         card_id = card.split("Requirement Description")[0].strip()
         
-        matchObj = re.search( r'Requirement Description\s*((.|\n)*)\nRequirement Priority', card)
+        matchObj = re.search(r'Requirement Description\s*((.|\n)*)\nRequirement Priority', card)
         if matchObj:
             card_description = matchObj.group(1).strip()
         else:
             print("Error close to card " + card_id + " (card_depends_on)")
             sys.exit()
             
-        matchObj = re.search( r'Requirement Priority\s*\n([0-9]*)\s*\nRequirement Dependencies', card)
+        matchObj = re.search(r'Requirement Priority\s*\n([0-9]*)\s*\nRequirement Dependencies', card)
         if matchObj:
             card_priority = int(matchObj.group(1).strip())
         else:
             print("Error close to card " + card_id + " (card_priority)")
             sys.exit()
         
-        matchObj = re.search( r'depends on\s*((.|\n)*)\nspecializes', card)
+        matchObj = re.search(r'depends on\s*((.|\n)*)\nspecializes', card)
         if matchObj:
-            card_depends_on = re.split('\s*|\n*',matchObj.group(1).strip())
-            card_depends_on = filter(None, card_depends_on)#removes empty strings
+            card_depends_on = re.split('\s*|\n*', matchObj.group(1).strip())
+            card_depends_on = filter(None, card_depends_on)  # removes empty strings
         else:
             print("Error close to card " + card_id + " (card_depends_on)")
             sys.exit()
             
-        matchObj = re.search( r'specializes\s*((.|\n)*)\nspecialized by', card)
+        matchObj = re.search(r'specializes\s*((.|\n)*)\nspecialized by', card)
         if matchObj:
-            card_specializes = re.split('\s*|\n*',matchObj.group(1).strip())
+            card_specializes = re.split('\s*|\n*', matchObj.group(1).strip())
             card_specializes = filter(None, card_specializes)
         else:
             print("Error close to card " + card_id + " (card_specializes)")
             sys.exit()
             
-        matchObj = re.search( r'specialized by\s*((.|\n)*)\nInput', card)
+        matchObj = re.search(r'specialized by\s*((.|\n)*)\nInput', card)
         if matchObj:
-            card_specialized_by = re.split('\s*|\n*',matchObj.group(1).strip())
+            card_specialized_by = re.split('\s*|\n*', matchObj.group(1).strip())
             card_specialized_by = filter(None, card_specialized_by)
         else:
             print("Error close to card " + card_id + " (card_specialized_by)")
             sys.exit()
             
-        matchObj = re.search( r'Input\s*((.|\n)*)\nOutput', card)
+        matchObj = re.search(r'Input\s*((.|\n)*)\nOutput', card)
         if matchObj:
             card_input = matchObj.group(1).strip()
         else:
             print("Error close to card " + card_id + " (card_input)")
             sys.exit()
 
-        matchObj = re.search( r'Output\s*((.|\n)*)\nActors using the requirement', card)
+        matchObj = re.search(r'Output\s*((.|\n)*)\nActors using the requirement', card)
         if matchObj:
             card_output = matchObj.group(1).strip()
         else:
             print("Error close to card " + card_id + " (card_output)")
             sys.exit()
             
-        matchObj = re.search( r'Actors using the requirement\s*\n(.*)', card)
+        matchObj = re.search(r'Actors using the requirement\s*\n(.*)', card)
         if matchObj:
             card_actors = matchObj.group(1).strip()
         else:
             print("Error close to card " + card_id + " (card_actors)")
             sys.exit()
-        
-        
-        #debugging purposes
+
+        # debugging purposes
         """
         print("card_id: " + card_id
         print("card_priority: " + str(card_priority)
@@ -186,17 +185,19 @@ for card in cards:
         else:
             node_color = "color = black,"
 
-        node_tooltip = "tooltip=\""+card_description.replace('\n', '').replace('\r', '').replace('"','')+"\","
+        node_tooltip = "tooltip=\""+card_description.replace('\n', '').replace('\r', '').replace('"', '')+"\","
         
         #Start adding to "nodes" variable 
-        nodes += "\"" + card_id + "\"" + "[style=filled, " + node_color + node_tooltip +"];\n"
+        nodes += "\"" + card_id + "\"" + "[style=filled, " + node_color + node_tooltip + "];\n"
         
         #Start adding to "edges" variable
         for perjantai in card_depends_on:
-            edges += "\"" + card_id + "\" -> \"" + perjantai + "\" [color=blue,tooltip=\"" + card_id + " depends on " + perjantai + "\"];\n"
+            edges += "\"" + card_id + "\" -> \"" + perjantai + \
+                     "\" [color=blue,tooltip=\"" + card_id + " depends on " + perjantai + "\"];\n"
             
         for perjantai in card_specializes:
-            edges += "\"" + card_id + "\" -> \"" + perjantai + "\" [color=green,tooltip=\"" + card_id + " specializes " + perjantai + "\"];\n"
+            edges += "\"" + card_id + "\" -> \"" + perjantai + \
+                     "\" [color=green,tooltip=\"" + card_id + " specializes " + perjantai + "\"];\n"
         
         #Actually, we don't want an arrow back.        
         #for perjantai in card_specialized_by:

@@ -44,6 +44,15 @@ class EventForm(forms.ModelForm):
         model = Event
         fields = ('title', 'text', 'signup_deadline', 'start', 'stop')
 
+    def save(self, commit=True, user=None):
+        if user is None:
+            raise ValueError("Argument 'user' is missing")
+        event = super(EventForm, self).save(commit=False)
+        event.author = user
+        if commit:
+            event.save()
+        return event
+
 
 class EventItemsForm(forms.Form):
 
