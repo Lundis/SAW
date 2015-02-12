@@ -15,13 +15,9 @@
 {% block main_content %}
     <div class="panel panel-primary">
         <div class="panel-heading">
-            <div class="row inherit-padding-left-right">
-                <div class="pull-left inherit-padding-left-right">
-                    <h1 class="h3">
-                        {{ event }}
-                    </h1>
-                </div>
-            </div>
+            <h1 class="h3">
+                {{ event }}
+            </h1>
         </div>
         <div class="panel-body">
             {{ event.text|safe }}
