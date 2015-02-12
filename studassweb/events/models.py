@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from datetime import datetime
+import django.utils.timezone as timezone
 from .register import CAN_CREATE_EVENTS
 from users import permissions
 from django.template.defaultfilters import slugify
@@ -63,7 +63,7 @@ class EventSignup(models.Model):
     user = models.ForeignKey(User, blank=True, null=True)
     name = models.CharField(max_length=100)
     email = models.EmailField()
-    created = models.DateTimeField(default=datetime.now, blank=True)
+    created = models.DateTimeField(default=timezone.now, blank=True)
     auth_code = models.CharField(max_length=32, unique=True)  # Edit and delete for anonymous users
 
     def user_can_edit(self, user):
