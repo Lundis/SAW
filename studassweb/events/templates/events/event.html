@@ -40,31 +40,27 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <div class="row inherit-padding-left-right">
-                <div class="pull-left inherit-padding-left-right">
-                    <h4 class="h3">
-                        {% if signupform.instance.pk %}
-                            {% trans "Edit your registration" %}
-                        {% else %}
-                            {% trans "Sign up" %}
-                        {% endif %}
-                    </h4>
-                </div>
+            <div class="panel-title">
+                {% if signupform.instance.pk %}
+                    {% trans "Edit your registration" %}
+                {% else %}
+                    {% trans "Sign up" %}
+                {% endif %}
             </div>
         </div>
         <div class="panel-body">
-            {% if signupform %}
-                <form action="" method="post">
-                    {% csrf_token %}
-                    {% bootstrap_form signupform %}
-                    {% bootstrap_form signupitemsform %}
-                    {% buttons %}
-                        <button type="submit" class="btn btn-primary">
-                            {% trans "Submit" %}
-                        </button>
-                    {% endbuttons %}
-                </form>
-            {% endif %}
+                {% if signupform %}
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        {% bootstrap_form signupform %}
+                        {% bootstrap_form signupitemsform %}
+                        {% buttons %}
+                            <button type="submit" class="btn btn-primary">
+                                {% trans "Submit" %}
+                            </button>
+                        {% endbuttons %}
+                    </form>
+                {% endif %}
         </div>
 
         <div class="panel-footer">
@@ -75,12 +71,8 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <div class="row inherit-padding-left-right">
-                <div class="pull-left inherit-padding-left-right">
-                    <h4 class="h3">
-                        {% trans "Signed up" %}
-                    </h4>
-                </div>
+            <div class="panel-title">
+                {% trans "Attending" %}
             </div>
         </div>
         <div class="table-responsive">
