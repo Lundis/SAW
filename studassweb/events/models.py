@@ -116,8 +116,7 @@ class EventSignup(models.Model):
                                                             'auth_code': self.auth_code})),
              'signup_cancel_url':
                  request.build_absolute_uri(reverse("events_delete_event_signup_by_code",
-                                                    kwargs={'auth_code': self.auth_code}))
-            }
+                                                    kwargs={'auth_code': self.auth_code}))}
         )
 
         template = get_template("events/email.html")

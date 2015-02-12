@@ -34,6 +34,7 @@ def create_album(request, album_id=None):
     context = {'form': form}
     return render(request, 'gallery/create_album.html', context)
 
+
 def view_album(request, album_id):
     try:
         album = Album.objects.get(id=album_id)
@@ -41,6 +42,7 @@ def view_album(request, album_id):
             'album': album},)
     except Album.DoesNotExist:
         return HttpResponseNotFound('No album with that id found')
+
 
 def edit_album(request, album_id):
     try:

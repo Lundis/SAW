@@ -38,10 +38,7 @@ def view_poll(request, poll_id):
         else:
             form = None
 
-
-
-
-        context = {'form': form,'poll': poll,'choices':choices}
+        context = {'form': form, 'poll': poll, 'choices': choices}
         return render(request, 'polls/view_poll.html', context)
     except Poll.DoesNotExist:
         return HttpResponseNotFound('No poll with that id found')
@@ -72,7 +69,7 @@ def add_poll(request):
 
             return HttpResponseRedirect(reverse("polls_view_poll", args=[tmppoll.id]))
 
-    context = {'form': form, 'choicesformset':choiceformset}
+    context = {'form': form, 'choicesformset': choiceformset}
     return render(request, 'polls/add_edit_poll.html', context)
 
 

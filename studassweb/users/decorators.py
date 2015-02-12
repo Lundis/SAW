@@ -2,6 +2,7 @@ from .permissions import has_user_perm
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 
+
 # http://stackoverflow.com/questions/9030255/django-add-optional-arguments-to-decorator
 def has_permission(permission):
     """

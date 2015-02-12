@@ -38,14 +38,14 @@ class ExamsHttpTests(TestCase):
         self.factory = RequestFactory()
 
     def test_anonymous_can_not_add_course(self):
-        request = self.factory.post(reverse("exams_add_course"), {'name': 'Datornätverk',})
+        request = self.factory.post(reverse("exams_add_course"), {'name': 'Datornätverk', })
         request.user = AnonymousUser()
         response = add_edit_exam(request)
         self.assertEqual(response.status_code, 403)
 
     @skip("We need to be able to run install process before this\n")
     def test_member_can_add_course(self):
-        request = self.factory.post(reverse("exams_add_course"), {'name': 'Datornätverk',})
+        request = self.factory.post(reverse("exams_add_course"), {'name': 'Datornätverk', })
         request.user = User.objects.get_by_natural_key(MEMBER_USERNAME)
         response = add_edit_exam(request)
         #print(response.content)

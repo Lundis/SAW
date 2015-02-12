@@ -51,7 +51,6 @@ if tmpcnt != data.count("Actors using the requirement"):
 print("Input seems sane")
 
 #Set up header
-output = ""
 nodes = ""
 edges = ""
 

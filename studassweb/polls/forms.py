@@ -44,7 +44,7 @@ class ChoiceFormSingle(forms.Form):
         self.fields["choices"] = forms.ChoiceField(choices=choices,
                                                    widget=forms.RadioSelect)
 
-    def save(self, request, commit=True):   #TODO CHANGE USER TO CURRENT TO SEE WHO HAS MADE CHOICE
+    def save(self, request, commit=True):  # TODO CHANGE USER TO CURRENT TO SEE WHO HAS MADE CHOICE
         if self.is_valid():
             choice_id = self.cleaned_data['choices']
             choice = Choice.objects.get(id=int(choice_id))

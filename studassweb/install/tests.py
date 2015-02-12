@@ -27,13 +27,11 @@ class InstallHttpTests(TestCase):
         response = welcome(request)
         self.assertEqual(response.status_code, 200)
 
-
         #GET Association page
         request = self.factory.get(reverse("install.views.association"))
         request.user = self.superuser
         response = association(request)
         self.assertEqual(response.status_code, 200)
-
 
         #POST Association page
         request = self.factory.post(reverse("install.views.association"),
