@@ -99,6 +99,9 @@ class Event(models.Model):
     def get_items(self):
         return ItemInEvent.objects.filter(event=self).order_by('item__id')
 
+    def count_participants(self):
+        return EventSignup.objects.filter(event=self).count()
+
 
 # Each user which signs up creates one of these
 # We need both user and name as we need to allow non-signed in users to sign up
@@ -109,6 +112,7 @@ class EventSignup(models.Model):
     email = models.EmailField()
     created = models.DateTimeField(auto_now_add=True, blank=True)
     auth_code = models.CharField(max_length=32, unique=True)  # Edit and delete for anonymous users
+    order_id = models.IntegerField(validators=MinValueValidator(1), default=1)
 
     class Meta:
         ordering = "created",
@@ -122,10 +126,14 @@ class EventSignup(models.Model):
     def __str__(self):
         return "{0}:{1} has registered to {2}".format(self.created, self.user, self.event)
 
+    def save(self, *args, **kwargs):
+        super(EventSignup, self).save(*args, **kwargs)
+        self.fix_indices()
+
     def delete(self, using=None):
         super(EventSignup, self).delete(using)
         # Notify a user on the reserve list that they're in by email
-        # Can't allow delete() to throw an exception
+        # Can't allow delete() to throw an exception related to the email
         try:
             signups = EventSignup.objects.filter(event=self.event)
             if self.event.max_participants >= signups.count():
@@ -134,6 +142,9 @@ class EventSignup(models.Model):
                 reserve_signup.send_reserve_email()
         except Exception as e:
             logger.error("Sending reserve email failed (%s)", e)
+
+        # update indices
+        self.fix_indices()
 
     def send_reserve_email(self):
         context = Context({'event': self.event})
@@ -167,6 +178,13 @@ class EventSignup(models.Model):
             if item.pk == self.pk:
                 return index >= self.event.max_participants
         logger.error("is_reserve couldn't find itself in the list")
+
+    def fix_indices(self):
+        signups = EventSignup.objects.filter(event=self.event)
+        for index, item in enumerate(signups):
+            if item.order_id != index + 1:
+                item.order_id = index + 1
+                item.save()
 
     def get_items(self):
         return ItemInSignup.objects.filter(signup=self).order_by('item__id')

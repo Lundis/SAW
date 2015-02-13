@@ -81,7 +81,10 @@
             <table class="table table-striped">
                 <tbody>
                 <tr>
-                    <th>{% trans "Signed up" %}</th>
+                    <th>#</th>
+                    {% if can_view_signup_info %}
+                        <th class="print-hide">{% trans "Signed up" %}</th>
+                    {% endif %}
                     <th>{% trans "Name" %}</th>
                     {% if can_view_signup_info %}
                         <th>{% trans "Email" %}</th>
@@ -98,7 +101,10 @@
                 </tr>
                 {% for signup in signups %}
                     <tr {% if signup.is_reserve %} class="text-muted" {% endif %}>
-                        <td>{{ signup.created|date:"Y-m-d H:i" }}</td>
+                        <td>{{ signup.order_id }}</td>
+                        {% if can_view_signup_info %}
+                            <td class="print-hide">{{ signup.created|date:"Y-m-d H:i" }}</td>
+                        {% endif %}
                         <td>{{ signup.name }}</td>
                         {% if can_view_signup_info %}
                             <td>{{ signup.email }}</td>
