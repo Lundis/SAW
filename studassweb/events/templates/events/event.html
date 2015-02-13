@@ -90,9 +90,9 @@
                         <th>{% trans "Name" %}</th>
                         {% if can_view_signup_info %}
                             <th>{% trans "Email" %}</th>
-                            <th>{% trans "User account" %}</th>
+                            <th class="print-hide">{% trans "User account" %}</th>
                         {% endif %}
-                        <th>{% trans "Action" %}</th>
+                        <th class="print-hide">{% trans "Action" %}</th>
                     </tr>
                     {% for signup in signups %}
                         <tr>
@@ -100,9 +100,9 @@
                             <td>{{ signup.name }}</td>
                             {% if can_view_signup_info %}
                                 <td>{{ signup.email }}</td>
-                                <td>{{ signup.user }}</td>
+                                <td class="print-hide">{{ signup.user }}</td>
                             {% endif %}
-                            <td>
+                            <td class="print-hide">
                                 {% user_can_edit signup user as can_edit_signup %}
                                 {% if can_edit_signup%}
                                     <a href="{% url 'events_view_event_edit_signup_by_id' event_id=event.id signup_id=signup.id %}">
@@ -131,6 +131,11 @@
             </div>
         </div>
         <div class="panel-footer">
+            {% if can_view_signup_info %}
+                <div id="print-toggle-button" class="btn btn-primary">
+                    {% trans "Print mode" %}
+                </div>
+            {% endif %}
         </div>
     </div>
 
@@ -147,4 +152,13 @@
             </a>
         </div>
     </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $("#print-toggle-button").click(function(event) {
+            $("#print-toggle-button").toggleClass("active");
+            $(".print-hide").toggleClass("hidden");
+        });
+    </script>
 {% endblock %}
