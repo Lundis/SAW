@@ -86,10 +86,12 @@
                     {% if can_view_signup_info %}
                         <th>{% trans "Email" %}</th>
                         <th class="print-hide">{% trans "User account" %}</th>
-                        {% for event_item in event.get_items %}
-                            <th>{{ event_item.item.name }}</th>
-                        {% endfor %}
                     {% endif %}
+                    {% for event_item in event.get_items %}
+                        {% if can_view_signup_info or event_item.public %}
+                            <th>{{ event_item.item.name }}</th>
+                        {% endif %}
+                    {% endfor %}
                     {% if request.user.is_authenticated %}
                         <th class="print-hide">{% trans "Action" %}</th>
                     {% endif %}
@@ -103,7 +105,9 @@
                             <td class="print-hide">{{ signup.user }}</td>
                         {% endif %}
                         {% for event_item in signup.get_items_relevant %}
-                            <td>{{ event_item.value }}</td>
+                            {% if can_view_signup_info or event_item.public %}
+                                <td>{{ event_item.value }}</td>
+                            {% endif %}
                         {% endfor %}
                         {% if request.user.is_authenticated %}
                             <td class="print-hide">
