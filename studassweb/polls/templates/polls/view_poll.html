@@ -31,8 +31,14 @@
             </form>
         {% else %}
             {% for c in choices %}
-                <td>{{ c.name }}</td>
-                {{ c.count_votes }}
+                <div class="row">
+                    <div class="col-xs-8">
+                        {{ c.name }}
+                    </div>
+                    <div class="col-xs-4">
+                        {{ c.count_votes }}
+                    </div>
+                </div>
             {% endfor %}
         {% endif %}
 

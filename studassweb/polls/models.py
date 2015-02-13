@@ -51,6 +51,10 @@ class Poll(models.Model):
         else:
             return not Votes.objects.filter(choice_id__id_to_poll=self, ip_address=request.META['REMOTE_ADDR']).exists()
 
+    def has_user_voted(self, request):
+        return not self.can_user_vote(request) #TODO STUFF ENNU NOGO
+
+
 
 class Choice(models.Model):
     name = models.CharField(max_length=200)
