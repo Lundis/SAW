@@ -36,11 +36,11 @@
             {% for album in gallery %}
                 <p><a href="/gallery/album/{{ album.id }}"></a></p>
             {% empty %}
-                <form action="{% url 'gallery.views.edit_album' album.id %}" method="post">
+                <form action="{% url 'gallery.views.delete_album' album.id %}" method="post">
                     {% csrf_token %}
                     {% buttons %}
                         <button type="submit" class="btn btn-danger">
-                            {% trans "edit album" %}
+                            {% trans "delete album" %}
                         </button>
                     {% endbuttons %}
                 </form>
@@ -52,25 +52,27 @@
 {% block sidebar %}
    <div class="panel panel-primary">
         <div class="panel-heading">
-            <h2 class="panel-title">{% trans "Add" %}</h2>
-        </div>
-        <div class="panel-body">
-            <div class="btn-group-vertical btn-block">
-                    <a href="{% url 'gallery_create_album' %}" class="btn btn-primary">
-                        {% trans "Add Album" %}
-                    </a>
-                </div>
-        </div>
-        <div class="panel-heading">
             <h2 class="panel-title">{% trans "Edit" %}</h2>
         </div>
         <div class="panel-body">
             <div class="btn-group-vertical btn-block">
                 <a href="{% url 'gallery_edit_album' album.id %}" class="btn btn-primary">
-                    {% trans "Edit THIS album" %}
+                    {% trans "Edit this album" %}
                 </a>
+            </div>
+        </div>
+        <div class="panel-heading">
+            <h2 class="panel-title">{% trans "Remove" %}</h2>
+        </div>
+        <div class="panel-body">
+            <div class="btn-group-vertical danger btn-block">
+                <form action="{% url 'gallery.views.delete_album' album.id %}" method="post">
+                {% csrf_token %}
+                        <button type="submit" class="btn-group-vertical btn-danger">s
+                            {% trans "delete album" %}
+                        </button>
+                </form>
             </div>
         </div>
    </div>
 {% endblock %}
-﻿
