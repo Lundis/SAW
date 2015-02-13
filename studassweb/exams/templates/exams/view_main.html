@@ -52,6 +52,19 @@
                     </a>
                 </div>
             </div>
+            <div class= "panel-heading">
+                <h2 class="panel-title" data-toggle="collapse" data-target="#helptext">
+                    {% trans "Help" %}
+                    <span class="glyphicon caret pull-right"></span>
+                </h2>
+            </div>
+            <div id="helptext" class="panel-collapse collapse helptext-collapse">
+                <div class="panel-body">
+                        <p>{% trans "This is the exam archive.You can create courses and upload individual exams for each course." %}</p>
+                        <p>{% trans "You can view exams by course and / or examinator." %}</p>
+                        <p>{% trans "Please begin by creating a course. Each exam must be connected to a course ." %}</p>
+                </div>
+            </div>
         </div>
     {% endif %}
 {% endblock %}
