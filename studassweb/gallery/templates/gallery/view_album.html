@@ -32,7 +32,6 @@
                     </form>
                 {% endfor %}
             </div>
-
             {% for album in gallery %}
                 <p><a href="/gallery/album/{{ album.id }}"></a></p>
             {% empty %}
@@ -68,7 +67,7 @@
             <div class="btn-group-vertical danger btn-block">
                 <form action="{% url 'gallery.views.delete_album' album.id %}" method="post">
                 {% csrf_token %}
-                        <button type="submit" class="btn-group-vertical btn-danger">s
+                        <button type="submit" class="btn-group-vertical btn-danger">
                             {% trans "delete album" %}
                         </button>
                 </form>

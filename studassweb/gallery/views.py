@@ -51,8 +51,10 @@ def edit_album(request, album_id):
         return HttpResponseNotFound('error')
     form = AlbumForm(instance=album)
     if request.method == 'POST':
+        form = AlbumForm(request.POST, instance=album)
         if form.is_valid():
-            tmp = form.save()
+            tmp = form.save(commit=False)
+            tmp.save()
             return HttpResponseRedirect(reverse('gallery_view_album', kwargs={'album_id': tmp.id}))
     context = {'album': album, 'form': form}
     return render(request, 'gallery/edit_album.html', context)
