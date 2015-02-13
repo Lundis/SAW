@@ -227,6 +227,10 @@ class EventItem(models.Model):
 class ItemInEvent(models.Model):
     event = models.ForeignKey(Event)
     item = models.ForeignKey(EventItem)
+    public = models.BooleanField(default=False,
+                                 verbose_name="Is this field shown to everyone?",)
+    hide_in_print_view = models.BooleanField(default=False,
+                                             verbose_name="Is this field hidden from the print view?",)
 
     def __str__(self):
         return str("{0} is enabled in {1}".format(self.item.name, self.event.title))

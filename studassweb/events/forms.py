@@ -78,7 +78,10 @@ class EventForm(forms.ModelForm):
 
 
 class EventItemsForm(forms.Form):
-
+    """
+    A form for creating/editing event items
+    TODO: create fields for public and hidden_in_print_view
+    """
     def __init__(self, *args, **kwargs):
         event = kwargs.pop("event", None)
         selected_eitems = []
@@ -111,7 +114,9 @@ class EventItemsForm(forms.Form):
 
 
 class SignupItemsForm(forms.Form):
-
+    """
+    A form for selecting items in a signup form
+    """
     def __init__(self, *args, **kwargs):
         event = kwargs.pop("event")
         signup = kwargs.pop("signup", None)
