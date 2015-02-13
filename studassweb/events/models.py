@@ -207,8 +207,8 @@ class EventItem(models.Model):
     TYPE_CHOICE = 'C'
     TYPE_CHOICES = (
         (TYPE_BOOL, 'Checkbox'),
-        (TYPE_STR, 'String'),
-        (TYPE_TEXT, 'Text'),
+        (TYPE_STR, 'Text (one line)'),
+        (TYPE_TEXT, 'Text (multiple lines)'),
         (TYPE_INT, 'Integer'),
         (TYPE_CHOICE, 'Choice'),
     )
@@ -217,7 +217,12 @@ class EventItem(models.Model):
     required = models.BooleanField(default=False, verbose_name="Is this field mandatory")
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=TYPE_INT,
                             verbose_name="Data type",
-                            help_text="Decides what kind of data is allowed in this field")
+                            help_text="Decides what kind of data is allowed in this field. The options are:<br />" +
+                                      "Checkbox: A simple checkbox (yes/no)<br />" +
+                                      "Text (one line): A text field with one line <br />" +
+                                      "Text (multiple lines): A larger resizeable text field that allows multiple lines<br />" +
+                                      "Integer: A number<br />" +
+                                      "Choice: A multiple-choices field. syntax for name: question//alternative1//alternative2//alternative3")
 
     def __str__(self):
         return str(self.name)
@@ -244,5 +249,3 @@ class ItemInSignup(models.Model):
 
     def __str__(self):
         return str("{0} signed up with {1}: {2}".format(self.signup.name, self.item.name, self.value))
-
-
