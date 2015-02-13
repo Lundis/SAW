@@ -38,3 +38,18 @@
     </form>
 
 {% endblock %}
+
+{% block helppanel %}
+    <div class= "panel-heading">
+        <h2 class="panel-title" data-toggle="collapse" data-target="#helptext">
+            {% trans "Help" %}
+            <span class="glyphicon caret pull-right"></span>
+        </h2>
+    </div>
+    <div id="helptext" class="panel-collapse collapse helptext-collapse">
+        <div class="panel-body">
+            <p>{% trans "This is where you create custom event items for later use." %}</p>
+            <p>{% trans "Don't worry, you can edit event items later." %}</p>
+        </div>
+    </div>
+{% endblock %}
