@@ -11,7 +11,7 @@ from menu.forms import MenuForm
 from menu.setup import setup_menu_module
 from .models import InstallProgress
 from users.decorators import has_permission
-from users.groups import setup_default_groups
+from users.groups import setup_default_groups, put_user_in_standard_group, WEBMASTER
 from .register import CAN_INSTALL
 import logging
 
@@ -28,6 +28,9 @@ def welcome(request):
             login_form.login_user(request)
         else:
             context['form'] = login_form
+    else:
+        if request.user.is_superuser:
+            put_user_in_standard_group(request.user, WEBMASTER)
 
     return render(request, 'install/welcome.html', context)
 

@@ -5,6 +5,7 @@ from users.groups import GUEST, BOARD_MEMBER
 CAN_VIEW_FRONTPAGE = "can_view_frontpage"
 CAN_EDIT_FRONTPAGE = "can_edit_frontpage"
 
+
 def get_menu_items():
     """
     :return: a tuple ([main menu items], [settings menu items], [others])
@@ -22,7 +23,7 @@ def get_urls():
     """
     :returns: A tuple of regexes describing what URLs the top-level URL dispatcher should associate with this module
     """
-    return r"^$",
+    return r"^frontpage/",
 
 
 def get_permissions():

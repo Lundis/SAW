@@ -16,6 +16,7 @@ PERMISSION_CHOICES = (
 
 )
 
+
 class Poll(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(max_length=300)
@@ -25,12 +26,12 @@ class Poll(models.Model):
     can_vote_on_many = models.BooleanField(default=False)
 
     permission = models.CharField(max_length=30, choices=PERMISSION_CHOICES, default="CAN_VIEW_PUBLIC_POLLS")
+
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
         return reverse("polls_view_poll", kwargs={'poll_id': self.id})
-
 
     def can_view(self, user):
         return has_user_perm(user, self.get_permission_str())
@@ -43,6 +44,13 @@ class Poll(models.Model):
     def get_permission_str(self):
         return dict(PERMISSION_CHOICES)[self.permission]
 
+    def can_user_vote(self, request):
+        if request.user.is_authenticated():
+            object = Votes.objects.filter(choice_id__id_to_poll=self, user=request.user)
+            return not object.exists()
+        else:
+            return not Votes.objects.filter(choice_id__id_to_poll=self, ip_address=request.META['REMOTE_ADDR']).exists()
+
 
 class Choice(models.Model):
     name = models.CharField(max_length=200)
@@ -53,6 +61,7 @@ class Choice(models.Model):
 
     def get_absolute_url(self):
         return reverse("polls.views.set_user_choice", kwargs={'choice_id': self.id})
+
     def count_votes(self):
         return Votes.objects.filter(choice_id=self.id).count()
 
@@ -60,4 +69,5 @@ class Choice(models.Model):
 class Votes(models.Model):
     choice_id = models.ForeignKey(Choice)
     user = models.ForeignKey(User)
+    ip_address = models.IPAddressField(default=None)
 

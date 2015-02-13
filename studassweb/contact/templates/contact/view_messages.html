@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load bootstrap3 %}
+{% load static %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -14,19 +15,35 @@
     <h1>{% trans "View messages" %}</h1>
     <div>
         {% for message in msgs %}
-            <div class="panel panel-primary">
+            <div {% if message.handled %}
+                class="panel panel-default"
+            {% else %}
+                class="panel panel-primary"
+            {% endif %} >
                 <div class="panel-heading">
                     <div class="row inherit-padding-left-right">
                         <div class="pull-left inherit-padding-left-right">
                             <h4>
                                 {{ message.title }}
                             </h4>
+
                         </div>
+                        <div class="pull-right inherit-padding-left-right">
+                            {% if message.handled %}
+                                <span class="glyphicon glyphicon-ok"></span>
+                            {% else %}
+                                <span class="glyphicon glyphicon-remove"></span>
+                            {% endif %}
+                        </div>
+
                     </div>
                 </div>
                 <div class="panel-body">
                     {{ message.message}}
-                    <form action="{% url 'contact_delete_message' message.id %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
+                </div>
+                <div class="panel-body">
+                    <form action="{% url 'contact_delete_message' message.id %}" method="post"
+                          onclick="return confirm('{% trans "Are you sure?" %}')">
                         {% csrf_token %}
                         {% buttons %}
                             <button type="submit" class="pull-right btn btn-danger">
@@ -34,6 +51,18 @@
                             </button>
                         {% endbuttons %}
                     </form>
+                    {% if not message.handled %}
+                        <form id="mark_as_handled_form_{{ message.id }}"
+                              class="mark_as_handled_form"
+                              action="{% url 'contact_mark_message_as_handled' %}" method="post">
+                            {% csrf_token %}
+                            {% buttons %}
+                                <button type="submit" class="pull-right btn btn-primary">
+                                    {% trans "Mark as handled" %}
+                                </button>
+                            {% endbuttons %}
+                        </form>
+                    {% endif %}
                 </div>
                 <div class="panel-footer">
                     <div class="row inherit-padding-left-right">
@@ -51,4 +80,25 @@
             <p>{% trans "No messages found!" %}</p>
         {% endfor %}
     </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{% static 'django_ajax/js/jquery.ajax.min.js' %}"></script>
+    <script>
+        $(".mark_as_handled_form").submit(function(event) {
+            event.preventDefault()
+            var form_id = event.target.getAttribute("id");
+            var split_id = form_id.split("_");
+            var message_id = split_id[split_id.length - 1];
+            ajaxPost('{% url "contact_mark_message_as_handled" %}',
+                    {'message_id': message_id},
+                    function(event) {
+                        $("#" + form_id).remove();
+
+                    }
+            );
+        });
+
+
+    </script>
 {% endblock %}

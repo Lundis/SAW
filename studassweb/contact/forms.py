@@ -1,4 +1,7 @@
 from django import forms
+from django.core.validators import ValidationError
+from django.utils.translation import ugettext as _
+from captcha.fields import ReCaptchaField
 from .models import Message, ContactInfo
 import logging
 
@@ -13,10 +16,12 @@ class MessageForm(forms.ModelForm):
         else:
             user = None
         super(MessageForm, self).__init__(*args, **kwargs)
-        if user is not None:
+        if user is not None and user.is_authenticated():
             logger.debug("MessageForm user: \"%s\"" % user)
             logger.debug("MessageForm user email: \"%s\"" % user.email)
             self.fields["from_email"].initial = user.email
+        else:
+            self.fields['captcha'] = ReCaptchaField()
 
     class Meta:
         model = Message
@@ -41,3 +46,21 @@ class ContactSettingsForm(forms.ModelForm):
     class Meta:
         model = ContactInfo
         fields = ('name', 'info_text', 'save_to_db', 'send_email', 'email', "ordering_index")
+
+
+class MarkAsHandledForm(forms.Form):
+    message_id = forms.IntegerField(widget=forms.HiddenInput())
+
+    def clean_message_id(self):
+        try:
+            Message.objects.get(id=self.cleaned_data['message_id'])
+            return self.cleaned_data['message_id']
+        except Message.DoesNotExist:
+            raise ValidationError(_("The specified message does not exist"))
+
+    def save(self):
+        if self.is_valid():
+            logger.debug(self.cleaned_data['message_id'])
+            msg = Message.objects.get(id=self.cleaned_data['message_id'])
+            msg.handled = True
+            msg.save()

@@ -3,6 +3,7 @@ from ..models import InstallProgress
 
 register = Library()
 
+
 @register.inclusion_tag('install/progress_bar.html', takes_context=True)
 def display_progress_bar(context, active_tab):
     """

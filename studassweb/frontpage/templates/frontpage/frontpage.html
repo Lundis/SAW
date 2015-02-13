@@ -1,5 +1,7 @@
 {% extends "base/base.html" %}
 {% load i18n %}
+{% load sawp %}
+{% load frontpage_items %}
 
 {% block title %}
     StudAssWeb Frontpage!
@@ -10,7 +12,74 @@
     {% display_menu "main_menu" "Home" %}
 {% endblock %}
 
+{% block breadcrumb %}
+{% endblock %}
+
 {% block main_content %}
     <h1>{% trans "Welcome!" %}</h1>
     <p>{% trans "This site is under heavy development. Don't worry if it's hard to understand right now, it will get better!" %}</p>
+    {% for item in main_items %}
+        {% display_frontpage_item item edit_mode "main" %}
+    {% endfor %}
+
+    {% if edit_mode %}
+        <h1>{% trans "Hidden items" %}</h1>
+        {% for item in hidden_items %}
+            {% display_frontpage_item item edit_mode "hidden" %}
+        {% endfor %}
+    {% endif %}
+{% endblock %}
+
+{% block sidebar %}
+    {% for item in side_items %}
+        {% display_frontpage_item item edit_mode "side" %}
+    {% endfor %}
+    {% has_perm "frontpage" "CAN_EDIT_FRONTPAGE" as show_edit_buttons %}
+    {% if show_edit_buttons %}
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <div class="panel-title">
+                    {% trans "Actions" %}
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="btn-group-vertical btn-block">
+                    {% if edit_mode %}
+                        <a class="btn btn-primary"
+                           href="{% url "frontpage_home" %}">
+                            {% trans "Back to frontpage" %}
+                        </a>
+                    {% else %}
+                        <a class="btn btn-primary"
+                           href="{% url "frontpage_edit" %}">
+                            {% trans "Enter edit mode" %}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    {% if edit_mode %}
+        <script>
+            $(".event_item").submit(function(event) {
+                // TODO: this is just copy-pasted from another file
+                event.preventDefault()
+                var form_id = event.target.getAttribute("id");
+                var split_id = form_id.split("_");
+                var message_id = split_id[split_id.length - 1];
+                ajaxPost('{% url "contact_mark_message_as_handled" %}',
+                        {'message_id': message_id},
+                        function(event) {
+                            $("#" + form_id).remove();
+
+                        }
+                );
+            });
+
+
+        </script>
+    {% endif %}
 {% endblock %}

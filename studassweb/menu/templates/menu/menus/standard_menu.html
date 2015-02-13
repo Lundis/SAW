@@ -23,11 +23,13 @@
                         {% elif  ratio >= 4 %}
                             col-xs-9
                         {% endif %}">
-                {% if menu_settings.image %}
-                    <img src="{{ menu_settings.image.url }}" style="position:relative;top:10px" height="80" />
-                {% else %}
-                    <img src="http://placehold.it/80x80" style="position:relative;top:10px" height="80" />
-                {% endif %}
+                <a href="{% url "frontpage_home" %}">
+                    {% if menu_settings.image %}
+                        <img src="{{ menu_settings.image.url }}" style="position:relative;top:10px" height="80" />
+                    {% else %}
+                        <img src="http://placehold.it/80x80" style="position:relative;top:10px" height="80" />
+                    {% endif %}
+                </a>
             </div>
             <div class="col-xs-3 pull-right">
                 <div class="col-xs-12 pull-right">

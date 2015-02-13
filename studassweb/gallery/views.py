@@ -8,12 +8,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def view_gallery(request):
     albums = Album.objects.filter().order_by('name')
     pictures = Photo.objects.filter().order_by('-uploaded')
 
     return render(request, 'gallery/view_gallery.html', {
         'albums': albums, 'pictures': pictures},)
+
 
 def create_album(request, album_id=None):
     try:
@@ -32,6 +34,7 @@ def create_album(request, album_id=None):
     context = {'form': form}
     return render(request, 'gallery/create_album.html', context)
 
+
 def view_album(request, album_id):
     try:
         album = Album.objects.get(id=album_id)
@@ -39,6 +42,7 @@ def view_album(request, album_id):
             'album': album},)
     except Album.DoesNotExist:
         return HttpResponseNotFound('No album with that id found')
+
 
 def edit_album(request, album_id):
     try:
@@ -50,8 +54,9 @@ def edit_album(request, album_id):
         if form.is_valid():
             tmp = form.save()
             return HttpResponseRedirect(reverse('gallery_view_album', kwargs={'album_id': tmp.id}))
-    context = {'album' : album ,'form': form}
+    context = {'album': album, 'form': form}
     return render(request, 'gallery/edit_album.html', context)
+
 
 def delete_album(request, album_id):
     if request.method == 'POST':
@@ -96,6 +101,7 @@ def add_picture(request, photo_id=None):
     context = {'form': form, 'filesformset': fileformset}
     return render(request, 'gallery/view_album.html', context)
 
+
 def view_picture(request, photo_id):
     try:
         photo = Photo.objects.get(id=photo_id)
@@ -105,6 +111,7 @@ def view_picture(request, photo_id):
             'images': images, 'photo': photo},)
     except Photo.DoesNotExist:
         return HttpResponseNotFound('No photo with that id found')
+
 
 def edit_picture(request, photo_id):
     form = PictureForm()
@@ -133,6 +140,7 @@ def edit_picture(request, photo_id):
     context = {'form': form, 'fileformset': fileformset}
     return render(request, 'gallery/view_photo.html', context)
 
+
 def delete_picture(request, photo_id):
         if request.method == 'POST':
             try:
@@ -140,7 +148,7 @@ def delete_picture(request, photo_id):
                 images = PhotoFile.objects.filter(photo_id=photo_id)
                 images.delete()
                 photo.delete()
-                return HttpResponseRedirect(reverse("gallery_main"))  #TODO give feedback to user
+                return HttpResponseRedirect(reverse("gallery_main"))  # TODO give feedback to user
             except Photo.DoesNotExist:
                 return HttpResponseNotFound('No such photo!')
         else:

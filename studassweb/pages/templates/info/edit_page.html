@@ -3,6 +3,16 @@
 {% load bootstrap3 %}
 
 {% block breadcrumb2 %}
+    {% if page and page.category %}
+        <li class="active">
+            <a href="{{ page.category.get_absolute_url }}">
+                {{ page.category }}
+            </a>
+        </li>
+    {% endif %}
+{% endblock %}
+
+{% block breadcrumb3 %}
     <li class="active">
         {% if page %}
             {% trans "Editing" %}
@@ -13,21 +23,31 @@
     </li>
 {% endblock %}
 
-{% block content %}
-    <div class="container">
-        <form action="" method="post">
-            {% csrf_token %}
-            {{ form.media }}
-            {{ form.as_p }}
+{% block main_content %}
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.media }}
+        {% bootstrap_form form %}
 
-            <button type="submit" class="btn btn-primary">
-                {% trans "Submit" %}
-            </button>
-            {% if page %}
-                <a href="{% url "pages_delete_page" page.id %}" class="btn btn-danger">
-                    {% trans "Delete" %}
-                </a>
-            {% endif %}
-        </form>
-    </div>
+        <button type="submit" class="btn btn-primary">
+            {% trans "Submit" %}
+        </button>
+    </form>
+{% endblock %}
+
+{% block sidebar %}
+    {% if page %}
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <div class="panel-title">{% trans "Actions" %}</div>
+            </div>
+            <div class="panel-body">
+                <div class="btn-group-vertical btn-block">
+                    <a href="{% url "pages_delete_page" page.id %}" class="btn btn-danger">
+                        {% trans "Delete this page" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

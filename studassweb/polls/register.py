@@ -11,6 +11,7 @@ CAN_VOTE_MEMBER_POLLS = "can_vote_member_polls"
 CAN_VOTE_BOARD_POLLS = "can_vote_board_polls"
 CAN_DELETE_ALL_POLLS = "can_delete_all_polls"
 
+
 def get_menu_items():
     """
     :return: a tuple ([main menu items], [settings menu items], [others])

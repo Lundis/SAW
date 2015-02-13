@@ -4,6 +4,7 @@
 {% load bootstrap3 %}
 {% load sawp %}
 {% load thumbnail %}
+{% load events_templatetags %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -12,105 +13,142 @@
 {% endblock %}
 
 {% block main_content %}
-    <h1>{{ event }}</h1>
-    <div class="list-group">
-        <ul class="list-group">
-            <li class="list-group-item">
-                {{ event.text }}
-            </li>
-            <li class="list-group-item">{% trans "Deadline for signing up: " %}{{ event.start|date:"Y-m-d H:i" }}</li>
-            <li class="list-group-item">{% trans "Start date: " %}{{ event.start|date:"Y-m-d H:i" }}</li>
-            <li class="list-group-item">{% trans "Stop date: " %}{{ event.stop|date:"Y-m-d H:i" }}</li>
-        </ul>
-    </div>
-    {% if signupform %}
-        <form action="" method="post">
-            {% csrf_token %}
-            {% bootstrap_form signupform %}
-            {% bootstrap_form signupitemsform %}
-            {% buttons %}
-                <button type="submit" class="btn btn-primary">
-                    {% trans "Submit" %}
-                </button>
-            {% endbuttons %}
-        </form>
-    {% endif %}
-
-    {% has_perm "events" "CAN_VIEW_SIGNUP_INFO" as can_view_signup_info %}
-
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <tbody>
-            <tr>
-                <th>{% trans "Signed up" %}</th>
-                <th>{% trans "Name" %}</th>
-                <th>{% trans "Association" %}</th>
-                {% if can_view_signup_info %}
-                    <th>{% trans "Email" %}</th>
-                    <th>{% trans "Diet" %}</th>
-                    <th>{% trans "Other" %}</th>
-                    <th>{% trans "Matricle" %}</th>
-                    <th>{% trans "User account" %}</th>
-                    <th>{% trans "Delete" %}</th>
-                {% endif %}
-            </tr>
-            {% for signup in signups %}
-                <tr>
-                    <td>{{ signup.created|date:"Y-m-d H:i" }}</td>
-                    <td>{{ signup.name }}</td>
-                    <td>{{ signup.association }}</td>
-                    {% if can_view_signup_info %}
-                        <td>{{ signup.email }}</td>
-                        <td>{{ signup.diet }}</td>
-                        <td>{{ signup.other }}</td>
-                        <td>{{ signup.matricle }}</td>
-                        <td>{{ signup.user }}</td>
-                        <td>
-                            <form action="{% url 'events_delete_event_signup' signup.id %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
-                                {% csrf_token %}
-                                {% buttons %}
-                                    <button type="submit" class="btn btn-danger">
-                                        {% trans "Delete" %}
-                                    </button>
-                                {% endbuttons %}
-                            </form>
-                        </td>
-                    {% endif %}
-                </tr>
-
-            {% empty %}
-
-            {% endfor %}
-
-            </tbody>
-        </table>
-    </div>
-
-{% endblock %}
-{% block sidebar %}
-    {% has_perm "events" "CAN_CREATE_EVENTS" as can_create_events %}
-    {% if can_create_events%}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Edit" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    <a href="{% url 'events_edit_event' event.id%}">
-                        <div class="btn list-group-item">{% trans "Edit this event" %}</div>
-                    </a>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h1 class="h3">
+                {{ event }}
+            </h1>
+        </div>
+        <div class="panel-body">
+            {{ event.text|safe }}
+        </div>
+        <div class="panel-footer">
+            <div class="row inherit-padding-left-right">
+                <div class="pull-left">
+                    {{ event.start|date:"Y-m-d H:i" }} - {{ event.stop|date:"Y-m-d H:i" }}
                 </div>
-            </div>
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Add" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    <a href="{% url 'events_add_event' %}">
-                        <div class="btn list-group-item">{% trans "Add new event" %}</div>
-                    </a>
+                <div class="pull-right text-right">
+                    {% trans "by " %}{{ event.author }}
                 </div>
             </div>
         </div>
-    {% endif %}
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="panel-title">
+                {% if signupform.instance.pk %}
+                    {% trans "Edit your registration" %}
+                {% else %}
+                    {% trans "Sign up" %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="panel-body">
+            {% if not event.is_past_signup_deadline %}
+                {% if signupform %}
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        {% bootstrap_form signupform %}
+                        {% bootstrap_form signupitemsform %}
+                        {% buttons %}
+                            <button type="submit" class="btn btn-primary">
+                                {% trans "Submit" %}
+                            </button>
+                        {% endbuttons %}
+                    </form>
+                {% endif %}
+            {% else %}
+                <p>
+                    {% trans "The signup ended at" %}
+                    {{ event.signup_deadline }}
+                </p>
+            {% endif %}
+        </div>
+        <div class="panel-footer">
+        </div>
+    </div>
+
+    {% has_perm "events" "CAN_VIEW_SIGNUP_INFO" as can_view_signup_info %}
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="panel-title">
+                {% trans "Attending" %}
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <tbody>
+                <tr>
+                    <th>{% trans "Signed up" %}</th>
+                    <th>{% trans "Name" %}</th>
+                    {% if can_view_signup_info %}
+                        <th>{% trans "Email" %}</th>
+                        <th>{% trans "User account" %}</th>
+                        {% for event_item in event.get_items %}
+                            <th>{{ event_item.item.name }}</th>
+                        {% endfor %}
+                    {% endif %}
+                    {% if request.user.is_authenticated %}
+                        <th>{% trans "Action" %}</th>
+                    {% endif %}
+                </tr>
+                {% for signup in signups %}
+                    <tr {% if signup.is_reserve %} class="text-muted" {% endif %}>
+                        <td>{{ signup.created|date:"Y-m-d H:i" }}</td>
+                        <td>{{ signup.name }}</td>
+                        {% if can_view_signup_info %}
+                            <td>{{ signup.email }}</td>
+                            <td>{{ signup.user }}</td>
+                            {% for event_item in signup.get_items_relevant %}
+                                <td>{{ event_item.value }}</td>
+                            {% endfor %}
+                        {% endif %}
+                        {% if request.user.is_authenticated %}
+                            <td>
+                                {% user_can_edit signup user as can_edit_signup %}
+                                {% if can_edit_signup%}
+                                    <a href="{% url 'events_view_event_edit_signup_by_id' event_id=event.id signup_id=signup.id %}">
+                                        <button class="btn btn-primary">
+                                            {% trans "Edit" %}
+                                        </button>
+                                    </a>
+                                    <form action="{% url 'events_delete_event_signup' signup.id %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
+                                        {% csrf_token %}
+                                        {% buttons %}
+                                            <button type="submit" class="btn btn-danger">
+                                                {% trans "Delete" %}
+                                            </button>
+                                        {% endbuttons %}
+                                    </form>
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                    </tr>
+
+                {% empty %}
+
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+        <div class="panel-footer">
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extrapanel %}
+    <div class="panel-heading">
+        <h2 class="panel-title">{% trans "Edit" %}</h2>
+    </div>
+    <div class="panel-body">
+        <div class="btn-group-vertical btn-block" >
+            <a href="{% url 'events_edit_event' event.id%}" class="btn btn-primary">
+                {% trans "Edit this event" %}
+            </a>
+        </div>
+    </div>
 {% endblock %}

@@ -43,17 +43,6 @@ def get_permissions():
     )
 
 
-def register_settings_pages():
-    contact_mod = Page(
-        "Contact module",
-        "Settings for contact module",
-        SECTION_OTHER,
-        reverse_lazy("contact_settings_list_contacts"),
-        CAN_EDIT_CONTACT_SETTINGS)
-
-    return contact_mod,
-
-
 def setup():
     """
     Creates a default contact group for the association
@@ -65,7 +54,7 @@ def setup():
                                       save_to_db=True,
                                       send_email=True,
                                       email=SiteConfiguration.instance().association_contact_email,
-                                      ordering_index=0
+                                      ordering_index=1
                                       )
         contact.save()
 

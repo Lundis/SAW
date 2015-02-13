@@ -29,6 +29,7 @@
 
     <form action="" method="post">
         {% csrf_token %}
+        {{ form.media }}
         {% bootstrap_form form %}
         {% bootstrap_form form_items %}
         {% buttons %}
@@ -37,6 +38,7 @@
             </button>
         {% endbuttons %}
     </form>
+
 {% endblock %}
 
 {% block scripts %}
@@ -46,15 +48,15 @@
         $(function () {
 
             //Set up datetimepicker
-            $( "#id_start" ).datetimepicker({
+            $( "#{{ form.signup_deadline.id_for_label }}" ).datetimepicker({
                 dayOfWeekStart: 1,
                 format: "d.n.Y H:m"
             });
-            $( "#id_stop" ).datetimepicker({
+            $( "#{{ form.start.id_for_label }}" ).datetimepicker({
                 dayOfWeekStart: 1,
                 format: "d.n.Y H:m"
             });
-            $( "#id_signup_deadline" ).datetimepicker({
+            $( "#{{ form.stop.id_for_label }}" ).datetimepicker({
                 dayOfWeekStart: 1,
                 format: "d.n.Y H:m"
             });

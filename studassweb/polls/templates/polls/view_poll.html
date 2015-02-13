@@ -15,28 +15,40 @@
     <ul class="list-group">
 
 
-        <li class="list-group-item">{% trans "Name: " %} {{ poll.name }}</li>
-        <li class="list-group-item">{% trans "Description: " %} {{ poll.description }}</li>
-        <li class="list-group-item">{% trans "Publication date: " %} {{ poll.publication }}</li>
-        <li class="list-group-item">{% trans "Expiration date: " %} {{ poll.expiration }}</li>
-        <li class="list-group-item">{% trans "Created by: " %} {{ poll.created_by }}</li>
+
+        <li class="list-group-item"> {{ poll.description }}</li>
 
         {% if form%}
 
-        <form action="{% url 'polls_view_poll' poll.id %}" method="post">
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            {% buttons %}
-                <button type="submit" class="btn btn-danger">
-                    {% trans "Make a choice" %}
-                </button>
-            {% endbuttons %}
-        </form>
+            <form action="{% url 'polls_view_poll' poll.id %}" method="post">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                {% buttons %}
+                    <button type="submit" class="btn btn-danger">
+                        {% trans "Make a choice" %}
+                    </button>
+                {% endbuttons %}
+            </form>
         {% else %}
             {% for c in choices %}
-                Lundis was here {{ c.count_votes }}
+                <td>{{ c.name }}</td>
+                {{ c.count_votes }}
             {% endfor %}
         {% endif %}
+
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <tbody>
+                <tr>
+                    <th>{% trans "Publication date: " %}{{ poll.publication }}</th>
+                    <th>{% trans "Expiration date: " %}{{ poll.expiration }}</th>
+                    <th>{% trans "Created by: " %}{{ poll.created_by }}</th>
+
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
 
 

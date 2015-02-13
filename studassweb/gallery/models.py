@@ -33,6 +33,7 @@ class Photo(models.Model):
     def __str__(self):
         return self.uploaded.strftime("%Y-%m-%d") + " : " + str(self.photo_id)
 
+
 class PhotoFile(models.Model):
     image = models.ImageField(upload_to='gallery_files')
     photo_id = models.ForeignKey(Photo)

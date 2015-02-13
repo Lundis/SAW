@@ -3,12 +3,11 @@ from django.http import Http404, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from users.decorators import has_permission
-from .models import InfoCategory, InfoPage
+from users.permissions import has_user_perm
+from .models import InfoCategory, InfoPage, InfoPageEdit
 from .forms import InfoPageForm, InfoCategoryForm
 from .register import EDIT, VIEW_PUBLIC
-from base.forms import ConfirmationForm
 from base.views import delete_confirmation_view
-
 
 
 @has_permission(VIEW_PUBLIC)
@@ -19,22 +18,36 @@ def main(request):
     :return:
     """
     categories = InfoCategory.objects.all()
-    pages_without_parent = InfoPage.objects.filter(category=None)
+    pages_without_parent = InfoPage.objects.filter(category=None, for_frontpage=False)
+    if has_user_perm(request.user, EDIT):
+        frontpage_pages = InfoPage.objects.filter(for_frontpage=True)
+    else:
+        frontpage_pages = None
     return render(request, 'info/main.html', {'categories': categories,
-                                              'pages': pages_without_parent})
+                                              'orphans': pages_without_parent,
+                                              'frontpage_pages': frontpage_pages})
 
 
 @has_permission(VIEW_PUBLIC)
-def view_page(request, page_id):
+def view_page(request, slug, revision_id=None):
     """
     view a page
     :param request:
     :return:
     """
-    page = InfoPage.objects.get(id=page_id)
+    page = InfoPage.objects.get(slug=slug)
     category = page.category
+    revisions = page.revisions()
+    if revision_id is None:
+        current_revision = page.revisions().first()
+    else:
+        try:
+            current_revision = revisions.get(id=revision_id)
+        except InfoPageEdit.DoesNotExist:
+            raise Http404(_("The requested revision could not be found"))
     return render(request, 'info/view_page.html', {'category': category,
-                                                   'page': page})
+                                                   'page': page,
+                                                   'current_revision': current_revision})
 
 
 @has_permission(EDIT)
@@ -59,11 +72,12 @@ def edit_page(request, category_id=None, page_id=None):
         except InfoCategory.DoesNotExist:
             pass
 
-    form = InfoPageForm(request.POST or None, instance=page, initial={'category': category})
+    form = InfoPageForm(request.POST or None,
+                        instance=page,
+                        initial={'category': category},
+                        user=request.user)
     if form.is_valid():
         new_page = form.save()
-        new_page.category = category
-        new_page.save()
         return HttpResponseRedirect(new_page.get_absolute_url())
     else:
         return render(request, 'info/edit_page.html', {'category': category,
@@ -72,14 +86,14 @@ def edit_page(request, category_id=None, page_id=None):
 
 
 @has_permission(VIEW_PUBLIC)
-def view_category(request, category_id):
+def view_category(request, slug):
     """
     renders a list of the pages in the specified category
     :param request:
     :return:
     """
     try:
-        category = InfoCategory.objects.get(id=category_id)
+        category = InfoCategory.objects.get(slug=slug)
     except InfoCategory.DoesNotExist:
         raise Http404
 
@@ -117,7 +131,8 @@ def delete_category(request, category_id):
         raise Http404(_("The requested object could not be found"))
     return delete_confirmation_view(request,
                                     item=category,
-                                    form_url=reverse("pages_delete_category"),
+                                    form_url=reverse("pages_delete_category",
+                                                     kwargs={'category_id': category_id}),
                                     redirect_url=reverse('pages_view_categories'))
 
 
@@ -129,5 +144,6 @@ def delete_page(request, page_id):
         raise Http404(_("The requested object could not be found"))
     return delete_confirmation_view(request,
                                     item=category,
-                                    form_url=reverse("pages_delete_page"),
+                                    form_url=reverse("pages_delete_page",
+                                                     kwargs={'page_id': page_id}),
                                     redirect_url=reverse('pages_view_categories'))

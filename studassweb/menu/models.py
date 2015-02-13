@@ -129,7 +129,6 @@ class Menu(models.Model):
         """
         return ItemInMenu.objects.filter(menu=self, item=item).exists()
 
-
     @classmethod
     def get(cls, name):
         """
@@ -190,7 +189,8 @@ class MenuItem(models.Model):
         super(MenuItem, self).save(*args, **kwargs)
 
     @classmethod
-    def get_or_create(cls, app_name, display_name, reverse_string=None, linked_object=None, url=None, permission=None, submenu=None):
+    def get_or_create(cls, app_name, display_name, reverse_string=None,
+                      linked_object=None, url=None, permission=None, submenu=None):
         """
         Convenience wrapper to create or get valid menu items
         :param app_name: Which app created this item (if any)

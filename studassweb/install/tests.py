@@ -13,7 +13,6 @@ ASSOCIATION_NAME = "Super association"
 ASSOCIATION_FOUNDED = "1990"
 
 
-
 class InstallHttpTests(TestCase):
 
     def setUp(self):
@@ -28,13 +27,11 @@ class InstallHttpTests(TestCase):
         response = welcome(request)
         self.assertEqual(response.status_code, 200)
 
-
         #GET Association page
         request = self.factory.get(reverse("install.views.association"))
         request.user = self.superuser
         response = association(request)
         self.assertEqual(response.status_code, 200)
-
 
         #POST Association page
         request = self.factory.post(reverse("install.views.association"),
@@ -73,7 +70,6 @@ class InstallHttpTests(TestCase):
         response = modules(request)
         self.assertEqual(response.status_code, 200)
 
-
         #POST Menu page
         # login_menu-menu-item-14=0&login_menu-menu-item-15=1&login_menu-menu-item-18=2&main_menu-menu-item-7=0&
         # main_menu-menu-item-8=1&main_menu-menu-item-9=2&main_menu-menu-item-10=3&main_menu-menu-item-11=4&
@@ -100,7 +96,6 @@ class InstallHttpTests(TestCase):
         response = menu(request)
         self.assertEqual(response.status_code, 302)
         #TODO check that the menu is saved correctly. This one might be hard(?)
-
 
         #GET Finished page
         request = self.factory.get(reverse("install.views.finished"))

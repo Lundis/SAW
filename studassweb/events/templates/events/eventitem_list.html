@@ -6,37 +6,62 @@
 
 {% block breadcrumb2 %}
     <li class="active">
-    <a href="{% url "events_list_eventitems" %}">{% trans "List items " %}</a>
+        <a href="{% url "events_list_eventitems" %}">{% trans "List items " %}</a>
     </li>
 {% endblock %}
 
 {% block main_content %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <tbody>
+            <tr>
+                <th>{% trans "Name" %}</th>
+                <th>{% trans "Type" %}</th>
+                <th>{% trans "Required" %}</th>
+                <th>{% trans "Action" %}</th>
+            </tr>
+            {% for eitem in object_list %}
+                <tr>
+                    <td>
+                        {{ eitem.name }}
+                    </td>
+                    <td>
+                        {{ eitem.get_type_display }}
+                    </td>
+                    <td>
+                        {{ eitem.required }}
+                    </td>
+                    <td>
+                        <a class="btn btn-primary" href="{% url "events_edit_eventitem" eitem.id %}">Edit</a>
+                        <a class="btn btn-danger" href="{% url "events_delete_eventitem" eitem.id %}">Delete</a>
+                    </td>
+                </tr>
+            {% empty %}
 
-    <ul class="list-group">
-        {% for eitem in object_list %}
-            <li class="list-item">
-                {{ eitem.name }}
-                <a href="{% url "events_edit_eventitem" eitem.id %}">Edit</a>
-                <a href="{% url "events_delete_eventitem" eitem.id %}">Delete</a>
-            </li>
-        {% endfor %}
-    </ul>
+                <tr>
+                    <td>
+                        {% trans "No event items added yet!" %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
 {% endblock %}
 
+
 {% block sidebar %}
-    {% has_perm "events" "CAN_CREATE_EVENTS" as can_create_events %}
-    {% if can_create_events%}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Add" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    <a href="{% url 'events_add_eventitem' %}">
-                        <div class="btn list-group-item">{% trans "Add new event item" %}</div>
-                    </a>
-                </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h2 class="panel-title">{% trans "Add" %}</h2>
+        </div>
+        <div class="panel-body">
+            <div class="btn-group-vertical btn-block" >
+                <a href="{% url 'events_add_eventitem' %}" class="btn btn-primary">
+                    {% trans "Add new event item" %}
+                </a>
             </div>
         </div>
-    {% endif %}
+    </div>﻿
 {% endblock %}

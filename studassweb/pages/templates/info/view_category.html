@@ -33,12 +33,12 @@
                     <h2 class="panel-title">{% trans "Edit" %}</h2>
                 </div>
                 <div class="panel-body">
-                    <div class="list-group">
-                        <a href="{% url "pages_new_page" category_id=category.id %}">
-                            <div class="btn list-group-item">{% trans "Create a new page" %}</div>
+                    <div class="btn-group-vertical btn-block">
+                        <a class="btn btn-primary" href="{% url "pages_new_page" category_id=category.id %}">
+                            {% trans "Create a new page" %}
                         </a>
-                        <a href="{% url "pages_edit_category" category.id %}">
-                            <div class="btn list-group-item">{% trans "Edit this category" %}</div>
+                        <a class="btn btn-primary" href="{% url "pages_edit_category" category.id %}">
+                            {% trans "Edit this category" %}
                         </a>
                     </div>
                 </div>

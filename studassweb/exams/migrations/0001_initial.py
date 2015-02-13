@@ -52,8 +52,10 @@ class Migration(migrations.Migration):
                 ('ocr', models.TextField(blank=True)),
                 ('exam_date', models.DateTimeField()),
                 ('course_id', models.ForeignKey(to='exams.Course', on_delete=django.db.models.deletion.PROTECT)),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, null=True, blank=True)),
-                ('examinator', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='exams.Examinator', null=True, blank=True)),
+                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL,
+                                                 to=settings.AUTH_USER_MODEL, null=True, blank=True)),
+                ('examinator', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT,
+                                                 to='exams.Examinator', null=True, blank=True)),
             ],
             options={
             },

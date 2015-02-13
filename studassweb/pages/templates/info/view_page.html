@@ -3,11 +3,13 @@
 {% load i18n %}
 
 {% block breadcrumb2 %}
-    <li>
-        <a href="{{ category.get_absolute_url }}">
-            {{ category.name }}
-        </a>
-    </li>
+    {% if category %}
+        <li>
+            <a href="{{ category.get_absolute_url }}">
+                {{ category.name }}
+            </a>
+        </li>
+    {% endif %}
 {% endblock %}
 
 {% block breadcrumb3 %}
@@ -17,50 +19,72 @@
 {% endblock %}
 
 {% block main_content %}
-    <div class="container">
-        <div class="row">
-            <h1>{{ page.title }}</h1>
+    <h1>{{ page.title }}</h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {{ current_revision.text | safe}}
         </div>
-        <div class="row">
-            {{ page.text | safe}}
+        <div class="panel-body">
+            <div class="pull-right">
+                {% trans "Updated" %}
+                {{ page.date}}
+            </div>
         </div>
     </div>
 {% endblock main_content %}
 {% block sidebar %}
-    {% if category.pages %}
-        <div class="panel panel-primary">
+    <div class="panel panel-primary">
+        {% if category.pages %}
             <div class="panel-heading">
-                <h2 class="panel-title">{{ category.name }}</h2>
+                <a href="{{ category.get_absolute_url }}" class="panel-title">{{ category.name }}</a>
             </div>
             <div class="panel-body">
-                <div class="list-group">
+                <div class="btn-group-vertical btn-block">
                     {% for page_ in category.pages %}
                         {% can_view_object page_ as show_page %}
                         {% if show_page %}
-                            <a href="{{ page_.get_absolute_url}}" class="list-group-item">
+                            <a href="{{ page_.get_absolute_url}}" class="btn btn-primary">
                                 {{ page_.title }}
                             </a>
                         {% endif %}
                     {% endfor %}
-
                 </div>
             </div>
-        </div>
+        {% endif %}
         {% can_edit_object page as show_edit_buttons %}
         {% if show_edit_buttons %}
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h2 class="panel-title">{% trans "Edit" %}</h2>
-                </div>
-                <div class="panel-body">
-                    <div class="list-group">
-                        <a href="{% url "pages_edit_page" page.id %}">
-                            <div class="btn list-group-item">{% trans "Edit this page" %}</div>
-                        </a>
-                    </div>
+            <div class="panel-heading">
+                <h2 class="panel-title">{% trans "Edit" %}</h2>
+            </div>
+            <div class="panel-body">
+                <div class="btn-group-vertical btn-block">
+                    <a href="{% url "pages_edit_page" page.id %}" class="btn btn-primary">
+                        {% trans "Edit this page" %}
+                    </a>
                 </div>
             </div>
-
         {% endif %}
-    {% endif %}
+        {% with page.revisions as revisions %}
+            {% if show_edit_buttons and revisions.count > 1 %}
+                <div class="panel-heading">
+                    <h2 class="panel-title">{% trans "Revisions" %}</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="btn-group-vertical btn-block">
+                        {% for revision in revisions %}
+                            {% if revision == current_revision %}
+                                <a href="#" class="btn btn-primary active">
+                                    {{ revision.date }}
+                                </a>
+                            {% else %}
+                                <a href="{{ revision.get_absolute_url}}" class="btn btn-primary">
+                                    {{ revision.date }}
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
 {% endblock %}

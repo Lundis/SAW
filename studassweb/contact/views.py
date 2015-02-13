@@ -7,9 +7,10 @@ from django.core.mail import send_mail, BadHeaderError
 from django.utils.translation import ugettext as _
 from users import permissions
 from users.decorators import has_permission
-from .forms import MessageForm
+from base.views import delete_confirmation_view
+from .forms import MessageForm, ContactSettingsForm
 from .models import Message, ContactInfo
-from .register import CAN_VIEW_CONTACT_INFO, CAN_USE_CONTACT_FORM, CAN_VIEW_MESSAGES
+from .register import CAN_VIEW_CONTACT_INFO, CAN_USE_CONTACT_FORM, CAN_VIEW_MESSAGES, CAN_EDIT_CONTACT_SETTINGS
 import logging
 
 logger = logging.getLogger(__name__)
@@ -19,7 +20,7 @@ logger = logging.getLogger(__name__)
 def home(request):
     contacts = ContactInfo.objects.all()
     context = {'contacts': contacts}
-    return render(request, "contact/show_contact_info.html", context)
+    return render(request, "contact/show_contacts.html", context)
 
 
 @has_permission(CAN_USE_CONTACT_FORM)
@@ -55,12 +56,16 @@ def write_message(request, contact_id):
                 return HttpResponseRedirect(reverse("contact_write_message"))
 
         messages.success(request, "Message successfully sent!")
-        return HttpResponseRedirect(reverse("contact_home"))
+        return HttpResponseRedirect(reverse("contact_send_confirmation"))
 
     context = {'form': form,
                'contact': contact}
 
     return render(request, "contact/write_message.html", context)
+
+
+def send_confirmation(request):
+    return render(request, "contact/message_confirmation.html")
 
 
 @has_permission(CAN_VIEW_MESSAGES)
@@ -84,7 +89,8 @@ def delete_message(request, message_id):
                 title = msg.title
                 msg.delete()
                 messages.success(request, "Message \""+title+"\" was sucessfully deleted!")
-                return HttpResponseRedirect(reverse("contact_read_messages"))
+                return HttpResponseRedirect(reverse("contact_view_messages",
+                                                    kwargs={'contact_id': msg.contact.id}))
             else:
                 logger.warning('User %s tried to delete message %s', request.user, message_id)
                 return HttpResponseForbidden('You don\'t have permission to remove this!')
@@ -93,3 +99,32 @@ def delete_message(request, message_id):
     else:
         logger.warning('Attempted to access delete_message via GET')
         return HttpResponseNotAllowed(['POST', ])
+
+
+@has_permission(CAN_EDIT_CONTACT_SETTINGS)
+def edit_contact(request, contact_id=None):
+    try:
+        contact = ContactInfo.objects.get(id=contact_id)
+    except ContactInfo.DoesNotExist:
+        contact = None
+
+    form = ContactSettingsForm(request.POST or None, instance=contact)
+    if form.is_valid():
+        form.save()
+        return HttpResponseRedirect(reverse("contact_home"))
+    context = {'form': form,
+               'contact': contact}
+    return render(request, "contact/edit_contact.html", context)
+
+
+@has_permission(CAN_EDIT_CONTACT_SETTINGS)
+def delete_contact(request, contact_id):
+    try:
+        contact = ContactInfo.objects.get(id=contact_id)
+    except ContactInfo.DoesNotExist:
+        raise Http404(_("The specified contact does not exist!"))
+    return delete_confirmation_view(request,
+                                    item=contact,
+                                    form_url=reverse("contact_delete",
+                                                     args=(contact_id,)),
+                                    redirect_url=reverse("contact_home"))

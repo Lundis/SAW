@@ -1,0 +1,15 @@
+{% load i18n %}
+{% if events.count > 0 %}
+    <ul style="list-style-type:disc;">
+        {% for event in events %}
+            <li>
+                <a href="{{ event.get_absolute_url }}">
+                    {{ event.title }}
+                    {{ event.start }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    {% trans "There are no upcoming events" %}
+{% endif %}

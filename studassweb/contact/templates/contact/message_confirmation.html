@@ -1,0 +1,12 @@
+{% extends "contact/base.html" %}
+{% load i18n %}
+
+{% block head %}
+    <meta http-equiv="refresh" content="5;url={% url "frontpage_home" %}" />
+{% endblock %}
+
+{% block main_content %}
+    <h2>{% trans "Success!" %}</h2>
+    <p>{% trans "Your message was delivered successfully" %}"</p>
+    <p>{% trans "You will be redirected to the front page in 5 seconds" %}.</p>
+{% endblock %}

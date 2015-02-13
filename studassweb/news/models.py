@@ -1,10 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from ckeditor.fields import RichTextField
 from django.template.defaultfilters import slugify
+
 from base.models import Comment
-from .utils import complete_html
+from base.fields import ValidatedRichTextField
 
 
 class Category(models.Model):
@@ -24,7 +24,7 @@ class Article(models.Model):
     title = models.CharField(max_length=100)
     summary = models.TextField(max_length=300, blank=True, null=True)
     slug = models.SlugField(editable=False)
-    text = RichTextField()
+    text = ValidatedRichTextField()
     # split the date and time in order to make fetching articles based on date easier
     created_date = models.DateField(auto_now_add=True)
     created_time = models.TimeField(auto_now_add=True)
@@ -42,8 +42,11 @@ class Article(models.Model):
         if self.summary:
             return self.summary
         else:
-            html, closing_tags = complete_html(self.text[:300])
-            return "%s<p><strong>...</strong></p>%s" % (html, closing_tags)
+            if len(self.text) > 300:
+                summary = ValidatedRichTextField.get_summary(self.text, 300)
+                return "%s<p><strong>...</strong></p>" % summary
+            else:
+                return self.text
 
     def comments(self):
         """
@@ -58,9 +61,21 @@ class Article(models.Model):
                                                     'day': self.created_date.day})
 
     def save(self, *args, **kwargs):
-        if not self.id:
+        if not self.pk:
             self.slug = slugify(self.title)
         super(Article, self).save(*args, **kwargs)
+        self.update_frontpage_items()
+
+    def delete(self, using=None):
+        super(Article, self).delete(using)
+        self.update_frontpage_items()
 
     def __str__(self):
         return self.title
+
+    def update_frontpage_items(self):
+        """
+        Makes sure the N latest items exist as frontpage items
+        :return:
+        """
+        pass
