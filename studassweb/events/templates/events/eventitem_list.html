@@ -63,5 +63,19 @@
                 </a>
             </div>
         </div>
-    </div>﻿
+    {% block helppanel %}
+        <div class= "panel-heading">
+            <h2 class="panel-title" data-toggle="collapse" data-target="#helptext">
+                {% trans "Help" %}
+                <span class="glyphicon caret pull-right"></span>
+            </h2>
+        </div>
+        <div id="helptext" class="panel-collapse collapse helptext-collapse">
+            <div class="panel-body">
+                <p>{% trans "This is where you create custom event items" %}</p>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
 {% endblock %}
+

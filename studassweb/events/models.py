@@ -40,6 +40,7 @@ class Event(models.Model):
     start = models.DateTimeField(verbose_name="Event ends")
     stop = models.DateTimeField(verbose_name="Event starts")
     author = models.ForeignKey(User)
+    signup_start = models.DateTimeField(verbose_name="Signup starts", default=timezone.now)
     signup_deadline = models.DateTimeField(verbose_name="Deadline for signups")
     permission = models.CharField(max_length=100, blank=True, null=True)  # Permission needed to see and attend
     max_participants = models.IntegerField(validators=[MinValueValidator(1)], default=50)
@@ -226,6 +227,10 @@ class EventItem(models.Model):
 class ItemInEvent(models.Model):
     event = models.ForeignKey(Event)
     item = models.ForeignKey(EventItem)
+    public = models.BooleanField(default=False,
+                                 verbose_name="Is this field shown to everyone?",)
+    hide_in_print_view = models.BooleanField(default=False,
+                                             verbose_name="Is this field hidden from the print view?",)
 
     def __str__(self):
         return str("{0} is enabled in {1}".format(self.item.name, self.event.title))
