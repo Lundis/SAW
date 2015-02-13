@@ -26,7 +26,7 @@
     </div>
 {% endblock %}
 {% block sidebar %}
-        <div class="panel panel-info">
+        <div class="panel panel-primary">
             <div class="panel-heading">
                 <h2 class="panel-title">{% trans "Add" %}</h2>
             </div>
@@ -35,10 +35,8 @@
                     <a href="{% url 'gallery_create_album' %}">
                         <div class="btn list-group-item">{% trans "Add Album" %}</div>
                     </a>
-                    <a href="{% url 'gallery_add_picture' %}">
-                        <div class="btn list-group-item">{% trans "Add Picture" %}</div>
-                    </a>
                 </div>
             </div>
         </div>
 {% endblock %}
+{

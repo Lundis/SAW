@@ -67,6 +67,7 @@ def delete_album(request, album_id):
             logger.warning('Attempted to access delete_album via GET')
             return HttpResponseNotAllowed(['POST', ])
 
+
 def add_picture(request, photo_id=None):
     form = PictureForm()
     photofile_factory = inlineformset_factory(Photo, PhotoFile, fields=('id', 'image',), extra=1, can_delete=True)
