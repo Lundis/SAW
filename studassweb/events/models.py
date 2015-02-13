@@ -40,6 +40,7 @@ class Event(models.Model):
     start = models.DateTimeField(verbose_name="Event ends")
     stop = models.DateTimeField(verbose_name="Event starts")
     author = models.ForeignKey(User)
+    signup_start = models.DateTimeField(verbose_name="Signup starts", default=timezone.now)
     signup_deadline = models.DateTimeField(verbose_name="Deadline for signups")
     permission = models.CharField(max_length=100, blank=True, null=True)  # Permission needed to see and attend
     max_participants = models.IntegerField(validators=[MinValueValidator(1)], default=50)
