@@ -15,6 +15,7 @@
     </li>
 {% endblock %}
 
+
 {% block main_content %}
     {% if form.instance.pk %}
         <form action="{% url 'events_delete_event' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">

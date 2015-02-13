@@ -26,17 +26,28 @@
     </div>
 {% endblock %}
 {% block sidebar %}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Add" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    <a href="{% url 'gallery_create_album' %}">
-                        <div class="btn list-group-item">{% trans "Add Album" %}</div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h2 class="panel-title">{% trans "Add" %}</h2>
+        </div>
+        <div class="panel-body">
+            <div class="btn-group-vertical btn-block">
+                    <a href="{% url 'gallery_create_album' %}" class="btn btn-primary">
+                        {% trans "Add Album" %}
                     </a>
-                </div>
             </div>
         </div>
+        <div class= "panel-heading">
+            <h2 class="panel-title" data-toggle="collapse" data-target="#helptext">
+                {% trans "Help" %}
+                <span class="glyphicon caret pull-right"></span>
+            </h2>
+        </div>
+        <div id="helptext" class="panel-collapse collapse helptext-collapse">
+            <div class="panel-body">
+                        <p>{% trans "This is the gallery. Pictures are organized into albums. Click on an album to see its content. Click on picture thumbnails to view the pictures in full screen." %}</p>
+                        <p>{% trans "If you have been granted admin permission, then you can also create new albums and add pictures. Please use the buttons above to modify albums / pictures." %}</p>
+                        <p>{% trans "If you want to remove albums or pictures: simply click on the item you want to remove and press the red “remove” button." %}</p>
+            </div>
+    </div>
 {% endblock %}
-{
