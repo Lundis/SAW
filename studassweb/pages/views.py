@@ -10,7 +10,6 @@ from .register import EDIT, VIEW_PUBLIC
 from base.views import delete_confirmation_view
 
 
-
 @has_permission(VIEW_PUBLIC)
 def main(request):
     """

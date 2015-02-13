@@ -1,15 +1,37 @@
 from django import forms
+from django.core.validators import ValidationError
 from .models import Event, EventSignup, EventItem, ItemInEvent, ItemInSignup
-
+from base.utils import generate_email_ver_code
 
 EITEMS = "eitems"
 
 
 class EventSignupForm(forms.ModelForm):
 
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop("event")
+        super(EventSignupForm, self).__init__(*args, **kwargs)
+
     class Meta:
         model = EventSignup
-        fields = ('name', 'email',)
+        fields = ('name', 'email')
+
+    def clean(self):
+        super(EventSignupForm, self).clean()
+        if self.event.is_past_signup_deadline():
+            raise ValidationError("It's already past the deadline!")
+
+    def save(self, commit=True, user=None,):
+        temp_signup = super(EventSignupForm, self).save(commit=False)
+        temp_signup.event = self.event
+        temp_signup.auth_code = generate_email_ver_code()
+        while EventSignup.objects.filter(auth_code=temp_signup.auth_code).exists():
+            temp_signup.auth_code = generate_email_ver_code()
+        if not user.is_anonymous():
+            temp_signup.user = user
+        if commit:
+            temp_signup.save()
+        return temp_signup
 
 
 class EventForm(forms.ModelForm):
@@ -28,7 +50,16 @@ class EventForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        fields = ('title', 'text', 'signup_deadline', 'start', 'stop')
+        fields = ('title', 'text', 'max_participants', 'signup_deadline', 'start', 'stop')
+
+    def save(self, commit=True, user=None):
+        if user is None:
+            raise ValueError("Argument 'user' is missing")
+        event = super(EventForm, self).save(commit=False)
+        event.author = user
+        if commit:
+            event.save()
+        return event
 
 
 class EventItemsForm(forms.Form):

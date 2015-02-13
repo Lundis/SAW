@@ -13,6 +13,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 @has_permission(CAN_VIEW_EXAM_ARCHIVE)
 def main(request):
     exams = SingleExam.objects.filter().order_by('-exam_date')
@@ -22,7 +23,7 @@ def main(request):
     show_add_buttons = permissions.has_user_perm(request.user, CAN_UPLOAD_EXAMS)
     return render(request, 'exams/view_main.html', {
         'exams': exams, 'courses': courses, 'examinators': examinators,
-        'show_add_buttons':show_add_buttons},)
+        'show_add_buttons': show_add_buttons},)
 
 
 @has_permission(CAN_VIEW_EXAM_ARCHIVE)
@@ -48,7 +49,8 @@ def view_examinator(request, examinator_id):
         examinator = Examinator.objects.get(id=examinator_id)
         exams = SingleExam.objects.filter(examinator=examinator_id).order_by('-exam_date')
 
-        show_edit_buttons = permissions.has_user_perm(request.user, CAN_EDIT_EXAMS) or examinator.created_by == request.user
+        show_edit_buttons = permissions.has_user_perm(request.user, CAN_EDIT_EXAMS) or \
+                            examinator.created_by == request.user
         show_add_buttons = permissions.has_user_perm(request.user, CAN_UPLOAD_EXAMS)
 
         return render(request, 'exams/view_examinator.html', {

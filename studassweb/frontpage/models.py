@@ -32,6 +32,9 @@ class FrontPageItem(models.Model):
                            ("_content_type", "_object_id"))
         ordering = "ordering_index",
 
+    def __str__(self):
+        return self.identifier
+
     def save(self, *args, **kwargs):
         """
         Try

@@ -45,6 +45,7 @@ def set_bootswatch_theme(request):
             logger.warn("Setting Bootswatch theme failed!")
         return HttpResponseRedirect(reverse('base_settings_edit_theme'))
 
+
 @has_permission(EDIT_THEME)
 def set_default_theme(request):
     if not request.POST:

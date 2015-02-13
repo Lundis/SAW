@@ -3,13 +3,23 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.template.loader import get_template
 from django.template import Context
+from django.core.validators import MinValueValidator
+from django.template.defaultfilters import slugify
+from django.utils.translation import ugettext as _
+from django.core.mail import send_mail
+from django.conf import settings
 import django.utils.timezone as timezone
 from .register import CAN_CREATE_EVENTS
 from users import permissions
-from django.template.defaultfilters import slugify
-import itertools
 from base.fields import ValidatedRichTextField
 from frontpage.models import FrontPageItem
+import itertools
+import logging
+
+from operator import attrgetter
+
+
+logger = logging.getLogger(__name__)
 
 
 # This should maybe be put in base or something
@@ -26,18 +36,22 @@ class MultiInputField(models.CharField):
 class Event(models.Model):
     title = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
-    text = ValidatedRichTextField()
-    start = models.DateTimeField()
-    stop = models.DateTimeField()
+    text = ValidatedRichTextField(verbose_name="Description")
+    start = models.DateTimeField(verbose_name="Event ends")
+    stop = models.DateTimeField(verbose_name="Event starts")
     author = models.ForeignKey(User)
-    signup_deadline = models.DateTimeField()
+    signup_deadline = models.DateTimeField(verbose_name="Deadline for signups")
     permission = models.CharField(max_length=100, blank=True, null=True)  # Permission needed to see and attend
+    max_participants = models.IntegerField(validators=[MinValueValidator(1)], default=50)
 
     def __str__(self):
         return str(self.title)
 
     def get_absolute_url(self):
         return reverse("events_view_event", kwargs={'slug': self.slug})
+
+    def is_past_signup_deadline(self):
+        return timezone.now() > self.signup_deadline
 
     # https://keyerror.com/blog/automatically-generating-unique-slugs-in-django
     def save(self, *args, **kwargs):
@@ -81,17 +95,22 @@ class Event(models.Model):
         event_item.content = template.render(context)
         event_item.save()
 
+    def get_items(self):
+        return ItemInEvent.objects.filter(event=self).order_by('item__id')
+
 
 # Each user which signs up creates one of these
 # We need both user and name as we need to allow non-signed in users to sign up
-# TODO we need to save the auth_codes somehow, to ensure that a new signup doesn't get the same code as a delete one
 class EventSignup(models.Model):
     event = models.ForeignKey(Event)
     user = models.ForeignKey(User, blank=True, null=True)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, verbose_name="Full name")
     email = models.EmailField()
-    created = models.DateTimeField(default=timezone.now, blank=True)
+    created = models.DateTimeField(auto_now_add=True, blank=True)
     auth_code = models.CharField(max_length=32, unique=True)  # Edit and delete for anonymous users
+
+    class Meta:
+        ordering = "created",
 
     def user_can_edit(self, user):
         if self.user == user or permissions.has_user_perm(user, CAN_CREATE_EVENTS):
@@ -102,6 +121,82 @@ class EventSignup(models.Model):
     def __str__(self):
         return "{0}:{1} has registered to {2}".format(self.created, self.user, self.event)
 
+    def delete(self, using=None):
+        super(EventSignup, self).delete(using)
+        # Notify a user on the reserve list that they're in by email
+        # Can't allow delete() to throw an exception
+        try:
+            signups = EventSignup.objects.filter(event=self.event)
+            if self.event.max_participants >= signups.count():
+                # Get the signup that just got below the participant limit
+                reserve_signup = signups[self.event.max_participants - 1]
+                reserve_signup.send_reserve_email()
+        except Exception as e:
+            logger.error("Sending reserve email failed (%s)", e)
+
+    def send_reserve_email(self):
+        context = Context({'event': self.event})
+        template = get_template("events/emails/reserve_notify.html")
+        message = template.render(context)
+        title = _("Reserve notification for") + " " + self.event.title
+        from_email = settings.NO_REPLY_EMAIL
+        to_emails = [self.email]
+        send_mail(title, message, from_email, to_emails)
+
+    def build_email_content(self, request):
+        context = Context(
+            {'request': request,
+             'event': self.event,
+             'signup': self,
+             'signup_edit_url':
+                 request.build_absolute_uri(reverse("events_view_event_edit_signup_by_code",
+                                                    kwargs={'event_id': self.event.id,
+                                                            'auth_code': self.auth_code})),
+             'signup_cancel_url':
+                 request.build_absolute_uri(reverse("events_delete_event_signup_by_code",
+                                                    kwargs={'auth_code': self.auth_code}))}
+        )
+
+        template = get_template("events/email.html")
+        return template.render(context)
+
+    def is_reserve(self):
+        signups = EventSignup.objects.filter(event=self.event)
+        for index, item in enumerate(signups):
+            if item.pk == self.pk:
+                return index >= self.event.max_participants
+        logger.error("is_reserve couldn't find itself in the list")
+
+    def get_items(self):
+        return ItemInSignup.objects.filter(signup=self).order_by('item__id')
+
+    # This function excludes items which has been removed from the event after signup was made
+    # It also adds "missing" items, which exists if item events are added to event after signup was created
+    def get_items_relevant(self):
+        # Only these items should be returned even if more are saved
+        items_in_event = ItemInEvent.objects.filter(event=self.event)
+        items_in_event_itemonly = ItemInEvent.objects.filter(event=self.event).values('item')
+
+        items_in_signup = ItemInSignup.objects.filter(signup=self).\
+            filter(item__in=items_in_event_itemonly).order_by('item__id')
+
+        items_in_signup_items = items_in_signup.values('item')
+        # Get all items which are configured for event but is not in signup
+        missing_items = items_in_event.exclude(item__in=items_in_signup_items)
+        result = list(items_in_signup)
+
+        # Add missing items
+        for item_in_event in missing_items:
+            fake_item_in_signup = ItemInSignup()
+            fake_item_in_signup.signup_id = self
+            fake_item_in_signup.value = 'not_set'
+            fake_item_in_signup.item = item_in_event.item
+            result.append(fake_item_in_signup)
+
+        # Needs to be sorted to get in right column
+        result.sort(key=attrgetter('item.id'))
+        return result
+
 
 class EventItem(models.Model):
     TYPE_BOOL = 'B'
@@ -110,7 +205,7 @@ class EventItem(models.Model):
     TYPE_INT = 'I'
     TYPE_CHOICE = 'C'
     TYPE_CHOICES = (
-        (TYPE_BOOL, 'Boolean'),
+        (TYPE_BOOL, 'Checkbox'),
         (TYPE_STR, 'String'),
         (TYPE_TEXT, 'Text'),
         (TYPE_INT, 'Integer'),
@@ -118,8 +213,10 @@ class EventItem(models.Model):
     )
 
     name = models.CharField(max_length=100)
-    required = models.BooleanField(default=False)
-    type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=TYPE_INT)
+    required = models.BooleanField(default=False, verbose_name="Is this field mandatory")
+    type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=TYPE_INT,
+                            verbose_name="Data type",
+                            help_text="Decides what kind of data is allowed in this field")
 
     def __str__(self):
         return str(self.name)

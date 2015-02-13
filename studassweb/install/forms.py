@@ -48,7 +48,9 @@ class ModulesForm(forms.Form):
         modules = kwargs.pop('modules')
         super(ModulesForm, self).__init__(*args, **kwargs)
         for module in modules:
-            self.fields[module] = forms.BooleanField(label=module, initial=DisabledModule.is_enabled(module), required=False)
+            self.fields[module] = forms.BooleanField(label=module,
+                                                     initial=DisabledModule.is_enabled(module),
+                                                     required=False)
 
     def apply(self):
         """

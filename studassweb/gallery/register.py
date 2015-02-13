@@ -8,6 +8,7 @@ CAN_CREATE_ALBUMS = "can_create_albums"
 CAN_EDIT_MEMBER_ALBUMS = "can_edit_member_albums"
 CAN_EDIT_ALL_ALBUMS = "can_edit_all_albums"
 
+
 def get_menu_items():
     """
     :return: a tuple ([main menu items], [settings menu items], [others])

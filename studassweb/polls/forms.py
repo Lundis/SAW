@@ -6,12 +6,11 @@ from polls.models import *
 from django.utils.translation import ugettext_lazy as _
 
 
-
 class PollForm(forms.ModelForm):
 
     class Meta:
         model = Poll
-        fields = ('name','description','publication','expiration','can_vote_on_many')
+        fields = ('name', 'description', 'publication', 'expiration', 'can_vote_on_many')
 
     def save(self, commit=True, user=None):
         poll = super(PollForm, self).save(commit=False)
@@ -24,6 +23,7 @@ class PollForm(forms.ModelForm):
             self.save_m2m()
         return poll
 
+
 class ChoiceForm(forms.ModelForm):
     class Meta:
         model = Choice
@@ -31,6 +31,7 @@ class ChoiceForm(forms.ModelForm):
         labels = {
             'name': _('Choice'),
         }
+
 
 class ChoiceFormSingle(forms.Form):
 
@@ -43,7 +44,7 @@ class ChoiceFormSingle(forms.Form):
         self.fields["choices"] = forms.ChoiceField(choices=choices,
                                                    widget=forms.RadioSelect)
 
-    def save(self, request, commit=True):   #TODO CHANGE USER TO CURRENT TO SEE WHO HAS MADE CHOICE
+    def save(self, request, commit=True):  # TODO CHANGE USER TO CURRENT TO SEE WHO HAS MADE CHOICE
         if self.is_valid():
             choice_id = self.cleaned_data['choices']
             choice = Choice.objects.get(id=int(choice_id))
