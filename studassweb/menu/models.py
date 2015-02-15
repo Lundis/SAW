@@ -8,6 +8,9 @@ from users.models import SAWPermission
 from base.models import DisabledModule
 from .setup import PATH_CHOICES
 from solo.models import SingletonModel
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class MenuTemplate(models.Model):
@@ -156,6 +159,7 @@ class MenuItem(models.Model):
 
     #app_name is used for checking if it belongs to a disabled module
     app_name = models.CharField(max_length=50, null=True, blank=True)
+    identifier = models.CharField(max_length=100, unique=True)
     display_name = models.CharField(max_length=30)
 
     # A field for referring to external URLs
@@ -172,12 +176,11 @@ class MenuItem(models.Model):
     # was the menu created by an app or a user?
     created_by = models.CharField(max_length=2, choices=TYPE_CHOICES, default=TYPE_APP)
 
-    class Meta:
-        # Don't allow duplicates inside apps
-        unique_together = ('app_name', 'display_name')
-
     def __str__(self):
-        return self.display_name + ": " + self.url()
+        url = self.url()
+        if url is None:
+            logger.error("Menu Item (%s) has no URL!", self.id)
+        return self.identifier
 
     def clean(self, *args, **kwargs):
         super(MenuItem, self).clean(*args, **kwargs)
@@ -189,7 +192,7 @@ class MenuItem(models.Model):
         super(MenuItem, self).save(*args, **kwargs)
 
     @classmethod
-    def get_or_create(cls, app_name, display_name, reverse_string=None,
+    def get_or_create(cls, identifier, app_name=None, display_name=None, reverse_string=None,
                       linked_object=None, url=None, permission=None, submenu=None):
         """
         Convenience wrapper to create or get valid menu items
@@ -201,6 +204,12 @@ class MenuItem(models.Model):
         :param permission: The permission required to view this item. if None, anyone can view it
         :return:
         """
+        menu_item, created = cls.objects.get_or_create(identifier=identifier)
+        if not created:
+            return menu_item, created
+        menu_item.app_name = app_name
+        menu_item.display_name = display_name
+
         if permission and isinstance(permission, str):
             permission = SAWPermission.get_or_create(perm_name=permission)
 
@@ -208,29 +217,25 @@ class MenuItem(models.Model):
             if reverse_string or url:
                 raise ValueError("reverse_string and/or url cannot be given at the same time as referred_item")
             content_type = ContentType.objects.get_for_model(linked_object)
-            menu_item, created = cls.objects.get_or_create(app_name=app_name,
-                                                           display_name=display_name,
-                                                           content_type=content_type,
-                                                           object_id=linked_object.id)
+            menu_item.content_type = content_type
+            menu_item.object_id = linked_object.id
+
         elif reverse_string:
             if url:
                 raise ValueError("url cannot be given at the same time as referred_item")
-            menu_item, created = cls.objects.get_or_create(app_name=app_name,
-                                                           display_name=display_name,
-                                                           reverse_string=reverse_string)
+            menu_item.reverse_string = reverse_string
         elif url:
-            menu_item, created = cls.objects.get_or_create(app_name=app_name,
-                                                           display_name=display_name,
-                                                           external_url=url)
+            menu_item.external_url = url
         else:
             raise ValueError("No url, reverse string or item was given to MenuItem.get_or_create()")
 
         if permission:
             menu_item.view_permission = permission
+
         if submenu:
             menu_item.submenu = submenu
-        if permission or submenu:
-            menu_item.save()
+
+        menu_item.save()
         return menu_item, created
 
     @classmethod
@@ -277,11 +282,11 @@ class MenuItem(models.Model):
         :param link_target: target model
         """
         items = cls.get_all_that_links_to(link_target)
-        if items:
-            for item in items:
-                if item.submenu:
-                    item.submenu.delete()
-                item.delete()
+        print(items)
+        for item in items:
+            item.delete()
+            if item.submenu:
+                item.submenu.delete()
 
     @classmethod
     def get_all_custom_items(cls):

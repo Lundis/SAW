@@ -7,6 +7,8 @@ from base.fields import ValidatedRichTextField
 from menu.models import MenuItem, Menu
 from users.permissions import has_user_perm
 from frontpage.models import FrontPageItem
+from django.dispatch import receiver
+from django.db.models.signals import pre_delete, post_delete
 import pages.register as pregister
 
 PERMISSION_CHOICES = (
@@ -20,7 +22,7 @@ class InfoCategory(models.Model):
     name = models.CharField(max_length=50, unique=True)
     slug = models.SlugField(editable=False)
     # an info category has an associated menu item, which in turn has a submenu
-    menu_item = models.ForeignKey(MenuItem, null=True)
+    menu_item = models.ForeignKey(MenuItem, null=True, on_delete=models.SET_NULL)
 
     permission = models.CharField(max_length=15, choices=PERMISSION_CHOICES, default="VIEW_PUBLIC")
 
@@ -38,8 +40,9 @@ class InfoCategory(models.Model):
             self.slug = slugify(self.name)
         super(InfoCategory, self).save(*args, **kwargs)
         # create a menu item if it doesn't exist
-        self.menu_item, created = MenuItem.get_or_create(__package__,
-                                                         self.name,
+        self.menu_item, created = MenuItem.get_or_create(identifier="pages/category/%d" % self.id,
+                                                         app_name=__package__,
+                                                         display_name=self.name,
                                                          linked_object=self,
                                                          permission=self.permission)
         if created:
@@ -48,10 +51,6 @@ class InfoCategory(models.Model):
             self.save()
             info_menu, created = Menu.get_or_create("pages_top_menu")
             info_menu.add_item(self.menu_item)
-
-    def delete(self, *args, **kwargs):
-        MenuItem.delete_all_that_links_to(self)
-        super(InfoCategory, self, *args, **kwargs)
 
     def can_view(self, user):
         return has_user_perm(user, self.get_permission_str())
@@ -62,6 +61,12 @@ class InfoCategory(models.Model):
 
     def get_permission_str(self):
         return dict(PERMISSION_CHOICES)[self.permission]
+
+
+@receiver(pre_delete, sender=InfoCategory, dispatch_uid="category_pre_delete")
+def category_pre_delete(**kwargs):
+    instance = kwargs.pop("instance")
+    instance.menu_item.delete()
 
 
 class InfoPage(models.Model):
@@ -95,8 +100,9 @@ class InfoPage(models.Model):
             edit = InfoPageEdit(author=self.author, text=self.text, page=self)
             edit.save()
         # create a menu item if it doesn't exist
-        menu_item, created = MenuItem.get_or_create(__package__,
-                                                    self.title,
+        menu_item, created = MenuItem.get_or_create(identifier="pages/page/%d" % self.id,
+                                                    app_name=__package__,
+                                                    display_name=self.title,
                                                     linked_object=self,
                                                     permission=self.permission)
         if self.category:
@@ -107,11 +113,6 @@ class InfoPage(models.Model):
                 # and add it last in the correct one
                 menu.add_item(menu_item, menu.count())
 
-        self.update_frontpage_item()
-
-    def delete(self, *args, **kwargs):
-        MenuItem.delete_all_that_links_to(self)
-        super(InfoPage, self).delete(*args, **kwargs)
         self.update_frontpage_item()
 
     def can_view(self, user):
@@ -147,12 +148,22 @@ class InfoPage(models.Model):
                                     )
                 new.set_target(self)
                 new.save()
+        # remove if it exists
+        elif old:
+            old.delete()
 
-        else:
-            # remove if it exists
-            old = FrontPageItem.get_with_target(self)
-            if old:
-                old.delete()
+
+@receiver(pre_delete, sender=InfoPage, dispatch_uid="page_pre_delete")
+def page_pre_delete(**kwargs):
+    instance = kwargs.pop("instance")
+    print("calling InfoPage.pre_delete")
+    MenuItem.delete_all_that_links_to(instance)
+
+
+@receiver(pre_delete, sender=InfoPage, dispatch_uid="page_post_delete")
+def page_post_delete(**kwargs):
+    instance = kwargs.pop("instance")
+    instance.update_frontpage_item()
 
 
 class InfoPageEdit(models.Model):

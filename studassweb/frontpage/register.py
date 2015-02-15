@@ -10,8 +10,9 @@ def get_menu_items():
     """
     :return: a tuple ([main menu items], [settings menu items], [others])
     """
-    item, created = MenuItem.get_or_create(__package__,
-                                           "Home",
+    item, created = MenuItem.get_or_create(identifier="frontpage_home",
+                                           app_name=__package__,
+                                           display_name="Home",
                                            reverse_string="frontpage_home",
                                            permission=SAWPermission.get_or_create(CAN_VIEW_FRONTPAGE))
     return ([item],
