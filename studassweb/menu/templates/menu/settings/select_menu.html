@@ -30,8 +30,7 @@
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <div class="panel-title">
-                        {% trans "Click on a menu item to edit it or " %}
-                        <a href="{% url "menu_settings_new_menu_item" %}">{% trans "create a new one" %}</a>
+                        {% trans "Click on a menu item to edit it" %}
                     </div>
                 </div>
                 <div class="panel-body">
@@ -77,6 +76,9 @@
     <div class="btn-group-vertical btn-block">
         <a href="{% url "menu_settings_new_menu" %}" class="btn btn-primary">
             {% trans "Create a new menu" %}
+        </a>
+        <a class="btn btn-primary" href="{% url "menu_settings_new_menu_item" %}">
+            {% trans "Create a new menu item" %}
         </a>
     </div>
 {% endblock %}
