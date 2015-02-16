@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.template.loader import get_template
 from django.template import Context
 import django.utils.timezone as timezone
-from .register import CAN_CREATE_EVENTS
+import events.register as eregister
 from users import permissions
 from django.template.defaultfilters import slugify
 import itertools
@@ -100,7 +100,7 @@ class EventSignup(models.Model):
         ordering = "created",
 
     def user_can_edit(self, user):
-        if self.user == user or permissions.has_user_perm(user, CAN_CREATE_EVENTS):
+        if self.user == user or permissions.has_user_perm(user, eregister.CAN_CREATE_EVENTS):
             return True
         else:
             return False
