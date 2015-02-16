@@ -18,8 +18,9 @@ def get_menu_items():
     """
     :return: a tuple ([main menu items], [settings menu items], [others])
     """
-    item, created = MenuItem.get_or_create(__package__,
-                                           "Settings",
+    item, created = MenuItem.get_or_create(identifier="settings_home",
+                                           app_name=__package__,
+                                           display_name="Settings",
                                            reverse_string="settings_main",
                                            permission=SAWPermission.get_or_create(VIEW_SETTINGS))
     return (None,

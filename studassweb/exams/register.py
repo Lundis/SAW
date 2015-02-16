@@ -11,8 +11,9 @@ def get_menu_items():
     """
     :return: a tuple ([main menu items], [settings menu items], [others])
     """
-    item, created = MenuItem.get_or_create(__package__,
-                                           "Exams",
+    item, created = MenuItem.get_or_create(identifier="exams_home",
+                                           app_name=__package__,
+                                           display_name="Exams",
                                            reverse_string="exams_main",
                                            permission=SAWPermission.get_or_create(CAN_VIEW_EXAM_ARCHIVE))
     return ([item],

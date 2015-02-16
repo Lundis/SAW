@@ -17,8 +17,9 @@ def get_menu_items():
     """
     :return: a tuple ([main menu items], [settings menu items], [others])
     """
-    item, created = MenuItem.get_or_create(__package__,
-                                           "Contact",
+    item, created = MenuItem.get_or_create(identifier="contact_home",
+                                           app_name=__package__,
+                                           display_name="Contact",
                                            reverse_string="contact_home",
                                            permission=SAWPermission.get_or_create(CAN_VIEW_CONTACT_INFO))
     return [item], None, None
