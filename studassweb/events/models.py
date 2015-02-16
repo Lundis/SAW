@@ -245,6 +245,12 @@ class EventItem(models.Model):
     def __str__(self):
         return str(self.name)
 
+    def get_name(self):
+        if self.type==self.TYPE_CHOICE:
+            return str(self.name.split("//")[0])
+        else:
+            return str(self.name)
+
 
 # This is for setting which items can be set when signing up to event
 class ItemInEvent(models.Model):
