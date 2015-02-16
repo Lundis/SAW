@@ -13,7 +13,7 @@
 
 {% block breadcrumb3 %}
     <li class="active">
-        {{ photo }}
+        {{ photo.uploaded |date:"Y-m-d" }}
     </li>
 {% endblock %}
 
@@ -21,7 +21,7 @@
     <h1>PHOTO</h1>
     <ul class="list-group">
         <li class="list-group-item">
-            {% for photofile in photos %}
+            {% for photofile in images %}
                 <a href="{{ photofile.image.url }}"><img  class="img-thumbnail" src="{% thumbnail photofile.image 100x100 crop=scale %}"/></a>
             {% endfor %}
         </li>
