@@ -4,16 +4,21 @@
 {% load bootstrap3 %}
 {% load static %}
 
+{% block breadcrumb2 %}
+    <li class="active">
+        {% if form.instance.pk %}
+            {% trans "Editing" %} {{ form.instance }}
+        {% else %}
+            {% trans "New Photo" %}
+        {% endif %}
+    </li>
+{% endblock %}
+
 {% block main_content %}
-    {% load navigator %}
-    {% url "gallery.views.view_gallery" as gallery_url %}
     {% if form.instance.pk %}
-        {% display_navigator gallery_url "Photos" form.instance.get_absolute_url form.instance %}
+        <h1>Edit {{ form.instance.name }}</h1>
     {% else %}
-        {% display_navigator gallery_url "Photos" "#" "New photo" %}
-    {% endif %}
-    {% if form.instance.pk %}
-        <h1>Edit photo {{ form.instance.name }}</h1>
+        <h1>Add photo</h1>
     {% endif %}
 
     {% if form.instance.pk %}
@@ -32,12 +37,14 @@
         {% bootstrap_form form %}
         <div id="photofilesformset_all">
             {% for f in filesformset.forms %}
+                <div class="photofilesformset_single">
                     {{ f.id }}
                     {% bootstrap_field f.image%}
                     {% if f.instance.pk %}{{ f.DELETE}}{% endif %}{# Note! removing this fucks with functionality #}
                 </div>
             {% endfor %}
         </div>
+
         {{ filesformset.management_form }}
         {% buttons %}
             <button type="submit" class="btn btn-primary">
@@ -54,11 +61,16 @@
     <script type="text/javascript">
         $(function () {
             //Set up dynamic adding of images
-            $('.filesformset_single').formset({
+            $('.photofilesformset_single').formset({
                 prefix: '{{ filesformset.prefix }}',
                 formCssClass: 'dynamic-formasdf',
                 addText: '{% trans "Add another image" %}',
                 deleteText: '{% trans "Remove image" %}'
+            });
+                       //Set up datepicker
+            $( "#id_uploaded" ).datepicker({
+                firstDay: 1,
+                dateFormat: "dd.mm.yy"
             });
         })
     </script>

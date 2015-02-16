@@ -1,0 +1,32 @@
+{% extends "gallery/base.html" %}
+
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block breadcrumb2 %}
+    <li class="active">
+        {% if form.instance.pk %}
+            {% trans "Editing" %} {{ form.instance }}
+        {% else %}
+            {% trans "New Album" %}
+        {% endif %}
+    </li>
+{% endblock %}
+
+{% block main_content %}
+    {% if form.instance.pk %}
+        <h1>Edit {{ form.instance.name }}</h1>
+    {% else %}
+        <h2>Create album</h2>
+    {% endif %}
+
+    <form action ="" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">
+            {% trans "Submit" %}
+            </button>
+        {% endbuttons %}
+    </form>
+{% endblock %}
