@@ -1,5 +1,6 @@
 from django import forms
 from gallery.models import *
+from datetime import date
 
 
 class AlbumForm(forms.ModelForm):
@@ -9,8 +10,23 @@ class AlbumForm(forms.ModelForm):
         fields = ('author', 'description', 'name')
 
 
-class PictureForm(forms.Form):
+class PictureForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(PictureForm, self).__init__(*args, **kwargs)
+
+
+    uploaded = forms.DateTimeField(
+        widget=forms.DateInput(format='%d.%m.%Y'),
+        input_formats=('%d.%m.%Y',),
+        initial=date.today)
 
     class Meta:
         model = Photo
-        fields = ('album_id', 'author', 'description', 'image','uploaded')
+        fields = ('album_id', 'author', 'description', 'uploaded')
+
+
+class PhotoFileForm(forms.ModelForm):
+
+    class Meta:
+        model = PhotoFile
+        fields = ('image',)
