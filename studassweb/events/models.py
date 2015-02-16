@@ -9,7 +9,7 @@ from django.utils.translation import ugettext as _
 from django.core.mail import send_mail
 from django.conf import settings
 import django.utils.timezone as timezone
-from .register import CAN_CREATE_EVENTS
+import events.register as eregister
 from users import permissions
 from base.fields import ValidatedRichTextField
 from frontpage.models import FrontPageItem
@@ -118,7 +118,7 @@ class EventSignup(models.Model):
         ordering = "created",
 
     def user_can_edit(self, user):
-        if self.user == user or permissions.has_user_perm(user, CAN_CREATE_EVENTS):
+        if self.user == user or permissions.has_user_perm(user, eregister.CAN_CREATE_EVENTS):
             return True
         else:
             return False
@@ -244,6 +244,12 @@ class EventItem(models.Model):
 
     def __str__(self):
         return str(self.name)
+
+    def get_name(self):
+        if self.type==self.TYPE_CHOICE:
+            return str(self.name.split("//")[0])
+        else:
+            return str(self.name)
 
 
 # This is for setting which items can be set when signing up to event

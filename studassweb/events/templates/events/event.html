@@ -92,7 +92,7 @@
                     {% endif %}
                     {% for event_item in event.get_items %}
                         {% if can_view_signup_info or event_item.public %}
-                            <th>{{ event_item.item.name }}</th>
+                            <th>{{ event_item.item.get_name }}</th>
                         {% endif %}
                     {% endfor %}
                     {% if request.user.is_authenticated %}
@@ -112,7 +112,13 @@
                         {% endif %}
                         {% for event_item in signup.get_items_relevant %}
                             {% if can_view_signup_info or event_item.public %}
-                                <td>{{ event_item.value }}</td>
+                                {% if event_item.value == "True" %}
+                                    <td><span class="glyphicon glyphicon-check" aria-label="True"></span></td>
+                                {% elif event_item.value == "False" %}
+                                    <td><span class="glyphicon glyphicon-unchecked" aria-label="False"></span></td>
+                                {% else %}
+                                    <td>{{ event_item.value }}</td>
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
                         {% if request.user.is_authenticated %}

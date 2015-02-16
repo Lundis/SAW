@@ -20,20 +20,29 @@
             {% trans "Save" %}
         </button>
     </form>
-    {% for group in groups %}
-        <div class="panel panel-primary col-sm-6 col-md-4">
-            <div class="panel-heading">{{ group.name }}</div>
-            <div class="panel-body">
-                <div id="group-{{ group.id }}" class="btn-group-vertical connected-sort ui-sortable permission-container">
-                    {% for perm in group.permissions %}
-                        <li id="permission-{{ perm.id }}" class="btn btn-primary permission ui-sortable-handle" title="{{ perm.description }}">
-                            {{ perm.permission.name }}
-                        </li>
-                    {% endfor %}
+    <div class="row">
+        {% for group in groups %}
+            <div class="col-sm-6 col-md-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            {{ group.name }}
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div id="group-{{ group.id }}" class="connected-sort ui-sortable permission-container"
+                             style="min-width:100%; min-height:100px;">
+                            {% for perm in group.permissions %}
+                                <li id="permission-{{ perm.id }}" class="btn btn-primary permission ui-sortable-handle" title="{{ perm.description }}">
+                                    {{ perm.permission.name }}
+                                </li>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
 {% endblock %}
 
 {% block scripts %}
