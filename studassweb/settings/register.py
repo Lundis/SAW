@@ -22,7 +22,7 @@ def get_menu_items():
                                            app_name=__package__,
                                            display_name="Settings",
                                            reverse_string="settings_main",
-                                           permission=SAWPermission.get_or_create(VIEW_SETTINGS))
+                                           permission=SAWPermission.get(VIEW_SETTINGS))
     return (None,
             [item],
             None)

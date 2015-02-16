@@ -11,7 +11,7 @@ from menu.forms import MenuForm
 from menu.setup import setup_menu_module
 from .models import InstallProgress
 from users.decorators import has_permission
-from users.groups import setup_default_groups, put_user_in_standard_group, WEBMASTER
+from users.groups import setup_default_groups_and_permissions, put_user_in_standard_group, WEBMASTER
 from .register import CAN_INSTALL
 import logging
 
@@ -19,8 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def welcome(request):
-    # create the can_install permission if it doesn't exist
-    SAWPermission.get_or_create("can_install", "Allows you to use the installation wizard")
+    setup_default_groups_and_permissions()
     context = {}
     if not request.user.is_authenticated():
         login_form = LoginForm(request.POST or None)
@@ -103,7 +102,6 @@ def get_other_items(occupied=[]):
 @has_permission(CAN_INSTALL)
 def finished(request):
     logger.info('in Finished')
-    setup_default_groups()
     InstallProgress.finish()
     context = {}
     return render(request, 'install/finished.html', context)

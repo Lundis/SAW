@@ -211,7 +211,7 @@ class MenuItem(models.Model):
         menu_item.display_name = display_name
 
         if permission and isinstance(permission, str):
-            permission = SAWPermission.get_or_create(perm_name=permission)
+            permission = SAWPermission.get(perm_name=permission)
 
         if linked_object:
             if reverse_string or url:

@@ -20,7 +20,7 @@ def get_menu_items():
                                            app_name=__package__,
                                            display_name="Polls",
                                            reverse_string="polls_home",
-                                           permission=SAWPermission.get_or_create(CAN_VIEW_PUBLIC_POLLS))
+                                           permission=SAWPermission.get(CAN_VIEW_PUBLIC_POLLS))
     return ([item],
             None,
             None)

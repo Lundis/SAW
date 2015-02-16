@@ -24,7 +24,11 @@ GROUP_CHOICES = ((GUEST, _(GUEST)),
                  (WEBMASTER, _(WEBMASTER)))
 
 
-def setup_default_groups():
+def setup_default_groups_and_permissions():
+    """
+    Creates all permissions and sets up all groups
+    :return:
+    """
     permission_funcs = [func for module, func in get_modules_with("register", "get_permissions")]
     # get all the groups from the database
     groups = [group for group, created in
@@ -33,7 +37,7 @@ def setup_default_groups():
         perms = get_perms()
         for perm, group, description in perms:
             # create the permission if it doesn't exist:
-            SAWPermission.get_or_create(perm, description)
+            SAWPermission.get_or_create(perm, group, description)
             # ignore permissions that already are in a group.
             # we don't want duplicates and we don't want to ruin changes made by the user.
             if not is_perm_in_groups(perm, groups):

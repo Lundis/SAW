@@ -83,23 +83,40 @@ class SAWPermission(models.Model):
     """
     permission = models.ForeignKey(Permission, primary_key=True)
     description = models.CharField(max_length=200)
+    default_group = models.ForeignKey(Group, null=True, default=None)
 
     def __str__(self):
         return self.permission.codename
 
     @classmethod
-    def get_or_create(cls, perm_name, description=None):
+    def get(cls, perm_name):
         """
-        :return: The requested SAWPermission
+        :param perm_name: The name of the permission (str)
+        :return:
         """
+        perm = Permission.objects.get(codename=perm_name)
+        return SAWPermission.objects.get(permission=perm)
+
+    @classmethod
+    def get_or_create(cls, perm_name, default_group, description):
+        """
+
+        :param perm_name: name of permission (str)
+        :param default_group: A Group or a string
+        :param description:
+        :return:
+        """
+        if not isinstance(default_group, Group):
+            default_group = Group.objects.get(name=default_group)
         fancy_name = perm_name[0].upper() + perm_name[1:].replace("_", " ")
         permission, created = Permission.objects.get_or_create(name=fancy_name,
                                                                codename=perm_name,
                                                                content_type=DummyPermissionBase.get_content_type())
+        logger.info("Created permission %s", perm_name)
         saw_permission, created = cls.objects.get_or_create(permission=permission)
-        # if the description isn't "" and the object was created or it doesn't have a description, add the description
-        if description and (created or not saw_permission.description):
+        if not saw_permission.description or not saw_permission.default_group:
             saw_permission.description = description
+            saw_permission.default_group = default_group
             saw_permission.save()
         return saw_permission
 

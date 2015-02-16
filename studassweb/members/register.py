@@ -11,7 +11,7 @@ def get_menu_items():
                                            app_name=__package__,
                                            display_name="Member Registry",
                                            reverse_string="members_home",
-                                           permission=SAWPermission.get_or_create(CAN_VIEW))
+                                           permission=SAWPermission.get(CAN_VIEW))
     return (None,
             [item],
             None)

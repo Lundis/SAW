@@ -21,7 +21,7 @@ def get_menu_items():
                                            app_name=__package__,
                                            display_name="Contact",
                                            reverse_string="contact_home",
-                                           permission=SAWPermission.get_or_create(CAN_VIEW_CONTACT_INFO))
+                                           permission=SAWPermission.get(CAN_VIEW_CONTACT_INFO))
     return [item], None, None
 
 

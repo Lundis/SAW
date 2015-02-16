@@ -15,7 +15,7 @@ def get_menu_items():
                                            app_name=__package__,
                                            display_name="Exams",
                                            reverse_string="exams_main",
-                                           permission=SAWPermission.get_or_create(CAN_VIEW_EXAM_ARCHIVE))
+                                           permission=SAWPermission.get(CAN_VIEW_EXAM_ARCHIVE))
     return ([item],
             None,
             None)

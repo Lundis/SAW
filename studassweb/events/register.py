@@ -16,7 +16,7 @@ def get_menu_items():
                                            app_name=__package__,
                                            display_name="Events",
                                            reverse_string="events_home",
-                                           permission=SAWPermission.get_or_create(CAN_VIEW_EVENTS))
+                                           permission=SAWPermission.get(CAN_VIEW_EVENTS))
     return ([item],
             None,
             None)
