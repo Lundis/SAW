@@ -9,8 +9,9 @@ def get_menu_items():
     """
     :return: a tuple ([main menu items], [settings menu items], [others])
     """
-    item, created = MenuItem.get_or_create(__package__,
-                                           "Pages",
+    item, created = MenuItem.get_or_create(identifier="pages_home",
+                                           app_name=__package__,
+                                           display_name="Pages",
                                            reverse_string="pages_view_categories",
                                            permission=SAWPermission.get_or_create(VIEW_PUBLIC))
     if not item.submenu:

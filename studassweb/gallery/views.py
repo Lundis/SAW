@@ -51,8 +51,10 @@ def edit_album(request, album_id):
         return HttpResponseNotFound('error')
     form = AlbumForm(instance=album)
     if request.method == 'POST':
+        form = AlbumForm(request.POST, instance=album)
         if form.is_valid():
-            tmp = form.save()
+            tmp = form.save(commit=False)
+            tmp.save()
             return HttpResponseRedirect(reverse('gallery_view_album', kwargs={'album_id': tmp.id}))
     context = {'album': album, 'form': form}
     return render(request, 'gallery/edit_album.html', context)
@@ -75,44 +77,69 @@ def delete_album(request, album_id):
 
 def add_picture(request, photo_id=None):
     form = PictureForm()
+    photofile_factory = inlineformset_factory(Photo, PhotoFile, fields=('id', 'image',), extra=1, can_delete=True)
     try:
         photo = Photo.objects.get(id=photo_id)
         form = PictureForm(instance=photo)
+        fileformset = photofile_factory(instance=photo, prefix='dynamix')
     except Photo.DoesNotExist:
+        fileformset = photofile_factory(prefix='dynamix')
         photo = None
     if request.method == 'POST':
         form = PictureForm(request.POST, instance=photo)
-        if form.is_valid():
-            tmp = form.save()
-            return HttpResponseRedirect(reverse('gallery_view_picture', kwargs={'photo_id': tmp.id}))
+        fileformset = photofile_factory(request.POST, request.FILES, instance=photo, prefix='dynamix')
+        if form.is_valid() and fileformset.is_valid():
+            tmp_photo = form.save(commit=False)
+            tmp_photo.save()
 
-    context = {'form': form}
+            for obj in fileformset.save(commit=False):
+                obj.photo_id = tmp_photo
+                obj.save()
+
+            for obj in fileformset.deleted_objects:
+                obj.delete()
+            return HttpResponseRedirect(reverse('gallery_view_picture', kwargs={'photo_id': tmp_photo.id}))
+
+    context = {'form': form, 'filesformset': fileformset}
     return render(request, 'gallery/view_album.html', context)
 
 
 def view_picture(request, photo_id):
     try:
         photo = Photo.objects.get(id=photo_id)
+        images = PhotoFile.objects.get(photo_id = photo_id)
+
         return render(request, 'gallery/view_photo.html', {
-            'photo': photo},)
+            'images': images, 'photo': photo},)
     except Photo.DoesNotExist:
         return HttpResponseNotFound('No photo with that id found')
 
 
 def edit_picture(request, photo_id):
     form = PictureForm()
+    photofile_factory = inlineformset_factory(Photo, PhotoFile, fields=('id', 'image',), extra=1, can_delete=True)
     try:
         photo = Photo.objects.get(id=photo_id)
         form = PictureForm(instance=photo)
+        fileformset = photofile_factory(instance=photo, prefix='dynamix')
     except Photo.DoesNotExist:
+        fileformset = photofile_factory(prefix='dynamix')
         photo = None
     if request.method == 'POST':
         form = PictureForm(request.POST, instance=photo)
-        if form.is_valid():
-            tmp = form.save()
-            return HttpResponseRedirect(reverse('gallery_view_picture', kwargs={'photo_id': tmp.id}))
+        if form.is_valid() and fileformset.is_valid():
+            tmp_photo = form.save(commit=False)
+            tmp_photo.save()
 
-    context = {'form': form}
+            for obj in fileformset.save(commit=False):
+                obj.photo_id = tmp_photo
+                obj.save()
+
+            for obj in fileformset.deleted_objects:
+                obj.delete()
+            return HttpResponseRedirect(reverse('gallery_view_picture', kwargs={'photo_id': tmp_photo.id}))
+
+    context = {'form': form, 'fileformset': fileformset}
     return render(request, 'gallery/view_photo.html', context)
 
 
@@ -120,6 +147,8 @@ def delete_picture(request, photo_id):
         if request.method == 'POST':
             try:
                 photo = Photo.objects.get(id=photo_id)
+                images = PhotoFile.objects.filter(photo_id=photo_id)
+                images.delete()
                 photo.delete()
                 return HttpResponseRedirect(reverse("gallery_main"))  # TODO give feedback to user
             except Photo.DoesNotExist:

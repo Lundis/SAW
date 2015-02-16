@@ -1,4 +1,7 @@
 from django import forms
+from django.core.validators import ValidationError
+from django.utils import timezone
+from django.utils.translation import ugettext as _
 from .models import Event, EventSignup, EventItem, ItemInEvent, ItemInSignup
 from base.utils import generate_email_ver_code
 
@@ -7,15 +10,22 @@ EITEMS = "eitems"
 
 class EventSignupForm(forms.ModelForm):
 
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop("event")
+        super(EventSignupForm, self).__init__(*args, **kwargs)
+
     class Meta:
         model = EventSignup
-        fields = ('name', 'email',)
+        fields = ('name', 'email')
 
-    def save(self, commit=True, user=None, event=None):
-        if event is None:
-            raise ValueError("EventSignupForm.save(): missing event")
+    def clean(self):
+        super(EventSignupForm, self).clean()
+        if self.event.is_past_signup_deadline():
+            raise ValidationError("It's already past the deadline!")
+
+    def save(self, commit=True, user=None,):
         temp_signup = super(EventSignupForm, self).save(commit=False)
-        temp_signup.event = event
+        temp_signup.event = self.event
         temp_signup.auth_code = generate_email_ver_code()
         while EventSignup.objects.filter(auth_code=temp_signup.auth_code).exists():
             temp_signup.auth_code = generate_email_ver_code()
@@ -36,13 +46,26 @@ class EventForm(forms.ModelForm):
         widget=forms.DateTimeInput(format='%d.%m.%Y %H:%M'),
         input_formats=('%d.%m.%Y %H:%M',))
 
+    signup_start = forms.DateTimeField(
+        widget=forms.DateTimeInput(format='%d.%m.%Y %H:%M'),
+        input_formats=('%d.%m.%Y %H:%M',),
+        initial=timezone.now())
+
     signup_deadline = forms.DateTimeField(
         widget=forms.DateTimeInput(format='%d.%m.%Y %H:%M'),
         input_formats=('%d.%m.%Y %H:%M',))
 
     class Meta:
         model = Event
-        fields = ('title', 'text', 'signup_deadline', 'start', 'stop')
+        fields = ('title', 'text', 'max_participants', 'signup_start', 'signup_deadline', 'start', 'stop')
+
+    def clean(self):
+        super(EventForm, self).clean()
+        if self.cleaned_data['signup_start'] > self.cleaned_data['signup_deadline']:
+            self.add_error('signup_deadline', _("The signup deadline can't be before it starts"))
+
+        if self.cleaned_data['start'] > self.cleaned_data['stop']:
+            self.add_error('stop', _("The event can't end before it starts!"))
 
     def save(self, commit=True, user=None):
         if user is None:
@@ -55,7 +78,10 @@ class EventForm(forms.ModelForm):
 
 
 class EventItemsForm(forms.Form):
-
+    """
+    A form for creating/editing event items
+    TODO: create fields for public and hidden_in_print_view
+    """
     def __init__(self, *args, **kwargs):
         event = kwargs.pop("event", None)
         selected_eitems = []
@@ -88,7 +114,9 @@ class EventItemsForm(forms.Form):
 
 
 class SignupItemsForm(forms.Form):
-
+    """
+    A form for selecting items in a signup form
+    """
     def __init__(self, *args, **kwargs):
         event = kwargs.pop("event")
         signup = kwargs.pop("signup", None)

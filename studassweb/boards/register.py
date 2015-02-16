@@ -12,8 +12,9 @@ def get_menu_items():
     """
     :return: a tuple ([main menu items], [settings menu items], [others])
     """
-    item, created = MenuItem.get_or_create(__package__,
-                                           "Board",
+    item, created = MenuItem.get_or_create(identifier="boards_home",
+                                           app_name=__package__,
+                                           display_name="Board",
                                            reverse_string="boards_main",
                                            permission=SAWPermission.get_or_create(CAN_VIEW_BOARDS))
     return ([item],

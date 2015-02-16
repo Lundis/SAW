@@ -4,6 +4,7 @@
 {% load bootstrap3 %}
 {% load sawp %}
 {% load thumbnail %}
+{% load polls_templatetags %}
 
 {% block breadcrumb1 %}
     <li class="active">
@@ -15,9 +16,31 @@
     <h3></h3>
 
     {% for p in all_polls %}
-        <a class="list-group-item" href="{% url 'polls_view_poll' p.id %}">{{ p.name }}
+        <a class="list-group-item" href="{% url 'polls_view_poll' p.id %}">
+            <div class="row">
 
+
+                <div class="col-xs-8">
+                    {% has_user_voted p request as show_voted_sign %}
+                    {% if show_voted_sign %}
+                        <span class="glyphicon glyphicon-ok">
+
+                    </span>
+                    {% else %}
+                        <span class="glyphicon glyphicon-remove">
+
+                    </span>
+
+                    {% endif %}
+                    {{ p.name }}
+
+                </div>
+                <div class="col-xs-4 text-right">
+                    {{ p.expiration }}
+                </div>
+            </div>
         </a>
+
     {% empty %}
         <p>{% trans "No polls found!" %}</p>
     {% endfor %}

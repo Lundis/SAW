@@ -3,14 +3,24 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.template.loader import get_template
 from django.template import Context
+from django.core.validators import MinValueValidator
+from django.template.defaultfilters import slugify
+from django.utils.translation import ugettext as _
+from django.core.mail import send_mail
+from django.conf import settings
 import django.utils.timezone as timezone
 import events.register as eregister
 from users import permissions
-from django.template.defaultfilters import slugify
-import itertools
 from base.fields import ValidatedRichTextField
 from frontpage.models import FrontPageItem
+import itertools
+import logging
+
 from operator import attrgetter
+
+
+logger = logging.getLogger(__name__)
+
 
 # This should maybe be put in base or something
 class MultiInputField(models.CharField):
@@ -30,14 +40,19 @@ class Event(models.Model):
     start = models.DateTimeField(verbose_name="Event ends")
     stop = models.DateTimeField(verbose_name="Event starts")
     author = models.ForeignKey(User)
+    signup_start = models.DateTimeField(verbose_name="Signup starts", default=timezone.now)
     signup_deadline = models.DateTimeField(verbose_name="Deadline for signups")
     permission = models.CharField(max_length=100, blank=True, null=True)  # Permission needed to see and attend
+    max_participants = models.IntegerField(validators=[MinValueValidator(1)], default=50)
 
     def __str__(self):
         return str(self.title)
 
     def get_absolute_url(self):
         return reverse("events_view_event", kwargs={'slug': self.slug})
+
+    def is_past_signup_deadline(self):
+        return timezone.now() > self.signup_deadline
 
     # https://keyerror.com/blog/automatically-generating-unique-slugs-in-django
     def save(self, *args, **kwargs):
@@ -84,10 +99,12 @@ class Event(models.Model):
     def get_items(self):
         return ItemInEvent.objects.filter(event=self).order_by('item__id')
 
+    def count_participants(self):
+        return EventSignup.objects.filter(event=self).count()
+
 
 # Each user which signs up creates one of these
 # We need both user and name as we need to allow non-signed in users to sign up
-# TODO we need to save the auth_codes somehow, to ensure that a new signup doesn't get the same code as a delete one
 class EventSignup(models.Model):
     event = models.ForeignKey(Event)
     user = models.ForeignKey(User, blank=True, null=True)
@@ -95,6 +112,7 @@ class EventSignup(models.Model):
     email = models.EmailField()
     created = models.DateTimeField(auto_now_add=True, blank=True)
     auth_code = models.CharField(max_length=32, unique=True)  # Edit and delete for anonymous users
+    order_id = models.IntegerField(validators=MinValueValidator(1), default=1)
 
     class Meta:
         ordering = "created",
@@ -107,6 +125,35 @@ class EventSignup(models.Model):
 
     def __str__(self):
         return "{0}:{1} has registered to {2}".format(self.created, self.user, self.event)
+
+    def save(self, *args, **kwargs):
+        super(EventSignup, self).save(*args, **kwargs)
+        self.fix_indices()
+
+    def delete(self, using=None):
+        super(EventSignup, self).delete(using)
+        # Notify a user on the reserve list that they're in by email
+        # Can't allow delete() to throw an exception related to the email
+        try:
+            signups = EventSignup.objects.filter(event=self.event)
+            if self.event.max_participants >= signups.count():
+                # Get the signup that just got below the participant limit
+                reserve_signup = signups[self.event.max_participants - 1]
+                reserve_signup.send_reserve_email()
+        except Exception as e:
+            logger.error("Sending reserve email failed (%s)", e)
+
+        # update indices
+        self.fix_indices()
+
+    def send_reserve_email(self):
+        context = Context({'event': self.event})
+        template = get_template("events/emails/reserve_notify.html")
+        message = template.render(context)
+        title = _("Reserve notification for") + " " + self.event.title
+        from_email = settings.NO_REPLY_EMAIL
+        to_emails = [self.email]
+        send_mail(title, message, from_email, to_emails)
 
     def build_email_content(self, request):
         context = Context(
@@ -124,6 +171,20 @@ class EventSignup(models.Model):
 
         template = get_template("events/email.html")
         return template.render(context)
+
+    def is_reserve(self):
+        signups = EventSignup.objects.filter(event=self.event)
+        for index, item in enumerate(signups):
+            if item.pk == self.pk:
+                return index >= self.event.max_participants
+        logger.error("is_reserve couldn't find itself in the list")
+
+    def fix_indices(self):
+        signups = EventSignup.objects.filter(event=self.event)
+        for index, item in enumerate(signups):
+            if item.order_id != index + 1:
+                item.order_id = index + 1
+                item.save()
 
     def get_items(self):
         return ItemInSignup.objects.filter(signup=self).order_by('item__id')
@@ -164,8 +225,8 @@ class EventItem(models.Model):
     TYPE_CHOICE = 'C'
     TYPE_CHOICES = (
         (TYPE_BOOL, 'Checkbox'),
-        (TYPE_STR, 'String'),
-        (TYPE_TEXT, 'Text'),
+        (TYPE_STR, 'Text (one line)'),
+        (TYPE_TEXT, 'Text (multiple lines)'),
         (TYPE_INT, 'Integer'),
         (TYPE_CHOICE, 'Choice'),
     )
@@ -174,7 +235,12 @@ class EventItem(models.Model):
     required = models.BooleanField(default=False, verbose_name="Is this field mandatory")
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=TYPE_INT,
                             verbose_name="Data type",
-                            help_text="Decides what kind of data is allowed in this field")
+                            help_text="Decides what kind of data is allowed in this field. The options are:<br />" +
+                                      "Checkbox: A simple checkbox (yes/no)<br />" +
+                                      "Text (one line): A text field with one line <br />" +
+                                      "Text (multiple lines): A larger resizeable text field that allows multiple lines<br />" +
+                                      "Integer: A number<br />" +
+                                      "Choice: A multiple-choices field. syntax for name: question//alternative1//alternative2//alternative3")
 
     def __str__(self):
         return str(self.name)
@@ -184,6 +250,10 @@ class EventItem(models.Model):
 class ItemInEvent(models.Model):
     event = models.ForeignKey(Event)
     item = models.ForeignKey(EventItem)
+    public = models.BooleanField(default=False,
+                                 verbose_name="Is this field shown to everyone?",)
+    hide_in_print_view = models.BooleanField(default=False,
+                                             verbose_name="Is this field hidden from the print view?",)
 
     def __str__(self):
         return str("{0} is enabled in {1}".format(self.item.name, self.event.title))
@@ -197,5 +267,3 @@ class ItemInSignup(models.Model):
 
     def __str__(self):
         return str("{0} signed up with {1}: {2}".format(self.signup.name, self.item.name, self.value))
-
-

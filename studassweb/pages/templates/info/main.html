@@ -61,7 +61,19 @@
                     </a>
                 </div>
             </div>
+            <div class= "panel-heading">
+                <h2 class="panel-title" data-toggle="collapse" data-target="#helptext">
+                    {% trans "Help" %}
+                    <span class="glyphicon caret pull-right"></span>
+                </h2>
+            </div>
+            <div id="helptext" class="panel-collapse collapse helptext-collapse">
+                <div class="panel-body">
+                        <p>{% trans "This is where you can create pages with custom information for your association." %}</p>
+                        <p>{% trans "Custom pages are placed in categories for easier navigation." %}</p>
+                        <p>{% trans "Custom page can be accessed via categories in the menu" %}</p>
+                </div>
+            </div>
         </div>
-
     {% endif %}
 {% endblock sidebar %}

@@ -15,6 +15,7 @@
     </li>
 {% endblock %}
 
+
 {% block main_content %}
     {% if form.instance.pk %}
         <form action="{% url 'events_delete_event' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
@@ -48,6 +49,10 @@
         $(function () {
 
             //Set up datetimepicker
+            $( "#{{ form.signup_start.id_for_label }}" ).datetimepicker({
+                dayOfWeekStart: 1,
+                format: "d.n.Y H:m"
+            });
             $( "#{{ form.signup_deadline.id_for_label }}" ).datetimepicker({
                 dayOfWeekStart: 1,
                 format: "d.n.Y H:m"
@@ -62,4 +67,19 @@
             });
         })
     </script>
+{% endblock %}
+
+{% block helppanel %}
+    <div class= "panel-heading">
+        <h2 class="panel-title" data-toggle="collapse" data-target="#helptext">
+            {% trans "Help" %}
+            <span class="glyphicon caret pull-right"></span>
+        </h2>
+    </div>
+    <div id="helptext" class="panel-collapse collapse helptext-collapse">
+        <div class="panel-body">
+            <p>{% trans "This is where you create events." %}</p>
+            <p>{% trans "Each field except event items (eitems) is required by default." %}</p>
+        </div>
+    </div>
 {% endblock %}

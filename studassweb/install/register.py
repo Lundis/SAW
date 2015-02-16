@@ -7,8 +7,9 @@ def get_menu_items():
     """
     :return: a tuple ([main menu items], [settings menu items], [others])
     """
-    item, created = MenuItem.get_or_create(__package__,
-                                           "Install",
+    item, created = MenuItem.get_or_create(identifier="install_home",
+                                           app_name=__package__,
+                                           display_name="Install",
                                            reverse_string="install_welcome",
                                            permission=SAWPermission.get_or_create(CAN_INSTALL))
     return (None,

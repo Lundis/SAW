@@ -13,8 +13,9 @@ def get_menu_items():
     """
     :return: a tuple ([main menu items], [settings menu items], [others])
     """
-    item, created = MenuItem.get_or_create(__package__,
-                                           "Gallery",
+    item, created = MenuItem.get_or_create(identifier="gallery_home",
+                                           app_name=__package__,
+                                           display_name="Gallery",
                                            reverse_string="gallery_main",
                                            permission=SAWPermission.get_or_create(CAN_VIEW_PUBLIC_ALBUMS))
     return ([item],

@@ -1,20 +1,17 @@
 from django.shortcuts import render
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseServerError
-from .models import Event, EventSignup, EventItem, ItemInSignup
+from .models import Event, EventSignup, EventItem
 from django.http import HttpResponseRedirect, Http404
 from users import permissions
 from users.decorators import has_permission
-from .register import CAN_VIEW_EVENTS, CAN_CREATE_EVENTS, CAN_SIGNUP_FOR_EVENTS, CAN_VIEW_SIGNUP_INFO
+from .register import CAN_CREATE_EVENTS
 from .forms import EventForm, EventSignupForm, EventItemsForm, SignupItemsForm
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.conf import settings
-from base.models import SiteConfiguration
 from django.core.mail import send_mail, BadHeaderError
 from django.views.generic import CreateView, UpdateView, ListView, DeleteView
-from django.template.loader import get_template
-from django.template import Context
 import sys
 import logging
 
@@ -69,12 +66,12 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
         initial_user_data = {'name': request.user.get_full_name(), 'email': request.user.email}
 
     signupform = EventSignupForm(request.POST or None, initial=initial_user_data,
-                                 instance=db_event_signup, prefix=MAIN_PREFIX)
+                                 instance=db_event_signup, prefix=MAIN_PREFIX, event=event)
     signupitemsform = SignupItemsForm(request.POST or None, event=event,
                                       signup=db_event_signup, prefix=ITEMS_PREFIX)
 
     if signupform.is_valid() and signupitemsform.is_valid():
-        temp_signup = signupform.save(user=request.user, event=event)
+        temp_signup = signupform.save(user=request.user)
         try:
             signupitemsform.save(signup=temp_signup)
         except Exception as e:

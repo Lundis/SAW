@@ -22,3 +22,18 @@
         {% endfor %}
     </div>
 {% endblock %}
+
+{% block helppanel %}
+    <div class= "panel-heading">
+        <h2 class="panel-title" data-toggle="collapse" data-target="#helptext">
+            {% trans "Help" %}
+            <span class="glyphicon caret pull-right"></span>
+        </h2>
+    </div>
+    <div id="helptext" class="panel-collapse collapse helptext-collapse">
+        <div class="panel-body">
+            <p>{% trans "here you can see available events." %}</p>
+            <p>{% trans "Event items are custom fields for signup. They can make your event easier to manage." %}</p>
+        </div>
+    </div>
+{% endblock %}
