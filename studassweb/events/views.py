@@ -79,29 +79,37 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
             temp_signup.delete()
             return HttpResponseServerError("Failed to save signup items")
 
-        from_email = settings.NO_REPLY_EMAIL
-        to_emails = [temp_signup.email]
-        title = _("You have registered for") + " " + event.title
-        message = temp_signup.build_email_content(request)
-        logger.info("Sending event email from %s to %s" % (from_email, to_emails[0]))
-        try:
-            send_mail(
-                title,
-                message,
-                from_email,
-                to_emails)
-            messages.success(request, _("Successfully signed up to the event!"))
+        # Don't send email when editing existing signup
+        if not db_event_signup:
+            from_email = settings.NO_REPLY_EMAIL
+            to_emails = [temp_signup.email]
+            title = _("You have registered for") + " " + event.title
+            message = temp_signup.build_email_content(request)
+            logger.info("Sending event email from %s to %s" % (from_email, to_emails[0]))
+            try:
+                send_mail(
+                    title,
+                    message,
+                    from_email,
+                    to_emails)
+                messages.success(request, _("Successfully signed up to the event!"))
+                # redirect to avoid duplicated signups on refresh
+                return HttpResponseRedirect(reverse("events_view_event", kwargs={'slug': event.slug}))
+
+            except BadHeaderError:
+                logger.error("BadHeaderError sending email to {0}".format(to_emails))
+                temp_signup.delete()
+                signupform.add_error(None, _("BadHeaderError, newlines in email address?"))
+            except:
+                logger.error("Exception {0} sending email to {1}".format(sys.exc_info()[0], to_emails))
+                temp_signup.delete()
+                signupform.add_error(None, _("Unknown error sending when email, please verify your data and try again"))
+
+        else:
+            messages.success(request, _("Successfully edited signup details!"))
             # redirect to avoid duplicated signups on refresh
             return HttpResponseRedirect(reverse("events_view_event", kwargs={'slug': event.slug}))
 
-        except BadHeaderError:
-            logger.error("BadHeaderError sending email to {0}".format(to_emails))
-            temp_signup.delete()
-            signupform.add_error(None, _("BadHeaderError, newlines in email address?"))
-        except:
-            logger.error("Exception {0} sending email to {1}".format(sys.exc_info()[0], to_emails))
-            temp_signup.delete()
-            signupform.add_error(None, _("Unknown error sending when email, please verify your data and try again"))
 
     signups = EventSignup.objects.filter(event=event)
 
