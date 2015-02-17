@@ -103,13 +103,12 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
             except:
                 logger.error("Exception {0} sending email to {1}".format(sys.exc_info()[0], to_emails))
                 temp_signup.delete()
-                signupform.add_error(None, _("Unknown error sending when email, please verify your data and try again"))
+                signupform.add_error(None, _("Unknown error when sending email, please verify your data and try again"))
 
         else:
             messages.success(request, _("Successfully edited signup details!"))
             # redirect to avoid duplicated signups on refresh
             return HttpResponseRedirect(reverse("events_view_event", kwargs={'slug': event.slug}))
-
 
     signups = EventSignup.objects.filter(event=event)
 

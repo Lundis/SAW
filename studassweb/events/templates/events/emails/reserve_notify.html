@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load baseurl %}
 {% trans "You have previously signed up for a reserve position at" %} {{ event.title }}. {% trans "Others have unregistered, and you are now on the list!" %}
 
-{% trans "Check the event details at" %} {{ event.get_absolute_url }}
+{% trans "Check the event details at" %} {{ event.get_absolute_url|with_base_url }}

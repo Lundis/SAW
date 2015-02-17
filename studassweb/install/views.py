@@ -13,6 +13,7 @@ from .models import InstallProgress
 from users.decorators import has_permission
 from users.groups import setup_default_groups_and_permissions, put_user_in_standard_group, WEBMASTER
 from .register import CAN_INSTALL
+from base.models import SiteConfiguration
 import logging
 
 logger = logging.getLogger(__name__)
@@ -40,6 +41,9 @@ def association(request):
     logger.info('In association, form is defined: %s', bool(form))
     if form.is_valid():
         form.apply()
+        site_config = SiteConfiguration.instance()
+        site_config.base_url = request.build_absolute_uri("/")[:-1]
+        site_config.save()
         InstallProgress.site_name_set()
         logger.info('In association, redirecting to modules')
         return HttpResponseRedirect('modules')

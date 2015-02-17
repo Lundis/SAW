@@ -136,7 +136,7 @@ class EventSignup(models.Model):
         # Can't allow delete() to throw an exception related to the email
         try:
             signups = EventSignup.objects.filter(event=self.event)
-            if self.event.max_participants >= signups.count():
+            if self.event.max_participants <= signups.count():
                 # Get the signup that just got below the participant limit
                 reserve_signup = signups[self.event.max_participants - 1]
                 reserve_signup.send_reserve_email()
@@ -178,6 +178,13 @@ class EventSignup(models.Model):
             if item.pk == self.pk:
                 return index >= self.event.max_participants
         logger.error("is_reserve couldn't find itself in the list")
+
+    def is_first_reserve(self):
+        signups = EventSignup.objects.filter(event=self.event)
+        for index, item in enumerate(signups):
+            if item.pk == self.pk:
+                return index == self.event.max_participants
+        logger.error("is_first_reserve couldn't find itself in the list")
 
     def fix_indices(self):
         signups = EventSignup.objects.filter(event=self.event)

@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load baseurl %}
 {% trans "You have signed up for" %} {{ event.title }}!
 
 {% trans "You can still edit your signup details using this URL" %}: {{ signup_edit_url }} .
@@ -7,4 +8,4 @@
 
 {% trans "You cannot change your details after the signup deadline" %} ({{ event.signup_deadline }}).
 
-{% trans "Questions? contact us at" %} {% url "contact_home" %}
+{% trans "Questions? contact us at" %} {% base_url %}{% url "contact_home" %}

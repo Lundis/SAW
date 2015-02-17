@@ -100,15 +100,66 @@
                     {% endif %}
                 </tr>
                 {% for signup in signups %}
-                    <tr {% if signup.is_reserve %} class="text-muted" {% endif %}>
+                    {% if signup.is_first_reserve %}
+                        </tbody>
+                        </table>
+                        </div>
+                        <div class="panel-footer">
+                            {% if can_view_signup_info %}
+                                <div id="print-toggle-button" class="btn btn-primary">
+                                    {% trans "Print mode" %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        </div>
+                        <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                {% trans "Reserve list" %}
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                        <table class="table table-striped">
+                        <tbody>
+                        <tr>
+                            <th>#</th>
+                            {% if can_view_signup_info %}
+                                <th class="print-reserve-hide">{% trans "Signed up" %}</th>
+                            {% endif %}
+                            <th>{% trans "Name" %}</th>
+                            {% if can_view_signup_info %}
+                                <th>{% trans "Email" %}</th>
+                                <th class="print-reserve-hide">{% trans "User account" %}</th>
+                            {% endif %}
+                            {% for event_item in event.get_items %}
+                                {% if can_view_signup_info or event_item.public %}
+                                    <th>{{ event_item.item.get_name }}</th>
+                                {% endif %}
+                            {% endfor %}
+                            {% if request.user.is_authenticated %}
+                                <th class="print-reserve-hide">{% trans "Action" %}</th>
+                            {% endif %}
+                        </tr>
+                    {% endif %}
+                    <tr>
                         <td>{{ signup.order_id }}</td>
                         {% if can_view_signup_info %}
-                            <td class="print-hide">{{ signup.created|date:"Y-m-d H:i" }}</td>
+                            {% if signup.is_reserve %}
+                                <td class="print-reserve-hide">
+                                    {% else %}
+                                <td class="print-hide">
+                            {% endif %}
+                        {{ signup.created|date:"Y-m-d H:i" }}</td>
                         {% endif %}
                         <td>{{ signup.name }}</td>
                         {% if can_view_signup_info %}
                             <td>{{ signup.email }}</td>
-                            <td class="print-hide">{{ signup.user }}</td>
+                            {% if signup.is_reserve %}
+                                <td class="print-reserve-hide">
+                                    {% else %}
+                                <td class="print-hide">
+                            {% endif %}
+                        {{ signup.user }}</td>
                         {% endif %}
                         {% for event_item in signup.get_items_relevant %}
                             {% if can_view_signup_info or event_item.public %}
@@ -122,24 +173,28 @@
                             {% endif %}
                         {% endfor %}
                         {% if request.user.is_authenticated %}
-                            <td class="print-hide">
-                                {% user_can_edit signup user as can_edit_signup %}
-                                {% if can_edit_signup%}
-                                    <a href="{% url 'events_view_event_edit_signup_by_id' event_id=event.id signup_id=signup.id %}">
-                                        <button class="btn btn-primary">
-                                            {% trans "Edit" %}
-                                        </button>
-                                    </a>
-                                    <form action="{% url 'events_delete_event_signup' signup.id %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
-                                        {% csrf_token %}
-                                        {% buttons %}
-                                            <button type="submit" class="btn btn-danger">
-                                                {% trans "Delete" %}
-                                            </button>
-                                        {% endbuttons %}
-                                    </form>
-                                {% endif %}
-                            </td>
+                            {% if signup.is_reserve %}
+                                <td class="print-reserve-hide">
+                                    {% else %}
+                                <td class="print-hide">
+                            {% endif %}
+                        {% user_can_edit signup user as can_edit_signup %}
+                        {% if can_edit_signup%}
+                            <a href="{% url 'events_view_event_edit_signup_by_id' event_id=event.id signup_id=signup.id %}">
+                                <button class="btn btn-primary">
+                                    {% trans "Edit" %}
+                                </button>
+                            </a>
+                            <form action="{% url 'events_delete_event_signup' signup.id %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
+                                {% csrf_token %}
+                                {% buttons %}
+                                    <button type="submit" class="btn btn-danger">
+                                        {% trans "Delete" %}
+                                    </button>
+                                {% endbuttons %}
+                            </form>
+                        {% endif %}
+                        </td>
                         {% endif %}
                     </tr>
 
@@ -148,17 +203,16 @@
                 {% endfor %}
 
                 </tbody>
-            </table>
-        </div>
-        <div class="panel-footer">
-            {% if can_view_signup_info %}
-                <div id="print-toggle-button" class="btn btn-primary">
-                    {% trans "Print mode" %}
+                </table>
                 </div>
-            {% endif %}
-        </div>
-    </div>
-
+                <div class="panel-footer">
+                    {% if can_view_signup_info %}
+                        <div id="print-reserve-toggle-button" class="btn btn-primary">
+                            {% trans "Print mode" %}
+                        </div>
+                    {% endif %}
+                </div>
+                </div>
 {% endblock %}
 
 {% block extrapanel %}
@@ -194,6 +248,10 @@
         $("#print-toggle-button").click(function(event) {
             $("#print-toggle-button").toggleClass("active");
             $(".print-hide").toggleClass("hidden");
+        });
+        $("#print-reserve-toggle-button").click(function(event) {
+            $("#print-reserve-toggle-button").toggleClass("active");
+            $(".print-reserve-hide").toggleClass("hidden");
         });
     </script>
 {% endblock %}
