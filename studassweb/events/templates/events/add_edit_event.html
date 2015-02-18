@@ -17,17 +17,6 @@
 
 
 {% block main_content %}
-    {% if form.instance.pk %}
-        <form action="{% url 'events_delete_event' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
-            {% csrf_token %}
-            {% buttons %}
-                <button type="submit" class="btn btn-danger">
-                    {% trans "Remove this event" %}
-                </button>
-            {% endbuttons %}
-        </form>
-    {% endif %}
-
     <form action="" method="post">
         {% csrf_token %}
         {{ form.media }}
@@ -69,17 +58,36 @@
     </script>
 {% endblock %}
 
-{% block helppanel %}
-    <div class= "panel-heading">
-        <h2 class="panel-title" data-toggle="collapse" data-target="#helptext">
-            {% trans "Help" %}
-            <span class="glyphicon caret pull-right"></span>
-        </h2>
-    </div>
-    <div id="helptext" class="panel-collapse collapse helptext-collapse">
-        <div class="panel-body">
-            <p>{% trans "This is where you create events." %}</p>
-            <p>{% trans "Each field except event items (eitems) is required by default." %}</p>
+
+
+{# Because we hid panel 4 in base template we still need to rewrite everything #}
+{% block sidebar-panel4 %}
+    {% if form.instance.pk %}
+        <div class="panel-heading">
+            <div class="panel-title">
+                {% block sidebar-panel4-header %}{% trans "Delete" %}{% endblock %}
+            </div>
         </div>
-    </div>
+        <div class="panel-body">
+            {% block sidebar-panel4-body%}
+                <div class="btn-group-vertical btn-block" >
+                    {# FIXME this button looks odd compared to the others #}
+                    <form action="{% url 'events_delete_event' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
+                        {% csrf_token %}
+                        {% buttons %}
+                            <button type="submit" class="btn btn-danger">
+                                {% trans "Remove this event" %}
+                            </button>
+                        {% endbuttons %}
+                    </form>
+                </div>
+            {% endblock %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+
+{% block sidebar-panel-help-body%}
+    <p>{% trans "This is where you create events." %}</p>
+    <p>{% trans "Each field except event items (eitems) is required by default." %}</p>
 {% endblock %}

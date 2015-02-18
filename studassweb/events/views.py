@@ -48,7 +48,9 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
         try:
             db_event_signup = EventSignup.objects.get(auth_code=auth_code)
         except EventSignup.DoesNotExist:
-            raise Http404(_("Invalid auth code!"))
+            messages.error(request,
+                           _("Wrong authentication code, check link and make sure you are still registered to event"))
+            return HttpResponseRedirect(event.get_absolute_url())
     elif signup_id:
         try:
             db_event_signup = EventSignup.objects.get(id=signup_id)
