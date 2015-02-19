@@ -2,7 +2,8 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
-
+from django.dispatch import receiver
+from django.db.models.signals import pre_delete, post_delete, post_save
 
 class FrontPageItem(models.Model):
     identifier = models.CharField(max_length=100)
@@ -56,14 +57,7 @@ class FrontPageItem(models.Model):
                     other.save()
             except FrontPageItem.DoesNotExist:
                 pass
-
         super(FrontPageItem, self).save(*args, **kwargs)
-        self._fix_indices()
-
-    def delete(self, using=None):
-        super(FrontPageItem, self).delete(using)
-        # Remove any inconsistencies caused by this deletion
-        self._fix_indices()
 
     def _fix_indices(self):
         pages = FrontPageItem.objects.filter(location=self.location)
@@ -92,3 +86,9 @@ class FrontPageItem(models.Model):
                                    _object_id=target.id)
         except cls.DoesNotExist:
             return None
+
+
+@receiver(post_save, sender=FrontPageItem, dispatch_uid="frontpage_item_post_save")
+def frontpage_item_post_save(**kwargs):
+    instance = kwargs.pop("instance")
+    instance._fix_indices()

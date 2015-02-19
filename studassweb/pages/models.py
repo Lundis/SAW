@@ -8,7 +8,7 @@ from menu.models import MenuItem, Menu
 from users.permissions import has_user_perm
 from frontpage.models import FrontPageItem
 from django.dispatch import receiver
-from django.db.models.signals import pre_delete, post_delete
+from django.db.models.signals import pre_delete, post_delete, post_save
 import pages.register as pregister
 
 PERMISSION_CHOICES = (
@@ -37,7 +37,7 @@ class InfoCategory(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.slug = slugify(self.name)
+            self.slug = self.slugify()
         super(InfoCategory, self).save(*args, **kwargs)
         # create a menu item if it doesn't exist
         self.menu_item, created = MenuItem.get_or_create(identifier="pages/category/%d" % self.id,
@@ -61,6 +61,20 @@ class InfoCategory(models.Model):
 
     def get_permission_str(self):
         return dict(PERMISSION_CHOICES)[self.permission]
+
+    def slugify(self, attempt=None):
+        slug = slugify(self.name)
+        if attempt is not None:
+            slug += "-" + str(attempt)
+        try:
+            InfoCategory.objects.get(slug=slug)
+            if attempt is None:
+                attempt = 1
+            else:
+                attempt += 1
+            return self.slugify(attempt)
+        except InfoCategory.DoesNotExist:
+            return slug
 
 
 @receiver(pre_delete, sender=InfoCategory, dispatch_uid="category_pre_delete")
@@ -93,27 +107,8 @@ class InfoPage(models.Model):
         else:
             old_page = None
             # Create a slug for new pages
-            self.slug = slugify(self.title)
+            self.slug = self.slugify()
         super(InfoPage, self).save(*args, **kwargs)
-        # create an edit object if this is a new object of if the text has changed
-        if not old_page or old_page.text != self.text:
-            edit = InfoPageEdit(author=self.author, text=self.text, page=self)
-            edit.save()
-        # create a menu item if it doesn't exist
-        menu_item, created = MenuItem.get_or_create(identifier="pages/page/%d" % self.id,
-                                                    app_name=__package__,
-                                                    display_name=self.title,
-                                                    linked_object=self,
-                                                    permission=self.permission)
-        if self.category:
-            menu = self.category.menu_item.submenu
-            if not menu.contains(menu_item):
-                # delete it from any other menus
-                Menu.remove_item_from_all_menus(menu_item)
-                # and add it last in the correct one
-                menu.add_item(menu_item, menu.count())
-
-        self.update_frontpage_item()
 
     def can_view(self, user):
         return has_user_perm(user, self.get_permission_str())
@@ -152,6 +147,20 @@ class InfoPage(models.Model):
         elif old:
             old.delete()
 
+    def slugify(self, attempt=None):
+        slug = slugify(self.title)
+        if attempt is not None:
+            slug += "-" + str(attempt)
+        try:
+            InfoPage.objects.get(slug=slug)
+            if attempt is None:
+                attempt = 1
+            else:
+                attempt += 1
+            return self.slugify(attempt)
+        except InfoPage.DoesNotExist:
+            return slug
+
 
 @receiver(pre_delete, sender=InfoPage, dispatch_uid="page_pre_delete")
 def page_pre_delete(**kwargs):
@@ -160,9 +169,33 @@ def page_pre_delete(**kwargs):
     MenuItem.delete_all_that_links_to(instance)
 
 
-@receiver(pre_delete, sender=InfoPage, dispatch_uid="page_post_delete")
+@receiver(post_delete, sender=InfoPage, dispatch_uid="page_post_delete")
 def page_post_delete(**kwargs):
     instance = kwargs.pop("instance")
+    # Remove any frontpage item associated to this one
+    instance.for_frontpage = False
+    instance.update_frontpage_item()
+
+
+@receiver(post_save, sender=InfoPage, dispatch_uid="page_post_save")
+def page_post_save(**kwargs):
+    instance = kwargs.pop("instance")
+    # create an edit object if this is a new object of if the text has changed
+    if not instance.revisions().exists() or instance.revisions().first().text != instance.text:
+        edit = InfoPageEdit(author=instance.author, text=instance.text, page=instance)
+        edit.save()
+    # create a menu item if it doesn't exist
+    menu_item, created = MenuItem.get_or_create(identifier="pages/page/%d" % instance.id,
+                                                app_name=__package__,
+                                                display_name=instance.title,
+                                                linked_object=instance,
+                                                permission=instance.get_permission_str())
+    if instance.category:
+        menu = instance.category.menu_item.submenu
+        if not menu.contains(menu_item):
+            # and add it last in the correct one
+            menu.add_item(menu_item, menu.count())
+
     instance.update_frontpage_item()
 
 

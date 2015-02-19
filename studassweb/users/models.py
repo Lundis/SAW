@@ -95,7 +95,10 @@ class SAWPermission(models.Model):
         :return:
         """
         perm = Permission.objects.get(codename=perm_name)
-        return SAWPermission.objects.get(permission=perm)
+        try:
+            return cls.objects.get(permission=perm)
+        except cls.DoesNotExist:
+            logger.error("SAWPermission \"%s\" does not exist!", perm.codename)
 
     @classmethod
     def get_or_create(cls, perm_name, default_group, description):
