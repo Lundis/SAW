@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load sawp %}
 {% load frontpage_items %}
+{% load static %}
 
 {% block title %}
     StudAssWeb Frontpage!
@@ -67,17 +68,19 @@
 {% endblock %}
 
 {% block scripts %}
+
     {% if edit_mode %}
+        <script type="text/javascript" src="{% static 'django_ajax/js/jquery.ajax.min.js' %}"></script>
         <script>
             $(".move_down_button").click(function(event) {
-                move_down(event.target);
+                move_down(get_item(event.target));
             });
             $(".move_up_button").click(function(event) {
-                move_up(event.target);
+                move_up(get_item(event.target));
             });
             $(".move_location_button").click(function(event) {
                 var location = event.target.getAttribute("data-location-target");
-                move_to_other_location(event.target, location);
+                move_to_other_location(get_item(event.target), location);
             });
 
             // Tells the server to move this item to the specified location and position
@@ -102,9 +105,15 @@
                             // TODO: show feedback to the user somehow
                         },
                         {'onError': function(response) {
-                            alert("Moving item failed!");
+                            alert("Moving the item failed! Please refresh the page and try again.");
                         }}
                 );
+            }
+
+            function get_item(button) {
+                var id = button.getAttribute("id").split("_");
+                var item_id = id[id.length - 1];
+                return document.getElementById("item_" + item_id);
             }
 
             function move_up(item) {
@@ -119,8 +128,8 @@
 
             function move_down(item) {
                 if (count_after(item) > 0) {
-                    item.parentNode.insertAfter(item, get_next_sibling(item));
-                    move_item(item);
+                    var next = get_next_sibling(item)
+                    return move_up(next)
                 } else {
                     alert("Can't move the item any further down!");
                 }
@@ -130,8 +139,29 @@
                 var container = $("div[data-location-container="+ location + "]").get(0);
                 container.appendChild(item);
                 item.setAttribute("data-location", location);
+                var item_id = item.getAttribute("id").split("_");
+                var id = item_id[item_id.length - 1];
+                // Update button visibilities
+                if (location == "mainbar") {
+                    $("#move_down_button_" + id).removeClass("hidden");
+                    $("#move_up_button_" + id).removeClass("hidden");
+                    $("#move_to_mainbar_button_" + id).addClass("hidden");
+                    $("#move_to_sidebar_button_" + id).removeClass("hidden");
+                    $("#move_to_hidden_button_" + id).removeClass("hidden");
+                } else if (location == "sidebar") {
+                    $("#move_down_button_" + id).removeClass("hidden");
+                    $("#move_up_button_" + id).removeClass("hidden");
+                    $("#move_to_mainbar_button_" + id).removeClass("hidden");
+                    $("#move_to_sidebar_button_" + id).addClass("hidden");
+                    $("#move_to_hidden_button_" + id).removeClass("hidden");
+                } else { // hidden
+                    $("#move_down_button_" + id).addClass("hidden");
+                    $("#move_up_button_" + id).addClass("hidden");
+                    $("#move_to_mainbar_button_" + id).removeClass("hidden");
+                    $("#move_to_sidebar_button_" + id).removeClass("hidden");
+                    $("#move_to_hidden_button_" + id).addClass("hidden");
+                }
                 move_item(item);
-
             }
 
             function get_previous_sibling(item) {

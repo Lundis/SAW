@@ -3,6 +3,9 @@ from django_ajax.decorators import ajax
 from .forms import PlacementForm
 from users.decorators import has_permission
 from .register import CAN_EDIT_FRONTPAGE
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @ajax
@@ -21,3 +24,6 @@ def move_item(request):
     form = PlacementForm(request.POST)
     if form.is_valid():
         form.save()
+        logger.info("Moving item succeeded")
+    else:
+        logger.info("Moving item failed: " + form.errors)
