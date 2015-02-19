@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load bootstrap3 %}
 {% load static %}
+{% load sidemenu %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -60,34 +61,29 @@
 
 
 
-{# Because we hid panel 4 in base template we still need to rewrite everything #}
 {% block sidebar-panel4 %}
     {% if form.instance.pk %}
-        <div class="panel-heading">
-            <div class="panel-title">
-                {% block sidebar-panel4-header %}{% trans "Delete" %}{% endblock %}
-            </div>
-        </div>
-        <div class="panel-body">
-            {% block sidebar-panel4-body%}
-                <div class="btn-group-vertical btn-block" >
-                    {# FIXME this button looks odd compared to the others #}
-                    <form action="{% url 'events_delete_event' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
-                        {% csrf_token %}
-                        {% buttons %}
-                            <button type="submit" class="btn btn-danger">
-                                {% trans "Remove this event" %}
-                            </button>
-                        {% endbuttons %}
-                    </form>
-                </div>
-            {% endblock %}
-        </div>
+        {% sidebarpanel "vertical_buttons" %}
+            {% trans "Delete" %}
+            {% body %}
+            {# FIXME this button looks odd compared to the others #}
+            <form action="{% url 'events_delete_event' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
+                {% csrf_token %}
+                {% buttons %}
+                    <button type="submit" class="btn btn-danger">
+                        {% trans "Remove this event" %}
+                    </button>
+                {% endbuttons %}
+            </form>
+        {% endsidebarpanel %}
     {% endif %}
 {% endblock %}
 
-
-{% block sidebar-panel-help-body%}
-    <p>{% trans "This is where you create events." %}</p>
-    <p>{% trans "Each field except event items (eitems) is required by default." %}</p>
+{% block sidebar-panel-help %}
+    {% sidebarpanel "help" %}
+        {% trans "Help" %}
+        {% body %}
+        <p>{% trans "This is where you create events." %}</p>
+        <p>{% trans "Each field except event items (eitems) is required by default." %}</p>
+    {% endsidebarpanel %}
 {% endblock %}

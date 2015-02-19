@@ -1,6 +1,7 @@
 {% extends 'base/base.html' %}
 {% load i18n %}
 {% load sawp %}
+{% load sidemenu %}
 
 {% block title %}
     {% trans "Events" %}
@@ -17,37 +18,34 @@
     </a></li>
 {% endblock %}
 
-{% block sidebar-panel1 %}{% endblock %}
-{% block sidebar-panel2 %}{% endblock %}
-{% block sidebar-panel3 %}{% endblock %}
-{% block sidebar-panel4 %}{% endblock %} {# Hide empty panels #}
 
-{% has_perm "events" "CAN_CREATE_EVENTS" as can_create_events %}
-{% if can_create_events%}
-    {% block sidebar-panel5-header %}
-        {% trans "Add" %}
-    {% endblock %}
-    {% block sidebar-panel5-body %}
-        <div class="btn-group-vertical btn-block" >
+
+{% block sidebar-panel5 %}
+    {% has_perm "events" "CAN_CREATE_EVENTS" as can_create_events %}
+    {% if can_create_events%}
+        {% sidebarpanel "vertical_buttons" %}
+            {% trans "Add" %}
+            {% body %}
             <a href="{% url 'events_add_event' %}" class="btn btn-primary">
                 {% trans "Add new event" %}
             </a>
-        </div>
-    {% endblock %}
-    {% block sidebar-panel6-header %}
-        {% trans "Settings" %}
-    {% endblock %}
-    {% block sidebar-panel6-body %}
-        <div class="btn-group-vertical btn-block" >
+        {% endsidebarpanel %}
+    {% endif %}
+{% endblock%}
+
+{% block sidebar-panel6 %}
+    {% has_perm "events" "CAN_CREATE_EVENTS" as can_create_events %}
+    {% if can_create_events%}
+        {% sidebarpanel "vertical_buttons" %}
+            {% trans "Settings" %}
+            {% body %}
             <a href="{% url 'events_list_eventitems' %}" class="btn btn-primary">
                 {% trans "Configure event items" %}
             </a>
-        </div>
-    {% endblock %}
+        {% endsidebarpanel %}
+    {% endif %}
+{% endblock%}
 
-{% endif %}
 
 
-{% block sidebar-panel7 %}{% endblock %}
-{% block sidebar-panel8 %}{% endblock %}
-{% block sidebar-panel9 %}{% endblock %}
+

@@ -3,10 +3,11 @@
 {% load i18n %}
 {% load bootstrap3 %}
 {% load sawp %}
+{% load sidemenu %}
 
 {% block breadcrumb2 %}
     <li class="active">
-    <a href="{% url "events_list_eventitems" %}">{% trans "List items " %}</a>
+        <a href="{% url "events_list_eventitems" %}">{% trans "List items " %}</a>
     </li>
 {% endblock %}
 
@@ -39,18 +40,12 @@
 
 {% endblock %}
 
-{% block helppanel %}
-    <div class= "panel-heading">
-        <h2 class="panel-title" data-toggle="collapse" data-target="#helptext">
-            {% trans "Help" %}
-            <span class="glyphicon caret pull-right"></span>
-        </h2>
-    </div>
-    <div id="helptext" class="panel-collapse collapse helptext-collapse">
-        <div class="panel-body">
-            <p>{% trans "This is where you create custom event items for later use." %}</p>
-            <p>{% trans "You can define a datatype for each event item. The datatype defines the type of input that is accepted " %}</p>
-            <p>{% trans "Don't worry, you can edit event items later." %}</p>
-        </div>
-    </div>
+{% block sidebar-panel-help %}
+    {% sidebarpanel "help" %}
+        {% trans "Help" %}
+        {% body %}
+        <p>{% trans "This is where you create custom event items for later use." %}</p>
+        <p>{% trans "You can define a datatype for each event item. The datatype defines the type of input that is accepted " %}</p>
+        <p>{% trans "Don't worry, you can edit event items later." %}</p>
+    {% endsidebarpanel %}
 {% endblock %}

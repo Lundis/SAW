@@ -5,6 +5,7 @@
 {% load sawp %}
 {% load thumbnail %}
 {% load events_templatetags %}
+{% load sidemenu %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -215,30 +216,27 @@
                 </div>
 {% endblock %}
 
-{# Because we hid panel 4 in base template we still need to rewrite everything #}
+
 {% block sidebar-panel4 %}
     {% has_perm "events" "CAN_CREATE_EVENTS" as can_create_events %}
-    {% if can_create_events%}
-        <div class="panel-heading">
-            <div class="panel-title">
-                {% block sidebar-panel4-header %}{% trans "Edit" %}{% endblock %}
-            </div>
-        </div>
-        <div class="panel-body">
-            {% block sidebar-panel4-body%}
-                <div class="btn-group-vertical btn-block" >
-                    <a href="{% url 'events_edit_event' event.id%}" class="btn btn-primary">
-                        {% trans "Edit this event" %}
-                    </a>
-                </div>
-            {% endblock %}
-        </div>
+    {% if can_create_events %}
+        {% sidebarpanel "vertical_buttons" %}
+            {% trans "Edit" %}
+            {% body %}
+            <a href="{% url 'events_edit_event' event.id%}" class="btn btn-primary">
+                {% trans "Edit this event" %}
+            </a>
+        {% endsidebarpanel %}
     {% endif %}
 {% endblock %}
 
-{% block sidebar-panel-help-body%}
-    <p>{% trans "here you can see the details for each event" %}</p>
-    <p>{% trans "pressing the 'print mode' button will make the signup-list less cluttered" %}</p>
+{% block sidebar-panel-help %}
+    {% sidebarpanel "help" %}
+        {% trans "Help" %}
+        {% body %}
+        <p>{% trans "here you can see the details for each event" %}</p>
+        <p>{% trans "pressing the 'print mode' button will make the signup-list less cluttered" %}</p>
+    {% endsidebarpanel %}
 {% endblock %}
 
 {% block scripts %}
