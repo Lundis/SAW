@@ -18,22 +18,27 @@
 {% block main_content %}
     <h1>{% trans "Welcome!" %}</h1>
     <p>{% trans "This site is under heavy development. Don't worry if it's hard to understand right now, it will get better!" %}</p>
-    {% for item in main_items %}
-        {% display_frontpage_item item edit_mode "main" %}
-    {% endfor %}
-
+    <div id="mainbar-container" data-location-container="mainbar">
+        {% for item in main_items %}
+            {% display_frontpage_item item edit_mode "main" %}
+        {% endfor %}
+    </div>
     {% if edit_mode %}
         <h1>{% trans "Hidden items" %}</h1>
-        {% for item in hidden_items %}
-            {% display_frontpage_item item edit_mode "hidden" %}
-        {% endfor %}
+        <div id="hidden-container" data-location-container="hidden">
+            {% for item in hidden_items %}
+                {% display_frontpage_item item edit_mode "hidden" %}
+            {% endfor %}
+        </div>
     {% endif %}
 {% endblock %}
 
 {% block sidebar %}
-    {% for item in side_items %}
-        {% display_frontpage_item item edit_mode "side" %}
-    {% endfor %}
+    <div id="sidebar-container" data-location-container="sidebar">
+        {% for item in side_items %}
+            {% display_frontpage_item item edit_mode "side" %}
+        {% endfor %}
+    </div>
     {% has_perm "frontpage" "CAN_EDIT_FRONTPAGE" as show_edit_buttons %}
     {% if show_edit_buttons %}
         <div class="panel panel-primary">
@@ -64,25 +69,109 @@
 {% block scripts %}
     {% if edit_mode %}
         <script>
-            $(".event_item").submit(function(event) {
-                // TODO: this is just copy-pasted from another file
-                event.preventDefault()
-                var form_id = event.target.getAttribute("id");
-                var split_id = form_id.split("_");
-                var message_id = split_id[split_id.length - 1];
-                ajaxPost('{% url "contact_mark_message_as_handled" %}',
-                        {'message_id': message_id},
-                        function(event) {
-                            $("#" + form_id).remove();
-
-                        }
-                );
+            $(".move_down_button").click(function(event) {
+                move_down(event.target);
+            });
+            $(".move_up_button").click(function(event) {
+                move_up(event.target);
+            });
+            $(".move_location_button").click(function(event) {
+                var location = event.target.getAttribute("data-location-target");
+                move_to_other_location(event.target, location);
             });
 
-            function get_index(element) {
-                // find the index of this element in its location
-                var location = element.getAttribute("location")
-                var container = document.getElementById("")
+            // Tells the server to move this item to the specified location and position
+            function move_item(item) {
+
+                var location = item.getAttribute("data-location");
+                if (location == "mainbar") {
+                    location = "{{ loc_mainbar }}";
+                } else if (location == "sidebar") {
+                    location = "{{ loc_sidebar }}";
+                } else if (location == "hidden") {
+                    location = "{{ loc_hidden }}";
+                }
+                var index = index_of(item);
+                var item_id = item.getAttribute("id").split("_")[1];
+                ajaxPost('{% url "contact_mark_message_as_handled" %}',
+                        {'item_id': item_id,
+                            'location': location,
+                            'ordering_index': index},
+                        function(event) {
+                            // on success
+                            // TODO: show feedback to the user somehow
+                        },
+                        {'onError': function(response) {
+                            alert("Moving item failed!");
+                        }}
+                );
+            }
+
+            function move_up(item) {
+                var old_index = index_of(item);
+                if (old_index > 1) {
+                    item.parentNode.insertBefore(item, get_previous_sibling(item));
+                    move_item(item);
+                } else {
+                    alert("Can't move the item any further up!");
+                }
+            }
+
+            function move_down(item) {
+                if (count_after(item) > 0) {
+                    item.parentNode.insertAfter(item, get_next_sibling(item));
+                    move_item(item);
+                } else {
+                    alert("Can't move the item any further down!");
+                }
+            }
+
+            function move_to_other_location(item, location) {
+                var container = $("div[data-location-container="+ location + "]").get(0);
+                container.appendChild(item);
+                item.setAttribute("data-location", location);
+                move_item(item);
+
+            }
+
+            function get_previous_sibling(item) {
+                var sibling = item.previousSibling;
+                // ignore non-HTML-tags (like newlines and similar shit)
+                while (sibling != null && sibling.nodeType != 1) {
+                    sibling = sibling.previousSibling;
+                }
+                return sibling;
+            }
+
+            function get_next_sibling(item) {
+                var sibling = item.nextSibling;
+                // ignore non-HTML-tags (like newlines and similar shit)
+                while (sibling != null && sibling.nodeType != 1) {
+                    sibling = sibling.nextSibling;
+                }
+                return sibling;
+            }
+
+            function index_of(item) {
+                // get the index by counting how many previous siblings there are
+                var index = 1;
+                var previous = get_previous_sibling(item);
+                // ignore non-HTML-tags (like newlines and shit)
+                while (previous != null) {
+                    previous = get_previous_sibling(previous);
+                    index++;
+                }
+                return index;
+            }
+            // Counts how many items are after this one
+            function count_after(item) {
+                var count = 0;
+                var next = get_next_sibling(item);
+                while (next != null) {
+                    next = get_previous_sibling(next);
+                    count++;
+                }
+                return count;
             }
 
         </script>
