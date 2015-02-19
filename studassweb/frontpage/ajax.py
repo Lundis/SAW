@@ -26,4 +26,4 @@ def move_item(request):
         form.save()
         logger.info("Moving item succeeded")
     else:
-        logger.info("Moving item failed: " + form.errors)
+        logger.info("Moving item failed: " + str(form.errors))

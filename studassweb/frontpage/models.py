@@ -87,6 +87,7 @@ class FrontPageItem(models.Model):
         except cls.DoesNotExist:
             return None
 
+
 @receiver(post_save, sender=FrontPageItem, dispatch_uid="frontpage_item_post_save")
 def frontpage_item_post_save(**kwargs):
     instance = kwargs.pop("instance")
