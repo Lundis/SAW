@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import ugettext as _
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from .models import UserExtension
 from captcha.fields import ReCaptchaField
 import logging
@@ -85,3 +85,9 @@ class ProfileForm(forms.ModelForm):
     class Meta():
         model = UserExtension
         fields = ('avatar', 'description', 'link_to_homepage')
+
+
+class CustomGroupForm(forms.ModelForm):
+    class Meta():
+        model = Group
+        fields = ("name",)
