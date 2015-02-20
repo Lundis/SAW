@@ -57,15 +57,34 @@
 {% endblock %}
 
 {% block sidebar-panel1 %}
+    {% sidebarpanel %}
+        {% trans "Actions"%}
+        {% body %}
+        <form action="" method="post">
+            <div class="btn-group-vertical btn-block">
+                <div type="submit" class="btn btn-primary">
+                    {% trans "Save" %}
+                </div>
+                <a href="" class="btn btn-warning">
+                    {% trans "Reset all permissions" %}
+                </a>
+            </div>
+        </form>
+    {% endsidebarpanel %}
+{% endblock %}
+
+{% block sidebar-panel2 %}
     {% sidebarpanel "vertical_buttons"%}
         {% trans "Show from modules"%}
         {% body %}
-        {% for module in modules %}
-            <div class="btn btn-primary btn-small"
-                 data-toggle="hide" data-target="module-{{ module }}">
-                {{ module }}
-            </div>
-        {% endfor %}
+        <div class="row">
+            {% for module in modules %}
+                <div class="btn btn-primary btn-small col-xs-6"
+                     data-toggle="hide" data-target="module-{{ module }}">
+                    {{ module }}
+                </div>
+            {% endfor %}
+        </div>
     {% endsidebarpanel %}
 {% endblock %}
 
@@ -73,7 +92,11 @@
     {% sidebarpanel "help"%}
         {% trans "Help"%}
         {% body %}
-        Help text here
+        <p>
+            {% trans "You can see what permissions are in which group" %}.
+            {% trans "Use the menu above to more easily find the permissions you're looking for" %}.
+            {% trans "Drag and drop the permissions to change them" %}.
+        </p>
     {% endsidebarpanel %}
 {% endblock %}
 
