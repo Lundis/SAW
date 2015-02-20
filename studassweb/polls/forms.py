@@ -30,7 +30,7 @@ class ChoiceForm(forms.ModelForm):
         fields = ('name',)
         labels = {
             'name': _('Choice'),
-        }
+            }
 
 
 class ChoiceFormSingle(forms.Form):
@@ -48,8 +48,13 @@ class ChoiceFormSingle(forms.Form):
         if self.is_valid():
             choice_id = self.cleaned_data['choices']
             choice = Choice.objects.get(id=int(choice_id))
+
+            if(request.user.is_authenticated()):
+                user=request.user
+            else:
+                user=None
             vote = Votes(choice_id=choice,
-                         user=request.user,
+                         user=user,
                          ip_address=request.META['REMOTE_ADDR'])
             if commit:
                 vote.save()
@@ -60,14 +65,47 @@ class ChoiceFormSingle(forms.Form):
         fields = ('name',)
         labels = {
             'name': _('Choice'),
-        }
+            }
 
 
 class ChoiceFormMultiple(forms.ModelForm):
+
+
+    def __init__(self, *args, **kwargs):
+        poll_choices = kwargs.pop("poll_choices")
+        super(ChoiceFormSingle, self).__init__(*args, **kwargs)
+        choices = ()
+        for choice in poll_choices:
+            choices += (str(choice.id), choice.name),
+        self.fields["choices"] = forms.MultipleChoiceField(choices=choices)
+
+
+
+
+    def save(self,request,poll,commit=True):
+        if self.is_valid():
+            ids_of_choices = self.cleaned_data["choices"]
+            if(request.user.is_authenticated()):
+                user=request.user
+            else:
+                user=None
+            for id_choice in ids_of_choices:
+                try:
+                    choice = Choice.objects.get(id=id_choice)
+
+                    vote = Votes(choice_id=choice,
+                                 user=user,
+                                 ip_address=request.META['REMOTE_ADDR'])
+                    if(commit):
+                        vote.save()
+                except Choice.DoesNotExist:
+                    raise  # TODO something
+            return None
+
 
     class Meta:
         model = Choice
         fields = ('name',)
         labels = {
             'name': _('Choice'),
-        }
+            }
