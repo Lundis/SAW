@@ -4,6 +4,9 @@ from django.core.urlresolvers import reverse
 from users.permissions import has_user_perm
 from .register import CAN_VIEW_PUBLIC_POLLS, CAN_VIEW_MEMBER_POLLS, \
     CAN_VIEW_BOARD_POLLS, CAN_VOTE_PUBLIC_POLLS, CAN_VOTE_MEMBER_POLLS, CAN_VOTE_BOARD_POLLS
+
+from base.fields import ValidatedRichTextField
+
 # Create your models here.
 
 PERMISSION_CHOICES = (
@@ -19,13 +22,16 @@ PERMISSION_CHOICES = (
 
 class Poll(models.Model):
     name = models.CharField(max_length=100)
-    description = models.TextField(max_length=300)
+    description = ValidatedRichTextField(max_length=300)
     publication = models.DateTimeField('Date published')
     expiration = models.DateTimeField('Poll closes')
     created_by = models.ForeignKey(User)
     can_vote_on_many = models.BooleanField(default=False)
 
     permission = models.CharField(max_length=30, choices=PERMISSION_CHOICES, default="CAN_VIEW_PUBLIC_POLLS")
+
+    def count_votes(self):
+        return Votes.objects.filter(choice_id__id_to_poll=self).count()
 
     def __str__(self):
         return self.name
@@ -69,9 +75,17 @@ class Choice(models.Model):
     def count_votes(self):
         return Votes.objects.filter(choice_id=self.id).count()
 
+    def percentage(self):
+        total_votes_for_poll = self.id_to_poll.count_votes()
+        total_votes_for_specific_choice=Votes.objects.filter(choice_id=self).count()
+        percent= total_votes_for_specific_choice/total_votes_for_poll
+        return percent*100
+
 
 class Votes(models.Model):
     choice_id = models.ForeignKey(Choice)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User,null=True)
     ip_address = models.IPAddressField(default=None)
+
+
 
