@@ -33,3 +33,11 @@ def setup_menu_module():
 
     main_menu, created = menu.models.Menu.get_or_create("main_menu", standard_template)
     login_menu, created = menu.models.Menu.get_or_create("login_menu")
+
+
+def setup():
+    """
+    Removes all disabled menu items.
+    :return:
+    """
+    menu.models.MenuItem.remove_disabled_items()

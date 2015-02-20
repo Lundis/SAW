@@ -1,11 +1,11 @@
 from django.core.urlresolvers import reverse_lazy
-from django.utils.translation import ugettext as _
+
 from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, BOARD_MEMBER
 from settings.sections import Page, SECTION_OTHER
-from base.models import SiteConfiguration
-import contact.models as cmodels
+
+
 
 CAN_VIEW_CONTACT_INFO = "can_view_contact_info"
 CAN_USE_CONTACT_FORM = "can_use_contact_form"
@@ -44,29 +44,3 @@ def get_permissions():
     )
 
 
-def setup():
-    """
-    Creates a default contact group for the association
-    :return:
-    """
-    # First check if the module has been set up before
-    if not cmodels.ContactSettings.is_setup():
-        contact = cmodels.ContactInfo(name=_("The Board"),
-                                      save_to_db=True,
-                                      send_email=True,
-                                      email=SiteConfiguration.instance().association_contact_email,
-                                      ordering_index=1
-                                      )
-        contact.save()
-
-        contact = cmodels.ContactInfo(name=_("The developers"),
-                                      info_text=_("Give feedback and report bugs to the developers!"),
-                                      save_to_db=False,
-                                      send_email=True,
-                                      email="SAW.errors@gmail.com",
-                                      ordering_index=99
-                                      )
-        contact.save()
-        settings = cmodels.ContactSettings.objects.get()
-        settings._is_setup = True
-        settings.save()

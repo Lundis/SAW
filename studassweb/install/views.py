@@ -58,7 +58,7 @@ def modules(request):
     if form.is_valid():
         form.apply()
         InstallProgress.modules_set()
-        DisabledModule.execute_for_all_enabled("register", "setup")
+        DisabledModule.execute_for_all_enabled("setup", "setup")
         logger.info('In modules, redirecting to menu')
         return HttpResponseRedirect('menu')
 
