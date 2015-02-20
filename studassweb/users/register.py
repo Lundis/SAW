@@ -1,7 +1,5 @@
 from django.core.urlresolvers import reverse_lazy
 from users.groups import MEMBER, LOGGED_ON, WEBMASTER
-from menu.models import MenuItem
-from users.models import SAWPermission
 from settings.sections import Page, SECTION_PERSONAL_SETTINGS, SECTION_USERS
 
 
