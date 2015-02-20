@@ -84,6 +84,7 @@ class SAWPermission(models.Model):
     permission = models.ForeignKey(Permission, primary_key=True)
     description = models.CharField(max_length=200)
     default_group = models.ForeignKey(Group, null=True, default=None)
+    module = models.CharField(max_length=100)
 
     def __str__(self):
         return self.permission.codename
@@ -101,7 +102,7 @@ class SAWPermission(models.Model):
             logger.error("SAWPermission \"%s\" does not exist!", perm.codename)
 
     @classmethod
-    def get_or_create(cls, perm_name, default_group, description):
+    def get_or_create(cls, perm_name, default_group, description, module):
         """
 
         :param perm_name: name of permission (str)
@@ -117,9 +118,13 @@ class SAWPermission(models.Model):
                                                                content_type=DummyPermissionBase.get_content_type())
         logger.info("Created permission %s", perm_name)
         saw_permission, created = cls.objects.get_or_create(permission=permission)
-        if not saw_permission.description or not saw_permission.default_group:
+        if module:
+            saw_permission.module = module
+        if description:
             saw_permission.description = description
+        if default_group:
             saw_permission.default_group = default_group
+        if description or default_group or module:
             saw_permission.save()
         return saw_permission
 
