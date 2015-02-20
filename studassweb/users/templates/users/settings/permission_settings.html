@@ -1,5 +1,14 @@
-{% extends "settings/base.html" %}
+{% extends "base/base.html" %}
 {% load i18n %}
+{% load sidemenu %}
+
+{% block breadcrumb1 %}
+    <li class="active">
+        <a href="{% url "settings_main" %}">
+            {% trans "Settings" %}
+        </a>
+    </li>
+{% endblock %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -35,7 +44,7 @@
                         <div id="group-{{ group.id }}" class="connected-sort ui-sortable permission-container"
                              style="min-width:100%; min-height:100px;">
                             {% for perm in group.permissions %}
-                                <li id="permission-{{ perm.id }}" class="btn btn-primary permission ui-sortable-handle" title="{{ perm.description }}">
+                                <li id="permission-{{ perm.id }}" class="btn btn-primary permission ui-sortable-handle module-{{ perm.module }}" title="{{ perm.description }}">
                                     {{ perm.permission.name }}
                                 </li>
                             {% endfor %}
@@ -45,6 +54,27 @@
             </div>
         {% endfor %}
     </div>
+{% endblock %}
+
+{% block sidebar-panel1 %}
+    {% sidebarpanel "vertical_buttons"%}
+        {% trans "Show from modules"%}
+        {% body %}
+        {% for module in modules %}
+            <div class="btn btn-primary btn-small"
+                 data-toggle="hide" data-target="module-{{ module }}">
+                {{ module }}
+            </div>
+        {% endfor %}
+    {% endsidebarpanel %}
+{% endblock %}
+
+{% block sidebar-panel-help %}
+    {% sidebarpanel "help"%}
+        {% trans "Help"%}
+        {% body %}
+        Help text here
+    {% endsidebarpanel %}
 {% endblock %}
 
 {% block scripts %}

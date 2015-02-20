@@ -7,7 +7,7 @@ from .decorators import has_permission
 from .groups import group_names, get_permissions_in_group
 from .register import EDIT_LOGIN_SETTINGS, EDIT_PROFILE, EDIT_PERMISSIONS
 from .forms import UserBaseForm, ProfileForm, CustomGroupForm
-from .models import UserExtension
+from .models import UserExtension, SAWPermission
 from settings.sections import SECTION_PERSONAL_SETTINGS, SECTION_USERS, Section
 
 urlpatterns = patterns('',
@@ -38,6 +38,12 @@ urlpatterns = patterns('',
 )
 
 
+def get_modules_with_permissions():
+    perms_in_dicts = SAWPermission.objects.values("module").distinct()
+    perms = [entry['module'] for entry in perms_in_dicts]
+    return sorted(perms)
+
+
 @has_permission(EDIT_PERMISSIONS)
 def edit_permissions(request):
     """
@@ -53,7 +59,8 @@ def edit_permissions(request):
                         'permissions': get_permissions_in_group(group)}]
     # TODO: mega permission form
     context = {'section': section,
-               'groups': group_list}
+               'groups': group_list,
+               'modules': get_modules_with_permissions()}
     return render(request, "users/settings/permission_settings.html", context)
 
 
@@ -90,7 +97,8 @@ def edit_groups(request, group_id=None, new=False):
     context = {'section': section,
                'groups': custom_groups,
                'group': group,
-               'form': form}
+               'form': form,
+               'modules': get_modules_with_permissions()}
     return render(request, "users/settings/edit_groups.html", context)
 
 

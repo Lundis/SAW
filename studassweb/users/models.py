@@ -108,6 +108,7 @@ class SAWPermission(models.Model):
         :param perm_name: name of permission (str)
         :param default_group: A Group or a string
         :param description:
+        :param module:
         :return:
         """
         if not isinstance(default_group, Group):
