@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext as _
 from .models import Event, EventSignup, EventItem, ItemInEvent, ItemInSignup
 from base.utils import generate_email_ver_code
+from users.models import SAWPermission
 
 EITEMS = "eitems"
 
@@ -57,7 +58,7 @@ class EventForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        fields = ('title', 'text', 'max_participants', 'signup_start', 'signup_deadline', 'start', 'stop')
+        fields = ('title', 'text', 'max_participants', 'signup_start', 'signup_deadline', 'start', 'stop', 'permission')
 
     def clean(self):
         super(EventForm, self).clean()

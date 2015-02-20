@@ -26,8 +26,6 @@ def home(request):
     return render(request, 'events/view_events.html', {'events': events})
 
 
-# TODO we shouldn't have all this code in the view
-# A lot of these errors should simply invalidate the form so the user can correct it!
 def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None):
     try:
         if slug:
@@ -41,6 +39,14 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
     except Event.DoesNotExist:
         logger.warning('Could not find event with slug %s or id %s', slug, event_id)
         return HttpResponseNotFound('Event not found')
+
+    # Check permissions
+    if not event.user_can_view_and_join(request.user):
+        logger.warning('User %s tried to view event %s', request.user, event)
+        messages.error(request, _("You don't have permission to view this event"))
+        return HttpResponseRedirect(reverse("events_home"))
+
+
 
     # Check if this is a request to edit a signup.
     db_event_signup = None
