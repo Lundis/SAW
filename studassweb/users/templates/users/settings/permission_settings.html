@@ -65,11 +65,14 @@
                 <div type="submit" class="btn btn-primary">
                     {% trans "Save" %}
                 </div>
-                <a href="" class="btn btn-warning">
-                    {% trans "Reset all permissions" %}
-                </a>
+
             </div>
         </form>
+        <div class="btn-group-vertical btn-block" style="margin-top: 10px;">
+            <a href="" class="btn btn-warning">
+                {% trans "Reset all permissions" %}
+            </a>
+        </div>
     {% endsidebarpanel %}
 {% endblock %}
 
@@ -77,13 +80,23 @@
     {% sidebarpanel "vertical_buttons"%}
         {% trans "Show from modules"%}
         {% body %}
-        <div class="row">
-            {% for module in modules %}
-                <div class="btn btn-primary btn-small col-xs-6"
-                     data-toggle="hide" data-target="module-{{ module }}">
-                    {{ module }}
+        <div class="panel-body" style="padding-top: 0px; padding-bottom: 0px;">
+            <div class="row">
+                {% for module in modules %}
+                    <div class="btn btn-primary btn-small col-xs-6"
+                         data-toggle="hide" data-target="module-{{ module }}">
+                        {{ module }}
+                    </div>
+                {% endfor %}
+                <div class="btn btn-info btn-small col-xs-6"
+                     id="hide_all_button">
+                    {% trans "Hide all" %}
                 </div>
-            {% endfor %}
+                <div class="btn btn-info btn-small col-xs-6"
+                     id="show_all_button">
+                    {% trans "Show all" %}
+                </div>
+            </div>
         </div>
     {% endsidebarpanel %}
 {% endblock %}
@@ -103,6 +116,19 @@
 {% block scripts %}
     <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
     <script>
+
+        $("#hide_all_button").click(function(event) {
+            var button = event.target;
+            $(".permission").addClass("hidden");
+            $("div[data-toggle=hide]").removeClass("active");
+        });
+
+        $("#show_all_button").click(function(event) {
+            var button = event.target;
+            $(".permission").removeClass("hidden");
+            $("div[data-toggle=hide]").addClass("active");
+        });
+
         // bootstrap tooltips conflict with jquery-ui sortable
         // https://github.com/twbs/bootstrap/issues/6303
 
