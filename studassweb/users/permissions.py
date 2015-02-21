@@ -22,7 +22,7 @@ def has_user_perm(user, perm_name):
 def add_perm_to_group(perm, group):
     """
     Adds a permission to a group and at the same time creates a SAWPermission if it doesn't exist.
-    :param perm:
+    :param perm: A permission string
     :param group: Either an Actual Group object or a string
     """
     if isinstance(group, Group):
@@ -30,7 +30,7 @@ def add_perm_to_group(perm, group):
     else:
         group_instance = Group.objects.get(name=group)
 
-    sawp = SAWPermission.get_or_create(perm)
+    sawp = SAWPermission.get(perm)
     group_instance.permissions.add(sawp.permission)
 
 

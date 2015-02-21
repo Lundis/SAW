@@ -7,7 +7,7 @@ from .register import get_menu_items
 from studassweb.urls import urlpatterns
 from django.contrib.auth.models import AnonymousUser, User
 from users.models import UserExtension
-from users.groups import setup_default_groups
+from users.groups import setup_default_groups_and_permissions
 from users.groups import put_user_in_standard_group, MEMBER
 from unittest import skip
 
@@ -25,7 +25,7 @@ class ExamsHttpTests(TestCase):
     def setUp(self):
         # Here we should run the whole install process...
         # TODO we need to be able to run install from code
-        setup_default_groups()  # Create default user groups
+        setup_default_groups_and_permissions()  # Create default user groups
         # get_menu_items()  # Create default menu items... No we don't want to do this for every single application.fuck.
 
         # Setup test members/users

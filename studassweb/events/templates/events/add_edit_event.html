@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load bootstrap3 %}
 {% load static %}
+{% load sidemenu %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -17,17 +18,6 @@
 
 
 {% block main_content %}
-    {% if form.instance.pk %}
-        <form action="{% url 'events_delete_event' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
-            {% csrf_token %}
-            {% buttons %}
-                <button type="submit" class="btn btn-danger">
-                    {% trans "Remove this event" %}
-                </button>
-            {% endbuttons %}
-        </form>
-    {% endif %}
-
     <form action="" method="post">
         {% csrf_token %}
         {{ form.media }}
@@ -51,35 +41,49 @@
             //Set up datetimepicker
             $( "#{{ form.signup_start.id_for_label }}" ).datetimepicker({
                 dayOfWeekStart: 1,
-                format: "d.n.Y H:m"
+                format: "d.n.Y H:i"
             });
             $( "#{{ form.signup_deadline.id_for_label }}" ).datetimepicker({
                 dayOfWeekStart: 1,
-                format: "d.n.Y H:m"
+                format: "d.n.Y H:i"
             });
             $( "#{{ form.start.id_for_label }}" ).datetimepicker({
                 dayOfWeekStart: 1,
-                format: "d.n.Y H:m"
+                format: "d.n.Y H:i"
             });
             $( "#{{ form.stop.id_for_label }}" ).datetimepicker({
                 dayOfWeekStart: 1,
-                format: "d.n.Y H:m"
+                format: "d.n.Y H:i"
             });
         })
     </script>
 {% endblock %}
 
-{% block helppanel %}
-    <div class= "panel-heading">
-        <h2 class="panel-title" data-toggle="collapse" data-target="#helptext">
-            {% trans "Help" %}
-            <span class="glyphicon caret pull-right"></span>
-        </h2>
-    </div>
-    <div id="helptext" class="panel-collapse collapse helptext-collapse">
-        <div class="panel-body">
-            <p>{% trans "This is where you create events." %}</p>
-            <p>{% trans "Each field except event items (eitems) is required by default." %}</p>
-        </div>
-    </div>
+
+
+{% block sidebar-panel4 %}
+    {% if form.instance.pk %}
+        {% sidebarpanel "vertical_buttons" %}
+            {% trans "Delete" %}
+            {% body %}
+            {# FIXME this button looks odd compared to the others #}
+            <form action="{% url 'events_delete_event' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
+                {% csrf_token %}
+                {% buttons %}
+                    <button type="submit" class="btn btn-danger">
+                        {% trans "Remove this event" %}
+                    </button>
+                {% endbuttons %}
+            </form>
+        {% endsidebarpanel %}
+    {% endif %}
+{% endblock %}
+
+{% block sidebar-panel-help %}
+    {% sidebarpanel "help" %}
+        {% trans "Help" %}
+        {% body %}
+        <p>{% trans "This is where you create events." %}</p>
+        <p>{% trans "Each field except event items (eitems) is required by default." %}</p>
+    {% endsidebarpanel %}
 {% endblock %}

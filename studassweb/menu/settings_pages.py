@@ -50,9 +50,9 @@ menu_section = Section.get_section(SECTION_MENU)
 
 @has_permission(EDIT_MENUS)
 def select_menu(request):
-    custom_items = MenuItem.get_all_custom_items()
+    menu_items = MenuItem.objects.all()
     return render(request, "menu/settings/select_menu.html", {'menus': Menu.objects.all(),
-                                                              'custom_menu_items': custom_items,
+                                                              'menu_items': menu_items,
                                                               'section': menu_section})
 
 

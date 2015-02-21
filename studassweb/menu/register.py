@@ -1,6 +1,5 @@
 from django.core.urlresolvers import reverse_lazy
 from users.groups import WEBMASTER
-from menu.models import MenuItem
 from users.models import SAWPermission
 from settings.sections import Page, SECTION_MENU, SECTION_APPEARANCE
 
@@ -30,9 +29,3 @@ def register_settings_pages():
     return item, menu_layout
 
 
-def setup():
-    """
-    Removes all disabled menu items.
-    :return:
-    """
-    MenuItem.remove_disabled_items()

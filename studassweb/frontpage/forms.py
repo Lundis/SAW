@@ -11,6 +11,7 @@ class PlacementForm(forms.ModelForm):
     item_id = forms.IntegerField(widget=forms.HiddenInput())
 
     class Meta:
+        model = FrontPageItem
         fields = ("ordering_index", "location")
 
     def clean_item_id(self):

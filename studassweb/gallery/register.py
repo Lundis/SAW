@@ -17,7 +17,7 @@ def get_menu_items():
                                            app_name=__package__,
                                            display_name="Gallery",
                                            reverse_string="gallery_main",
-                                           permission=SAWPermission.get_or_create(CAN_VIEW_PUBLIC_ALBUMS))
+                                           permission=SAWPermission.get(CAN_VIEW_PUBLIC_ALBUMS))
     return ([item],
             None,
             None)

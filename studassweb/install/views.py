@@ -11,16 +11,16 @@ from menu.forms import MenuForm
 from menu.setup import setup_menu_module
 from .models import InstallProgress
 from users.decorators import has_permission
-from users.groups import setup_default_groups, put_user_in_standard_group, WEBMASTER
+from users.groups import setup_default_groups_and_permissions, put_user_in_standard_group, WEBMASTER
 from .register import CAN_INSTALL
+from base.models import SiteConfiguration
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 def welcome(request):
-    # create the can_install permission if it doesn't exist
-    SAWPermission.get_or_create("can_install", "Allows you to use the installation wizard")
+    setup_default_groups_and_permissions()
     context = {}
     if not request.user.is_authenticated():
         login_form = LoginForm(request.POST or None)
@@ -41,6 +41,9 @@ def association(request):
     logger.info('In association, form is defined: %s', bool(form))
     if form.is_valid():
         form.apply()
+        site_config = SiteConfiguration.instance()
+        site_config.base_url = request.build_absolute_uri("/")[:-1]
+        site_config.save()
         InstallProgress.site_name_set()
         logger.info('In association, redirecting to modules')
         return HttpResponseRedirect('modules')
@@ -55,7 +58,7 @@ def modules(request):
     if form.is_valid():
         form.apply()
         InstallProgress.modules_set()
-        DisabledModule.execute_for_all_enabled("register", "setup")
+        DisabledModule.execute_for_all_enabled("setup", "setup")
         logger.info('In modules, redirecting to menu')
         return HttpResponseRedirect('menu')
 
@@ -103,7 +106,6 @@ def get_other_items(occupied=[]):
 @has_permission(CAN_INSTALL)
 def finished(request):
     logger.info('in Finished')
-    setup_default_groups()
     InstallProgress.finish()
     context = {}
     return render(request, 'install/finished.html', context)

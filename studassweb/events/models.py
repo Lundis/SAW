@@ -21,6 +21,12 @@ from operator import attrgetter
 
 logger = logging.getLogger(__name__)
 
+PERMISSION_CHOICES = (
+    (eregister.CAN_VIEW_AND_JOIN_PUBLIC_EVENTS, "Public event"),
+    (eregister.CAN_VIEW_AND_JOIN_MEMBER_EVENTS, "Members-only event"),
+    (eregister.CAN_VIEW_AND_JOIN_BOARD_MEMBER_EVENTS, "Board members-only event"),
+)
+
 
 # This should maybe be put in base or something
 class MultiInputField(models.CharField):
@@ -32,7 +38,6 @@ class MultiInputField(models.CharField):
 
 
 # This is an actual event, for example a Christmas party
-# TODO is it public, for members, or for board members only?
 class Event(models.Model):
     title = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
@@ -42,7 +47,8 @@ class Event(models.Model):
     author = models.ForeignKey(User)
     signup_start = models.DateTimeField(verbose_name="Signup starts", default=timezone.now)
     signup_deadline = models.DateTimeField(verbose_name="Deadline for signups")
-    permission = models.CharField(max_length=100, blank=True, null=True)  # Permission needed to see and attend
+    permission = models.CharField(max_length=100, choices=PERMISSION_CHOICES,
+                                  default=eregister.CAN_VIEW_AND_JOIN_PUBLIC_EVENTS)
     max_participants = models.IntegerField(validators=[MinValueValidator(1)], default=50)
 
     def __str__(self):
@@ -102,6 +108,10 @@ class Event(models.Model):
     def count_participants(self):
         return EventSignup.objects.filter(event=self).count()
 
+    def user_can_view_and_join(self, user):
+        print(self.permission)
+        return permissions.has_user_perm(user, self.permission)
+
 
 # Each user which signs up creates one of these
 # We need both user and name as we need to allow non-signed in users to sign up
@@ -136,7 +146,7 @@ class EventSignup(models.Model):
         # Can't allow delete() to throw an exception related to the email
         try:
             signups = EventSignup.objects.filter(event=self.event)
-            if self.event.max_participants >= signups.count():
+            if self.event.max_participants <= signups.count():
                 # Get the signup that just got below the participant limit
                 reserve_signup = signups[self.event.max_participants - 1]
                 reserve_signup.send_reserve_email()
@@ -178,6 +188,13 @@ class EventSignup(models.Model):
             if item.pk == self.pk:
                 return index >= self.event.max_participants
         logger.error("is_reserve couldn't find itself in the list")
+
+    def is_first_reserve(self):
+        signups = EventSignup.objects.filter(event=self.event)
+        for index, item in enumerate(signups):
+            if item.pk == self.pk:
+                return index == self.event.max_participants
+        logger.error("is_first_reserve couldn't find itself in the list")
 
     def fix_indices(self):
         signups = EventSignup.objects.filter(event=self.event)

@@ -15,7 +15,7 @@ def get_menu_items():
                                            app_name=__package__,
                                            display_name="News",
                                            reverse_string="news_home",
-                                           permission=SAWPermission.get_or_create(VIEW_PUBLIC))
+                                           permission=SAWPermission.get(VIEW_PUBLIC))
     return ([item],
             None,
             None)

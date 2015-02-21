@@ -16,7 +16,7 @@ def get_menu_items():
                                            app_name=__package__,
                                            display_name="Board",
                                            reverse_string="boards_main",
-                                           permission=SAWPermission.get_or_create(CAN_VIEW_BOARDS))
+                                           permission=SAWPermission.get(CAN_VIEW_BOARDS))
     return ([item],
             None,
             None)

@@ -55,6 +55,28 @@
                     </div>
                     <div class="col-sm-4 col-md-3">
                         {% block sidebar %}
+                            <div class="panel panel-primary">
+                                {% block sidebar-panel1 %}
+                                {% endblock %}
+                                {% block sidebar-panel2 %}
+                                {% endblock %}
+                                {% block sidebar-panel3 %}
+                                {% endblock %}
+                                {% block sidebar-panel4 %}
+                                {% endblock %}
+                                {% block sidebar-panel5 %}
+                                {% endblock %}
+                                {% block sidebar-panel6 %}
+                                {% endblock %}
+                                {% block sidebar-panel7 %}
+                                {% endblock %}
+                                {% block sidebar-panel8 %}
+                                {% endblock %}
+                                {% block sidebar-panel9 %}
+                                {% endblock %}
+                                {% block sidebar-panel-help %}
+                                {% endblock %}
+                            </div>
                         {% endblock sidebar %}
                     </div>
                 </div>
@@ -75,7 +97,7 @@
                 <div class="col-xs-12 footer text-center navbar-brand">
                     <span class="glyphicon glyphicon-copyright-mark"></span>
                     {% now "Y" %} {{ site_config.association_name }}
-                     - Powered by SAW (beta)
+                    - Powered by SAW (beta)
                 </div>
             </div>
         </div>

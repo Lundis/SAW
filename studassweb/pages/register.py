@@ -13,7 +13,7 @@ def get_menu_items():
                                            app_name=__package__,
                                            display_name="Pages",
                                            reverse_string="pages_view_categories",
-                                           permission=SAWPermission.get_or_create(VIEW_PUBLIC))
+                                           permission=SAWPermission.get(VIEW_PUBLIC))
     if not item.submenu:
         item.submenu, created = Menu.objects.get_or_create(menu_name="pages_top_menu")
         item.save()

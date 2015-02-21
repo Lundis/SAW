@@ -4,7 +4,7 @@ from .models import Event, EventSignup, EventItem
 from django.http import HttpResponseRedirect, Http404
 from users import permissions
 from users.decorators import has_permission
-from .register import CAN_CREATE_EVENTS
+import events.register as eregister
 from .forms import EventForm, EventSignupForm, EventItemsForm, SignupItemsForm
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib import messages
@@ -22,12 +22,16 @@ ITEMS_PREFIX = "eventitems"
 
 
 def home(request):
-    events = Event.objects.filter().order_by('start')
+    events = Event.objects.all().order_by('start')
+    if not permissions.has_user_perm(request.user, eregister.CAN_VIEW_AND_JOIN_PUBLIC_EVENTS):
+        events = events.exclude(permission=eregister.CAN_VIEW_AND_JOIN_PUBLIC_EVENTS)
+    if not permissions.has_user_perm(request.user, eregister.CAN_VIEW_AND_JOIN_MEMBER_EVENTS):
+        events = events.exclude(permission=eregister.CAN_VIEW_AND_JOIN_MEMBER_EVENTS)
+    if not permissions.has_user_perm(request.user, eregister.CAN_VIEW_AND_JOIN_BOARD_MEMBER_EVENTS):
+        events = events.exclude(permission=eregister.CAN_VIEW_AND_JOIN_BOARD_MEMBER_EVENTS)
     return render(request, 'events/view_events.html', {'events': events})
 
 
-# TODO we shouldn't have all this code in the view
-# A lot of these errors should simply invalidate the form so the user can correct it!
 def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None):
     try:
         if slug:
@@ -42,13 +46,21 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
         logger.warning('Could not find event with slug %s or id %s', slug, event_id)
         return HttpResponseNotFound('Event not found')
 
+    # Check permissions
+    if not event.user_can_view_and_join(request.user):
+        logger.warning('User %s tried to view event %s', request.user, event)
+        messages.error(request, _("You don't have permission to view this event"))
+        return HttpResponseRedirect(reverse("events_home"))
+
     # Check if this is a request to edit a signup.
     db_event_signup = None
     if auth_code:
         try:
             db_event_signup = EventSignup.objects.get(auth_code=auth_code)
         except EventSignup.DoesNotExist:
-            raise Http404(_("Invalid auth code!"))
+            messages.error(request,
+                           _("Wrong authentication code, check link and make sure you are still registered to event"))
+            return HttpResponseRedirect(event.get_absolute_url())
     elif signup_id:
         try:
             db_event_signup = EventSignup.objects.get(id=signup_id)
@@ -79,29 +91,36 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
             temp_signup.delete()
             return HttpResponseServerError("Failed to save signup items")
 
-        from_email = settings.NO_REPLY_EMAIL
-        to_emails = [temp_signup.email]
-        title = _("You have registered for") + " " + event.title
-        message = temp_signup.build_email_content(request)
-        logger.info("Sending event email from %s to %s" % (from_email, to_emails[0]))
-        try:
-            send_mail(
-                title,
-                message,
-                from_email,
-                to_emails)
-            messages.success(request, _("Successfully signed up to the event!"))
+        # Don't send email when editing existing signup
+        if not db_event_signup:
+            from_email = settings.NO_REPLY_EMAIL
+            to_emails = [temp_signup.email]
+            title = _("You have registered for") + " " + event.title
+            message = temp_signup.build_email_content(request)
+            logger.info("Sending event email from %s to %s" % (from_email, to_emails[0]))
+            try:
+                send_mail(
+                    title,
+                    message,
+                    from_email,
+                    to_emails)
+                messages.success(request, _("Successfully signed up to the event!"))
+                # redirect to avoid duplicated signups on refresh
+                return HttpResponseRedirect(reverse("events_view_event", kwargs={'slug': event.slug}))
+
+            except BadHeaderError:
+                logger.error("BadHeaderError sending email to {0}".format(to_emails))
+                temp_signup.delete()
+                signupform.add_error(None, _("BadHeaderError, newlines in email address?"))
+            except:
+                logger.error("Exception {0} sending email to {1}".format(sys.exc_info()[0], to_emails))
+                temp_signup.delete()
+                signupform.add_error(None, _("Unknown error when sending email, please verify your data and try again"))
+
+        else:
+            messages.success(request, _("Successfully edited signup details!"))
             # redirect to avoid duplicated signups on refresh
             return HttpResponseRedirect(reverse("events_view_event", kwargs={'slug': event.slug}))
-
-        except BadHeaderError:
-            logger.error("BadHeaderError sending email to {0}".format(to_emails))
-            temp_signup.delete()
-            signupform.add_error(None, _("BadHeaderError, newlines in email address?"))
-        except:
-            logger.error("Exception {0} sending email to {1}".format(sys.exc_info()[0], to_emails))
-            temp_signup.delete()
-            signupform.add_error(None, _("Unknown error sending when email, please verify your data and try again"))
 
     signups = EventSignup.objects.filter(event=event)
 
@@ -109,7 +128,7 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
                   {'event': event, 'signupform': signupform, 'signupitemsform': signupitemsform, 'signups': signups})
 
 
-@has_permission(CAN_CREATE_EVENTS)
+@has_permission(eregister.CAN_CREATE_EVENTS)
 def add_edit_event(request, event_id=None):
     if event_id is not None:
         try:
@@ -131,7 +150,7 @@ def add_edit_event(request, event_id=None):
     return render(request, 'events/add_edit_event.html', context)
 
 
-@has_permission(CAN_CREATE_EVENTS)
+@has_permission(eregister.CAN_CREATE_EVENTS)
 def delete_event(request, event_id):
     if request.method == 'POST':
         try:
@@ -219,7 +238,7 @@ class AddEventItemView(CreateView):
     success_url = reverse_lazy("events_list_eventitems")
 
     def dispatch(self, request, *args, **kwargs):
-        if permissions.has_user_perm(request.user, CAN_CREATE_EVENTS):
+        if permissions.has_user_perm(request.user, eregister.CAN_CREATE_EVENTS):
             return super(AddEventItemView, self).dispatch(request, *args, **kwargs)
         messages.error(request, _("You don't have permission to add event items"))
         return HttpResponseRedirect(reverse("events_home"))
@@ -236,7 +255,7 @@ class EditEventItemView(UpdateView):
     success_url = reverse_lazy("events_list_eventitems")
 
     def dispatch(self, request, *args, **kwargs):
-        if permissions.has_user_perm(request.user, CAN_CREATE_EVENTS):
+        if permissions.has_user_perm(request.user, eregister.CAN_CREATE_EVENTS):
             return super(EditEventItemView, self).dispatch(request, *args, **kwargs)
         return HttpResponseForbidden(_("You don't have permission to edit event items"))
 
@@ -251,7 +270,7 @@ class DeleteEventItemView(DeleteView):
     success_url = reverse_lazy("events_list_eventitems")
 
     def dispatch(self, request, *args, **kwargs):
-        if permissions.has_user_perm(request.user, CAN_CREATE_EVENTS):
+        if permissions.has_user_perm(request.user, eregister.CAN_CREATE_EVENTS):
             return super(DeleteEventItemView, self).dispatch(request, *args, **kwargs)
         return HttpResponseForbidden(_("You don't have permission to add event items"))
 
@@ -265,6 +284,6 @@ class ListEventItemsView(ListView):
     model = EventItem
 
     def dispatch(self, request, *args, **kwargs):
-        if permissions.has_user_perm(request.user, CAN_CREATE_EVENTS):
+        if permissions.has_user_perm(request.user, eregister.CAN_CREATE_EVENTS):
             return super(ListEventItemsView, self).dispatch(request, *args, **kwargs)
         return HttpResponseForbidden(_("You don't have permission to view event items"))

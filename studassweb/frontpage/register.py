@@ -14,7 +14,7 @@ def get_menu_items():
                                            app_name=__package__,
                                            display_name="Home",
                                            reverse_string="frontpage_home",
-                                           permission=SAWPermission.get_or_create(CAN_VIEW_FRONTPAGE))
+                                           permission=SAWPermission.get(CAN_VIEW_FRONTPAGE))
     return ([item],
             None,
             None)

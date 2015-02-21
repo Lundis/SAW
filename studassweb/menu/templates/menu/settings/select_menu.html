@@ -1,5 +1,13 @@
-{% extends "settings/base.html" %}
+{% extends "base/base.html" %}
 {% load i18n %}
+
+{% block breadcrumb1 %}
+    <li>
+        <a href="{% url "settings_main" %}">
+            {% trans "Settings" %}
+        </a>
+    </li>
+{% endblock %}
 
 {% block breadcrumb2 %}
     <li>
@@ -17,61 +25,86 @@
 
 {% block main_content %}
     <div class="row">
-        <div class="col-sm-5">
+
+        <div class="col-xs-12 col-sm-8">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    {% trans "Menu preview" %}
+                    <div class="panel-title">
+                        {% trans "Click on a menu item to edit it" %}
+                    </div>
                 </div>
                 <div class="panel-body">
-                    {% for menu in menus %}
-                        <div id="menu-items-{{ menu.id }}" class="menu-items hidden">
-                            <div class="list-group">
-                                {% for item in menu.items %}
-                                    <div class="btn list-group-item">{{ item.display_name }}</div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-4">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3>{% trans "Select a menu to edit." %}</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="list-group">
-                        {% for menu in menus %}
-                            <a href="{% url "menu_settings_edit_menu" menu.id %}" >
-                                <div class="btn list-group-item menu" id="menu-{{ menu.id }}">{{ menu.menu_name }}</div>
+                    <div class="btn-group">
+                        {% for item in menu_items %}
+                            <a href="{% url "menu_settings_edit_menu_item" item_id=item.id %}"
+                               class="btn btn-primary"
+                               title="{{ item.get_absolute_url }}">
+                                {{ item.display_name }}
                             </a>
                         {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-sm-1">
-            <a href="{% url "menu_settings_new_menu" %}" class="btn btn-primary">{% trans "Create a new menu" %}</a>
+        <div class="col-sm-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        {% trans "Select a menu to edit." %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="btn-group-vertical btn-block">
+                        {% for menu in menus %}
+                            <a href="{% url "menu_settings_edit_menu" menu.id %}"
+                               class="btn btn-primary"
+                               id="menu-{{ menu.id }}">
+                                {{ menu.menu_name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="row">
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                {% trans "Click on a custom menu item to edit it or " %}
-                <a href="{% url "menu_settings_new_menu_item" %}">{% trans "create a new one" %}</a>
-            </div>
-            <div class="panel-body">
-                {% for item in custom_menu_items %}
-                    <a href="{% url "menu_settings_edit_menu_item" item_id=item.id %}" title="{{ item.get_absolute_url }}">
-                        {{ item.display_name }}
-                    </a>
+{% endblock %}
+
+{% block sidebar-panel1-header %}
+    {% trans "Actions" %}
+{% endblock %}
+{% block sidebar-panel1-body %}
+    <div class="btn-group-vertical btn-block">
+        <a href="{% url "menu_settings_new_menu" %}" class="btn btn-primary">
+            {% trans "Create a new menu" %}
+        </a>
+        <a class="btn btn-primary" href="{% url "menu_settings_new_menu_item" %}">
+            {% trans "Create a new menu item" %}
+        </a>
+    </div>
+{% endblock %}
+{% block sidebar-panel2-header %}
+    {% trans "Preview Menu" %}
+{% endblock %}
+{% block sidebar-panel2-body %}
+    <p>{% trans "Hover over a menu to see a preview of its items here" %}</p>
+    {% for menu in menus %}
+        <div id="menu-items-{{ menu.id }}" class="menu-items hidden">
+            <div class="btn-group-vertical btn-block">
+                {% for item in menu.items %}
+                    <div class="btn btn-sm">{{ item.display_name }}</div>
                 {% endfor %}
             </div>
         </div>
-    </div>
-
+    {% endfor %}
 {% endblock %}
+{% block sidebar-panel3 %}{% endblock %}
+{% block sidebar-panel4 %}{% endblock %}
+{% block sidebar-panel5 %}{% endblock %}
+{% block sidebar-panel6 %}{% endblock %}
+{% block sidebar-panel7 %}{% endblock %}
+{% block sidebar-panel8 %}{% endblock %}
+{% block sidebar-panel9 %}{% endblock %}
+{% block sidebar-panel-help %}{% endblock %}
 
 {% block scripts %}
     <script>

@@ -11,7 +11,7 @@ def get_menu_items():
                                            app_name=__package__,
                                            display_name="Install",
                                            reverse_string="install_welcome",
-                                           permission=SAWPermission.get_or_create(CAN_INSTALL))
+                                           permission=SAWPermission.get(CAN_INSTALL))
     return (None,
             [item],
             None)
