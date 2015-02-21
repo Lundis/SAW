@@ -4,7 +4,7 @@ from .models import Event, EventSignup, EventItem
 from django.http import HttpResponseRedirect, Http404
 from users import permissions
 from users.decorators import has_permission
-from .register import CAN_CREATE_EVENTS
+import events.register as eregister
 from .forms import EventForm, EventSignupForm, EventItemsForm, SignupItemsForm
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib import messages
@@ -22,7 +22,13 @@ ITEMS_PREFIX = "eventitems"
 
 
 def home(request):
-    events = Event.objects.filter().order_by('start')
+    events = Event.objects.all().order_by('start')
+    if not permissions.has_user_perm(request.user, eregister.CAN_VIEW_AND_JOIN_PUBLIC_EVENTS):
+        events = events.exclude(permission=eregister.CAN_VIEW_AND_JOIN_PUBLIC_EVENTS)
+    if not permissions.has_user_perm(request.user, eregister.CAN_VIEW_AND_JOIN_MEMBER_EVENTS):
+        events = events.exclude(permission=eregister.CAN_VIEW_AND_JOIN_MEMBER_EVENTS)
+    if not permissions.has_user_perm(request.user, eregister.CAN_VIEW_AND_JOIN_BOARD_MEMBER_EVENTS):
+        events = events.exclude(permission=eregister.CAN_VIEW_AND_JOIN_BOARD_MEMBER_EVENTS)
     return render(request, 'events/view_events.html', {'events': events})
 
 
@@ -45,8 +51,6 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
         logger.warning('User %s tried to view event %s', request.user, event)
         messages.error(request, _("You don't have permission to view this event"))
         return HttpResponseRedirect(reverse("events_home"))
-
-
 
     # Check if this is a request to edit a signup.
     db_event_signup = None
@@ -124,7 +128,7 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
                   {'event': event, 'signupform': signupform, 'signupitemsform': signupitemsform, 'signups': signups})
 
 
-@has_permission(CAN_CREATE_EVENTS)
+@has_permission(eregister.CAN_CREATE_EVENTS)
 def add_edit_event(request, event_id=None):
     if event_id is not None:
         try:
@@ -146,7 +150,7 @@ def add_edit_event(request, event_id=None):
     return render(request, 'events/add_edit_event.html', context)
 
 
-@has_permission(CAN_CREATE_EVENTS)
+@has_permission(eregister.CAN_CREATE_EVENTS)
 def delete_event(request, event_id):
     if request.method == 'POST':
         try:
@@ -234,7 +238,7 @@ class AddEventItemView(CreateView):
     success_url = reverse_lazy("events_list_eventitems")
 
     def dispatch(self, request, *args, **kwargs):
-        if permissions.has_user_perm(request.user, CAN_CREATE_EVENTS):
+        if permissions.has_user_perm(request.user, eregister.CAN_CREATE_EVENTS):
             return super(AddEventItemView, self).dispatch(request, *args, **kwargs)
         messages.error(request, _("You don't have permission to add event items"))
         return HttpResponseRedirect(reverse("events_home"))
@@ -251,7 +255,7 @@ class EditEventItemView(UpdateView):
     success_url = reverse_lazy("events_list_eventitems")
 
     def dispatch(self, request, *args, **kwargs):
-        if permissions.has_user_perm(request.user, CAN_CREATE_EVENTS):
+        if permissions.has_user_perm(request.user, eregister.CAN_CREATE_EVENTS):
             return super(EditEventItemView, self).dispatch(request, *args, **kwargs)
         return HttpResponseForbidden(_("You don't have permission to edit event items"))
 
@@ -266,7 +270,7 @@ class DeleteEventItemView(DeleteView):
     success_url = reverse_lazy("events_list_eventitems")
 
     def dispatch(self, request, *args, **kwargs):
-        if permissions.has_user_perm(request.user, CAN_CREATE_EVENTS):
+        if permissions.has_user_perm(request.user, eregister.CAN_CREATE_EVENTS):
             return super(DeleteEventItemView, self).dispatch(request, *args, **kwargs)
         return HttpResponseForbidden(_("You don't have permission to add event items"))
 
@@ -280,6 +284,6 @@ class ListEventItemsView(ListView):
     model = EventItem
 
     def dispatch(self, request, *args, **kwargs):
-        if permissions.has_user_perm(request.user, CAN_CREATE_EVENTS):
+        if permissions.has_user_perm(request.user, eregister.CAN_CREATE_EVENTS):
             return super(ListEventItemsView, self).dispatch(request, *args, **kwargs)
         return HttpResponseForbidden(_("You don't have permission to view event items"))

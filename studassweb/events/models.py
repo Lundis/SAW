@@ -22,9 +22,9 @@ from operator import attrgetter
 logger = logging.getLogger(__name__)
 
 PERMISSION_CHOICES = (
-    (eregister.CAN_VIEW_AND_JOIN_PUBLIC_EVENTS, eregister.CAN_VIEW_AND_JOIN_PUBLIC_EVENTS),
-    (eregister.CAN_VIEW_AND_JOIN_MEMBER_EVENTS, eregister.CAN_VIEW_AND_JOIN_MEMBER_EVENTS),
-    (eregister.CAN_VIEW_AND_JOIN_BOARD_MEMBER_EVENTS, eregister.CAN_VIEW_AND_JOIN_BOARD_MEMBER_EVENTS),
+    (eregister.CAN_VIEW_AND_JOIN_PUBLIC_EVENTS, "Public event"),
+    (eregister.CAN_VIEW_AND_JOIN_MEMBER_EVENTS, "Members-only event"),
+    (eregister.CAN_VIEW_AND_JOIN_BOARD_MEMBER_EVENTS, "Board members-only event"),
 )
 
 
