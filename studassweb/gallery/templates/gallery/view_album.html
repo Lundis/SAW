@@ -4,52 +4,58 @@
 {% load bootstrap3 %}
 {% load thumbnail %}
 
-{% block breadcrumb2 %}
+{% block breadcrumb_2 %}
     <li class="active">
         {{ album.name }}
     </li>
 {% endblock %}
 
 {% block main_content %}
-    <div class="row">
-        <div class="col-sm-6">
-            <h1>{{ album.name }}</h1>
-            <div class="list-group">
+<h1>{{ album.name }}</h1>
+<div class="list-group">
+    {% for photo in photos %}
+        <a class="list-group-item" href="{% url 'gallery_view_picture' photo.id %}">
+            {{ photo.uploaded|date:"Y-m-d" }}
+        </a>
+    {% empty %}
+        <p>{% trans "no photos in album" %}<p/>
+        <form action="{% url 'gallery_delete_album' album.id %}" method="post">
+           {% csrf_token %}
+           {% buttons %}
+               <button type="submit" class="btn btn-danger" onclick="return confirm('{% trans "Are you sure?" %}')">
+                   {% trans "remove album" %}
+               </button>
+           {% endbuttons %}
+        </form>
+    {% endfor %}
+</div>
 
-                {% for photo in photos %}
-                    <a class="list-group-item" href="{% url 'gallery_view_photo' photo.id %}">
-                        {{ photo.uploaded|date:"Y-m-d" }}
-                    </a>
-                {% empty %}
-                    <p>{% trans "no photos in album" %}<p/>
-                    <form action="{% url 'gallery_add_picture' %}" method="post">
-                       {% csrf_token %}
-                       {% buttons %}
-                           <button type="submit" class="btn list-group-item" onclick="return confirm('{% trans "Are you sure?" %}')">
-                               {% trans "add picture" %}
-                           </button>
-                       {% endbuttons %}
-                    </form>
-                {% endfor %}
-            </div>
-            {% for album in gallery %}
-                <p><a href="/gallery/album/{{ album.id }}"></a></p>
-            {% empty %}
-                <form action="{% url 'gallery.views.delete_album' album.id %}" method="post">
-                    {% csrf_token %}
-                    {% buttons %}
-                        <button type="submit" class="btn btn-danger">
-                            {% trans "delete album" %}
-                        </button>
-                    {% endbuttons %}
-                </form>
-            {% endfor %}
-        </div>
-    </div>
+<!--{% for album in gallery %}
+    <p><a href="/gallery/album/{{ album.id }}"></a></p>
+{% empty %}
+    <form action="{% url 'gallery.views.delete_album' album.id %}" method="post">
+        {% csrf_token %}
+        {% buttons %}
+            <button type="submit" class="btn btn-danger">
+                {% trans "delete album" %}
+            </button>
+        {% endbuttons %}
+    </form>
+{% endfor %}-->
 {% endblock %}
 
 {% block sidebar %}
    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h2 class="panel-title">{% trans "Add" %}</h2>
+        </div>
+        <div class="panel-body">
+            <div class="btn-group-vertical btn-block">
+                <a href="{% url 'gallery_add_picture' %}" class="btn btn-primary">
+                    {% trans "Add picture to album" %}
+                </a>
+            </div>
+        </div>
         <div class="panel-heading">
             <h2 class="panel-title">{% trans "Edit" %}</h2>
         </div>
