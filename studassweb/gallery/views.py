@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from gallery.forms import *
-from django.http import HttpResponseNotFound, HttpResponseRedirect, HttpResponseForbidden, HttpResponseNotAllowed
+from django.http import HttpResponseNotFound, HttpResponseRedirect, HttpResponseNotAllowed
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.forms.models import inlineformset_factory
@@ -37,7 +37,7 @@ def add_edit_album(request, album_id=-1):
         if form.is_valid():
             tmp = form.save(commit=False)
             tmp.save()
-            return HttpResponseRedirect(reverse('gallery_view_album', kwargs={'album_id': tmp.id}))
+            return HttpResponseRedirect(reverse("gallery_view_album", kwargs={'album_id': tmp.id}))
     context = {'form': form}
     return render(request, 'gallery/add_edit_album.html', context)
 
@@ -47,7 +47,7 @@ def delete_album(request, album_id):
             album = Album.objects.get(id=album_id)
             name = str(album)
             album.delete()
-            messages.success(request, "Course "+name+" was sucessfully deleted!")
+            messages.success(request, "Album "+name+" was sucessfully deleted!")
             return HttpResponseRedirect(reverse("gallery_main"))
         except Album.DoesNotExist:
             return HttpResponseNotFound('No such album found!')
@@ -103,10 +103,12 @@ def delete_picture(request, photo_id):
         if request.method == 'POST':
             try:
                 photo = Photo.objects.get(id=photo_id)
+                name = str(photo)
                 images = PhotoFile.objects.filter(photo_id=photo_id)
                 images.delete()
                 photo.delete()
-                return HttpResponseRedirect(reverse("gallery_main"))  # TODO give feedback to user
+                messages.success(request, "Photo "+name+" was sucessfully deleted!")
+                return HttpResponseRedirect(reverse("gallery_main"))
             except Photo.DoesNotExist:
                 return HttpResponseNotFound('No such photo!')
         else:

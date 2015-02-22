@@ -3,15 +3,15 @@
 {% load i18n %}
 {% load thumbnail %}
 
-{% block breadcrumb_2 %}
+{% block breadcrumb2 %}
     <li>
         <a href="{{ photo.album_id.get_absolute_url }}">
-            {{ photo.album_id }}
+            {{ photo.album_id.name }}
         </a>
     </li>
 {% endblock %}
 
-{% block breadcrumb_3 %}
+{% block breadcrumb3 %}
     <li class="active">
         {{ photo.uploaded |date:"Y-m-d" }}
     </li>
