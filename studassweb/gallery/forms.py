@@ -13,7 +13,7 @@ class AlbumForm(forms.ModelForm):
 class PictureForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(PictureForm, self).__init__(*args, **kwargs)
-
+        self.fields['album_id'].label_from_instance = lambda obj: "%s" % obj.name
 
     uploaded = forms.DateTimeField(
         widget=forms.DateInput(format='%d.%m.%Y'),

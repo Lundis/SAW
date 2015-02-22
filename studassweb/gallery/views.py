@@ -3,7 +3,6 @@ from gallery.forms import *
 from django.http import HttpResponseNotFound, HttpResponseRedirect, HttpResponseForbidden, HttpResponseNotAllowed
 from django.core.urlresolvers import reverse
 from django.forms.models import inlineformset_factory
-from users import permissions
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,10 +19,10 @@ def view_album(request, album_id):
         album = Album.objects.get(id=album_id)
         pictures = Photo.objects.filter(album_id = album_id).order_by('-uploaded')
         return render(request, 'gallery/view_album.html', {
-            'album': album, 'pictures' : pictures},)
+            'album': album, 'pictures': pictures},)
     except Album.DoesNotExist:
         logger.warning('Could not find album with id %s', album_id)
-        return HttpResponseNotFound('No course with that id found')
+        return HttpResponseNotFound('No album with that id found')
 
 def add_edit_album(request, album_id=-1):
     try:
