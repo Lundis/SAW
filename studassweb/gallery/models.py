@@ -24,7 +24,7 @@ class Album(models.Model):
         return str(Photo.objects.filter(album_id=self.id).count())
 
 class Photo(models.Model):
-    album_id = models.ForeignKey(Album, on_delete=models.PROTECT)
+    album_id = models.ForeignKey(Album)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     description = models.TextField(max_length=300)
     uploaded = models.DateTimeField()
