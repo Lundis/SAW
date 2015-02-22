@@ -105,17 +105,16 @@ class MenuForm(forms.Form):
         :return:
         """
         menu_html = {}
-        show_urls = MenuForm._can_show_urls()
         for menu_name, menu in self.menus.items():
             if self.default_items:
                 items = self.default_items[menu_name]
             else:
                 items = menu.items()
-            menu_html[menu_name] = self._render_menu(menu_name, items, show_urls)
+            menu_html[menu_name] = self._render_menu(menu_name, items)
         return menu_html
 
     @staticmethod
-    def _render_menu(menu_name, menu_items, show_urls=True):
+    def _render_menu(menu_name, menu_items):
         """
         renders the menu items of a menu
         :param menu_name:
@@ -125,8 +124,7 @@ class MenuForm(forms.Form):
 
         template = get_template("menu/menu_editor.html")
         context = Context({'menu_name': menu_name,
-                           'items': menu_items,
-                           'show_urls': show_urls})
+                           'items': menu_items})
         result = template.render(context)
         return result
 
@@ -135,12 +133,8 @@ class MenuForm(forms.Form):
         renders the available menu items
         :return:
         """
-        show_urls = MenuForm._can_show_urls()
-        if self.available_items:
-            items = self.available_items
-        else:
-            items = None
-        return self._render_menu("available", items, show_urls)
+        items = self.available_items
+        return self._render_menu("available", items)
 
     @staticmethod
     def get_form_id():
@@ -149,18 +143,6 @@ class MenuForm(forms.Form):
     @staticmethod
     def get_submit_js():
         return "updateHiddenFormFields();"
-
-    @staticmethod
-    def _can_show_urls():
-        """
-        Checks if the server has been restarted after the installation wizard, by trying to reverse settings_main.
-        :return:
-        """
-        try:
-            reverse("settings_main")
-            return True
-        except NoReverseMatch:
-            return False
 
 
 class MenuCreationForm(forms.ModelForm):
