@@ -47,7 +47,7 @@ def delete_album(request, album_id):
             album = Album.objects.get(id=album_id)
             name = str(album)
             album.delete()
-            messages.success(request, "Course "+name+" was sucessfully deleted!")
+            messages.success(request, "Album "+name+" was sucessfully deleted!")
             return HttpResponseRedirect(reverse("gallery_main"))
         except Album.DoesNotExist:
             return HttpResponseNotFound('No such album found!')
