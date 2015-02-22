@@ -20,9 +20,11 @@ class Album(models.Model):
     def __str__(self):
         return str(self.name)
 
+    def get_photo_count(self):
+        return str(Photo.objects.filter(album_id=self.id).count())
 
 class Photo(models.Model):
-    album_id = models.ForeignKey(Album, on_delete=models.PROTECT)
+    album_id = models.ForeignKey(Album)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     description = models.TextField(max_length=300)
     uploaded = models.DateTimeField()
@@ -31,7 +33,7 @@ class Photo(models.Model):
         return reverse("gallery.views.view_picture", kwargs={'photo_id': self.id})
 
     def __str__(self):
-        return self.uploaded.strftime("%Y-%m-%d") + " : " + str(self.photo_id)
+        return self.uploaded.strftime("%Y-%m-%d") + " : " + str(self.album_id)
 
 
 class PhotoFile(models.Model):

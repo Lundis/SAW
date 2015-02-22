@@ -11,37 +11,24 @@
 {% endblock %}
 
 {% block main_content %}
-<h1>{{ album.name }}</h1>
-<div class="list-group">
-    {% for photo in photos %}
-        <a class="list-group-item" href="{% url 'gallery_view_picture' photo.id %}">
-            {{ photo.uploaded|date:"Y-m-d" }}
-        </a>
-    {% empty %}
-        <p>{% trans "no photos in album" %}<p/>
-        <form action="{% url 'gallery_delete_album' album.id %}" method="post">
-           {% csrf_token %}
-           {% buttons %}
-               <button type="submit" class="btn btn-danger" onclick="return confirm('{% trans "Are you sure?" %}')">
-                   {% trans "remove album" %}
-               </button>
-           {% endbuttons %}
-        </form>
-    {% endfor %}
-</div>
-
-<!--{% for album in gallery %}
-    <p><a href="/gallery/album/{{ album.id }}"></a></p>
-{% empty %}
-    <form action="{% url 'gallery.views.delete_album' album.id %}" method="post">
-        {% csrf_token %}
-        {% buttons %}
-            <button type="submit" class="btn btn-danger">
-                {% trans "delete album" %}
-            </button>
-        {% endbuttons %}
-    </form>
-{% endfor %}-->
+    <h1>{{ album.name }}</h1>
+    <div class="list-group">
+        {% for photo in photos %}
+            <a class="list-group-item" href="{% url 'gallery_view_picture' photo.id %}">
+                {{ photo.uploaded|date:"Y-m-d" }}
+            </a>
+        {% empty %}
+            <p>{% trans "no photos in album" %}<p/>
+            <form action="{% url 'gallery_delete_album' album.id %}" method="post">
+               {% csrf_token %}
+               {% buttons %}
+                   <button type="submit" class="btn btn-danger" onclick="return confirm('{% trans "Are you sure?" %}')">
+                       {% trans "remove album" %}
+                   </button>
+               {% endbuttons %}
+            </form>
+        {% endfor %}
+    </div>
 {% endblock %}
 
 {% block sidebar %}
@@ -52,7 +39,7 @@
         <div class="panel-body">
             <div class="btn-group-vertical btn-block">
                 <a href="{% url 'gallery_add_picture' %}" class="btn btn-primary">
-                    {% trans "Add picture to album" %}
+                    {% trans "Add picture to  album" %}
                 </a>
             </div>
         </div>

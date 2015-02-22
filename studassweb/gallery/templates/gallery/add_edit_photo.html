@@ -21,8 +21,8 @@
         <h1>Add photo</h1>
     {% endif %}
 
-    <!--{% if form.instance.pk %}
-        <form action="{% url 'gallery_add_edit_photo' form.instance.pk %}" method="post">
+    {% if form.instance.pk %}
+        <form action="{% url 'gallery_delete_picture' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
             {% csrf_token %}
             {% buttons %}
                 <button type="submit" class="btn btn-danger">
@@ -30,7 +30,7 @@
                 </button>
             {% endbuttons %}
         </form>
-    {% endif %}-->
+    {% endif %}
 
     <form id="addEditPhotoForm" action="" method="post" enctype="multipart/form-data" >
         {% csrf_token %}
