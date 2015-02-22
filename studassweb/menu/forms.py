@@ -94,7 +94,8 @@ class MenuForm(forms.Form):
         :return:
         """
         template = get_template("menu/menu_form.html")
-        context = {'menu_strings': self.menus.values(),
+        menu_strings = "[" + ", ".join(['"' + s + '"' for s in self.menus.keys()]) + "]"
+        context = {'menu_strings': menu_strings,
                    'form_name': self.get_form_id()}
         result = template.render(Context(context))
         return result
@@ -143,6 +144,8 @@ class MenuForm(forms.Form):
     @staticmethod
     def get_submit_js():
         return "updateHiddenFormFields();"
+
+
 
 
 class MenuCreationForm(forms.ModelForm):
