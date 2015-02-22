@@ -15,7 +15,7 @@
         {% for album in albums %}
             <a class="list-group-item" href="{% url 'gallery_view_album' album.id %}">{{ album.name }}
                 <span class="badge">
-                {{ album.get_exam_count }}
+                {{ album.get_photo_count }}
                 </span>
             </a>
 
