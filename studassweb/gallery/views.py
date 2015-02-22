@@ -37,7 +37,7 @@ def add_edit_album(request, album_id=-1):
         if form.is_valid():
             tmp = form.save(commit=False)
             tmp.save()
-            return HttpResponseRedirect(reverse('gallery_view_album', kwargs={'album_id': tmp.id}))
+            return HttpResponseRedirect(reverse("gallery_view_album", kwargs={'album_id': tmp.id}))
     context = {'form': form}
     return render(request, 'gallery/add_edit_album.html', context)
 
