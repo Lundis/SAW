@@ -4,19 +4,20 @@
         for (i = 0; i < old_fields.length; i++) {
             old_fields[i].parentNode.removeChild(old_fields[i]);
         }
-        {% for menu in menu_strings %}
-            var new_{{ menu }}_items = document.getElementById("{{ menu }}-menu-container").childNodes;
+        var items = {{ menu_strings | safe }};
+        for (var j = 0; j < items.length; j++) {
+            var menu_name = items[j];
+            var new_items = document.getElementById(menu_name + "-menu-container").childNodes;
             var index = 0;
-            for ( var i = 0; i < new_{{ menu }}_items.length; i++) {
-                try {
-                    var menu_id = "{{ menu }}-" + new_{{ menu }}_items[i].getAttribute("id");
+            for (var i = 0; i < new_items.length; i++) {
+                // if it's an html element
+                if (new_items[i].nodeType == 1) {
+                    var menu_id = menu_name + "-" + new_items[i].getAttribute("id");
                     add_hidden_input(menu_id, index);
                     index++;
-                } catch(e) {
-                    // ignore error because it is weird and sucks and shouldn't exist
                 }
             }
-        {% endfor %}
+        }
     }
 
     function add_hidden_input(menu_id, order) {
