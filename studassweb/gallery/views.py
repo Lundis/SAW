@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from gallery.forms import *
-from django.http import HttpResponseNotFound, HttpResponseRedirect, HttpResponseForbidden, HttpResponseNotAllowed
+from django.http import HttpResponseNotFound, HttpResponseRedirect, HttpResponseNotAllowed
+from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.forms.models import inlineformset_factory
-from users import permissions
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,10 +20,10 @@ def view_album(request, album_id):
         album = Album.objects.get(id=album_id)
         pictures = Photo.objects.filter(album_id = album_id).order_by('-uploaded')
         return render(request, 'gallery/view_album.html', {
-            'album': album, 'pictures' : pictures},)
+            'album': album, 'pictures': pictures},)
     except Album.DoesNotExist:
         logger.warning('Could not find album with id %s', album_id)
-        return HttpResponseNotFound('No course with that id found')
+        return HttpResponseNotFound('No album with that id found')
 
 def add_edit_album(request, album_id=-1):
     try:
@@ -37,7 +37,7 @@ def add_edit_album(request, album_id=-1):
         if form.is_valid():
             tmp = form.save(commit=False)
             tmp.save()
-            return HttpResponseRedirect(reverse('gallery_view_album', kwargs={'album_id': tmp.id}))
+            return HttpResponseRedirect(reverse("gallery_view_album", kwargs={'album_id': tmp.id}))
     context = {'form': form}
     return render(request, 'gallery/add_edit_album.html', context)
 
@@ -45,12 +45,12 @@ def delete_album(request, album_id):
     if request.method == 'POST':
         try:
             album = Album.objects.get(id=album_id)
+            name = str(album)
             album.delete()
-            return HttpResponseRedirect(reverse("gallery_main"))  # TODO give feedback to user
+            messages.success(request, "Album "+name+" was sucessfully deleted!")
+            return HttpResponseRedirect(reverse("gallery_main"))
         except Album.DoesNotExist:
             return HttpResponseNotFound('No such album found!')
-        except models.ProtectedError:
-            return HttpResponseNotFound('You need to remove associated pictures first')
     else:
             logger.warning('Attempted to access delete_album via GET')
             return HttpResponseNotAllowed(['POST', ])
@@ -103,10 +103,12 @@ def delete_picture(request, photo_id):
         if request.method == 'POST':
             try:
                 photo = Photo.objects.get(id=photo_id)
+                name = str(photo)
                 images = PhotoFile.objects.filter(photo_id=photo_id)
                 images.delete()
                 photo.delete()
-                return HttpResponseRedirect(reverse("gallery_main"))  # TODO give feedback to user
+                messages.success(request, "Photo "+name+" was sucessfully deleted!")
+                return HttpResponseRedirect(reverse("gallery_main"))
             except Photo.DoesNotExist:
                 return HttpResponseNotFound('No such photo!')
         else:

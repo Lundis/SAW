@@ -4,9 +4,9 @@
 {% load thumbnail %}
 
 {% block breadcrumb2 %}
-    <li class="active">
+    <li>
         <a href="{{ photo.album_id.get_absolute_url }}">
-            {{ photo.album_id }}
+            {{ photo.album_id.name }}
         </a>
     </li>
 {% endblock %}
@@ -18,43 +18,43 @@
 {% endblock %}
 
 {% block main_content %}
-    <h1>PHOTO</h1>
+    <h1>Photo</h1>
     <ul class="list-group">
         <li class="list-group-item">
             {% for photofile in images %}
-                <a href="{{ photofile.image.url }}"><img  class="img-thumbnail" src="{% thumbnail photofile.image 100x100 crop=scale %}"/></a>
+                <a href="{{ photofile.image.url }}"><img class="img-thumbnail" src="{% thumbnail photofile.image 100x100 crop=scale %}"/></a>
             {% endfor %}
         </li>
-        <li class="list-group-item">{% trans "Name: " %}<a href="{% url 'gallery_view_picture' photo.album_id.id %}">{{ photo.album_id.name }}</a> </li>
+        <li class="list-group-item">{% trans "Name: " %}<a href="{% url 'gallery_view_album' photo.album_id.id %}">{{ photo.album_id.name }}</a> </li>
         <li class="list-group-item">{% trans "Uploaded: " %}{{ photo.uploaded|date:"Y-m-d" }}</li>
     </ul>
 {% endblock %}
 {% block sidebar %}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Edit" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    <a href="{% url 'gallery_edit_picture' photo.id %}">
-                        <div class="btn list-group-item">{% trans "Edit picture" %}</div>
-                    </a>
-                </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h2 class="panel-title">{% trans "Add" %}</h2>
+        </div>
+        <div class="panel-body">
+            <div class="list-group">
+                <a href="{% url 'gallery_add_picture' %}">
+                    <div class="btn list-group-item">{% trans "Add new picture" %}</div>
+                </a>
+                <a href="{% url 'gallery_create_album' %}">
+                    <div class="btn list-group-item">{% trans "Add new album" %}</div>
+                </a>
             </div>
         </div>
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Add" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    <a href="{% url 'gallery_add_picture' %}">
-                        <div class="btn list-group-item">{% trans "Add new picture" %}</div>
-                    </a>
-                    <a href="{% url 'gallery_create_album' %}">
-                        <div class="btn list-group-item">{% trans "Add new album" %}</div>
-                    </a>
-                </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h2 class="panel-title">{% trans "Edit" %}</h2>
+        </div>
+        <div class="panel-body">
+            <div class="list-group">
+                <a href="{% url 'gallery_edit_picture' photo.id %}">
+                    <div class="btn list-group-item">{% trans "Edit picture" %}</div>
+                </a>
             </div>
         </div>
+    </div>
 {% endblock %}

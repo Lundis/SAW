@@ -4,7 +4,7 @@
 {% load bootstrap3 %}
 {% load static %}
 
-{% block breadcrumb2 %}
+{% block breadcrumb_2 %}
     <li class="active">
         {% if form.instance.pk %}
             {% trans "Editing" %} {{ form.instance }}
@@ -39,7 +39,7 @@
             {% for f in filesformset.forms %}
                 <div class="photofilesformset_single">
                     {{ f.id }}
-                    {% bootstrap_field f.image%}
+                    {% bootstrap_field f.image %}
                     {% if f.instance.pk %}{{ f.DELETE}}{% endif %}{# Note! removing this fucks with functionality #}
                 </div>
             {% endfor %}

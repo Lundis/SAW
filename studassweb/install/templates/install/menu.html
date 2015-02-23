@@ -42,7 +42,7 @@
 
     <form id="{{ form.get_form_id }}" action="{% url "install.views.menu" %}" method="post" class=form" onsubmit="{{ form.get_submit_js }}">
         {% csrf_token %}
-        {{ form }}
+        {{ form.render_javascript }}
 
         <a href="{% url "install.views.modules" %}">
             <button type="button" class="btn btn-primary">
