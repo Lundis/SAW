@@ -36,6 +36,7 @@ class ChoiceForm(forms.ModelForm):
 class ChoiceFormSingle(forms.Form):
 
     def __init__(self, *args, **kwargs):
+        self.poll = kwargs.pop("poll")
         poll_choices = kwargs.pop("poll_choices")
         super(ChoiceFormSingle, self).__init__(*args, **kwargs)
         choices = ()
@@ -43,6 +44,12 @@ class ChoiceFormSingle(forms.Form):
             choices += (str(choice.id), choice.name),
         self.fields["choices"] = forms.ChoiceField(choices=choices,
                                                    widget=forms.RadioSelect)
+    def clean(self):
+        super(ChoiceFormSingle, self).clean()
+        choice_id = self.cleaned_data['choices']
+        choice = Choice.objects.get(id=int(choice_id))
+        if choice.id_to_poll != self.poll:
+            self.add_error(None, "Selected choice is not in poll")
 
     def save(self, request, commit=True):
         if self.is_valid():
@@ -68,21 +75,32 @@ class ChoiceFormSingle(forms.Form):
             }
 
 
-class ChoiceFormMultiple(forms.ModelForm):
+class ChoiceFormMultiple(forms.Form):
 
 
     def __init__(self, *args, **kwargs):
+        self.poll = kwargs.pop("poll")
         poll_choices = kwargs.pop("poll_choices")
-        super(ChoiceFormSingle, self).__init__(*args, **kwargs)
+        super(ChoiceFormMultiple, self).__init__(*args, **kwargs)
         choices = ()
         for choice in poll_choices:
             choices += (str(choice.id), choice.name),
-        self.fields["choices"] = forms.MultipleChoiceField(choices=choices)
+        self.fields["choices"] = forms.MultipleChoiceField(choices=choices,
+                                                           widget=forms.CheckboxSelectMultiple)
 
 
 
+    def clean(self):
+        super(ChoiceFormMultiple, self).clean()
+        choice_id = self.cleaned_data['choices']
 
-    def save(self,request,poll,commit=True):
+        for c in choice_id:
+            choice = Choice.objects.get(id=int(c))
+            if choice.id_to_poll != self.poll:
+                self.add_error(None, "Selected choice is not in poll")
+
+
+    def save(self,request,commit=True):
         if self.is_valid():
             ids_of_choices = self.cleaned_data["choices"]
             if(request.user.is_authenticated()):
@@ -101,11 +119,3 @@ class ChoiceFormMultiple(forms.ModelForm):
                 except Choice.DoesNotExist:
                     raise  # TODO something
             return None
-
-
-    class Meta:
-        model = Choice
-        fields = ('name',)
-        labels = {
-            'name': _('Choice'),
-            }

@@ -20,6 +20,10 @@
 
         {% if form%}
 
+
+
+
+
             <form action="{% url 'polls_view_poll' poll.id %}" method="post">
                 {% csrf_token %}
                 {% bootstrap_form form %}
@@ -29,6 +33,8 @@
                     </button>
                 {% endbuttons %}
             </form>
+
+
         {% else %}
             {% for c in choices %}
                 <div class="row">
