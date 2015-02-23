@@ -23,7 +23,6 @@
 {% endblock %}
 
 {% block main_content %}
-    <p>{% trans "Drag the permissions between the groups" %}</p>
     <p id="form-errors">
         {% load bootstrap3 %}
         {% bootstrap_form_errors form %}
@@ -141,8 +140,10 @@
         {% body %}
         <p>
             {% trans "You can see what permissions are in which group" %}.
+            {% trans "Drag and drop the permissions between groups to change them" %}.
+            </p>
+        <p>
             {% trans "Use the menu above to more easily find the permissions you're looking for" %}.
-            {% trans "Drag and drop the permissions to change them" %}.
         </p>
     {% endsidebarpanel %}
 {% endblock %}
