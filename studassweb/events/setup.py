@@ -6,11 +6,15 @@ def setup():
     if not emodels.EventItem.objects.all().exists():
         event_item = emodels.EventItem(name=_("Diet"),
                                        required=False,
+                                       public=False,
+                                       hide_in_print_view=False,
                                        type=emodels.EventItem.TYPE_STR,
                                        )
         event_item.save()
         event_item = emodels.EventItem(name=_("Association"),
                                        required=False,
+                                       public=True,
+                                       hide_in_print_view=False,
                                        type=emodels.EventItem.TYPE_STR,
                                        )
         event_item.save()

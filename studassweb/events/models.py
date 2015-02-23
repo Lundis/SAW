@@ -250,6 +250,10 @@ class EventItem(models.Model):
 
     name = models.CharField(max_length=100)
     required = models.BooleanField(default=False, verbose_name="Is this field mandatory")
+    public = models.BooleanField(default=False,
+                                 verbose_name="Is this field shown to everyone?",)
+    hide_in_print_view = models.BooleanField(default=False,
+                                             verbose_name="Is this field hidden from the print view?",)
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=TYPE_INT,
                             verbose_name="Data type",
                             help_text="Decides what kind of data is allowed in this field. The options are:<br />" +
@@ -273,10 +277,6 @@ class EventItem(models.Model):
 class ItemInEvent(models.Model):
     event = models.ForeignKey(Event)
     item = models.ForeignKey(EventItem)
-    public = models.BooleanField(default=False,
-                                 verbose_name="Is this field shown to everyone?",)
-    hide_in_print_view = models.BooleanField(default=False,
-                                             verbose_name="Is this field hidden from the print view?",)
 
     def __str__(self):
         return str("{0} is enabled in {1}".format(self.item.name, self.event.title))

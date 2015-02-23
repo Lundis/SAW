@@ -92,8 +92,18 @@
                         <th class="print-hide">{% trans "User account" %}</th>
                     {% endif %}
                     {% for event_item in event.get_items %}
-                        {% if can_view_signup_info or event_item.public %}
-                            <th>{{ event_item.item.get_name }}</th>
+                        {% if can_view_signup_info or event_item.item.public %}
+                            {% if event_item.item.hide_in_print_view%}
+                                {% if signup.is_reserve %}
+                                    <th class="print-reserve-hide">
+                                        {% else %}
+                                    <th class="print-hide">
+                                {% endif %}
+                            {% else %}
+                                <th>
+                            {% endif %}
+                        {{ event_item.item.get_name }}
+                            </th>
                         {% endif %}
                     {% endfor %}
                     {% if request.user.is_authenticated %}
@@ -133,8 +143,18 @@
                                 <th class="print-reserve-hide">{% trans "User account" %}</th>
                             {% endif %}
                             {% for event_item in event.get_items %}
-                                {% if can_view_signup_info or event_item.public %}
-                                    <th>{{ event_item.item.get_name }}</th>
+                                {% if can_view_signup_info or event_item.item.public %}
+                                    {% if event_item.item.hide_in_print_view%}
+                                        {% if signup.is_reserve %}
+                                            <th class="print-reserve-hide">
+                                                {% else %}
+                                            <th class="print-hide">
+                                        {% endif %}
+                                    {% else %}
+                                        <th>
+                                    {% endif %}
+                                {{ event_item.item.get_name }}
+                                    </th>
                                 {% endif %}
                             {% endfor %}
                             {% if request.user.is_authenticated %}
@@ -163,14 +183,24 @@
                         {{ signup.user }}</td>
                         {% endif %}
                         {% for event_item in signup.get_items_relevant %}
-                            {% if can_view_signup_info or event_item.public %}
-                                {% if event_item.value == "True" %}
-                                    <td><span class="glyphicon glyphicon-check" aria-label="True"></span></td>
-                                {% elif event_item.value == "False" %}
-                                    <td><span class="glyphicon glyphicon-unchecked" aria-label="False"></span></td>
+                            {% if can_view_signup_info or event_item.item.public %}
+                                {% if event_item.item.hide_in_print_view%}
+                                    {% if signup.is_reserve %}
+                                        <td class="print-reserve-hide">
+                                            {% else %}
+                                        <td class="print-hide">
+                                    {% endif %}
                                 {% else %}
-                                    <td>{{ event_item.value }}</td>
+                                    <td>
                                 {% endif %}
+                            {% if event_item.value == "True" %}
+                                <span class="glyphicon glyphicon-check" aria-label="True"></span>
+                            {% elif event_item.value == "False" %}
+                                <span class="glyphicon glyphicon-unchecked" aria-label="False"></span>
+                            {% else %}
+                                {{ event_item.value }}
+                            {% endif %}
+                            </td>
                             {% endif %}
                         {% endfor %}
                         {% if request.user.is_authenticated %}
@@ -208,9 +238,16 @@
                 </div>
                 <div class="panel-footer">
                     {% if can_view_signup_info %}
-                        <div id="print-reserve-toggle-button" class="btn btn-primary">
-                            {% trans "Print mode" %}
-                        </div>
+                        {% if show_reserve_list %}
+                            <div id="print-reserve-toggle-button" class="btn btn-primary">
+                                {% trans "Print mode" %}
+                            </div>
+                        {% else %}
+                            <div id="print-toggle-button" class="btn btn-primary">
+                                {% trans "Print mode" %}
+                            </div>
+                        {% endif %}
+
                     {% endif %}
                 </div>
                 </div>
@@ -241,13 +278,19 @@
 
 {% block scripts %}
     <script>
+        /**/
         $("#print-toggle-button").click(function(event) {
             $("#print-toggle-button").toggleClass("active");
             $(".print-hide").toggleClass("hidden");
         });
-        $("#print-reserve-toggle-button").click(function(event) {
-            $("#print-reserve-toggle-button").toggleClass("active");
-            $(".print-reserve-hide").toggleClass("hidden");
-        });
+        /**/
+
+        {% if show_reserve_list %}
+            $("#print-reserve-toggle-button").click(function(event) {
+                $("#print-reserve-toggle-button").toggleClass("active");
+                $(".print-reserve-hide").toggleClass("hidden");
+            });
+        {% endif %}
+
     </script>
 {% endblock %}

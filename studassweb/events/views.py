@@ -123,9 +123,11 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
             return HttpResponseRedirect(reverse("events_view_event", kwargs={'slug': event.slug}))
 
     signups = EventSignup.objects.filter(event=event)
+    show_reserve_list = len(signups) > event.max_participants
 
     return render(request, 'events/event.html',
-                  {'event': event, 'signupform': signupform, 'signupitemsform': signupitemsform, 'signups': signups})
+                  {'event': event, 'signupform': signupform, 'signupitemsform': signupitemsform, 'signups': signups,
+                   'show_reserve_list': show_reserve_list})
 
 
 @has_permission(eregister.CAN_CREATE_EVENTS)
@@ -234,7 +236,7 @@ class DeleteEventSignupByCodeView(DeleteView):
 
 class AddEventItemView(CreateView):
     model = EventItem
-    fields = ['name', 'type', 'required']
+    fields = ['name', 'type', 'required', 'public', 'hide_in_print_view']
     success_url = reverse_lazy("events_list_eventitems")
 
     def dispatch(self, request, *args, **kwargs):
@@ -251,7 +253,7 @@ class AddEventItemView(CreateView):
 
 class EditEventItemView(UpdateView):
     model = EventItem
-    fields = ['name', 'type', 'required']
+    fields = ['name', 'type', 'required', 'public', 'hide_in_print_view']
     success_url = reverse_lazy("events_list_eventitems")
 
     def dispatch(self, request, *args, **kwargs):
