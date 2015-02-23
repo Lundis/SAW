@@ -10,7 +10,7 @@ class ValidatedRichTextField(RichTextField):
 
     def formfield(self, **kwargs):
         # Change the default form field
-        if not 'form_class' in kwargs:
+        if 'form_class' not in kwargs:
             kwargs['form_class'] = ValidatedRichTextFormField
         return super(ValidatedRichTextField, self).formfield(**kwargs)
 

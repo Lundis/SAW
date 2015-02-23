@@ -139,6 +139,12 @@ class SAWPermission(models.Model):
         return user.is_superuser or is_guest_permission or \
                user.has_perm(self.permission.content_type.app_label + "." + self.permission.codename)
 
+    def standard_group(self):
+        """
+        Returns the name of the standard group this permission is in.
+        """
+        return users.groups.get_standard_group_of_perm(self.permission)
+
 
 class DummyPermissionBase(SingletonModel):
     """
