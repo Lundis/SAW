@@ -99,11 +99,26 @@ class SortingForm(forms.Form):
         self._available_items = available_items
         self.all_items = all_items
         self._verify_arguments()
+        if initial_items is not None:
+            self._add_indices()
         super(SortingForm, self).__init__(*args, **kwargs)
         # the first argument is the post data
         if post_items is not None:
             # Use post data to populate items if it's provided
             self._interpret_post_data(args[0])
+
+    def _add_indices(self):
+        """
+        User-supplied data won't have indices, so we add them
+        :return:
+        """
+        for container, items in self.items.items():
+            wrapped_items = ()
+            index = 0
+            for item in items:
+                wrapped_items += (item, index),
+                index += 1
+            self.items[container] = wrapped_items
 
     def _verify_arguments(self):
         """
@@ -171,8 +186,8 @@ class SortingForm(forms.Form):
                 self._available_items += item,
 
     def _is_item_in_items(self, item):
-        for items in self.items.values():
-            if item in items:
+        for items_and_indices in self.items.values():
+            if item in (item_and_index[0] for item_and_index in items_and_indices):
                 return True
         return False
 
@@ -186,14 +201,31 @@ class SortingForm(forms.Form):
         for c in self.items:
             self.items[c] = ()
         # for all post data that matches the valid format
+        used_ids = ()
+        used_indices = {}
+        for c in self.containers:
+            used_indices[c] = ()
+
         for name, value in self.cleaned_data.items():
             matches = re.match(r"^(" + container_regex + ")-item-(\d+)$", name)
             if matches:
                 # Add it to the correct item container
                 container = matches.group(1)
                 id = matches.group(2)
+                index = value
+                # Check for duplicates/tampering
+                if id in used_ids:
+                    self.add_error(None, "id %s appeared twice!" % id)
+                    continue
+                if index in used_indices[container]:
+                    self.add_error(None, "index %s appeared twice in %s!" % (id, container))
+                    continue
                 # Add a tuple (item_id, index) to the container list
-                self.items[container] += (int(id), value),
+                item = self.child_model.objects.get(id=id)
+                self.items[container] += (item, index),
+                used_ids += id,
+                used_indices[container] += index,
+        self._update_available_items()
 
     def save(self):
         raise NotImplementedError("You need to subclass to use save()." +
@@ -227,8 +259,8 @@ class SortingForm(forms.Form):
         for c in self.containers:
             items_in_container = ()
             for item in self.items[c]:
-                items_in_container += {'item': item,
-                                       'id': c +"-item-" + str(item.id)},
+                items_in_container += {'item': item[0],
+                                       'id': "item-" + str(item[0].id)},
             items[c] = self.containers[c], items_in_container
         return items
 
@@ -242,7 +274,7 @@ class SortingForm(forms.Form):
         list_of_items = ()
         for item in items:
             list_of_items += {'item': item,
-                              'id': "available-item-" + str(item.id)},
+                              'id': "item-" + str(item.id)},
         return list_of_items
 
     @staticmethod

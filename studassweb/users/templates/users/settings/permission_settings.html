@@ -25,8 +25,12 @@
 {% block main_content %}
     <p>{% trans "Drag the permissions between the groups" %}</p>
     <div id="permission-description"> Description here</div>
+    <p id="form-errors">
+        {% load bootstrap3 %}
+        {% bootstrap_form_errors form %}
+    </p>
     <div class="row">
-        {% for data in form.cleaned_items.values %}
+        {% for group_name, data in form.cleaned_items.items %}
             {% with group=data.0 perms=data.1 %}
                 <div class="col-sm-6 col-md-4">
                     <div class="panel panel-primary">
@@ -36,10 +40,12 @@
                             </div>
                         </div>
                         <div class="panel-body">
-                            <div id="group-{{ group.id }}" class="connected-sort ui-sortable item-container"
+                            <div id="{{ group_name }}-container" class="connected-sort ui-sortable item-container"
                                  style="min-width:100%; min-height:100px;">
                                 {% for perm_and_id in perms %}
-                                    <li id="{{ perm_and_id.id }}" class="btn btn-primary sort-item ui-sortable-handle module-{{ perm.module }}" title="{{ perm.description }}">
+                                    <li id="{{ perm_and_id.id }}" 
+                                        class="btn btn-primary sort-item ui-sortable-handle module-{{ perm_and_id.item.module }}"
+                                        title="{{ perm_and_id.item.description }}">
                                         {{ perm_and_id.item.permission.name }}
                                     </li>
                                 {% endfor %}
@@ -60,7 +66,9 @@
                     <div id="available-container" class="connected-sort ui-sortable item-container"
                          style="min-width:100%; min-height:100px;">
                         {% for perm_and_id in form.available_items %}
-                            <li id="{{ perm_and_id.id }}" class="btn btn-primary sort-item ui-sortable-handle module-{{ perm.module }}" title="{{ perm.description }}">
+                            <li id="{{ perm_and_id.id }}"
+                                class="btn btn-primary sort-item ui-sortable-handle module-{{ perm_and_id.item.module }}"
+                                title="{{ perm_and_id.item.description }}">
                                 {{ perm_and_id.item.permission.name }}
                             </li>
                         {% endfor %}
@@ -75,12 +83,14 @@
     {% sidebarpanel %}
         {% trans "Actions"%}
         {% body %}
-        <form id="{{ form.get_form_id }}" action="{% url "users_settings_edit_permissions" %}" method="post" onsubmit="{{ form.get_submit_js }}">
+        <form id="{{ form.get_form_id }}" action="{% url "users_settings_edit_permissions" %}"
+              method="post" onsubmit="{{ form.get_submit_js }}">
+            {% csrf_token %}
             {{ form.render_javascript }}
             <div class="btn-group-vertical btn-block">
-                <div type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary">
                     {% trans "Save" %}
-                </div>
+                </button>
 
             </div>
         </form>
@@ -135,13 +145,13 @@
 
         $("#hide_all_button").click(function(event) {
             var button = event.target;
-            $(".permission").addClass("hidden");
+            $(".sort-item").addClass("hidden");
             $("div[data-toggle=hide]").removeClass("active");
         });
 
         $("#show_all_button").click(function(event) {
             var button = event.target;
-            $(".permission").removeClass("hidden");
+            $(".sort-item").removeClass("hidden");
             $("div[data-toggle=hide]").addClass("active");
         });
 
@@ -151,12 +161,6 @@
         $(".sort-item").mouseover(function(event) {
             var description = document.getElementById("permission-description");
             description.innerHTML = event.target.getAttribute("title");
-        });
-
-
-        $('#permission-form').submit(function() {
-            //updateHiddenFormFields();
-            return true; // return false to cancel form action
         });
 
         $(function() {
