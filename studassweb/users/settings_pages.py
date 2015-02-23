@@ -9,6 +9,7 @@ from .register import EDIT_LOGIN_SETTINGS, EDIT_PROFILE, EDIT_PERMISSIONS
 from .forms import UserBaseForm, ProfileForm, CustomGroupForm
 from .models import UserExtension, SAWPermission
 from settings.sections import SECTION_PERSONAL_SETTINGS, SECTION_USERS, Section
+from base.forms import SortingForm
 
 urlpatterns = patterns('',
     url(r'^%s/permissions/$' % SECTION_USERS,
@@ -53,7 +54,19 @@ def edit_permissions(request):
     """
     section = Section.get_section(SECTION_USERS)
     groups = Group.objects.filter(name__in=group_names)
-    group_list = []
+    group_dict = {}
+    for group in groups:
+        group_dict[group.name] = group
+
+    form = SortingForm(request.POST or None,
+                       container_model=Group,
+                       child_model=SAWPermission,
+                       containers=group_dict,
+                       initial_items=initial_items,
+                       available_items=orphans)
+    if form.is_valid():
+        form.save()
+        return HttpResponseRedirect(reverse("settings_users_edit_permissions"))
     for group in groups:
         group_list += [{'name': group,
                         'permissions': get_permissions_in_group(group)}]
