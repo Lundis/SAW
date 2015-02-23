@@ -57,6 +57,9 @@ class Event(models.Model):
     def get_absolute_url(self):
         return reverse("events_view_event", kwargs={'slug': self.slug})
 
+    def is_before_signup_start(self):
+        return timezone.now() < self.signup_start
+
     def is_past_signup_deadline(self):
         return timezone.now() > self.signup_deadline
 
@@ -111,6 +114,26 @@ class Event(models.Model):
     def user_can_view_and_join(self, user):
         print(self.permission)
         return permissions.has_user_perm(user, self.permission)
+
+    def fancy_daterange(self):
+        """
+        Returns a nicer version of "startdate - enddate"
+        Example: instead of 22.2.2015 - 23.2.2015 this should return something like 22-23.2.2015
+        """
+        if self.start.year == self.stop.year:
+            if self.start.month == self.stop.month:
+                return "{0} - {1}.{2}.{3}".format(self.start.day,
+                                                  self.stop.day, self.stop.month, self.stop.year)
+            return "{0}.{1} - {2}.{3}.{4}".format(self.start.day, self.start.month,
+                                                  self.stop.day, self.stop.month, self.stop.year)
+
+        elif self.start.day == self.stop.day and self.start.month == self.stop.month:
+            return "{0}.{1}.{2} - {3}".format(self.start.day, self.start.month, self.start.year,
+                                              self.stop.year)
+
+        return "{0}.{1}.{2} - {3}.{4}.{5}".format(self.start.day, self.start.month, self.start.year,
+                                                  self.stop.day, self.stop.month, self.stop.year)
+
 
 
 # Each user which signs up creates one of these
@@ -267,7 +290,7 @@ class EventItem(models.Model):
         return str(self.name)
 
     def get_name(self):
-        if self.type==self.TYPE_CHOICE:
+        if self.type == self.TYPE_CHOICE:
             return str(self.name.split("//")[0])
         else:
             return str(self.name)

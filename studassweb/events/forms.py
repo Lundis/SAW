@@ -4,7 +4,6 @@ from django.utils import timezone
 from django.utils.translation import ugettext as _
 from .models import Event, EventSignup, EventItem, ItemInEvent, ItemInSignup
 from base.utils import generate_email_ver_code
-from users.models import SAWPermission
 
 EITEMS = "eitems"
 
@@ -81,6 +80,7 @@ class EventForm(forms.ModelForm):
 class EventItemsForm(forms.Form):
     """
     A form for creating/editing event items
+    That is, the event items which are used in a specific event.
     """
     def __init__(self, *args, **kwargs):
         event = kwargs.pop("event", None)
@@ -102,6 +102,15 @@ class EventItemsForm(forms.Form):
             initial=selected_eitems,
             required=False)
 
+    def clean(self):
+        super(EventItemsForm, self).clean()
+        ids_of_event_items = self.cleaned_data[EITEMS]
+        for id_ei in ids_of_event_items:
+                try:
+                    EventItem.objects.get(id=id_ei)
+                except EventItem.DoesNotExist:
+                    self.add_error(EITEMS, _("Tried to add nonexistant event item"))
+
     def save(self, event):
         if self.is_valid():
             ids_of_event_items = self.cleaned_data[EITEMS]
@@ -111,11 +120,8 @@ class EventItemsForm(forms.Form):
 
             #  and then add them again!
             for id_ei in ids_of_event_items:
-                try:
-                    even_item = EventItem.objects.get(id=id_ei)
-                    ItemInEvent(event=event, item=even_item).save()
-                except EventItem.DoesNotExist:
-                    raise  # TODO something
+                even_item = EventItem.objects.get(id=id_ei)
+                ItemInEvent(event=event, item=even_item).save()
             return None
 
 
