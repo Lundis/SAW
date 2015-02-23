@@ -25,6 +25,17 @@ def view_album(request, album_id):
         logger.warning('Could not find album with id %s', album_id)
         return HttpResponseNotFound('No album with that id found')
 
+def view_picture(request, photo_id):
+    try:
+        photo = Photo.objects.get(id=photo_id)
+        images = PhotoFile.objects.filter(photo_id = photo_id)
+
+        return render(request, 'gallery/view_picture.html', {
+            'photo': photo, 'images': images},)
+    except Photo.DoesNotExist:
+        logger.warning('could not find photo with id %s', photo_id)
+        return HttpResponseNotFound('No photo with that id found')
+
 def add_edit_album(request, album_id=-1):
     try:
         album = Album.objects.get(id=album_id)
@@ -86,18 +97,6 @@ def add_edit_picture(request, photo_id=-1):
 
     context = {'form': form, 'filesformset': fileformset}
     return render(request, 'gallery/add_edit_photo.html', context)
-
-
-def view_picture(request, photo_id):
-    try:
-        photo = Photo.objects.get(id=photo_id)
-        images = PhotoFile.objects.filter(photo_id = photo_id)
-
-        return render(request, 'gallery/view_picture.html', {
-            'photo': photo, 'images': images},)
-    except Photo.DoesNotExist:
-        logger.warning('could not find photo with id %s', photo_id)
-        return HttpResponseNotFound('No photo with that id found')
 
 def delete_picture(request, photo_id):
         if request.method == 'POST':
