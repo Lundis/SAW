@@ -1,7 +1,6 @@
 from django import forms
 from django.template.loader import get_template
 from django.template import Context
-from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.translation import ugettext as _
 from .fields import HiddenMenuField
 from .models import MenuItem, Menu, TYPE_USER, MainMenuSettings, MenuTemplate
@@ -88,7 +87,7 @@ class MenuForm(forms.Form):
             menu_item = MenuItem.objects.get(id=menu_item)
             menu.add_item(menu_item, order)
 
-    def __str__(self):
+    def render_javascript(self):
         """
         renders the required javascript for this form
         :return:

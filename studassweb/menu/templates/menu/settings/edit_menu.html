@@ -41,7 +41,7 @@
         <div class="col-sm-2">
             <form action="{% url "menu_settings_edit_menu" menu.id %}" id="{{ form.get_form_id }}" method="post" onsubmit="{{ form.get_submit_js }}">
                 {% csrf_token %}
-                {{ form }}
+                {{ form.render_javascript }}
                 <div class="btn-group-vertical">
                     <button type="submit" value="Submit" class="btn btn-primary">
                         {% trans "Save" %}

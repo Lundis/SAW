@@ -1,0 +1,32 @@
+<script>
+    function updateSortingFields() {
+        var old_fields = document.getElementsByClassName("hidden-item-field");
+        for (i = 0; i < old_fields.length; i++) {
+            old_fields[i].parentNode.removeChild(old_fields[i]);
+        }
+        var items = {{ container_strings | safe }};
+        for (var j = 0; j < items.length; j++) {
+            var menu_name = items[j];
+            var new_items = document.getElementById(menu_name + "-container").childNodes;
+            var index = 0;
+            for (var i = 0; i < new_items.length; i++) {
+                // if it's an html element
+                if (new_items[i].nodeType == 1) {
+                    var item_name = menu_name + "-" + new_items[i].getAttribute("id");
+                    add_hidden_input(item_name, index);
+                    index++;
+                }
+            }
+        }
+    }
+
+    function add_hidden_input(item_name, order) {
+        var input_field = document.createElement("input");
+        input_field.setAttribute("name", item_name);
+        input_field.setAttribute("value", order);
+        input_field.setAttribute("type", "hidden");
+        input_field.setAttribute("class","hidden-item-field");
+        var form = document.getElementById("{{ form_name }}");
+        form.appendChild(input_field);
+    }
+</script>
