@@ -3,6 +3,8 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User, Group
 from .models import UserExtension
+from base.forms import SortingForm
+from .groups import put_perm_in_standard_group
 from captcha.fields import ReCaptchaField
 import logging
 
@@ -91,3 +93,12 @@ class CustomGroupForm(forms.ModelForm):
     class Meta():
         model = Group
         fields = ("name",)
+
+
+class PermissionEditorForm(SortingForm):
+
+    def save(self):
+        for group, sawps_and_ids in self.cleaned_items().values():
+            for sawp_and_id in sawps_and_ids:
+                sawp = sawp_and_id['item']
+                put_perm_in_standard_group(sawp, group)

@@ -4,12 +4,11 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from .decorators import has_permission
-from .groups import group_names, get_permissions_in_group
+from .groups import group_names
 from .register import EDIT_LOGIN_SETTINGS, EDIT_PROFILE, EDIT_PERMISSIONS
-from .forms import UserBaseForm, ProfileForm, CustomGroupForm
+from .forms import UserBaseForm, ProfileForm, CustomGroupForm, PermissionEditorForm
 from .models import UserExtension, SAWPermission
 from settings.sections import SECTION_PERSONAL_SETTINGS, SECTION_USERS, Section
-from base.forms import SortingForm
 
 urlpatterns = patterns('',
     url(r'^%s/permissions/$' % SECTION_USERS,
@@ -70,16 +69,16 @@ def edit_permissions(request):
         else:
             initial_items[g] += sawp,
 
-    form = SortingForm(request.POST or None,
-                       container_model=Group,
-                       child_model=SAWPermission,
-                       initial_items=initial_items,
-                       available_items=orphans,
-                       containers=group_dict,
-                       all_items=sawps)
+    form = PermissionEditorForm(request.POST or None,
+                                container_model=Group,
+                                child_model=SAWPermission,
+                                initial_items=initial_items,
+                                available_items=orphans,
+                                containers=group_dict,
+                                all_items=sawps)
     if form.is_valid():
         form.save()
-        return HttpResponseRedirect(reverse("settings_users_edit_permissions"))
+        return HttpResponseRedirect(reverse("users_settings_edit_permissions"))
 
     context = {'section': section,
                'groups': groups,

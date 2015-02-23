@@ -49,7 +49,7 @@ def setup_default_groups_and_permissions():
                                      "\" wants to join a non-existing default group \"" +
                                      group + "\"")
                 if group_index != -1:
-                    _add_perm_to_group(perm, groups[group_index])
+                    put_perm_in_standard_group(perm, groups[group_index])
 
 
 def is_perm_in_groups(perm, groups):
@@ -101,18 +101,32 @@ def put_user_in_standard_group(user, new_group_name):
     user.save()
 
 
-def _add_perm_to_group(perm, group):
+def _remove_sawp_from_all_standard_groups(permission):
+    """
+    :param permission: A Permission
+    :return:
+    """
+    for group_name in group_names:
+        group = Group.objects.get(name=group_name)
+        if permission in group.permissions.all():
+            group.permissions.remove(permission)
+
+
+def put_perm_in_standard_group(perm, group):
     """
     Adds a permission to a group.
-    :param perm: A permission string
-    :param group: Either an Actual Group object or a string
+    :param perm: A permission string or a SAWPermission
+    :param group: A group name string or a Group
     """
     if isinstance(group, Group):
         group_instance = group
     else:
         group_instance = Group.objects.get(name=group)
-
-    sawp = SAWPermission.get(perm)
+    if isinstance(perm, SAWPermission):
+        sawp = perm
+    else:
+        sawp = SAWPermission.get(perm)
+    _remove_sawp_from_all_standard_groups(sawp.permission)
     group_instance.permissions.add(sawp.permission)
 
 
