@@ -81,7 +81,6 @@ class EventForm(forms.ModelForm):
 class EventItemsForm(forms.Form):
     """
     A form for creating/editing event items
-    TODO: create fields for public and hidden_in_print_view
     """
     def __init__(self, *args, **kwargs):
         event = kwargs.pop("event", None)
@@ -93,9 +92,15 @@ class EventItemsForm(forms.Form):
         super(EventItemsForm, self).__init__(*args, **kwargs)
         all_event_items = EventItem.objects.filter()
         eitems = ()
+        # Create a 'choices' variable with all event items
         for eitem in all_event_items:
             eitems += (str(eitem.id), eitem.name),
-        self.fields[EITEMS] = forms.MultipleChoiceField(choices=eitems, initial=selected_eitems, required=False)
+
+        self.fields[EITEMS] = forms.MultipleChoiceField(
+            widget=forms.CheckboxSelectMultiple(),
+            choices=eitems,
+            initial=selected_eitems,
+            required=False)
 
     def save(self, event):
         if self.is_valid():

@@ -6,8 +6,8 @@ CAN_CREATE_EVENTS = "can_create_events"
 CAN_VIEW_SIGNUP_INFO = "can_view_signup_info"
 
 CAN_VIEW_AND_JOIN_PUBLIC_EVENTS = "can_view_and_join_public_events"
-CAN_VIEW_AND_JOIN_MEMBER_EVENTS = "can_view_and_join_board_member_events"
-CAN_VIEW_AND_JOIN_BOARD_MEMBER_EVENTS = "can_view_and_join_board:member_events"
+CAN_VIEW_AND_JOIN_MEMBER_EVENTS = "can_view_and_join_member_events"
+CAN_VIEW_AND_JOIN_BOARD_MEMBER_EVENTS = "can_view_and_join_board_member_events"
 
 
 def get_menu_items():
