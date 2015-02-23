@@ -26,10 +26,10 @@ def view_poll(request, poll_id):
 
         if poll.can_user_vote(request):
             if poll.can_vote_on_many:
-                pass
+                form=ChoiceFormMultiple(request.POST or None, poll_choices=choices, poll = poll)
 
             else:
-                form = ChoiceFormSingle(request.POST or None, poll_choices=choices)
+                form = ChoiceFormSingle(request.POST or None, poll_choices=choices, poll= poll)
 
             if form.is_valid():
                 form.save(request)
