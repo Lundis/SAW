@@ -24,7 +24,6 @@
 
 {% block main_content %}
     <p>{% trans "Drag the permissions between the groups" %}</p>
-    <div id="permission-description"> Description here</div>
     <p id="form-errors">
         {% load bootstrap3 %}
         {% bootstrap_form_errors form %}
@@ -43,7 +42,7 @@
                             <div id="{{ group_name }}-container" class="connected-sort ui-sortable item-container"
                                  style="min-width:100%; min-height:100px;">
                                 {% for perm_and_id in perms %}
-                                    <li id="{{ perm_and_id.id }}" 
+                                    <li id="{{ perm_and_id.id }}"
                                         class="btn btn-primary sort-item ui-sortable-handle module-{{ perm_and_id.item.module }}"
                                         title="{{ perm_and_id.item.description }}">
                                         {{ perm_and_id.item.permission.name }}
@@ -126,6 +125,15 @@
         </div>
     {% endsidebarpanel %}
 {% endblock %}
+{% block sidebar-panel3 %}
+    {% sidebarpanel %}
+        {% trans "Description"%}
+        {% body %}
+        <p id="permission-description"> {% trans "Hover over a permission for further details" %}</p>
+    {% endsidebarpanel %}
+{% endblock %}
+
+
 
 {% block sidebar-panel-help %}
     {% sidebarpanel "help"%}
