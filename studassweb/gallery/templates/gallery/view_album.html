@@ -2,7 +2,7 @@
 
 {% load i18n %}
 {% load bootstrap3 %}
-{% load thumbnail %} <!-- what for?-->
+{% load thumbnail %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -13,7 +13,11 @@
 {% block main_content %}
     <h1>{{ album.name }}</h1>
     <div class="list-group">
-
+        <!--<li class="list-group-item">
+            {% for photofile in images %}
+                    <a href="{{ photofile.image.url }}"><img class="img-thumbnail" src="{% thumbnail photofile.image 100x100 crop=scale %}"/></a>
+             {% endfor %}
+        </li>-->
         {% for picture in pictures %}
             <a class="list-group-item" href="{% url 'gallery_view_picture' picture.id %}">
                 {{ picture.uploaded|date:"Y-m-d" }}
