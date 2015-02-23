@@ -25,34 +25,49 @@
 {% block main_content %}
     <p>{% trans "Drag the permissions between the groups" %}</p>
     <div id="permission-description"> Description here</div>
-    <form id="permission-form">
-        {% csrf_token %}
-        <button type="submit" value="Submit" class="btn btn-primary">
-            {% trans "Save" %}
-        </button>
-    </form>
     <div class="row">
-        {% for group in groups %}
-            <div class="col-sm-6 col-md-4">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <div class="panel-title">
-                            {{ group.name }}
+        {% for data in form.cleaned_items.values %}
+            {% with group=data.0 perms=data.1 %}
+                <div class="col-sm-6 col-md-4">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                {{ group.name }}
+                            </div>
                         </div>
-                    </div>
-                    <div class="panel-body">
-                        <div id="group-{{ group.id }}" class="connected-sort ui-sortable permission-container"
-                             style="min-width:100%; min-height:100px;">
-                            {% for perm in group.permissions %}
-                                <li id="permission-{{ perm.id }}" class="btn btn-primary permission ui-sortable-handle module-{{ perm.module }}" title="{{ perm.description }}">
-                                    {{ perm.permission.name }}
-                                </li>
-                            {% endfor %}
+                        <div class="panel-body">
+                            <div id="group-{{ group.id }}" class="connected-sort ui-sortable item-container"
+                                 style="min-width:100%; min-height:100px;">
+                                {% for perm_and_id in perms %}
+                                    <li id="{{ perm_and_id.id }}" class="btn btn-primary sort-item ui-sortable-handle module-{{ perm.module }}" title="{{ perm.description }}">
+                                        {{ perm_and_id.item.permission.name }}
+                                    </li>
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            {% endwith %}
         {% endfor %}
+        <div class="col-sm-6 col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        {% trans "Permissions without groups" %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div id="available-container" class="connected-sort ui-sortable item-container"
+                         style="min-width:100%; min-height:100px;">
+                        {% for perm_and_id in form.available_items %}
+                            <li id="{{ perm_and_id.id }}" class="btn btn-primary sort-item ui-sortable-handle module-{{ perm.module }}" title="{{ perm.description }}">
+                                {{ perm_and_id.item.permission.name }}
+                            </li>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}
 
@@ -60,7 +75,8 @@
     {% sidebarpanel %}
         {% trans "Actions"%}
         {% body %}
-        <form action="" method="post">
+        <form id="{{ form.get_form_id }}" action="{% url "users_settings_edit_permissions" %}" method="post" onsubmit="{{ form.get_submit_js }}">
+            {{ form.render_javascript }}
             <div class="btn-group-vertical btn-block">
                 <div type="submit" class="btn btn-primary">
                     {% trans "Save" %}
@@ -83,7 +99,7 @@
         <div class="panel-body" style="padding-top: 0px; padding-bottom: 0px;">
             <div class="row">
                 {% for module in modules %}
-                    <div class="btn btn-primary btn-small col-xs-6"
+                    <div class="btn btn-primary btn-small col-xs-6 active"
                          data-toggle="hide" data-target="module-{{ module }}">
                         {{ module }}
                     </div>
@@ -132,7 +148,7 @@
         // bootstrap tooltips conflict with jquery-ui sortable
         // https://github.com/twbs/bootstrap/issues/6303
 
-        $(".permission").mouseover(function(event) {
+        $(".sort-item").mouseover(function(event) {
             var description = document.getElementById("permission-description");
             description.innerHTML = event.target.getAttribute("title");
         });
@@ -143,38 +159,8 @@
             return true; // return false to cancel form action
         });
 
-        function updateHiddenFormFields() {
-            var old_fields = document.getElementsByClassName("permission-hidden-field");
-            for (var i = 0; i < old_fields.length; i++) {
-                old_fields[i].parentNode.removeChild(old_fields[i]);
-            }
-            var group_containers = document.getElementsByClassName("permission-container")
-            for (var i = 0; i < group_containers.length; i++) {
-                var permissions = group_containers[i].childNodes;
-                var group_id = group_containers[i].getAttribute("id").split("-")[1];
-                for (var j = 0; j < permissions.length; j++) {
-                    try {
-                        var permission_id = permissions[j].getAttribute("id").split("-")[1];
-                        add_hidden_input(permission_id, group_id);
-                    } catch(e) {
-                        // ignore error because it is weird and sucks and shouldn't exist
-                    }
-                }
-            }
-        }
-
-        function add_hidden_input(group_id, permission_id) {
-            var input_field = document.createElement("input");
-            input_field.setAttribute("name", permission_id);
-            input_field.setAttribute("value", group_id);
-            input_field.setAttribute("type", "hidden");
-            input_field.setAttribute("class","permission-hidden-field");
-            var form = document.getElementById("permission-form");
-            form.appendChild(input_field);
-        }
-
         $(function() {
-            $( ".permission-container" ).sortable({
+            $( ".item-container" ).sortable({
                 connectWith: ".connected-sort"
             }).disableSelection();
         });

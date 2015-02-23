@@ -55,25 +55,36 @@ def edit_permissions(request):
     section = Section.get_section(SECTION_USERS)
     groups = Group.objects.filter(name__in=group_names)
     group_dict = {}
+    initial_items = {}
+    orphans = {}
     for group in groups:
         group_dict[group.name] = group
+        initial_items[group.name] = ()
+
+    sawps = SAWPermission.objects.all()
+    # Add each permission to its group
+    for sawp in sawps:
+        g = sawp.standard_group()
+        if g is None:
+            orphans += sawp,
+        else:
+            initial_items[g] += sawp,
 
     form = SortingForm(request.POST or None,
                        container_model=Group,
                        child_model=SAWPermission,
-                       containers=group_dict,
                        initial_items=initial_items,
-                       available_items=orphans)
+                       available_items=orphans,
+                       containers=group_dict,
+                       all_items=sawps)
     if form.is_valid():
         form.save()
         return HttpResponseRedirect(reverse("settings_users_edit_permissions"))
-    for group in groups:
-        group_list += [{'name': group,
-                        'permissions': get_permissions_in_group(group)}]
-    # TODO: mega permission form
+
     context = {'section': section,
-               'groups': group_list,
-               'modules': get_modules_with_permissions()}
+               'groups': groups,
+               'modules': get_modules_with_permissions(),
+               'form': form}
     return render(request, "users/settings/permission_settings.html", context)
 
 

@@ -73,7 +73,7 @@ class SortingForm(forms.Form):
     A form that parses hidden items from a sorting page (such as the menu editor).
     """
     def __init__(self, *args, container_model=None, child_model=None,
-                 containers=None, initial_items=None, available_items=None, **kwargs):
+                 containers=None, initial_items=None, available_items=None, all_items=None, **kwargs):
         """
         :param args: request.POST or None
         :param container_model: The model representing the container (Such as Menu, Group)
@@ -96,7 +96,8 @@ class SortingForm(forms.Form):
             self.items = {}
         else:
             self.items = initial_items
-        self.available_items = available_items
+        self._available_items = available_items
+        self.all_items = all_items
         self._verify_arguments()
         super(SortingForm, self).__init__(*args, **kwargs)
         # the first argument is the post data
@@ -110,16 +111,18 @@ class SortingForm(forms.Form):
         make using/debugging it easier in the future.
         :return:
         """
-        if self.model is None:
-            raise ValueError("required keyword argument 'model' is missing")
+        if self.container_model is None:
+            raise ValueError("required keyword argument 'container_model' is missing")
+        if self.child_model is None:
+            raise ValueError("required keyword argument 'child_model' is missing")
         # Check that the container exists and contains the correct model
         if self.containers is None:
             raise ValueError("required keyword argument 'containers' is missing")
         if type(self.containers) != dict:
             raise ValueError("container must be a dictionary ({'container_name': container_object})")
-        for c in self.containers:
+        for c in self.containers.values():
             if not isinstance(c, self.container_model):
-                raise ValueError("%s in containers is not a %s" % (str(c), str(self.model)))
+                raise ValueError("%s in containers is not a %s" % (str(c), str(self.container_model)))
 
         if not isinstance(self.items, dict):
             raise ValueError("initial_items must be a dictionary")
@@ -136,6 +139,8 @@ class SortingForm(forms.Form):
                 if not isinstance(item, self.child_model):
                     raise ValueError("item {0} in container {1} is not a {3}" % (str(item), key, self.child_model))
 
+        # TODO: verify that all items are in self.all_items
+
     def _interpret_post_data(self, post_data):
         """
         Adds user-submitted data to self.fields
@@ -151,6 +156,25 @@ class SortingForm(forms.Form):
             if matches and name not in self.fields.keys():
                 # Add the field
                 self.fields[name] = HiddenModelField(name=name, model=self.child_model, initial=index, required=True)
+        self._update_available_items()
+
+    def _update_available_items(self):
+        """
+        Puts all items that aren't in any container in self.items into self.available_items
+        :return:
+        """
+        # clear available items
+        self._available_items = ()
+        # Then add any item not in any of the containers to it
+        for item in self.all_items:
+            if not self._is_item_in_items(item):
+                self._available_items += item,
+
+    def _is_item_in_items(self, item):
+        for items in self.items.values():
+            if item in items:
+                return True
+        return False
 
     def clean(self):
         # Super cleans the individual fields using HiddenModelField's validation
@@ -187,25 +211,11 @@ class SortingForm(forms.Form):
         result = template.render(Context(context))
         return result
 
-    @staticmethod
-    def _render_menu(menu_name, menu_items):
-        """
-        renders the menu items of a menu
-        :param menu_name:
-        :param menu_items:
-        :return:
-        """
-
-        template = get_template("menu/menu_editor.html")
-        context = Context({'menu_name': menu_name,
-                           'items': menu_items})
-        result = template.render(context)
-        return result
-
-    def all_items(self):
+    def cleaned_items(self):
         """
         Returns a dictionary:
-            {'container_name': ({'item': item,
+            {'container_name': Group,
+                               ({'item': item,
                                  'id': html_id},
                                 ...,
                                )
@@ -219,23 +229,25 @@ class SortingForm(forms.Form):
             for item in self.items[c]:
                 items_in_container += {'item': item,
                                        'id': c +"-item-" + str(item.id)},
-            items[c] = items_in_container
+            items[c] = self.containers[c], items_in_container
         return items
 
     def available_items(self):
         """
-        renders the available items (those that aren't in any category)
+        renders the available items (those that aren't in any category) in the form
+        ( {'item': item, 'id': html-id}, ... )
         :return:
         """
-        items = self.available_items
+        items = self._available_items
         list_of_items = ()
         for item in items:
             list_of_items += {'item': item,
                               'id': "available-item-" + str(item.id)},
         return list_of_items
 
-    def get_form_id(self):
-        return "%s-editor-form" % self.model
+    @staticmethod
+    def get_form_id():
+        return "sorting-form"
 
     @staticmethod
     def get_submit_js():

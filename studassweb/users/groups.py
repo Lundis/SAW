@@ -129,7 +129,7 @@ def get_standard_group_of_perm(perm):
 
     # iterate through them in reverse
     for group_name in group_names:
-        group = Group.get(name=group_name)
+        group = Group.objects.get(name=group_name)
         # TODO: this is a pretty inefficient query
         if perm in group.permissions.all():
             return group.name

@@ -81,7 +81,7 @@ class SAWPermission(models.Model):
     """
     This model wraps Django's built-in Permission object, providing a description.
     """
-    permission = models.ForeignKey(Permission, primary_key=True)
+    permission = models.ForeignKey(Permission, unique=True)
     description = models.CharField(max_length=200)
     default_group = models.ForeignKey(Group, null=True, default=None)
     module = models.CharField(max_length=100)
@@ -141,7 +141,7 @@ class SAWPermission(models.Model):
 
     def standard_group(self):
         """
-        Returns the name of the standard group this permission is in.
+        :return: The name of the standard group this permission is in. None if it's not in any.
         """
         return users.groups.get_standard_group_of_perm(self.permission)
 
