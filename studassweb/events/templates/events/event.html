@@ -26,7 +26,7 @@
         <div class="panel-footer">
             <div class="row inherit-padding-left-right">
                 <div class="pull-left">
-                    {{ event.start|date:"Y-m-d H:i" }} - {{ event.stop|date:"Y-m-d H:i" }}
+                    {{ event.fancy_daterange }}<br>{{ event.start|date:"H:i" }} -  {{ event.stop|date:"H:i" }}
                 </div>
                 <div class="pull-right text-right">
                     {% trans "by " %}{{ event.author }}
@@ -46,7 +46,23 @@
             </div>
         </div>
         <div class="panel-body">
-            {% if not event.is_past_signup_deadline %}
+            {% if event.is_past_signup_deadline %}
+                <p>
+                    {% trans "The signup ended at" %}
+                    {{ event.signup_deadline|date:"d.m.Y H:i" }}
+                </p>
+                </div>
+                <div class="panel-footer">
+                </div>
+            {% elif event.is_before_signup_start %}
+                <p>
+                    {% trans "The signup starts at" %}
+                    {{ event.signup_start|date:"d.m.Y H:i" }}
+                </p>
+                </div>
+                <div class="panel-footer">
+                </div>
+            {% else %}
                 {% if signupform %}
                     <form action="" method="post">
                         {% csrf_token %}
@@ -59,15 +75,14 @@
                         {% endbuttons %}
                     </form>
                 {% endif %}
-            {% else %}
-                <p>
-                    {% trans "The signup ended at" %}
-                    {{ event.signup_deadline }}
-                </p>
+
+
+                </div>
+                <div class="panel-footer">
+                    ({% trans "closes " %} {{ event.signup_deadline|date:"d.m.Y H:i" }} )
+                </div>
             {% endif %}
-        </div>
-        <div class="panel-footer">
-        </div>
+
     </div>
 
     {% has_perm "events" "CAN_VIEW_SIGNUP_INFO" as can_view_signup_info %}
@@ -103,7 +118,7 @@
                                 <th>
                             {% endif %}
                         {{ event_item.item.get_name }}
-                            </th>
+                        </th>
                         {% endif %}
                     {% endfor %}
                     {% if request.user.is_authenticated %}
@@ -154,7 +169,7 @@
                                         <th>
                                     {% endif %}
                                 {{ event_item.item.get_name }}
-                                    </th>
+                                </th>
                                 {% endif %}
                             {% endfor %}
                             {% if request.user.is_authenticated %}
