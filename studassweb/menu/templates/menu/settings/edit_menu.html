@@ -1,5 +1,6 @@
 {% extends "settings/base.html" %}
 {% load i18n %}
+{% load static %}
 
 {% block breadcrumb2 %}
     <li>
@@ -57,7 +58,7 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+    <script src="{% static "js/jquery-ui.min.js" %}"></script>
     <script>
         $(function() {
             $( ".menu-item-container" ).sortable({

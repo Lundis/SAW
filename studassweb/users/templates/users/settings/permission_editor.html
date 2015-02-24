@@ -1,6 +1,7 @@
 {% extends "base/base.html" %}
 {% load i18n %}
 {% load sidemenu %}
+{% load static %}
 
 {% block breadcrumb1 %}
     <li class="active">
@@ -93,7 +94,7 @@
             </div>
         </form>
         <div class="btn-group-vertical btn-block" style="margin-top: 10px;">
-            <a href="" class="btn btn-warning">
+            <a href="{% url "users_settings_reset_permissions" %}" class="btn btn-warning">
                 {% trans "Reset all permissions" %}
             </a>
         </div>
@@ -133,7 +134,6 @@
 {% endblock %}
 
 
-
 {% block sidebar-panel-help %}
     {% sidebarpanel "help"%}
         {% trans "Help"%}
@@ -149,7 +149,7 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+    <script src="{% static "js/jquery-ui.min.js" %}"></script>
     <script>
 
         $("#hide_all_button").click(function(event) {
