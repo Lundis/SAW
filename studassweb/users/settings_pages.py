@@ -1,19 +1,25 @@
 from django.conf.urls import patterns, url
 from django.contrib.auth.models import Group
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, Http404, HttpResponseNotAllowed
 from django.core.urlresolvers import reverse
+from settings.sections import SECTION_PERSONAL_SETTINGS, SECTION_USERS, Section
+from base.forms import DummyForm
 from .decorators import has_permission
 from .groups import group_names
 from .register import EDIT_LOGIN_SETTINGS, EDIT_PROFILE, EDIT_PERMISSIONS
 from .forms import UserBaseForm, ProfileForm, CustomGroupForm, PermissionEditorForm
 from .models import UserExtension, SAWPermission
-from settings.sections import SECTION_PERSONAL_SETTINGS, SECTION_USERS, Section
+
 
 urlpatterns = patterns('',
     url(r'^%s/permissions/$' % SECTION_USERS,
         'users.settings_pages.edit_permissions',
         name='users_settings_edit_permissions'),
+
+    url(r'^%s/permissions/reset' % SECTION_USERS,
+        'users.settings_pages.reset_permissions',
+        name='users_settings_reset_permissions'),
 
     url(r'^%s/groups/$' % SECTION_USERS,
         'users.settings_pages.edit_groups',
@@ -84,7 +90,20 @@ def edit_permissions(request):
                'groups': groups,
                'modules': get_modules_with_permissions(),
                'form': form}
-    return render(request, "users/settings/permission_settings.html", context)
+    return render(request, "users/settings/permission_editor.html", context)
+
+
+@has_permission(EDIT_PERMISSIONS)
+def reset_permissions(request):
+    if request.POST is not None:
+        csrf_form = DummyForm(request.POST)
+        if csrf_form.is_valid():
+            sawps = SAWPermission.objects.all()
+            for sawp in sawps:
+                sawp.reset_to_default_group()
+            return HttpResponseRedirect(reverse("users_settings_edit_permissions"))
+    else:
+        return HttpResponseNotAllowed(['POST'])
 
 
 @has_permission(EDIT_PERMISSIONS)

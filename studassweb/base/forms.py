@@ -7,6 +7,13 @@ from .fields import HiddenModelField
 import re
 
 
+class DummyForm(forms.Form):
+    """
+    A form for when you only need to check the CSRF token
+    """
+    pass
+
+
 class ConfirmationForm(forms.Form):
     confirmation_box = forms.BooleanField(widget=forms.CheckboxInput, required=True)
 
@@ -284,3 +291,4 @@ class SortingForm(forms.Form):
     @staticmethod
     def get_submit_js():
         return "updateSortingFields();"
+

@@ -145,6 +145,10 @@ class SAWPermission(models.Model):
         """
         return users.groups.get_standard_group_of_perm(self.permission)
 
+    def reset_to_default_group(self):
+        if self.standard_group() != self.default_group.name:
+            users.groups.put_perm_in_standard_group(self, self.default_group)
+
 
 class DummyPermissionBase(SingletonModel):
     """

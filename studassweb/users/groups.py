@@ -126,6 +126,7 @@ def put_perm_in_standard_group(perm, group):
         sawp = perm
     else:
         sawp = SAWPermission.get(perm)
+    # Enforce that each permission only occurs in one of the standard groups
     _remove_sawp_from_all_standard_groups(sawp.permission)
     group_instance.permissions.add(sawp.permission)
 
