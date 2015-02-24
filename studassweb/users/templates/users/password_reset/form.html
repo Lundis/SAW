@@ -1,0 +1,15 @@
+{% extends 'users/password_reset/base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+
+{% block main_content %}
+    <p>{% trans "Please specify your email address to receive instructions for resetting it." %}</p>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.email.errors }}
+        {% bootstrap_form form %}
+        <input type="submit" value="{% trans "Reset password" %}" /></p>
+    </form>
+{% endblock %}

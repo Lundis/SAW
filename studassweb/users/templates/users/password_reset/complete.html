@@ -1,0 +1,9 @@
+{% extends 'users/password_reset/base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+
+{% block main_content %}
+    <p>{% trans "Your password has been set.  You may go ahead and log in now." %}</p>
+    <p><a href="{{ login_url }}">{% trans 'Log in' %}</a></p>
+{% endblock %}
