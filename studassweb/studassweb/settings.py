@@ -177,7 +177,7 @@ LOGGING = {
             'propagate': False,
         },
         'studassweb': {
-            'handlers': ['appdebugfile', 'allwarnings', 'console'],
+            'handlers': ['appdebugfile', 'allwarnings'],
             'level': 'DEBUG',
             'propagate': True,
         },
@@ -189,6 +189,7 @@ if DEBUG:
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'simple'}
+    LOGGING['loggers']['studassweb']['handlers'].append('console')
 
 #This is the logger added to every module
 if DEBUG:
