@@ -19,6 +19,7 @@ class UserExtension(models.Model):
     link_to_homepage = models.URLField(blank=True, default="")
     email_verified = models.BooleanField(default=False)
     email_verification_code = models.CharField(max_length=32, unique=True)
+    incomplete = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username
