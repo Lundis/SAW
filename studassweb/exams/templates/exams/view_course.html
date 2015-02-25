@@ -2,6 +2,8 @@
 
 {% load i18n %}
 {% load bootstrap3 %}
+{% load sidemenu %}
+{% load exams_templatetags %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -12,57 +14,35 @@
 {% block main_content %}
     <h1>{{ course.name }}</h1>
     <div class="list-group">
-
         {% for exam in exams %}
             <a class="list-group-item" href="{% url 'exams_view_exam' exam.id %}">
                 {{ exam.exam_date|date:"Y-m-d" }} : {{ exam.examinator_with_default_values }}
             </a>
         {% empty %}
             <p>{% trans "No exams found!" %}</p>
-            <form action="{% url 'exams_delete_course' course.id %}" method="post">
-                {% csrf_token %}
-                {% buttons %}
-                    <button type="submit" class="btn btn-danger" onclick="return confirm('{% trans "Are you sure?" %}')">
-                        {% trans "Remove this course" %}
-                    </button>
-                {% endbuttons %}
-            </form>
         {% endfor %}
     </div>
 {% endblock %}
-{% block sidebar %}
-    {% if show_edit_buttons%}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Edit" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    <a href="{% url 'exams_edit_course' course.id %}">
-                        <div class="btn list-group-item">{% trans "Edit this course" %}</div>
-                    </a>
-                </div>
-            </div>
-        </div>
+
+{% block sidebar-panel4 %}
+    {% can_edit_course course as can_edit_course_ %}
+    {% if can_edit_course_ %}
+        {% sidebarpanel "vertical_buttons" %}
+            {% trans "Actions" %}
+            {% body %}
+            <a class="btn btn-primary" href="{% url 'exams_edit_course' course.id %}">
+                {% trans "Edit this course" %}
+            </a>
+            {% if not exams %}
+                <form action="{% url 'exams_delete_course' course.id %}" method="post">
+                    {% csrf_token %}
+                    {% buttons %}
+                        <button type="submit" class="btn btn-danger btn-block" onclick="return confirm('{% trans "Are you sure?" %}')">
+                            {% trans "Remove this course" %}
+                        </button>
+                    {% endbuttons %}
+                </form>
+            {% endif %}
+        {% endsidebarpanel %}
     {% endif %}
-    {% if show_add_buttons%}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Add" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    <a href="{% url 'exams_add_exam' %}">
-                        <div class="btn list-group-item">{% trans "Add new exam" %}</div>
-                    </a>
-                    <a href="{% url 'exams_add_course' %}">
-                        <div class="btn list-group-item">{% trans "Add new course" %}</div>
-                    </a>
-                    <a href="{% url 'exams_add_examinator' %}">
-                        <div class="btn list-group-item">{% trans "Add new examinator" %}</div>
-                    </a>
-                </div>
-            </div>
-        </div>
-    {% endif %}
-{% endblock %}
+{% endblock%}
