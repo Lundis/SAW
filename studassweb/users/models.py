@@ -79,6 +79,9 @@ class KerberosServer(models.Model):
     realm = models.CharField(max_length=255, help_text="Example: srv.domain.com")
     service = models.CharField(max_length=255, help_text="Example: krbtgt@srv.domain.com")
 
+    def __str__(self):
+        return self.hostname
+
 
 class KerberosLink(models.Model):
     """

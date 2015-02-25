@@ -34,23 +34,28 @@ class KrbBackend(ModelBackend):
         :param kwargs: Nothing
         :return:
         """
+        logger.debug("calling kerberos authenticate")
         if not "@" in username:
             return None
         username, hostname = username.split("@")
         # Check if a server with the specified hostname exists
         try:
             server = KerberosServer.objects.get(hostname=hostname)
+            logger.debug("Found kerberos server")
         except KerberosServer.DoesNotExist:
             return None
         # Check if the credentials are correct
         if not self.check_password(server, username, password):
             #authentication failed
             return None
+        logger.debug("Kerberos auth successful")
         # Next check if the user already exists
         try:
             krblink = KerberosLink.objects.get(server=server, username=username)
+            logger.debug("kerberos user already exists")
             return krblink.user.user
         except KerberosLink.DoesNotExist:
+            logger.info("Creating new User (%s)" % username)
             # Create a new user
             user_ext = UserExtension.create_user(username=username,
                                                  password=generate_random_password(),
@@ -68,8 +73,8 @@ class KrbBackend(ModelBackend):
         try:
             kerberos.checkPassword(username.lower(), password, server.service, server.realm)
             return True
-        except kerberos.BasicAuthError:
-            logger.info("Wrong krb credentials authentication (user %s)" % username)
+        except kerberos.BasicAuthError as e:
+            logger.info("Wrong krb credentials authentication (user %s): %s" % (username, e))
         except Exception as e:
             logger.error("Failure during krb authentication: %s", e)
             # for all other exceptions also deny access
