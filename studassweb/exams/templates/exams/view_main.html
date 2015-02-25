@@ -1,6 +1,8 @@
 {% extends "exams/base.html" %}
 
 {% load i18n %}
+{% load sawp %}
+{% load sidemenu %}
 
 
 {% block breadcrumb1 %}
@@ -33,38 +35,18 @@
         {% endfor %}
     </div>
 {% endblock %}
-{% block sidebar %}
-    {% if show_add_buttons %}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Add" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    <a href="{% url 'exams_add_exam' %}">
-                        <div class="btn list-group-item">{% trans "Add new exam" %}</div>
-                    </a>
-                    <a href="{% url 'exams_add_course' %}">
-                        <div class="btn list-group-item">{% trans "Add new course" %}</div>
-                    </a>
-                    <a href="{% url 'exams_add_examinator' %}">
-                        <div class="btn list-group-item">{% trans "Add new examinator" %}</div>
-                    </a>
-                </div>
-            </div>
-            <div class= "panel-heading">
-                <h2 class="panel-title" data-toggle="collapse" data-target="#helptext">
-                    {% trans "Help" %}
-                    <span class="glyphicon caret pull-right"></span>
-                </h2>
-            </div>
-            <div id="helptext" class="panel-collapse collapse helptext-collapse">
-                <div class="panel-body">
-                        <p>{% trans "This is the exam archive.You can create courses and upload individual exams for each course." %}</p>
-                        <p>{% trans "You can view exams by course and / or examinator." %}</p>
-                        <p>{% trans "Uploaded exams must be connected to courses, begin by creating a course ." %}</p>
-                </div>
-            </div>
-        </div>
+
+{% block sidebar-panel-help %}
+    {% has_perm "exams" "CAN_UPLOAD_EXAMS" as can_upload_exams %}
+    {% if can_upload_exams%}
+        {% sidebarpanel "help" %}
+            {% trans "Help" %}
+            {% body %}
+            <p>{% trans "This is the exam archive.You can create courses and upload individual exams for each course." %}</p>
+            <p>{% trans "You can view exams by course and / or examinator." %}</p>
+            <p>{% trans "Uploaded exams must be connected to courses, begin by creating a course ." %}</p>
+        {% endsidebarpanel %}
     {% endif %}
-{% endblock %}
+{% endblock%}
+
+

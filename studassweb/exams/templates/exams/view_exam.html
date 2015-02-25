@@ -2,11 +2,13 @@
 
 {% load i18n %}
 {% load thumbnail %}
+{% load sidemenu %}
+{% load exams_templatetags %}
 
 {% block breadcrumb2 %}
     <li>
         <a href="{{ exam.course_id.get_absolute_url }}">
-        {{ exam.course_id.name }}
+            {{ exam.course_id.name }}
         </a>
     </li>
 {% endblock %}
@@ -36,39 +38,16 @@
         </li>
     </ul>
 {% endblock %}
-{% block sidebar %}
-    {% if show_edit_buttons %}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Edit" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    <a href="{% url 'exams_edit_exam' exam.id %}">
-                        <div class="btn list-group-item">{% trans "Edit this exam" %}</div>
-                    </a>
-                </div>
-            </div>
-        </div>
+
+{% block sidebar-panel4 %}
+    {% can_edit_exam exam as can_edit_exam_ %}
+    {% if can_edit_exam_ %}
+        {% sidebarpanel "vertical_buttons" %}
+            {% trans "Edit" %}
+            {% body %}
+            <a class="btn btn-primary" href="{% url 'exams_edit_exam' exam.id %}">
+                {% trans "Edit this exam" %}
+            </a>
+        {% endsidebarpanel %}
     {% endif %}
-    {% if show_add_buttons%}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Add" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    <a href="{% url 'exams_add_exam' %}">
-                        <div class="btn list-group-item">{% trans "Add new exam" %}</div>
-                    </a>
-                    <a href="{% url 'exams_add_course' %}">
-                        <div class="btn list-group-item">{% trans "Add new course" %}</div>
-                    </a>
-                    <a href="{% url 'exams_add_examinator' %}">
-                        <div class="btn list-group-item">{% trans "Add new examinator" %}</div>
-                    </a>
-                </div>
-            </div>
-        </div>
-    {% endif %}
-{% endblock %}
+{% endblock%}

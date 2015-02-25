@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+import exams.register as eregister
+from users import permissions
 
 
 class Course(models.Model):
@@ -16,6 +18,9 @@ class Course(models.Model):
     def get_exam_count(self):
         return str(SingleExam.objects.filter(course_id=self.id).count())
 
+    def user_can_edit(self, user):
+        return permissions.has_user_perm(user, eregister.CAN_EDIT_EXAMS) or self.created_by == user
+
 
 class Examinator(models.Model):
     name = models.CharField(max_length=100)
@@ -29,6 +34,9 @@ class Examinator(models.Model):
 
     def get_exam_count(self):
         return str(SingleExam.objects.filter(examinator=self.id).count())
+
+    def user_can_edit(self, user):
+        return permissions.has_user_perm(user, eregister.CAN_EDIT_EXAMS) or self.created_by == user
 
 
 class SingleExam(models.Model):
@@ -50,6 +58,9 @@ class SingleExam(models.Model):
             return self.examinator
         else:
             return Examinator(name="Unknown examinator")
+
+    def user_can_edit(self, user):
+        return permissions.has_user_perm(user, eregister.CAN_UPLOAD_EXAMS)
 
 
 class ExamFile(models.Model):
