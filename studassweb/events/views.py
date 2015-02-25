@@ -22,7 +22,7 @@ ITEMS_PREFIX = "eventitems"
 
 
 def home(request):
-    events = Event.objects.all().order_by('start')
+    events = Event.objects.all().order_by('-start')
     if not permissions.has_user_perm(request.user, eregister.CAN_VIEW_AND_JOIN_PUBLIC_EVENTS):
         events = events.exclude(permission=eregister.CAN_VIEW_AND_JOIN_PUBLIC_EVENTS)
     if not permissions.has_user_perm(request.user, eregister.CAN_VIEW_AND_JOIN_MEMBER_EVENTS):
