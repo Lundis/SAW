@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User, Permission, ContentType, Group
+from django.core.validators import MinValueValidator, MaxValueValidator
 from solo.models import SingletonModel
 from base.models import DisabledModule
 from importlib import import_module
@@ -68,13 +69,29 @@ class UserExtension(models.Model):
         return users.groups.get_user_group(self.user),
 
 
-class LdapLink(models.Model):
-    user = models.ForeignKey(User)
-    hostname = models.CharField(max_length=200)
+class KerberosServer(models.Model):
+    """
+    Contains details about a Kerberos Server
+    """
+    hostname = models.CharField(max_length=255, unique=True,
+                                help_text="Example: domain.com, as in user@domain.com")
+    realm = models.CharField(max_length=255, help_text="Example: srv.domain.com")
+    service = models.CharField(max_length=255, help_text="Example: krbtgt@srv.domain.com")
+
+
+class KerberosLink(models.Model):
+    """
+    Links a user account to a Kerberos server
+    """
+    user = models.ForeignKey(UserExtension)
+    server = models.ForeignKey(KerberosServer)
     username = models.CharField(max_length=50)
 
+    class Meta:
+        unique_together = ("server", "username")
+
     def __str__(self):
-        return self.user.username + ": " + self.username + "@" + self.hostname
+        return self.user.username + ": " + self.username + "@" + self.server.hostname
 
 
 class SAWPermission(models.Model):
