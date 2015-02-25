@@ -13,15 +13,25 @@
 
 {% block main_content %}
     <h3>Events</h3>
-    <div class="list-group">
-        {% for event in events %}
-            <a class="list-group-item" href="{{ event.get_absolute_url }}">
-                {{ event.start|date:"Y-m-d" }} {{ event.title }}
-            </a>
-        {% empty %}
-            <p>{% trans "No events found!" %}</p>
-        {% endfor %}
-    </div>
+    {% for event in events %}
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+
+                <h4>
+                    <a class="h3" href="{{ event.get_absolute_url }}">
+                        {{ event.start|date:"Y-m-d" }} {{ event.title }}
+                    </a>
+                </h4>
+
+            </div>
+            <div class="panel-body">
+                {{ event.get_summary|safe }}
+            </div>
+        </div>
+    {% empty %}
+        <p>{% trans "No events found!" %}</p>
+    {% endfor %}
+
 
 {% endblock %}
 

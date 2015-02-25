@@ -78,9 +78,27 @@ class RegisterForm(forms.Form):
 
 class UserBaseForm(forms.ModelForm):
 
+    def __init__(self, *args, **kwargs):
+        super(UserBaseForm, self).__init__(*args, **kwargs)
+        self.fields['first_name'].required = True
+        self.fields['last_name'].required = True
+
     class Meta():
         model = User
-        fields = ('email',)
+        fields = ('first_name', 'last_name', 'email',)
+
+    def save(self, commit=True):
+        """
+        Mark the user as complete
+        :param commit:
+        :return:
+        """
+        user = super(UserBaseForm, self).save(commit=commit)
+        user_ext = UserExtension.objects.get(user=user)
+        user_ext.incomplete = False
+        if commit:
+            user_ext.save()
+        return user
 
 
 class ProfileForm(forms.ModelForm):

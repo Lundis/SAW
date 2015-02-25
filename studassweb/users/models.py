@@ -19,6 +19,7 @@ class UserExtension(models.Model):
     link_to_homepage = models.URLField(blank=True, default="")
     email_verified = models.BooleanField(default=False)
     email_verification_code = models.CharField(max_length=32, unique=True)
+    incomplete = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username
@@ -77,6 +78,9 @@ class KerberosServer(models.Model):
                                 help_text="Example: domain.com, as in user@domain.com")
     realm = models.CharField(max_length=255, help_text="Example: srv.domain.com")
     service = models.CharField(max_length=255, help_text="Example: krbtgt@srv.domain.com")
+
+    def __str__(self):
+        return self.hostname
 
 
 class KerberosLink(models.Model):

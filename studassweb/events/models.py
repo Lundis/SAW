@@ -134,7 +134,12 @@ class Event(models.Model):
         return "{0}.{1}.{2} - {3}.{4}.{5}".format(self.start.day, self.start.month, self.start.year,
                                                   self.stop.day, self.stop.month, self.stop.year)
 
-
+    def get_summary(self):
+        if len(self.text) > 300:
+            summary = ValidatedRichTextField.get_summary(self.text, 300)
+            return "%s<p><strong>...</strong></p>" % summary
+        else:
+            return self.text
 
 # Each user which signs up creates one of these
 # We need both user and name as we need to allow non-signed in users to sign up

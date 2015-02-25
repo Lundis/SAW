@@ -14,8 +14,24 @@ from base.utils import get_all_modules
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
+# Check for Kerberos libs
+try:
+    # Linux
+    import kerberos
+    KERBEROS_ENABLED = True
+except ImportError:
+    # Windows
+    try:
+        import kerberos_sspi as kerberos
+        KERBEROS_ENABLED = True
+    except ImportError:
+        KERBEROS_ENABLED = False
+
+if KERBEROS_ENABLED:
+    AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+        'users.krb_backend.KrbBackend',
+    )
 
 EXTERNAL_APPS = (
     'solo',  # singleton models. pip install django-solo
