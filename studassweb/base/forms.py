@@ -14,10 +14,6 @@ class DummyForm(forms.Form):
     pass
 
 
-class ConfirmationForm(forms.Form):
-    confirmation_box = forms.BooleanField(widget=forms.CheckboxInput, required=True)
-
-
 class BootswatchThemeSelectForm(forms.Form):
     theme = forms.CharField(required=True)
 

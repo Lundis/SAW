@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.validators import ValidationError
 from django.utils.translation import ugettext as _
+from django.dispatch import receiver
+from django.db.models.signals import post_delete
 from users.groups import put_user_in_standard_group, MEMBER
 from users.models import UserExtension
 from base.models import SiteConfiguration
@@ -66,6 +68,14 @@ class Member(models.Model):
                                   last_name=user_ext.user.last_name,
                                   email=user_ext.user.email,
                                   confirmed=confirmed)
+
+
+@receiver(post_delete, sender=Member, dispatch_uid="member_post_delete")
+def page_post_delete(**kwargs):
+    instance = kwargs.pop("instance")
+    # Remove the UserExtension if it exists
+    if instance.user_ext:
+        instance.user_ext.delete()
 
 
 class PaymentPurpose(models.Model):

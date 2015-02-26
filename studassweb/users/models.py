@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User, Permission, ContentType, Group
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.dispatch import receiver
+from django.db.models.signals import post_delete
 from solo.models import SingletonModel
 from base.models import DisabledModule
 from importlib import import_module
@@ -69,6 +70,13 @@ class UserExtension(models.Model):
         :return:
         """
         return users.groups.get_user_group(self.user),
+
+
+@receiver(post_delete, sender=UserExtension, dispatch_uid="UserExtension_post_delete")
+def page_post_delete(**kwargs):
+    instance = kwargs.pop("instance")
+    # Also remove the User
+    instance.user.delete()
 
 
 class KerberosServer(models.Model):

@@ -3,6 +3,12 @@
 {% load bootstrap3 %}
 {% load setvar %}
 
+{% block breadcrumb1 %}
+    <li class="active">
+        {% trans "Member Registry" %}
+    </li>
+{% endblock %}
+
 {% block main_content %}
     <table class="table table-striped table-condensed">
         <tr>
@@ -36,7 +42,7 @@
                         <span class="glyphicon glyphicon-remove"></span>
                     {% endif %}
                 </td>
-                <td class="col-realname">{{ member.first_name }} {{ member.last_name }}</td>
+                <td class="col-realname">{{ member.get_full_name }}</td>
                 <td class="col-applying">
                     {% if member.applying %}
                         <a href="{% url "members_confirm_membership" member_id=member.id %}">

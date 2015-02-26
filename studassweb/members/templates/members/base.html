@@ -9,3 +9,11 @@
     {% load dynamic_menu %}
     {% display_menu "main_menu" "Member Registry" %}
 {% endblock %}
+
+{% block breadcrumb1 %}
+    <li>
+        <a href="{% url "members_home" %}">
+            {% trans "Member Registry" %}
+        </a>
+    </li>
+{% endblock %}
