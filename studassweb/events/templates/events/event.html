@@ -66,8 +66,12 @@
                 {% if signupform %}
                     <form action="" method="post">
                         {% csrf_token %}
-                        {% bootstrap_form signupform %}
+                        {% bootstrap_field signupform.name %}
+                        {% bootstrap_field signupform.email %}
                         {% bootstrap_form signupitemsform %}
+                        {% if signupform.captcha %}
+                            {% bootstrap_field signupform.captcha %}
+                        {% endif %}
                         {% buttons %}
                             <button type="submit" class="btn btn-primary">
                                 {% trans "Submit" %}
@@ -269,43 +273,39 @@
 {% endblock %}
 
 
-{% block sidebar-panel4 %}
+{% block extrabuttons_in_panel5 %}
     {% has_perm "events" "CAN_CREATE_EVENTS" as can_create_events %}
     {% if can_create_events %}
-        {% sidebarpanel "vertical_buttons" %}
-            {% trans "Edit" %}
-            {% body %}
-            <a href="{% url 'events_edit_event' event.id%}" class="btn btn-primary">
-                {% trans "Edit this event" %}
-            </a>
-        {% endsidebarpanel %}
+        <a href="{% url 'events_edit_event' event.id%}" class="btn btn-primary">
+            {% trans "Edit this event" %}
+        </a>
     {% endif %}
 {% endblock %}
 
 {% block sidebar-panel-help %}
+    {% has_perm "events" "CAN_VIEW_SIGNUP_INFO" as can_view_signup_info %}
     {% sidebarpanel "help" %}
         {% trans "Help" %}
         {% body %}
-        <p>{% trans "here you can see the details for each event" %}</p>
-        <p>{% trans "pressing the 'print mode' button will make the signup-list less cluttered" %}</p>
+        <p>{% trans "Here you can see the details of an event." %}</p>
+        <p>{% trans "After you have signed up you will get a confirmation email. This email contains information to change or cancel your signup." %}</p>
+        {% if can_view_signup_info %}
+            <p>{% trans "Pressing the 'print mode' button will make the signup-list less cluttered." %}</p>
+        {% endif %}
     {% endsidebarpanel %}
 {% endblock %}
 
 {% block scripts %}
     <script>
-        /**/
         $("#print-toggle-button").click(function(event) {
             $("#print-toggle-button").toggleClass("active");
             $(".print-hide").toggleClass("hidden");
         });
-        /**/
-
         {% if show_reserve_list %}
             $("#print-reserve-toggle-button").click(function(event) {
                 $("#print-reserve-toggle-button").toggleClass("active");
                 $(".print-reserve-hide").toggleClass("hidden");
             });
         {% endif %}
-
     </script>
 {% endblock %}

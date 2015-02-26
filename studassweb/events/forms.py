@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext as _
 from .models import Event, EventSignup, EventItem, ItemInEvent, ItemInSignup
 from base.utils import generate_email_ver_code
+from captcha.fields import ReCaptchaField
 
 EITEMS = "eitems"
 
@@ -12,7 +13,10 @@ class EventSignupForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop("event")
+        self.user = kwargs.pop('user')
         super(EventSignupForm, self).__init__(*args, **kwargs)
+        if self.event.use_captcha and not self.user.is_authenticated():
+            self.fields['captcha'] = ReCaptchaField()
 
     class Meta:
         model = EventSignup
@@ -57,7 +61,9 @@ class EventForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        fields = ('title', 'text', 'max_participants', 'signup_start', 'signup_deadline', 'start', 'stop', 'permission')
+        fields = ('title', 'text', 'max_participants', 'signup_start', 'signup_deadline', 'start', 'stop', 'permission',
+                  'use_captcha', 'send_email_for_reserves'
+                  )
 
     def clean(self):
         super(EventForm, self).clean()
@@ -83,28 +89,35 @@ class EventItemsForm(forms.Form):
     That is, the event items which are used in a specific event.
     """
     def __init__(self, *args, **kwargs):
+        # If editing, keep track of items already applied to event so we can mark them as applied in the form.
         event = kwargs.pop("event", None)
         selected_eitems = []
         if event:
             selected_event_items = ItemInEvent.objects.filter(event=event)
             for tmp in selected_event_items:
                 selected_eitems.append(tmp.item.id)
+
         super(EventItemsForm, self).__init__(*args, **kwargs)
+
         all_event_items = EventItem.objects.filter()
-        eitems = ()
-        # Create a 'choices' variable with all event items
+        # Create a 'choices' variable with all event items, in the right format
+        choices_eitems = ()
         for eitem in all_event_items:
-            eitems += (str(eitem.id), eitem.name),
+            choices_eitems += (str(eitem.id), eitem.name),
 
         self.fields[EITEMS] = forms.MultipleChoiceField(
             widget=forms.CheckboxSelectMultiple(),
-            choices=eitems,
+            choices=choices_eitems,
             initial=selected_eitems,
-            required=False)
+            required=False,
+            label=_("Event items"),
+            help_text=_("Event items are optional signup fields for an event.")
+        )
 
     def clean(self):
         super(EventItemsForm, self).clean()
         ids_of_event_items = self.cleaned_data[EITEMS]
+        # Check that all event items added to event exists
         for id_ei in ids_of_event_items:
                 try:
                     EventItem.objects.get(id=id_ei)
@@ -115,10 +128,10 @@ class EventItemsForm(forms.Form):
         if self.is_valid():
             ids_of_event_items = self.cleaned_data[EITEMS]
 
-            # Let's remove all choices from this event
+            # Let's remove all chosen event items from this event
             ItemInEvent.objects.filter(event=event).delete()
 
-            #  and then add them again!
+            #  and then create/add the newly chosen ones!
             for id_ei in ids_of_event_items:
                 even_item = EventItem.objects.get(id=id_ei)
                 ItemInEvent(event=event, item=even_item).save()
@@ -133,64 +146,65 @@ class SignupItemsForm(forms.Form):
         event = kwargs.pop("event")
         signup = kwargs.pop("signup", None)
         selected_eitems = {}
+        # If we are editing an existing signup, we need to get the old event item values to show in forms
         if signup:
             selected_signup_items = ItemInSignup.objects.filter(signup=signup)
             for signup_item in selected_signup_items:
                 selected_eitems[signup_item.item.id] = signup_item.value
+
         super(SignupItemsForm, self).__init__(*args, **kwargs)
-        this_event_items = []
-        this_event_iteminevents = ItemInEvent.objects.filter(event=event)
-        for iteminevent in this_event_iteminevents:
-            this_event_items.append(iteminevent.item)
-        for eitem in this_event_items:
-            if eitem.type == EventItem.TYPE_BOOL:
-                self.fields[EITEMS+str(eitem.id)] = forms.BooleanField(
-                    label=eitem.name,
-                    initial=selected_eitems.get(eitem.id),
-                    required=eitem.required
+
+        # So every field's id is (static string for event items)+(id for the event item)
+        # The static string in the beginning is to ensure we are not mixing form inputs or anything similar.
+        for item_in_event in ItemInEvent.objects.filter(event=event):
+            if item_in_event.item.type == EventItem.TYPE_BOOL:
+                self.fields[EITEMS+str(item_in_event.item.id)] = forms.BooleanField(
+                    label=item_in_event.item.name,
+                    initial=selected_eitems.get(item_in_event.item.id),
+                    required=item_in_event.item.required
                 )
-            elif eitem.type == EventItem.TYPE_STR:
-                self.fields[EITEMS+str(eitem.id)] = forms.CharField(
-                    label=eitem.name,
-                    initial=selected_eitems.get(eitem.id),
-                    required=eitem.required
+            elif item_in_event.item.type == EventItem.TYPE_STR:
+                self.fields[EITEMS+str(item_in_event.item.id)] = forms.CharField(
+                    label=item_in_event.item.name,
+                    initial=selected_eitems.get(item_in_event.item.id),
+                    required=item_in_event.item.required
                 )
-            elif eitem.type == EventItem.TYPE_TEXT:
-                self.fields[EITEMS+str(eitem.id)] = forms.CharField(
+            elif item_in_event.item.type == EventItem.TYPE_TEXT:
+                self.fields[EITEMS+str(item_in_event.item.id)] = forms.CharField(
                     widget=forms.Textarea,
-                    label=eitem.name,
-                    initial=selected_eitems.get(eitem.id),
-                    required=eitem.required
+                    label=item_in_event.item.name,
+                    initial=selected_eitems.get(item_in_event.item.id),
+                    required=item_in_event.item.required
                 )
-            elif eitem.type == EventItem.TYPE_INT:
-                self.fields[EITEMS+str(eitem.id)] = forms.IntegerField(
-                    label=eitem.name,
-                    initial=selected_eitems.get(eitem.id),
-                    required=eitem.required
+            elif item_in_event.item.type == EventItem.TYPE_INT:
+                self.fields[EITEMS+str(item_in_event.item.id)] = forms.IntegerField(
+                    label=item_in_event.item.name,
+                    initial=selected_eitems.get(item_in_event.item.id),
+                    required=item_in_event.item.required
                 )
-            elif eitem.type == EventItem.TYPE_CHOICE:
+            elif item_in_event.item.type == EventItem.TYPE_CHOICE:
                 # This will probably change...
                 # Anyway, strings are splitted by //
                 # First string is the label, rest is choices
                 items = ()
                 i = 0
-                strings = eitem.name.split("//")
+                strings = item_in_event.item.name.split("//")
                 for string in strings:
                     if i != 0:
                         items += (string, string),
                     i += 1
-                self.fields[EITEMS+str(eitem.id)] = forms.ChoiceField(
+                self.fields[EITEMS+str(item_in_event.item.id)] = forms.ChoiceField(
                     choices=items,
                     label=strings[0],
-                    initial=selected_eitems.get(eitem.id),
-                    required=eitem.required
+                    initial=selected_eitems.get(item_in_event.item.id),
+                    required=item_in_event.item.required
                 )
 
     def save(self, signup):
         if self.is_valid():
-            # Remove old
+            # Remove old event items for event
             ItemInSignup.objects.filter(signup=signup).delete()
-            # Add new
+            # Add newly selected. The field's ids' ends with the event item id
             for index in self.cleaned_data:
                 if str(index).startswith(EITEMS):
                     id1 = str(index)[len(EITEMS):]

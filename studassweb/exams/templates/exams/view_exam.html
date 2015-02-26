@@ -36,6 +36,12 @@
                 {% trans "Examinator: Unknown examinator" %}
             {% endif %}
         </li>
+        {% if exam.description %}
+            <li class="list-group-item">
+                {% trans "Description: " %} {{ exam.description }}
+            </li>
+        {% endif %}
+
     </ul>
 {% endblock %}
 

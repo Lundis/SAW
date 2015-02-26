@@ -29,6 +29,8 @@ PERMISSION_CHOICES = (
 
 
 # This should maybe be put in base or something
+# TODO if the field is a boolean, it should return False / True
+# TODO if the field is a integer or float, it should return appropriate type!
 class MultiInputField(models.CharField):
     description = "This is magic"
 
@@ -50,6 +52,11 @@ class Event(models.Model):
     permission = models.CharField(max_length=100, choices=PERMISSION_CHOICES,
                                   default=eregister.CAN_VIEW_AND_JOIN_PUBLIC_EVENTS)
     max_participants = models.IntegerField(validators=[MinValueValidator(1)], default=50)
+    use_captcha = models.BooleanField(default=False, verbose_name="Use captcha when anonymous people sign up")
+    send_email_for_reserves = models.BooleanField(
+        default=True,
+        verbose_name="Send email when someone is moved from reserve list to attending"
+        )
 
     def __str__(self):
         return str(self.title)
@@ -141,6 +148,7 @@ class Event(models.Model):
         else:
             return self.text
 
+
 # Each user which signs up creates one of these
 # We need both user and name as we need to allow non-signed in users to sign up
 class EventSignup(models.Model):
@@ -170,19 +178,20 @@ class EventSignup(models.Model):
 
     def delete(self, using=None):
         super(EventSignup, self).delete(using)
-        # Notify a user on the reserve list that they're in by email
-        # Can't allow delete() to throw an exception related to the email
-        try:
-            signups = EventSignup.objects.filter(event=self.event)
-            if self.event.max_participants <= signups.count():
-                # Get the signup that just got below the participant limit
-                reserve_signup = signups[self.event.max_participants - 1]
-                reserve_signup.send_reserve_email()
-        except Exception as e:
-            logger.error("Sending reserve email failed (%s)", e)
+        if self.event.send_email_for_reserves:
+            # Notify a user on the reserve list that they're in by email
+            # Can't allow delete() to throw an exception related to the email
+            try:
+                signups = EventSignup.objects.filter(event=self.event)
+                if self.event.max_participants <= signups.count():
+                    # Get the signup that just got below the participant limit
+                    reserve_signup = signups[self.event.max_participants - 1]
+                    reserve_signup.send_reserve_email()
+            except Exception as e:
+                logger.error("Sending reserve email failed (%s)", e)
 
-        # update indices
-        self.fix_indices()
+            # update indices
+            self.fix_indices()
 
     def send_reserve_email(self):
         context = Context({'event': self.event})
@@ -277,19 +286,20 @@ class EventItem(models.Model):
     )
 
     name = models.CharField(max_length=100)
-    required = models.BooleanField(default=False, verbose_name="Is this field mandatory")
+    required = models.BooleanField(default=False, verbose_name=_("Is this field mandatory"))
     public = models.BooleanField(default=False,
-                                 verbose_name="Is this field shown to everyone?",)
+                                 verbose_name=_("Is this field shown to everyone?",))
     hide_in_print_view = models.BooleanField(default=False,
-                                             verbose_name="Is this field hidden from the print view?",)
+                                             verbose_name=_("Is this field hidden from the print view?",))
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=TYPE_INT,
                             verbose_name="Data type",
-                            help_text="Decides what kind of data is allowed in this field. The options are:<br />" +
-                                      "Checkbox: A simple checkbox (yes/no)<br />" +
-                                      "Text (one line): A text field with one line <br />" +
-                                      "Text (multiple lines): A larger resizeable text field that allows multiple lines<br />" +
-                                      "Integer: A number<br />" +
-                                      "Choice: A multiple-choices field. syntax for name: question//alternative1//alternative2//alternative3")
+                            help_text=_("Decides what kind of data is allowed in this field. The options are:<br />" +
+                                        "Checkbox: A simple checkbox (yes/no)<br />" +
+                                        "Text (one line): A text field with one line <br />" +
+                                        "Text (multiple lines): A larger resizeable text field that allows multiple lines<br />" +
+                                        "Integer: A number<br />" +
+                                        "Choice: A multiple-choices field. syntax for name: question//alternative1//alternative2//alternative3")
+    )
 
     def __str__(self):
         return str(self.name)

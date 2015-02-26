@@ -78,7 +78,7 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
         initial_user_data = {'name': request.user.get_full_name(), 'email': request.user.email}
 
     signupform = EventSignupForm(request.POST or None, initial=initial_user_data,
-                                 instance=db_event_signup, prefix=MAIN_PREFIX, event=event)
+                                 instance=db_event_signup, prefix=MAIN_PREFIX, event=event, user=request.user)
     signupitemsform = SignupItemsForm(request.POST or None, event=event,
                                       signup=db_event_signup, prefix=ITEMS_PREFIX)
 
@@ -217,7 +217,7 @@ class DeleteEventSignupByCodeView(DeleteView):
     def get(self, request, *args, **kwargs):
         if not self.get_object():
             return HttpResponseRedirect(reverse("events_home"))
-        return super(DeleteView, self).get(request, *args, **kwargs)
+        return super(DeleteEventSignupByCodeView, self).get(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()
