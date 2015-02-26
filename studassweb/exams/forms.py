@@ -17,8 +17,8 @@ class ExamForm(forms.ModelForm):
         initial=date.today)
 
     class Meta:
-        model = SingleExam
-        fields = ('course_id', 'examinator', 'exam_date')
+        model = Exam
+        fields = ('course_id', 'examinator', 'exam_date', 'description')
 
 
 class ExaminatorForm(forms.ModelForm):

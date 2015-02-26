@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 @has_permission(CAN_VIEW_EXAM_ARCHIVE)
 def main(request):
-    exams = SingleExam.objects.filter().order_by('-exam_date')
+    exams = Exam.objects.filter().order_by('-exam_date')
     courses = Course.objects.filter().order_by('name')
     examinators = Examinator.objects.filter().order_by('name')
 
@@ -25,11 +25,11 @@ def main(request):
 @has_permission(CAN_VIEW_EXAM_ARCHIVE)
 def view_exam(request, exam_id):
     try:
-        exam = SingleExam.objects.get(id=exam_id)
+        exam = Exam.objects.get(id=exam_id)
         images = ExamFile.objects.filter(exam_id=exam_id)
 
         return render(request, 'exams/view_exam.html', {'exam': exam, 'images': images},)
-    except SingleExam.DoesNotExist:
+    except Exam.DoesNotExist:
         logger.warning('Could not find exam with id %s', exam_id)
         return HttpResponseNotFound(_('No exam with that id found'))
 
@@ -38,7 +38,7 @@ def view_exam(request, exam_id):
 def view_examinator(request, examinator_id):
     try:
         examinator = Examinator.objects.get(id=examinator_id)
-        exams = SingleExam.objects.filter(examinator=examinator_id).order_by('-exam_date')
+        exams = Exam.objects.filter(examinator=examinator_id).order_by('-exam_date')
 
         return render(request, 'exams/view_examinator.html', {'examinator': examinator, 'exams': exams},)
     except Examinator.DoesNotExist:
@@ -50,7 +50,7 @@ def view_examinator(request, examinator_id):
 def view_course(request, course_id):
     try:
         course = Course.objects.get(id=course_id)
-        exams = SingleExam.objects.filter(course_id=course_id).order_by('-exam_date')
+        exams = Exam.objects.filter(course_id=course_id).order_by('-exam_date')
 
         return render(request, 'exams/view_course.html', {'course': course, 'exams': exams},)
     except Course.DoesNotExist:
@@ -60,15 +60,15 @@ def view_course(request, course_id):
 
 def add_edit_exam(request, exam_id=-1):
     form = ExamForm()
-    examfile_factory = inlineformset_factory(SingleExam, ExamFile, fields=('id', 'image',), extra=1, can_delete=True)
+    examfile_factory = inlineformset_factory(Exam, ExamFile, fields=('id', 'image',), extra=1, can_delete=True)
     try:
-        exam = SingleExam.objects.get(id=exam_id)
+        exam = Exam.objects.get(id=exam_id)
         if not (permissions.has_user_perm(request.user, CAN_EDIT_EXAMS) or exam.created_by == request.user):
             logger.warning('User %s tried to edit exam %s', request.user, exam_id)
             return HttpResponseForbidden(_('You don\'t have permission to edit this exam!'))
         form = ExamForm(instance=exam)
         fileformset = examfile_factory(instance=exam, prefix='dynamix')
-    except SingleExam.DoesNotExist:
+    except Exam.DoesNotExist:
         if not permissions.has_user_perm(request.user, CAN_UPLOAD_EXAMS):
                 logger.warning('User %s tried to add exam', request.user)
                 return HttpResponseForbidden(_('You don\'t have permission to add exams!'))
@@ -150,7 +150,7 @@ def add_edit_course(request, course_id=-1):
 def delete_exam(request, exam_id):
         if request.method == 'POST':
             try:
-                exam = SingleExam.objects.get(id=exam_id)
+                exam = Exam.objects.get(id=exam_id)
                 if permissions.has_user_perm(request.user, CAN_EDIT_EXAMS) or exam.created_by == request.user:
                     name = str(exam)
                     images = ExamFile.objects.filter(exam_id=exam_id)
@@ -161,7 +161,7 @@ def delete_exam(request, exam_id):
                 else:
                     logger.warning('User %s tried to delete exam %s', request.user, exam_id)
                     return HttpResponseForbidden(_('You don\'t have permission to remove this!'))
-            except SingleExam.DoesNotExist:
+            except Exam.DoesNotExist:
                 return HttpResponseNotFound(_('No such exam!'))
         else:
             logger.warning('Attempted to access delete_exam via GET')

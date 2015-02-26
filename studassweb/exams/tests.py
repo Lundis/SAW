@@ -1,17 +1,11 @@
 from django.test import TestCase, RequestFactory
 from django.core.urlresolvers import reverse
-from .models import Course, Examinator, SingleExam, ExamFile
-from django.contrib.auth.models import User
 from .views import add_edit_exam
-from .register import get_menu_items
-from studassweb.urls import urlpatterns
 from django.contrib.auth.models import AnonymousUser, User
 from users.models import UserExtension
 from users.groups import setup_default_groups_and_permissions
 from users.groups import put_user_in_standard_group, MEMBER
 from unittest import skip
-
-from django.conf.urls import include, patterns, url
 
 SUPERUSER_USERNAME = "examssuperuser"
 SUPERUSER_PASSWORD = "examssuperuser"
@@ -48,6 +42,6 @@ class ExamsHttpTests(TestCase):
         request = self.factory.post(reverse("exams_add_course"), {'name': 'Datornätverk', })
         request.user = User.objects.get_by_natural_key(MEMBER_USERNAME)
         response = add_edit_exam(request)
-        #print(response.content)
+        # print(response.content)
         self.assertEqual(response.status_code, 200)
 
