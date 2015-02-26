@@ -3,7 +3,8 @@ from django.http import HttpResponseRedirect
 from .forms import ConfirmationForm
 
 
-def delete_confirmation_view(request, item, form_url, redirect_url):
+def delete_confirmation_view(request, item, form_url, redirect_url,
+                             template="base/delete_confirmation.html"):
     form = ConfirmationForm(request.POST or None)
     item_name = str(item)
     if form.is_valid():
@@ -16,4 +17,4 @@ def delete_confirmation_view(request, item, form_url, redirect_url):
                'item': item,
                'form_url': form_url,
                'item_name': item_name}
-    return render(request, "base/delete_confirmation.html", context)
+    return render(request, template, context)
