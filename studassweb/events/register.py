@@ -39,6 +39,6 @@ def get_permissions():
         (CAN_VIEW_AND_JOIN_PUBLIC_EVENTS, GUEST, "Can view and join public events"),
         (CAN_VIEW_AND_JOIN_MEMBER_EVENTS, MEMBER, "Can view and join member events"),
         (CAN_VIEW_AND_JOIN_BOARD_MEMBER_EVENTS, BOARD_MEMBER, "Can view and join board member events"),
-        (CAN_CREATE_EVENTS, BOARD_MEMBER, "Can create events"),
+        (CAN_CREATE_EVENTS, BOARD_MEMBER, "Can create and edit events"),
         (CAN_VIEW_SIGNUP_INFO, BOARD_MEMBER, "Can view normally hidden info about signed up people"),
     )
