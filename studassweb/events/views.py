@@ -217,7 +217,7 @@ class DeleteEventSignupByCodeView(DeleteView):
     def get(self, request, *args, **kwargs):
         if not self.get_object():
             return HttpResponseRedirect(reverse("events_home"))
-        return super(DeleteView, self).get(request, *args, **kwargs)
+        return super(DeleteEventSignupByCodeView, self).get(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()

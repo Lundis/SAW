@@ -24,8 +24,9 @@
     {% has_perm "events" "CAN_CREATE_EVENTS" as can_create_events %}
     {% if can_create_events%}
         {% sidebarpanel "vertical_buttons" %}
-            {% trans "Add" %}
+            {% trans "Actions" %}
             {% body %}
+            {% block extrabuttons_in_panel5 %}{% endblock %}
             <a href="{% url 'events_add_event' %}" class="btn btn-primary">
                 {% trans "Add new event" %}
             </a>
