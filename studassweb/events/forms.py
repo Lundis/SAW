@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext as _
 from .models import Event, EventSignup, EventItem, ItemInEvent, ItemInSignup
 from base.utils import generate_email_ver_code
+from captcha.fields import ReCaptchaField
 
 EITEMS = "eitems"
 
@@ -12,7 +13,10 @@ class EventSignupForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop("event")
+        self.user = kwargs.pop('user')
         super(EventSignupForm, self).__init__(*args, **kwargs)
+        if self.event.use_captcha and not self.user.is_authenticated():
+            self.fields['captcha'] = ReCaptchaField()
 
     class Meta:
         model = EventSignup
@@ -57,7 +61,9 @@ class EventForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        fields = ('title', 'text', 'max_participants', 'signup_start', 'signup_deadline', 'start', 'stop', 'permission')
+        fields = ('title', 'text', 'max_participants', 'signup_start', 'signup_deadline', 'start', 'stop', 'permission',
+                  'use_captcha', 'send_email_for_reserves'
+                  )
 
     def clean(self):
         super(EventForm, self).clean()

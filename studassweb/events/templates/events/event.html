@@ -66,8 +66,12 @@
                 {% if signupform %}
                     <form action="" method="post">
                         {% csrf_token %}
-                        {% bootstrap_form signupform %}
+                        {% bootstrap_field signupform.name %}
+                        {% bootstrap_field signupform.email %}
                         {% bootstrap_form signupitemsform %}
+                        {% if signupform.captcha %}
+                            {% bootstrap_field signupform.captcha %}
+                        {% endif %}
                         {% buttons %}
                             <button type="submit" class="btn btn-primary">
                                 {% trans "Submit" %}

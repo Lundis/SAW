@@ -78,7 +78,7 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
         initial_user_data = {'name': request.user.get_full_name(), 'email': request.user.email}
 
     signupform = EventSignupForm(request.POST or None, initial=initial_user_data,
-                                 instance=db_event_signup, prefix=MAIN_PREFIX, event=event)
+                                 instance=db_event_signup, prefix=MAIN_PREFIX, event=event, user=request.user)
     signupitemsform = SignupItemsForm(request.POST or None, event=event,
                                       signup=db_event_signup, prefix=ITEMS_PREFIX)
 
