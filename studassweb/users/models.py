@@ -32,6 +32,7 @@ class UserExtension(models.Model):
         user = User.objects.create_user(username, email, password)
         user.first_name = first_name
         user.last_name = last_name
+        users.groups.put_user_in_standard_group(users.groups.LOGGED_ON)
         user.save()
         return cls.create_for_user(user)
 
