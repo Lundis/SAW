@@ -8,6 +8,7 @@ from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext as _
 from django.core.mail import send_mail
 from django.conf import settings
+from solo.models import SingletonModel
 import django.utils.timezone as timezone
 import events.register as eregister
 from users import permissions
@@ -328,3 +329,13 @@ class ItemInSignup(models.Model):
 
     def __str__(self):
         return str("{0} signed up with {1}: {2}".format(self.signup.name, self.item.name, self.value))
+
+
+class EventSettings(SingletonModel):
+    is_setup = models.BooleanField(default=False)
+
+    @classmethod
+    def instance(cls):
+        instance, created = cls.objects.get_or_create()
+        return instance
+
