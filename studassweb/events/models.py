@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 from django.core.mail import send_mail
 from django.conf import settings
 import django.utils.timezone as timezone
+from solo.models import SingletonModel
 import events.register as eregister
 from users import permissions
 from base.fields import ValidatedRichTextField
@@ -333,6 +334,7 @@ class ItemInSignup(models.Model):
 
     def __str__(self):
         return str("{0} signed up with {1}: {2}".format(self.signup.name, self.item.name, self.get_value()))
+        return str("{0} signed up with {1}: {2}".format(self.signup.name, self.item.name, self.get_value()))
 
     def get_value(self):
         if self.value == VALUE_DOES_NOT_EXIST:
@@ -353,4 +355,15 @@ class ItemInSignup(models.Model):
         else:
             raise NotImplementedError()
 
+
+        return str("{0} signed up with {1}: {2}".format(self.signup.name, self.item.name, self.value))
+
+
+class EventSettings(SingletonModel):
+    is_setup = models.BooleanField(default=False)
+
+    @classmethod
+    def instance(cls):
+        instance, created = cls.objects.get_or_create()
+        return instance
 

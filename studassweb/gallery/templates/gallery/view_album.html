@@ -13,15 +13,8 @@
 {% block main_content %}
     <h1>{{ album.name }}</h1>
     <div class="list-group">
-        <!--<li class="list-group-item">
-            {% for photofile in images %}
-                    <a href="{{ photofile.image.url }}"><img class="img-thumbnail" src="{% thumbnail photofile.image 100x100 crop=scale %}"/></a>
-             {% endfor %}
-        </li>-->
         {% for picture in pictures %}
-            <a class="list-group-item" href="{% url 'gallery_view_picture' picture.id %}">
-                {{ picture.uploaded|date:"Y-m-d" }}
-            </a>
+            <a href="{{ picture.image.url }}"><img class="img-thumbnail" src="{% thumbnail picture.image 100x100 crop=scale %}"/></a>
         {% empty %}
             <p>{% trans "no photos in album" %}<p/>
             <form action="{% url 'gallery_delete_album' album.id %}" method="post">

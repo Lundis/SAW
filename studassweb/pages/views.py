@@ -4,10 +4,10 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from users.decorators import has_permission
 from users.permissions import has_user_perm
+from base.views import delete_confirmation_view
 from .models import InfoCategory, InfoPage, InfoPageEdit
 from .forms import InfoPageForm, InfoCategoryForm
 from .register import EDIT, VIEW_PUBLIC
-from base.views import delete_confirmation_view
 
 
 @has_permission(VIEW_PUBLIC)
@@ -23,9 +23,9 @@ def main(request):
         frontpage_pages = InfoPage.objects.filter(for_frontpage=True)
     else:
         frontpage_pages = None
-    return render(request, 'info/main.html', {'categories': categories,
-                                              'orphans': pages_without_parent,
-                                              'frontpage_pages': frontpage_pages})
+    return render(request, 'pages/main.html', {'categories': categories,
+                                               'orphans': pages_without_parent,
+                                               'frontpage_pages': frontpage_pages})
 
 
 @has_permission(VIEW_PUBLIC)
@@ -45,9 +45,9 @@ def view_page(request, slug, revision_id=None):
             current_revision = revisions.get(id=revision_id)
         except InfoPageEdit.DoesNotExist:
             raise Http404(_("The requested revision could not be found"))
-    return render(request, 'info/view_page.html', {'category': category,
-                                                   'page': page,
-                                                   'current_revision': current_revision})
+    return render(request, 'pages/view_page.html', {'category': category,
+                                                    'page': page,
+                                                    'current_revision': current_revision})
 
 
 @has_permission(EDIT)
@@ -80,9 +80,9 @@ def edit_page(request, category_id=None, page_id=None):
         new_page = form.save()
         return HttpResponseRedirect(new_page.get_absolute_url())
     else:
-        return render(request, 'info/edit_page.html', {'category': category,
-                                                       'page': page,
-                                                       'form': form})
+        return render(request, 'pages/edit_page.html', {'category': category,
+                                                        'page': page,
+                                                        'form': form})
 
 
 @has_permission(VIEW_PUBLIC)
@@ -97,7 +97,7 @@ def view_category(request, slug):
     except InfoCategory.DoesNotExist:
         raise Http404
 
-    return render(request, 'info/view_category.html', {'category': category})
+    return render(request, 'pages/view_category.html', {'category': category})
 
 
 @has_permission(EDIT)
@@ -119,8 +119,8 @@ def edit_category(request, category_id=None):
         cat = form.save()
         return HttpResponseRedirect(cat.get_absolute_url())
     else:
-        return render(request, 'info/edit_category.html', {'category': category,
-                                                           'form': form})
+        return render(request, 'pages/edit_category.html', {'category': category,
+                                                            'form': form})
 
 
 @has_permission(EDIT)

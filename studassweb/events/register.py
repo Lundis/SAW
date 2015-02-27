@@ -2,6 +2,8 @@ from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, MEMBER, BOARD_MEMBER
 
+DESCRIPTION = "Create events that people can sign up for"
+
 CAN_CREATE_EVENTS = "can_create_events"
 CAN_VIEW_SIGNUP_INFO = "can_view_signup_info"
 

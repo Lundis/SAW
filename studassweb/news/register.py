@@ -2,6 +2,10 @@ from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, MEMBER, BOARD_MEMBER
 
+
+DESCRIPTION = "Spread the news of your ventures to the public"
+
+
 VIEW_PUBLIC = "can_view_public_news"
 VIEW_MEMBER = "can_view_member_news"
 EDIT = "can_create_news"

@@ -23,10 +23,3 @@ class PictureForm(forms.ModelForm):
     class Meta:
         model = Photo
         fields = ('album_id', 'author', 'description', 'uploaded')
-
-
-class PhotoFileForm(forms.ModelForm):
-
-    class Meta:
-        model = PhotoFile
-        fields = ('image',)

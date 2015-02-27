@@ -36,7 +36,7 @@ def get_modules_with(file_name, function_name):
     return modules
 
 
-def get_attr_from_module(app, module, attribute, validator):
+def get_attr_from_module(app, module, attribute, validator=None):
     """
     :param app: A Django app
     :param module: Python module
@@ -50,7 +50,7 @@ def get_attr_from_module(app, module, attribute, validator):
     if hasattr(mod, attribute):
         # is it an actual function or just a variable?
         f = getattr(mod, attribute)
-        if validator(f):
+        if not validator or validator(f):
             return f
     # Otherwise, return None
     return None

@@ -9,8 +9,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 def view_gallery(request):
-    albums = Album.objects.filter().order_by('name')
-    pictures = Photo.objects.filter().order_by('-uploaded')
+    albums = Album.objects.order_by('name')
+    pictures = Photo.objects.order_by('-uploaded')
 
     return render(request, 'gallery/view_gallery.html', {
         'albums': albums, 'pictures': pictures},)
@@ -28,10 +28,8 @@ def view_album(request, album_id):
 def view_picture(request, photo_id):
     try:
         photo = Photo.objects.get(id=photo_id)
-        images = PhotoFile.objects.filter(photo_id = photo_id)
-
         return render(request, 'gallery/view_picture.html', {
-            'photo': photo, 'images': images},)
+            'photo': photo},)
     except Photo.DoesNotExist:
         logger.warning('could not find photo with id %s', photo_id)
         return HttpResponseNotFound('No photo with that id found')
@@ -69,7 +67,7 @@ def delete_album(request, album_id):
 
 def add_edit_picture(request, photo_id=-1):
     form = PictureForm()
-    photofile_factory = inlineformset_factory(Photo, PhotoFile, fields=('id', 'image',), extra=1, can_delete=True)
+    photofile_factory = inlineformset_factory(Album, Photo, fields=('id', 'image',), extra=1, can_delete=True)
     try:
         photo = Photo.objects.get(id=photo_id)
         form = PictureForm(instance=photo)
@@ -79,8 +77,7 @@ def add_edit_picture(request, photo_id=-1):
         photo = None
 
     if request.method == 'POST':
-        form = PictureForm(request.POST, instance=photo)
-
+        form = PictureForm(request.POST, request.FILES, instance=photo)
         fileformset = photofile_factory(request.POST, request.FILES, instance=photo, prefix='dynamix')
         if form.is_valid() and fileformset.is_valid():
             tmp_photo = form.save(commit=False)
@@ -103,7 +100,7 @@ def delete_picture(request, photo_id):
             try:
                 photo = Photo.objects.get(id=photo_id)
                 name = str(photo)
-                images = PhotoFile.objects.filter(photo_id=photo_id)
+                images = Photo.objects.filter(photo_id=photo_id)
                 images.delete()
                 photo.delete()
                 messages.success(request, "Photo "+name+" was sucessfully deleted!")

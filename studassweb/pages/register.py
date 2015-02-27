@@ -4,6 +4,8 @@ from users.groups import GUEST, MEMBER, BOARD_MEMBER
 import pages.models
 from .frontpage import InfoFrontPageItem
 
+DESCRIPTION = "Create pages with arbitrary information that can be put in menus or submenus in any way you like"
+
 
 def get_menu_items():
     """
