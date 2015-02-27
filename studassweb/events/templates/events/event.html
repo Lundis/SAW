@@ -212,12 +212,12 @@
                                 {% else %}
                                     <td>
                                 {% endif %}
-                            {% if event_item.value == "True" %}
+                            {% if event_item.get_value == True %}
                                 <span class="glyphicon glyphicon-check" aria-label="True"></span>
-                            {% elif event_item.value == "False" %}
+                            {% elif event_item.get_value == False %}
                                 <span class="glyphicon glyphicon-unchecked" aria-label="False"></span>
                             {% else %}
-                                {{ event_item.value }}
+                                {{ event_item.get_value }}
                             {% endif %}
                             </td>
                             {% endif %}

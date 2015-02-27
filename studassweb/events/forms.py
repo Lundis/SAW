@@ -150,7 +150,7 @@ class SignupItemsForm(forms.Form):
         if signup:
             selected_signup_items = ItemInSignup.objects.filter(signup=signup)
             for signup_item in selected_signup_items:
-                selected_eitems[signup_item.item.id] = signup_item.value
+                selected_eitems[signup_item.item.id] = signup_item.get_value()
 
         super(SignupItemsForm, self).__init__(*args, **kwargs)
 
