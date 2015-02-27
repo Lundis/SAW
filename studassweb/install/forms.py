@@ -2,8 +2,11 @@ from django import forms
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from base.models import SiteConfiguration, DisabledModule
-import datetime
+from base.utils import get_attr_from_module
+import django.utils.timezone as datetime
+import logging
 
+logger = logging.getLogger(__name__)
 
 # TODO for all forms: sanitize input according to the requirements / design.
 
@@ -51,6 +54,11 @@ class ModulesForm(forms.Form):
             self.fields[module] = forms.BooleanField(label=module,
                                                      initial=DisabledModule.is_enabled(module),
                                                      required=False)
+            description = get_attr_from_module(module, "register", "DESCRIPTION")
+            if description is not None:
+                self.fields[module].help_text = _(description)
+            else:
+                logger.error("DESCRIPTION missing from register.py in module %s", module)
 
     def apply(self):
         """

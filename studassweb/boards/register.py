@@ -2,6 +2,8 @@ from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, BOARD_MEMBER
 
+DESCRIPTION = "Present who is on the board, or on other committees, both this year and in the past"
+
 CAN_VIEW_BOARDS = "can_view_boards"
 CAN_EDIT_BOARDS = "can_edit_boards"
 CAN_EDIT_ROLES = "can_edit_roles"
