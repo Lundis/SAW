@@ -8,12 +8,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def view_gallery(request):
     albums = Album.objects.order_by('name')
     pictures = Photo.objects.order_by('-uploaded')
 
     return render(request, 'gallery/view_gallery.html', {
         'albums': albums, 'pictures': pictures},)
+
 
 def view_album(request, album_id):
     try:
@@ -25,6 +27,7 @@ def view_album(request, album_id):
         logger.warning('Could not find album with id %s', album_id)
         return HttpResponseNotFound('No album with that id found')
 
+
 def view_picture(request, photo_id):
     try:
         photo = Photo.objects.get(id=photo_id)
@@ -33,6 +36,7 @@ def view_picture(request, photo_id):
     except Photo.DoesNotExist:
         logger.warning('could not find photo with id %s', photo_id)
         return HttpResponseNotFound('No photo with that id found')
+
 
 def add_edit_album(request, album_id=-1):
     try:
@@ -44,11 +48,11 @@ def add_edit_album(request, album_id=-1):
     if request.method == 'POST':
         form = AlbumForm(request.POST, instance=album)
         if form.is_valid():
-            tmp = form.save(commit=False)
-            tmp.save()
-            return HttpResponseRedirect(reverse("gallery_view_album", kwargs={'album_id': tmp.id}))
+            form.save(user=request.user)
+            return HttpResponseRedirect(reverse("gallery_view_album", kwargs={'album_id': form.instance.pk}))
     context = {'form': form}
     return render(request, 'gallery/add_edit_album.html', context)
+
 
 def delete_album(request, album_id):
     if request.method == 'POST':
@@ -80,20 +84,22 @@ def add_edit_picture(request, photo_id=-1):
         form = PictureForm(request.POST, request.FILES, instance=photo)
         fileformset = photofile_factory(request.POST, request.FILES, instance=photo, prefix='dynamix')
         if form.is_valid() and fileformset.is_valid():
-            tmp_photo = form.save(commit=False)
-            tmp_photo.save()
+
+            form.save(user=request.user)
+
 
             for obj in fileformset.save(commit=False):
-                obj.photo_id = tmp_photo
+                obj.photo_id = form.instance
                 obj.save()
 
             for obj in fileformset.deleted_objects:
                 obj.delete()
 
-            return HttpResponseRedirect(reverse("gallery_view_picture", args=[tmp_photo.id]))
+            return HttpResponseRedirect(reverse("gallery_view_picture", args=[form.instance.pk]))
 
     context = {'form': form, 'filesformset': fileformset}
     return render(request, 'gallery/add_edit_photo.html', context)
+
 
 def delete_picture(request, photo_id):
         if request.method == 'POST':
@@ -110,9 +116,3 @@ def delete_picture(request, photo_id):
         else:
             logger.warning('Attempted to access delete_picture via GET')
             return HttpResponseNotAllowed(['POST', ])
-
-
-
-
-
-

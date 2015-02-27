@@ -7,13 +7,21 @@ class AlbumForm(forms.ModelForm):
 
     class Meta:
         model = Album
-        fields = ('author', 'description', 'name')
+        fields = ('description', 'name')
+
+    def save(self, user, commit=True,):
+        temp_album = super(AlbumForm, self).save(commit=False)
+        if not user.is_anonymous():
+            temp_album.user = user
+        if commit:
+            temp_album.save()
+        return temp_album
 
 
 class PictureForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(PictureForm, self).__init__(*args, **kwargs)
-        self.fields['album_id'].label_from_instance = lambda obj: "%s" % obj.name
+        self.fields['album'].label_from_instance = lambda obj: "%s" % obj.name
 
     uploaded = forms.DateTimeField(
         widget=forms.DateInput(format='%d.%m.%Y'),
@@ -22,4 +30,12 @@ class PictureForm(forms.ModelForm):
 
     class Meta:
         model = Photo
-        fields = ('album_id', 'author', 'description', 'uploaded')
+        fields = ('album', 'description', 'uploaded')
+
+    def save(self, user, commit=True,):
+        temp_photo = super(AlbumForm, self).save(commit=False)
+        if not user.is_anonymous():
+            temp_photo.user = user
+        if commit:
+            temp_photo.save()
+        return temp_photo
