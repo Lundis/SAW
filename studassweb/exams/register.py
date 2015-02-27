@@ -2,6 +2,8 @@ from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, MEMBER, BOARD_MEMBER
 
+DESCRIPTION = "Upload exams and view exams that others have uploaded"
+
 CAN_VIEW_EXAM_ARCHIVE = "can_view_exam_archive"
 CAN_UPLOAD_EXAMS = "can_upload_exams"
 CAN_EDIT_EXAMS = "can_edit_exams"
