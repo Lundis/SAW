@@ -14,6 +14,7 @@ from users import permissions
 from base.fields import ValidatedRichTextField
 from frontpage.models import FrontPageItem
 import itertools
+from django.core import exceptions
 import logging
 
 from operator import attrgetter
@@ -27,16 +28,70 @@ PERMISSION_CHOICES = (
     (eregister.CAN_VIEW_AND_JOIN_BOARD_MEMBER_EVENTS, "Board members-only event"),
 )
 
+# This is used when the user has been adding event items to an event after signups has been made
+VALUE_DOES_NOT_EXIST = "not_set"
+
+PREFIX_TO_AVOID_AUTOCAST = "hahgay"
+
 
 # This should maybe be put in base or something
 # TODO if the field is a boolean, it should return False / True
 # TODO if the field is a integer or float, it should return appropriate type!
-class MultiInputField(models.CharField):
+class MultiInputField(models.CharField, metaclass=models.SubfieldBase):
     description = "This is magic"
 
     def __init__(self, *args, **kwargs):
         super(MultiInputField, self).__init__(*args, **kwargs)
         # self.validators.append(validators.MaxLengthValidator(self.max_length))
+
+
+    #"darn! this is the only solution I was looking for. It turns out to_python() is rampant in django source code and
+    # it's called everywhere like a mess. Wtf to call the same function in form->db and db-> form? Who designed this?"
+#    def get_prep_value(self, value):
+#        if value is not None:
+#            value = PREFIX_TO_AVOID_AUTOCAST+str(value)
+#        return value
+
+    # Note to self: metaclass=models.SubfieldBase fucks shit up
+    def to_python(self, value):
+        print("to_python:")
+        print(value)
+        if value is None:
+            return None
+        if value == VALUE_DOES_NOT_EXIST:
+            #I don't know why this is getting here, seriously ><
+            return VALUE_DOES_NOT_EXIST
+        elif isinstance(value, bool):
+            return value
+        elif isinstance(value, int):
+            return value
+        #check if is subscriptable [:]
+        elif hasattr(value, "__getitem__"):
+            type = value[0:1]
+
+            if value.startswith(PREFIX_TO_AVOID_AUTOCAST):
+                value = value[len(PREFIX_TO_AVOID_AUTOCAST):]
+            if value[0:1] == EventItem.TYPE_BOOL:
+                return bool(value)
+            elif value[0:1] == EventItem.TYPE_INT:
+                return int(value)
+            elif value[0:1] == EventItem.TYPE_STR:
+                return super(MultiInputField, self).to_python(value)
+            elif value[0:1] == EventItem.TYPE_TEXT:
+                return super(MultiInputField, self).to_python(value)
+            elif value[0:1] == EventItem.TYPE_CHOICE:
+                return super(MultiInputField, self).to_python(value)
+            else:
+                print("INVALID subscriptable!")
+                print(value.__class__.__name__)
+                print(value)
+                return value
+                #raise exceptions.ValidationError("Invalid event item type, subscriptable!")
+        else:
+            print("INVALID non-subscriptable")
+            print(value)
+            raise exceptions.ValidationError("Invalid event item type, non-subscriptable!")
+
 
 
 # This is an actual event, for example a Christmas party
@@ -262,7 +317,7 @@ class EventSignup(models.Model):
         for item_in_event in missing_items:
             fake_item_in_signup = ItemInSignup()
             fake_item_in_signup.signup_id = self
-            fake_item_in_signup.value = 'not_set'
+            fake_item_in_signup.value = VALUE_DOES_NOT_EXIST
             fake_item_in_signup.item = item_in_event.item
             result.append(fake_item_in_signup)
 
@@ -328,3 +383,12 @@ class ItemInSignup(models.Model):
 
     def __str__(self):
         return str("{0} signed up with {1}: {2}".format(self.signup.name, self.item.name, self.value))
+
+    def save(self, *args, **kwargs):
+        print("IIII AAAAM SAAAAVIIIIING")
+        if not self.value is None:
+            print("DOING MAGIC")
+            self.value = str(self.item.type) + str(self.value)
+        print("saving ItemInSignup! Value is")
+        print(self.value)
+        super(ItemInSignup, self).save(*args, **kwargs)

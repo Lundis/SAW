@@ -88,7 +88,8 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
             signupitemsform.save(signup=temp_signup)
         except Exception as e:
             logger.error("Failed to save signup items!? (%s)", e)
-            temp_signup.delete()
+            # We probably don't want a signup to disappear because of a problem with the signup items?
+            # temp_signup.delete()
             return HttpResponseServerError("Failed to save signup items")
 
         # Don't send email when editing existing signup
