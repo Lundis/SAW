@@ -334,7 +334,6 @@ class ItemInSignup(models.Model):
 
     def __str__(self):
         return str("{0} signed up with {1}: {2}".format(self.signup.name, self.item.name, self.get_value()))
-        return str("{0} signed up with {1}: {2}".format(self.signup.name, self.item.name, self.get_value()))
 
     def get_value(self):
         if self.value == VALUE_DOES_NOT_EXIST:
@@ -354,9 +353,6 @@ class ItemInSignup(models.Model):
             return int(self.value)
         else:
             raise NotImplementedError()
-
-
-        return str("{0} signed up with {1}: {2}".format(self.signup.name, self.item.name, self.value))
 
 
 class EventSettings(SingletonModel):
