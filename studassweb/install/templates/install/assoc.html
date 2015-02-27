@@ -10,17 +10,14 @@
 {% endblock %}
 
 {% block content %}
-    <div class="install-content">
-
-        <form action="{% url "install.views.association" %}" method="post" class=form">
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            <a href="welcome"><button type="button" class="btn btn-primary">
-                Previous
-            </button></a>
-            <button type="submit" value="Submit" class="btn btn-primary" >
-                Next
-            </button>
-        </form>
-    </div>
+    <form action="{% url "install.views.association" %}" method="post" class=form">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <a href="{% url "install_welcome" %}"><button type="button" class="btn btn-primary">
+            {% trans "Previous" %}
+        </button></a>
+        <button type="submit" value="Submit" class="btn btn-primary" >
+            {% trans "Next" %}
+        </button>
+    </form>
 {% endblock %}
