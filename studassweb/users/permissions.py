@@ -19,21 +19,6 @@ def has_user_perm(user, perm_name):
     return sawp.has_user_perm(user)
 
 
-def add_perm_to_group(perm, group):
-    """
-    Adds a permission to a group and at the same time creates a SAWPermission if it doesn't exist.
-    :param perm: A permission string
-    :param group: Either an Actual Group object or a string
-    """
-    if isinstance(group, Group):
-        group_instance = group
-    else:
-        group_instance = Group.objects.get(name=group)
-
-    sawp = SAWPermission.get(perm)
-    group_instance.permissions.add(sawp.permission)
-
-
 def get_readable_perm(perm_codename):
     """
     Removes underscores and capitalizes the first letter of the argument and returns the result

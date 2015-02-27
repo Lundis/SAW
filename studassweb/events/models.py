@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 from django.core.mail import send_mail
 from django.conf import settings
 import django.utils.timezone as timezone
+from solo.models import SingletonModel
 import events.register as eregister
 from users import permissions
 from base.fields import ValidatedRichTextField
@@ -29,6 +30,8 @@ PERMISSION_CHOICES = (
 
 
 # This should maybe be put in base or something
+# TODO if the field is a boolean, it should return False / True
+# TODO if the field is a integer or float, it should return appropriate type!
 class MultiInputField(models.CharField):
     description = "This is magic"
 
@@ -50,12 +53,20 @@ class Event(models.Model):
     permission = models.CharField(max_length=100, choices=PERMISSION_CHOICES,
                                   default=eregister.CAN_VIEW_AND_JOIN_PUBLIC_EVENTS)
     max_participants = models.IntegerField(validators=[MinValueValidator(1)], default=50)
+    use_captcha = models.BooleanField(default=False, verbose_name="Use captcha when anonymous people sign up")
+    send_email_for_reserves = models.BooleanField(
+        default=True,
+        verbose_name="Send email when someone is moved from reserve list to attending"
+        )
 
     def __str__(self):
         return str(self.title)
 
     def get_absolute_url(self):
         return reverse("events_view_event", kwargs={'slug': self.slug})
+
+    def is_before_signup_start(self):
+        return timezone.now() < self.signup_start
 
     def is_past_signup_deadline(self):
         return timezone.now() > self.signup_deadline
@@ -112,6 +123,32 @@ class Event(models.Model):
         print(self.permission)
         return permissions.has_user_perm(user, self.permission)
 
+    def fancy_daterange(self):
+        """
+        Returns a nicer version of "startdate - enddate"
+        Example: instead of 22.2.2015 - 23.2.2015 this should return something like 22-23.2.2015
+        """
+        if self.start.year == self.stop.year:
+            if self.start.month == self.stop.month:
+                return "{0} - {1}.{2}.{3}".format(self.start.day,
+                                                  self.stop.day, self.stop.month, self.stop.year)
+            return "{0}.{1} - {2}.{3}.{4}".format(self.start.day, self.start.month,
+                                                  self.stop.day, self.stop.month, self.stop.year)
+
+        elif self.start.day == self.stop.day and self.start.month == self.stop.month:
+            return "{0}.{1}.{2} - {3}".format(self.start.day, self.start.month, self.start.year,
+                                              self.stop.year)
+
+        return "{0}.{1}.{2} - {3}.{4}.{5}".format(self.start.day, self.start.month, self.start.year,
+                                                  self.stop.day, self.stop.month, self.stop.year)
+
+    def get_summary(self):
+        if len(self.text) > 300:
+            summary = ValidatedRichTextField.get_summary(self.text, 300)
+            return "%s<p><strong>...</strong></p>" % summary
+        else:
+            return self.text
+
 
 # Each user which signs up creates one of these
 # We need both user and name as we need to allow non-signed in users to sign up
@@ -142,19 +179,20 @@ class EventSignup(models.Model):
 
     def delete(self, using=None):
         super(EventSignup, self).delete(using)
-        # Notify a user on the reserve list that they're in by email
-        # Can't allow delete() to throw an exception related to the email
-        try:
-            signups = EventSignup.objects.filter(event=self.event)
-            if self.event.max_participants <= signups.count():
-                # Get the signup that just got below the participant limit
-                reserve_signup = signups[self.event.max_participants - 1]
-                reserve_signup.send_reserve_email()
-        except Exception as e:
-            logger.error("Sending reserve email failed (%s)", e)
+        if self.event.send_email_for_reserves:
+            # Notify a user on the reserve list that they're in by email
+            # Can't allow delete() to throw an exception related to the email
+            try:
+                signups = EventSignup.objects.filter(event=self.event)
+                if self.event.max_participants <= signups.count():
+                    # Get the signup that just got below the participant limit
+                    reserve_signup = signups[self.event.max_participants - 1]
+                    reserve_signup.send_reserve_email()
+            except Exception as e:
+                logger.error("Sending reserve email failed (%s)", e)
 
-        # update indices
-        self.fix_indices()
+            # update indices
+            self.fix_indices()
 
     def send_reserve_email(self):
         context = Context({'event': self.event})
@@ -249,21 +287,26 @@ class EventItem(models.Model):
     )
 
     name = models.CharField(max_length=100)
-    required = models.BooleanField(default=False, verbose_name="Is this field mandatory")
+    required = models.BooleanField(default=False, verbose_name=_("Is this field mandatory"))
+    public = models.BooleanField(default=False,
+                                 verbose_name=_("Is this field shown to everyone?",))
+    hide_in_print_view = models.BooleanField(default=False,
+                                             verbose_name=_("Is this field hidden from the print view?",))
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=TYPE_INT,
                             verbose_name="Data type",
-                            help_text="Decides what kind of data is allowed in this field. The options are:<br />" +
-                                      "Checkbox: A simple checkbox (yes/no)<br />" +
-                                      "Text (one line): A text field with one line <br />" +
-                                      "Text (multiple lines): A larger resizeable text field that allows multiple lines<br />" +
-                                      "Integer: A number<br />" +
-                                      "Choice: A multiple-choices field. syntax for name: question//alternative1//alternative2//alternative3")
+                            help_text=_("Decides what kind of data is allowed in this field. The options are:<br />" +
+                                        "Checkbox: A simple checkbox (yes/no)<br />" +
+                                        "Text (one line): A text field with one line <br />" +
+                                        "Text (multiple lines): A larger resizeable text field that allows multiple lines<br />" +
+                                        "Integer: A number<br />" +
+                                        "Choice: A multiple-choices field. syntax for name: question//alternative1//alternative2//alternative3")
+    )
 
     def __str__(self):
         return str(self.name)
 
     def get_name(self):
-        if self.type==self.TYPE_CHOICE:
+        if self.type == self.TYPE_CHOICE:
             return str(self.name.split("//")[0])
         else:
             return str(self.name)
@@ -273,10 +316,6 @@ class EventItem(models.Model):
 class ItemInEvent(models.Model):
     event = models.ForeignKey(Event)
     item = models.ForeignKey(EventItem)
-    public = models.BooleanField(default=False,
-                                 verbose_name="Is this field shown to everyone?",)
-    hide_in_print_view = models.BooleanField(default=False,
-                                             verbose_name="Is this field hidden from the print view?",)
 
     def __str__(self):
         return str("{0} is enabled in {1}".format(self.item.name, self.event.title))
@@ -290,3 +329,13 @@ class ItemInSignup(models.Model):
 
     def __str__(self):
         return str("{0} signed up with {1}: {2}".format(self.signup.name, self.item.name, self.value))
+
+
+class EventSettings(SingletonModel):
+    is_setup = models.BooleanField(default=False)
+
+    @classmethod
+    def instance(cls):
+        instance, created = cls.objects.get_or_create()
+        return instance
+

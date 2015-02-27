@@ -1,11 +1,9 @@
-from django.core.urlresolvers import reverse_lazy
-
 from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, BOARD_MEMBER
-from settings.sections import Page, SECTION_OTHER
 
-
+DESCRIPTION = "Manage your contact details, and the contact details of any committees in your organization." + \
+              "Also lets users contact you via a form."
 
 CAN_VIEW_CONTACT_INFO = "can_view_contact_info"
 CAN_USE_CONTACT_FORM = "can_use_contact_form"

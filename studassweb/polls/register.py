@@ -2,6 +2,8 @@ from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, MEMBER, BOARD_MEMBER
 
+DESCRIPTION = "Democracy! Easily ask your members for their opinion on all kinds of matters"
+
 CAN_CREATE_POLLS = "can_create_polls"
 CAN_VIEW_PUBLIC_POLLS = "can_view_public_polls"
 CAN_VIEW_MEMBER_POLLS = "can_view_member_polls"

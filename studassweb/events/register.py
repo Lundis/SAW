@@ -2,12 +2,14 @@ from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, MEMBER, BOARD_MEMBER
 
+DESCRIPTION = "Create events that people can sign up for"
+
 CAN_CREATE_EVENTS = "can_create_events"
 CAN_VIEW_SIGNUP_INFO = "can_view_signup_info"
 
 CAN_VIEW_AND_JOIN_PUBLIC_EVENTS = "can_view_and_join_public_events"
-CAN_VIEW_AND_JOIN_MEMBER_EVENTS = "can_view_and_join_board_member_events"
-CAN_VIEW_AND_JOIN_BOARD_MEMBER_EVENTS = "can_view_and_join_board:member_events"
+CAN_VIEW_AND_JOIN_MEMBER_EVENTS = "can_view_and_join_member_events"
+CAN_VIEW_AND_JOIN_BOARD_MEMBER_EVENTS = "can_view_and_join_board_member_events"
 
 
 def get_menu_items():
@@ -39,6 +41,6 @@ def get_permissions():
         (CAN_VIEW_AND_JOIN_PUBLIC_EVENTS, GUEST, "Can view and join public events"),
         (CAN_VIEW_AND_JOIN_MEMBER_EVENTS, MEMBER, "Can view and join member events"),
         (CAN_VIEW_AND_JOIN_BOARD_MEMBER_EVENTS, BOARD_MEMBER, "Can view and join board member events"),
-        (CAN_CREATE_EVENTS, BOARD_MEMBER, "Can create events"),
+        (CAN_CREATE_EVENTS, BOARD_MEMBER, "Can create and edit events"),
         (CAN_VIEW_SIGNUP_INFO, BOARD_MEMBER, "Can view normally hidden info about signed up people"),
     )

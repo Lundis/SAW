@@ -8,7 +8,7 @@ from users.models import UserExtension
 from .models import Member, PaymentPurpose, CustomField, CustomEntry
 from .forms import MemberApplicationForm, PaymentPurposeForm, MemberEditForm
 from .register import CAN_VIEW, CAN_EDIT
-from base.forms import ConfirmationForm
+from base.views import delete_confirmation_view
 
 
 @has_permission(CAN_VIEW)
@@ -44,6 +44,19 @@ def edit_member(request, member_id=None):
                    'form': form}
         return render(request, 'members/edit_member.html', context)
 
+
+@has_permission(CAN_EDIT)
+def delete_member(request, member_id):
+    try:
+        member = Member.objects.get(id=member_id)
+    except Member.DoesNotExist:
+        raise Http404("Member with id %s not found", member_id)
+
+    return delete_confirmation_view(request,
+                                    form_url=reverse("members_delete_member", kwargs={'member_id': member_id}),
+                                    redirect_url=reverse("members_home"),
+                                    item=member,
+                                    template="members/delete_member.html")
 
 @has_permission(CAN_EDIT)
 def confirm_membership(request, member_id):
@@ -111,13 +124,10 @@ def edit_paymentpurpose(request, paymentpurpose_id):
     except PaymentPurpose.DoesNotExist:
         raise Http404
 
-    form = PaymentPurposeForm(instance=paymentpurpose)
-
-    if request.method == 'POST':
-        form = PaymentPurposeForm(request.POST, instance=paymentpurpose)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('/members')  # TODO user probably wants feedback
+    form = PaymentPurposeForm(request.POST or None, instance=paymentpurpose)
+    if form.is_valid():
+        form.save()
+        return HttpResponseRedirect('/members')  # TODO user probably wants feedback
 
     context = {'form': form}
     return render(request, 'members/edit_paymentpurpose.html', context)
@@ -130,10 +140,9 @@ def delete_paymentpurpose(request, paymentpurpose_id):
     except PaymentPurpose.DoesNotExist:
         raise Http404
 
-    form = ConfirmationForm(request.POST or None)
-    if form.is_valid():
-        paymentpurpose.delete()
-        return HttpResponseRedirect('/members')  # TODO user probably wants feedback
-    
-    context = {'form': form}
-    return render(request, 'members/delete_paymentpurpose.html', context)
+    return delete_confirmation_view(request,
+                                    form_url=reverse("members_delete_paymentpurpose"),
+                                    item=paymentpurpose,
+                                    # TODO: redirect to a page that lists all payment purposes?
+                                    redirect_url=reverse("members_home"),
+                                    template='members/delete_paymentpurpose.html')

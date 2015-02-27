@@ -19,6 +19,8 @@
                 <th>{% trans "Name" %}</th>
                 <th>{% trans "Type" %}</th>
                 <th>{% trans "Required" %}</th>
+                <th>{% trans "Public" %}</th>
+                <th>{% trans "Hidden in print view" %}</th>
                 <th>{% trans "Action" %}</th>
             </tr>
             {% for eitem in object_list %}
@@ -30,7 +32,25 @@
                         {{ eitem.get_type_display }}
                     </td>
                     <td>
-                        {{ eitem.required }}
+                        {% if eitem.required == True %}
+                            <span class="glyphicon glyphicon-check" aria-label="True"></span>
+                        {% else %}
+                            <span class="glyphicon glyphicon-unchecked" aria-label="False"></span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if eitem.public == True %}
+                            <span class="glyphicon glyphicon-check" aria-label="True"></span>
+                        {% else %}
+                            <span class="glyphicon glyphicon-unchecked" aria-label="False"></span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if eitem.hide_in_print_view == True %}
+                            <span class="glyphicon glyphicon-check" aria-label="True"></span>
+                        {% else %}
+                            <span class="glyphicon glyphicon-unchecked" aria-label="False"></span>
+                        {% endif %}
                     </td>
                     <td>
                         <a class="btn btn-primary" href="{% url "events_edit_eventitem" eitem.id %}">Edit</a>
@@ -54,13 +74,13 @@
 
 
 {% block sidebar-panel5 %}
-        {% sidebarpanel "vertical_buttons" %}
-            {% trans "Add" %}
-            {% body %}
-            <a href="{% url 'events_add_eventitem' %}" class="btn btn-primary">
+    {% sidebarpanel "vertical_buttons" %}
+        {% trans "Add" %}
+        {% body %}
+        <a href="{% url 'events_add_eventitem' %}" class="btn btn-primary">
             {% trans "Add new event item" %}
         </a>
-        {% endsidebarpanel %}
+    {% endsidebarpanel %}
 {% endblock%}
 
 {% block sidebar-panel6 %}

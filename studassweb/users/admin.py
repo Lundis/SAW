@@ -1,6 +1,4 @@
 from django.contrib import admin
-from .models import SAWPermission, UserExtension, LdapLink
+from .models import SAWPermission, UserExtension, KerberosLink, KerberosServer
 
-admin.site.register(SAWPermission)
-admin.site.register(UserExtension)
-admin.site.register(LdapLink)
+admin.site.register((SAWPermission, UserExtension, KerberosServer, KerberosLink))

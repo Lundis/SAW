@@ -22,7 +22,7 @@ ITEMS_PREFIX = "eventitems"
 
 
 def home(request):
-    events = Event.objects.all().order_by('start')
+    events = Event.objects.all().order_by('-start')
     if not permissions.has_user_perm(request.user, eregister.CAN_VIEW_AND_JOIN_PUBLIC_EVENTS):
         events = events.exclude(permission=eregister.CAN_VIEW_AND_JOIN_PUBLIC_EVENTS)
     if not permissions.has_user_perm(request.user, eregister.CAN_VIEW_AND_JOIN_MEMBER_EVENTS):
@@ -78,7 +78,7 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
         initial_user_data = {'name': request.user.get_full_name(), 'email': request.user.email}
 
     signupform = EventSignupForm(request.POST or None, initial=initial_user_data,
-                                 instance=db_event_signup, prefix=MAIN_PREFIX, event=event)
+                                 instance=db_event_signup, prefix=MAIN_PREFIX, event=event, user=request.user)
     signupitemsform = SignupItemsForm(request.POST or None, event=event,
                                       signup=db_event_signup, prefix=ITEMS_PREFIX)
 
@@ -123,9 +123,11 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
             return HttpResponseRedirect(reverse("events_view_event", kwargs={'slug': event.slug}))
 
     signups = EventSignup.objects.filter(event=event)
+    show_reserve_list = len(signups) > event.max_participants
 
     return render(request, 'events/event.html',
-                  {'event': event, 'signupform': signupform, 'signupitemsform': signupitemsform, 'signups': signups})
+                  {'event': event, 'signupform': signupform, 'signupitemsform': signupitemsform, 'signups': signups,
+                   'show_reserve_list': show_reserve_list})
 
 
 @has_permission(eregister.CAN_CREATE_EVENTS)
@@ -215,7 +217,7 @@ class DeleteEventSignupByCodeView(DeleteView):
     def get(self, request, *args, **kwargs):
         if not self.get_object():
             return HttpResponseRedirect(reverse("events_home"))
-        return super(DeleteView, self).get(request, *args, **kwargs)
+        return super(DeleteEventSignupByCodeView, self).get(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -234,7 +236,7 @@ class DeleteEventSignupByCodeView(DeleteView):
 
 class AddEventItemView(CreateView):
     model = EventItem
-    fields = ['name', 'type', 'required']
+    fields = ['name', 'type', 'required', 'public', 'hide_in_print_view']
     success_url = reverse_lazy("events_list_eventitems")
 
     def dispatch(self, request, *args, **kwargs):
@@ -251,7 +253,7 @@ class AddEventItemView(CreateView):
 
 class EditEventItemView(UpdateView):
     model = EventItem
-    fields = ['name', 'type', 'required']
+    fields = ['name', 'type', 'required', 'public', 'hide_in_print_view']
     success_url = reverse_lazy("events_list_eventitems")
 
     def dispatch(self, request, *args, **kwargs):

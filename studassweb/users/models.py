@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User, Permission, ContentType, Group
+from django.dispatch import receiver
+from django.db.models.signals import post_delete
 from solo.models import SingletonModel
 from base.models import DisabledModule
 from importlib import import_module
@@ -18,6 +20,7 @@ class UserExtension(models.Model):
     link_to_homepage = models.URLField(blank=True, default="")
     email_verified = models.BooleanField(default=False)
     email_verification_code = models.CharField(max_length=32, unique=True)
+    incomplete = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username
@@ -30,6 +33,7 @@ class UserExtension(models.Model):
         user = User.objects.create_user(username, email, password)
         user.first_name = first_name
         user.last_name = last_name
+        users.groups.put_user_in_standard_group(user, users.groups.LOGGED_ON)
         user.save()
         return cls.create_for_user(user)
 
@@ -68,20 +72,46 @@ class UserExtension(models.Model):
         return users.groups.get_user_group(self.user),
 
 
-class LdapLink(models.Model):
-    user = models.ForeignKey(User)
-    hostname = models.CharField(max_length=200)
-    username = models.CharField(max_length=50)
+@receiver(post_delete, sender=UserExtension, dispatch_uid="UserExtension_post_delete")
+def page_post_delete(**kwargs):
+    instance = kwargs.pop("instance")
+    # Also remove the User
+    instance.user.delete()
+
+
+class KerberosServer(models.Model):
+    """
+    Contains details about a Kerberos Server
+    """
+    hostname = models.CharField(max_length=255, unique=True,
+                                help_text="Example: domain.com, as in user@domain.com")
+    realm = models.CharField(max_length=255, help_text="Example: srv.domain.com")
+    service = models.CharField(max_length=255, help_text="Example: krbtgt@srv.domain.com")
 
     def __str__(self):
-        return self.user.username + ": " + self.username + "@" + self.hostname
+        return self.hostname
+
+
+class KerberosLink(models.Model):
+    """
+    Links a user account to a Kerberos server
+    """
+    user = models.ForeignKey(UserExtension)
+    server = models.ForeignKey(KerberosServer)
+    username = models.CharField(max_length=50)
+
+    class Meta:
+        unique_together = ("server", "username")
+
+    def __str__(self):
+        return self.user.username + ": " + self.username + "@" + self.server.hostname
 
 
 class SAWPermission(models.Model):
     """
     This model wraps Django's built-in Permission object, providing a description.
     """
-    permission = models.ForeignKey(Permission, primary_key=True)
+    permission = models.ForeignKey(Permission, unique=True)
     description = models.CharField(max_length=200)
     default_group = models.ForeignKey(Group, null=True, default=None)
     module = models.CharField(max_length=100)
@@ -138,6 +168,16 @@ class SAWPermission(models.Model):
         logger.debug("\"%s\" is guest permission? %s" % (self.permission.codename, is_guest_permission))
         return user.is_superuser or is_guest_permission or \
                user.has_perm(self.permission.content_type.app_label + "." + self.permission.codename)
+
+    def standard_group(self):
+        """
+        :return: The name of the standard group this permission is in. None if it's not in any.
+        """
+        return users.groups.get_standard_group_of_perm(self.permission)
+
+    def reset_to_default_group(self):
+        if self.standard_group() != self.default_group.name:
+            users.groups.put_perm_in_standard_group(self, self.default_group)
 
 
 class DummyPermissionBase(SingletonModel):

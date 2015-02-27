@@ -12,14 +12,15 @@
 
 
 {% block content %}
+    <p>{% trans "Set up your main menu, and the menu that will be shown when clicking on your name after logging in" %}.
+        {% trans "Drag and drop the menu items to the menu you want them in, in the order that you want them" %}.</p>
     {% setvar form.rendered_menu_editors as menu_items %}
-    <div class="install-content">
-        <div class="panel panel-primary">
-            <div class="panel-heading">{% trans "Main Menu" %}!</div>
-            <div class="panel-body">
-                {{ menu_items.main_menu }}
-            </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">{% trans "Main Menu" %}!</div>
+        <div class="panel-body">
+            {{ menu_items.main_menu }}
         </div>
+    </div>
 
 
     <div class="panel panel-primary">
@@ -33,14 +34,14 @@
 
     <div class="panel panel-primary">
         <div class="panel-heading">
-            {% trans "Available menu items. Click or drag them above to add them to the menu." %}
+            {% trans "Unused menu items. Drag items here to hide them." %}
         </div>
         <div class="panel-body">
             {{ form.render_available_items }}
         </div>
     </div>
 
-    <form id="{{ form.get_form_id }}" action="{% url "install.views.menu" %}" method="post" class=form" onsubmit="{{ form.get_submit_js }}">
+    <form id="{{ form.get_form_id }}" action="{% url "install.views.menu" %}" method="post" onsubmit="{{ form.get_submit_js }}">
         {% csrf_token %}
         {{ form.render_javascript }}
 
@@ -53,12 +54,11 @@
             {% trans "Next" %}
         </button>
     </form>
-    </div>
 {% endblock %}
 
 
 {% block scripts %}
-    <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+    <script src="{% static "js/jquery-ui.min.js" %}"></script>
     <script>
         $(function() {
             $( ".menu-item-container" ).sortable({

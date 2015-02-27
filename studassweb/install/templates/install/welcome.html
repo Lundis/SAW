@@ -10,25 +10,24 @@
 {% endblock %}
 
 {% block content %}
-    <div class="install-content">
+        <h3>{% trans 'Welcome to the StudAssWeb Installation Wizard' %}!</h3>
+
     {% if form %}
-        <p>Please log on to use this feature.</p>
-        <form action="{% url "install.views.welcome" %}" method="post" class=form">
+        <p>{% trans "Please log in to use this feature" %}.</p>
+        <form action="{% url "install.views.welcome" %}" method="post">
             {% csrf_token %}
             {% bootstrap_form form %}
             {% buttons %}
                 <button type="submit" class="btn btn-primary">
-                    Login
+                    {% trans "Login" %}
                 </button>
             {% endbuttons %}
         </form>
     {% else %}
-        <h2>{% trans 'Welcome to the StudAssWeb Installation Wizard' %}!</h2>
         <a href="{% url "install.views.association" %}">
             <button type="button" class="btn btn-primary" >
-                {% trans 'Get Started' %}
+                {% trans 'Click here to get started' %}
             </button>
         </a>
     {% endif %}
-    </div>
 {% endblock %}

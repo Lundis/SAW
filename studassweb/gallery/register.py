@@ -8,6 +8,8 @@ CAN_CREATE_ALBUMS = "can_create_albums"
 CAN_EDIT_MEMBER_ALBUMS = "can_edit_member_albums"
 CAN_EDIT_ALL_ALBUMS = "can_edit_all_albums"
 
+DESCRIPTION = "A simple image gallery. Create albums, upload images to them and select who should be able to view them"
+
 
 def get_menu_items():
     """

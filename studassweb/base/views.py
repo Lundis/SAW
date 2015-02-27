@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from .forms import ConfirmationForm
+from .forms import DummyForm
 
 
-def delete_confirmation_view(request, item, form_url, redirect_url):
-    form = ConfirmationForm(request.POST or None)
+def delete_confirmation_view(request, item, form_url, redirect_url,
+                             template="base/delete_confirmation.html"):
+    form = DummyForm(request.POST or None)
     item_name = str(item)
     if form.is_valid():
         item.delete()
@@ -16,4 +17,4 @@ def delete_confirmation_view(request, item, form_url, redirect_url):
                'item': item,
                'form_url': form_url,
                'item_name': item_name}
-    return render(request, "base/delete_confirmation.html", context)
+    return render(request, template, context)

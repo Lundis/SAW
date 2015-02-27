@@ -3,6 +3,8 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User, Group
 from .models import UserExtension
+from base.forms import SortingForm
+from .groups import put_perm_in_standard_group
 from captcha.fields import ReCaptchaField
 import logging
 
@@ -76,9 +78,27 @@ class RegisterForm(forms.Form):
 
 class UserBaseForm(forms.ModelForm):
 
+    def __init__(self, *args, **kwargs):
+        super(UserBaseForm, self).__init__(*args, **kwargs)
+        self.fields['first_name'].required = True
+        self.fields['last_name'].required = True
+
     class Meta():
         model = User
-        fields = ('email',)
+        fields = ('first_name', 'last_name', 'email',)
+
+    def save(self, commit=True):
+        """
+        Mark the user as complete
+        :param commit:
+        :return:
+        """
+        user = super(UserBaseForm, self).save(commit=commit)
+        user_ext = UserExtension.objects.get(user=user)
+        user_ext.incomplete = False
+        if commit:
+            user_ext.save()
+        return user
 
 
 class ProfileForm(forms.ModelForm):
@@ -91,3 +111,12 @@ class CustomGroupForm(forms.ModelForm):
     class Meta():
         model = Group
         fields = ("name",)
+
+
+class PermissionEditorForm(SortingForm):
+
+    def save(self):
+        for group, sawps_and_ids in self.cleaned_items().values():
+            for sawp_and_id in sawps_and_ids:
+                sawp = sawp_and_id['item']
+                put_perm_in_standard_group(sawp, group)

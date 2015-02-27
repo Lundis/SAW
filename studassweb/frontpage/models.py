@@ -3,7 +3,8 @@ from django.core.validators import MinValueValidator
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.dispatch import receiver
-from django.db.models.signals import pre_delete, post_delete, post_save
+from django.db.models.signals import pre_delete, post_delete, post_save, pre_save
+
 
 class FrontPageItem(models.Model):
     identifier = models.CharField(max_length=100)
@@ -36,29 +37,6 @@ class FrontPageItem(models.Model):
     def __str__(self):
         return self.identifier
 
-    def save(self, *args, **kwargs):
-        """
-        Try
-        :param args:
-        :param kwargs:
-        :return:
-        """
-        if not self.pk:
-            # Put it last
-            self.ordering_index = self._count_in_location() + 1
-        else:
-            try:
-                # Get the object currently at the wanted position:
-                other = FrontPageItem.objects.get(location=self.location,
-                                                  ordering_index=self.ordering_index)
-                # and move it forward
-                if self.pk != other.pk:
-                    other.ordering_index += 1
-                    other.save()
-            except FrontPageItem.DoesNotExist:
-                pass
-        super(FrontPageItem, self).save(*args, **kwargs)
-
     def _fix_indices(self):
         pages = FrontPageItem.objects.filter(location=self.location)
         i = 1
@@ -87,6 +65,25 @@ class FrontPageItem(models.Model):
         except cls.DoesNotExist:
             return None
 
+
+@receiver(pre_save, sender=FrontPageItem, dispatch_uid="frontpage_item_pre_save")
+def frontpage_item_pre_save(**kwargs):
+    instance = kwargs.pop("instance")
+
+    if not instance.ordering_index:
+        # Put it last
+        instance.ordering_index = instance._count_in_location() + 1
+    else:
+        try:
+            # Get the object currently at the wanted position:
+            other = FrontPageItem.objects.get(location=instance.location,
+                                              ordering_index=instance.ordering_index)
+            # and move it forward
+            if instance.pk != other.pk:
+                other.ordering_index += 1
+                other.save()
+        except FrontPageItem.DoesNotExist:
+            pass
 
 @receiver(post_save, sender=FrontPageItem, dispatch_uid="frontpage_item_post_save")
 def frontpage_item_post_save(**kwargs):

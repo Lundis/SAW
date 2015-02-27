@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load bootstrap3 %}
 {% load static %}
+{% load sidemenu %}
 
 
 {% block breadcrumb2 %}
@@ -20,17 +21,6 @@
         <h1>Edit {{ form.instance.name }}</h1>
     {% else %}
         <h1>Add exam</h1>
-    {% endif %}
-
-    {% if form.instance.pk %}
-        <form action="{% url 'exams_delete_exam' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
-            {% csrf_token %}
-            {% buttons %}
-                <button type="submit" class="btn btn-danger">
-                    {% trans "Remove this exam" %}
-                </button>
-            {% endbuttons %}
-        </form>
     {% endif %}
 
     <form id="addEditExamForm" action="" method="post" enctype="multipart/form-data" >
@@ -53,6 +43,25 @@
         {% endbuttons %}
     </form>
 {% endblock %}
+
+{% block sidebar-panel4 %}
+    {% if form.instance.pk %}
+        {% sidebarpanel "vertical_buttons" %}
+            {% trans "Delete" %}
+            {% body %}
+
+            <form action="{% url 'exams_delete_exam' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
+                {% csrf_token %}
+                {% buttons %}
+                    <button type="submit" class="btn btn-danger btn-block">
+                        {% trans "Remove this exam" %}
+                    </button>
+                {% endbuttons %}
+            </form>
+
+        {% endsidebarpanel %}
+    {% endif %}
+{% endblock%}
 
 {% block scripts %}
     <script src="{% static "js/base/jquery.formset.js" %}"></script>

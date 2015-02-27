@@ -7,8 +7,11 @@ from .fields import HiddenModelField
 import re
 
 
-class ConfirmationForm(forms.Form):
-    confirmation_box = forms.BooleanField(widget=forms.CheckboxInput, required=True)
+class DummyForm(forms.Form):
+    """
+    A form for when you only need to check the CSRF token
+    """
+    pass
 
 
 class BootswatchThemeSelectForm(forms.Form):
@@ -23,7 +26,7 @@ class BootswatchThemeSelectForm(forms.Form):
             raise ValidationError("No theme was specified")
         theme_name = self.cleaned_data['theme']
         try:
-            theme = BootswatchTheme.objects.get(name=theme_name)
+            BootswatchTheme.objects.get(name=theme_name)
         except BootswatchTheme.DoesNotExist:
             raise ValidationError("Theme " + theme_name + " does not exist")
 
@@ -72,47 +75,91 @@ class SortingForm(forms.Form):
     """
     A form that parses hidden items from a sorting page (such as the menu editor).
     """
-    def __init__(self, *args, container_model=None, child_model=None, containers=None, initial_items=None, available_items=None, **kwargs):
+    def __init__(self, *args, container_model=None, child_model=None,
+                 containers=None, initial_items=None, available_items=None, all_items=None, **kwargs):
         """
         :param args: request.POST or None
-        :param model: The model representing the items being sorted
-        :param categories: a list of category identifiers
-        :param initial_items: a dict of items that will be rendered inside each container
-        :param available_items: the items that will be rendered as not belonging to any specific container
+        :param container_model: The model representing the container (Such as Menu, Group)
+        :param child_model: The model representing the items being sorted (Such as MenuItem, SAWPermission)
+        :param containers: a dict of container identifiers (strings key)
+                           and actual container objects (container_model)
+        :param initial_items: a dict of an item sequence {"container_string": (item1, item2, ...)}
+                              that will be
+        :param available_items: an iterable of the items that will be rendered as not belonging to any specific container
         :return:
         """
+        if len(args) > 0:
+            post_items = args[0]
+        else:
+            post_items = None
         self.containers = containers
         self.container_model = container_model
         self.child_model = child_model
-        self.default_items = initial_items
-        self.available_items = available_items
+        if initial_items is None:
+            self.items = {}
+        else:
+            self.items = initial_items
+        self._available_items = available_items
+        self.all_items = all_items
         self._verify_arguments()
+        if initial_items is not None:
+            self._add_indices()
         super(SortingForm, self).__init__(*args, **kwargs)
         # the first argument is the post data
-        if len(args) > 0 and args[0]:
-            self.add_fields(args[0])
+        if post_items is not None:
+            # Use post data to populate items if it's provided
+            self._interpret_post_data(args[0])
+
+    def _add_indices(self):
+        """
+        User-supplied data won't have indices, so we add them
+        :return:
+        """
+        for container, items in self.items.items():
+            wrapped_items = ()
+            index = 0
+            for item in items:
+                wrapped_items += (item, index),
+                index += 1
+            self.items[container] = wrapped_items
 
     def _verify_arguments(self):
         """
-        Verifies that the menus keyword argument was correct.
+        Verifies that the menus keyword argument was correct. Since this form is so complicated, I do this to
+        make using/debugging it easier in the future.
         :return:
         """
-        if self.model is None:
-            raise ValueError("required keyword argument 'model' is missing")
-        if self.categories is None:
-            raise ValueError("required keyword argument 'categories' is missing")
-        menus_type = type(self.menus)
-        if self.default_items:
-            if not isinstance(self.default_items, dict):
-                raise ValueError("initial_items must be a dictionary")
-        # TODO: verify that all the default items are of the correct type
-        if not menus_type is dict:
-            raise ValueError("keyword argument 'containers' must be a dictionary")
-        for c in self.containers:
-            if not isinstance(c, self.model):
-                raise ValueError("%s in containers is not a %s" % (str(c), str(self.model)))
+        if self.container_model is None:
+            raise ValueError("required keyword argument 'container_model' is missing")
+        if self.child_model is None:
+            raise ValueError("required keyword argument 'child_model' is missing")
+        # Check that the container exists and contains the correct model
+        if self.containers is None:
+            raise ValueError("required keyword argument 'containers' is missing")
+        if type(self.containers) != dict:
+            raise ValueError("container must be a dictionary ({'container_name': container_object})")
+        for c in self.containers.values():
+            if not isinstance(c, self.container_model):
+                raise ValueError("%s in containers is not a %s" % (str(c), str(self.container_model)))
 
-    def add_fields(self, post_data):
+        if not isinstance(self.items, dict):
+            raise ValueError("initial_items must be a dictionary")
+        # check that self.items contain lists for all containers
+        for c in self.containers:
+            if c not in self.items:
+                # if not, create it
+                self.items[c] = ()
+        # check that all items are in a valid container and that they are indeed objects of class child_model
+        for key, items_in_container in self.items.items():
+            if key not in self.containers.keys():
+                raise ValueError("key '%s' is not in containers" % key)
+            for item in items_in_container:
+                if not isinstance(item, self.child_model):
+                    raise ValueError("item {0} in container {1} is not a {3}" % (str(item), key, self.child_model))
+
+        # TODO: verify that all items are in self.all_items
+
+    def _interpret_post_data(self, post_data):
         """
         Adds user-submitted data to self.fields
         :param post_data: a bunch of <container>-item-<id>=<index>
@@ -122,29 +169,70 @@ class SortingForm(forms.Form):
         container_regex = '|'.join(container_strings)
         for name, index in post_data.items():
             matches = re.match(r"^(" + container_regex + ")-item-(\d+)$", name)
-            # if it's a match and it isn't a duplicate
+            # If it's a relevant entry (there are also stuff like csrf-tokens)
+            # and it isn't a duplicate
             if matches and name not in self.fields.keys():
+                # Add the field
                 self.fields[name] = HiddenModelField(name=name, model=self.child_model, initial=index, required=True)
+        self._update_available_items()
+
+    def _update_available_items(self):
+        """
+        Puts all items that aren't in any container in self.items into self.available_items
+        :return:
+        """
+        # clear available items
+        self._available_items = ()
+        # Then add any item not in any of the containers to it
+        for item in self.all_items:
+            if not self._is_item_in_items(item):
+                self._available_items += item,
+
+    def _is_item_in_items(self, item):
+        for items_and_indices in self.items.values():
+            if item in (item_and_index[0] for item_and_index in items_and_indices):
+                return True
+        return False
 
     def clean(self):
         # Super cleans the individual fields using HiddenModelField's validation
         super(SortingForm, self).clean()
-        # We organize the resulting data
+        # We organize the resulting data into self.items
         containers_strings = self.containers.keys()
-        for container_str in containers_strings:
-            # Create an empty list for each container
-            self.cleaned_data[container_str + '_items'] = []
-
         container_regex = '|'.join(containers_strings)
+        # Clear all containers in items
+        for c in self.items:
+            self.items[c] = ()
+        # for all post data that matches the valid format
+        used_ids = ()
+        used_indices = {}
+        for c in self.containers:
+            used_indices[c] = ()
+
         for name, value in self.cleaned_data.items():
             matches = re.match(r"^(" + container_regex + ")-item-(\d+)$", name)
-            # if it matches the container
             if matches:
+                # Add it to the correct item container
+                container = matches.group(1)
+                id = matches.group(2)
+                index = value
+                # Check for duplicates/tampering
+                if id in used_ids:
+                    self.add_error(None, "id %s appeared twice!" % id)
+                    continue
+                if index in used_indices[container]:
+                    self.add_error(None, "index %s appeared twice in %s!" % (id, container))
+                    continue
                 # Add a tuple (item_id, index) to the container list
-                self.cleaned_data[matches.group(1) + '_items'].append((int(matches.group(2)), value,))
+                item = self.child_model.objects.get(id=id)
+                self.items[container] += (item, index),
+                used_ids += id,
+                used_indices[container] += index,
+        self._update_available_items()
 
     def save(self):
-        raise NotImplementedError("You need to subclass save()!")
+        raise NotImplementedError("You need to subclass to use save()." +
+                                  "Alternatively just read form.items and save it accordingly!")
 
     def render_javascript(self):
         """
@@ -158,46 +246,45 @@ class SortingForm(forms.Form):
         result = template.render(Context(context))
         return result
 
-    def rendered_menu_editors(self):
+    def cleaned_items(self):
         """
-        return a dictionary of rendered containers
+        Returns a dictionary:
+            {'container_name': Group,
+                               ({'item': item,
+                                 'id': html_id},
+                                ...,
+                               )
+             ...
+            }
         :return:
         """
-        menu_html = {}
-        for menu_name, menu in self.menus.items():
-            if self.default_items:
-                items = self.default_items[menu_name]
-            else:
-                items = menu.items()
-            menu_html[menu_name] = self._render_menu(menu_name, items)
-        return menu_html
+        items = {}
+        for c in self.containers:
+            items_in_container = ()
+            for item in self.items[c]:
+                items_in_container += {'item': item[0],
+                                       'id': "item-" + str(item[0].id)},
+            items[c] = self.containers[c], items_in_container
+        return items
+
+    def available_items(self):
+        """
+        renders the available items (those that aren't in any category) in the form
+        ( {'item': item, 'id': html-id}, ... )
+        :return:
+        """
+        items = self._available_items
+        list_of_items = ()
+        for item in items:
+            list_of_items += {'item': item,
+                              'id': "item-" + str(item.id)},
+        return list_of_items
 
     @staticmethod
-    def _render_menu(menu_name, menu_items):
-        """
-        renders the menu items of a menu
-        :param menu_name:
-        :param menu_items:
-        :return:
-        """
-
-        template = get_template("menu/menu_editor.html")
-        context = Context({'menu_name': menu_name,
-                           'items': menu_items})
-        result = template.render(context)
-        return result
-
-    def render_available_items(self):
-        """
-        renders the available menu items
-        :return:
-        """
-        items = self.available_items
-        return self._render_menu("available", items)
-
-    def get_form_id(self):
-        return "%s-editor-form" % self.model
+    def get_form_id():
+        return "sorting-form"
 
     @staticmethod
     def get_submit_js():
         return "updateSortingFields();"
+

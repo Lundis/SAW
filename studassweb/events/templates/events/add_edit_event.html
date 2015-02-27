@@ -70,7 +70,7 @@
             <form action="{% url 'events_delete_event' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
                 {% csrf_token %}
                 {% buttons %}
-                    <button type="submit" class="btn btn-danger">
+                    <button type="submit" class="btn btn-danger btn-block">
                         {% trans "Remove this event" %}
                     </button>
                 {% endbuttons %}

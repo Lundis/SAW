@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+import exams.register as eregister
+from users import permissions
 
 
 class Course(models.Model):
@@ -14,7 +16,10 @@ class Course(models.Model):
         return reverse("exams.views.view_course", kwargs={'course_id': self.id})
 
     def get_exam_count(self):
-        return str(SingleExam.objects.filter(course_id=self.id).count())
+        return str(Exam.objects.filter(course_id=self.id).count())
+
+    def user_can_edit(self, user):
+        return permissions.has_user_perm(user, eregister.CAN_EDIT_EXAMS) or self.created_by == user
 
 
 class Examinator(models.Model):
@@ -28,12 +33,16 @@ class Examinator(models.Model):
         return reverse("exams.views.view_examinator", kwargs={'examinator_id': self.id})
 
     def get_exam_count(self):
-        return str(SingleExam.objects.filter(examinator=self.id).count())
+        return str(Exam.objects.filter(examinator=self.id).count())
+
+    def user_can_edit(self, user):
+        return permissions.has_user_perm(user, eregister.CAN_EDIT_EXAMS) or self.created_by == user
 
 
-class SingleExam(models.Model):
+class Exam(models.Model):
     course_id = models.ForeignKey(Course, on_delete=models.PROTECT)
     ocr = models.TextField(blank=True)
+    description = models.TextField(blank=True)
     exam_date = models.DateTimeField()
     examinator = models.ForeignKey(Examinator, on_delete=models.PROTECT, null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
@@ -51,10 +60,13 @@ class SingleExam(models.Model):
         else:
             return Examinator(name="Unknown examinator")
 
+    def user_can_edit(self, user):
+        return permissions.has_user_perm(user, eregister.CAN_UPLOAD_EXAMS)
+
 
 class ExamFile(models.Model):
     image = models.ImageField(upload_to='exams_files')
-    exam_id = models.ForeignKey(SingleExam)
+    exam_id = models.ForeignKey(Exam)
 
     def __str__(self):
         return self.image.name

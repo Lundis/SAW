@@ -36,7 +36,7 @@ def get_modules_with(file_name, function_name):
     return modules
 
 
-def get_attr_from_module(app, module, attribute, validator):
+def get_attr_from_module(app, module, attribute, validator=None):
     """
     :param app: A Django app
     :param module: Python module
@@ -50,7 +50,7 @@ def get_attr_from_module(app, module, attribute, validator):
     if hasattr(mod, attribute):
         # is it an actual function or just a variable?
         f = getattr(mod, attribute)
-        if validator(f):
+        if not validator or validator(f):
             return f
     # Otherwise, return None
     return None
@@ -68,9 +68,18 @@ def get_all_modules():
     return [mod for mod, f in get_modules_with(None, None)]
 
 
+def generate_random_sentence(alphabet, length):
+    seq = ""
+    for i in range(length):
+        seq += alphabet[random.randint(0, len(alphabet)-1)]
+    return seq
+
+
 def generate_email_ver_code():
-        code = ""
-        alphabet = "qwertyuiopasdfghjklzxcvbnm1234567890"
-        for i in range(32):
-            code += alphabet[random.randint(0, len(alphabet)-1)]
-        return code
+    alphabet = "qwertyuiopasdfghjklzxcvbnm1234567890"
+    return generate_random_sentence(alphabet, 32)
+
+
+def generate_random_password():
+    alphabet = "qwertyuiopasdfghjklzxcvbnm1234567890!#¤%&/()=?`¨',.-;:_><|@£$€{[]}\\\W"
+    return generate_random_sentence(alphabet, 15)

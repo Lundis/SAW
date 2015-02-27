@@ -3,18 +3,20 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.template.defaultfilters import slugify
+from django.dispatch import receiver
+from django.db.models.signals import pre_delete, post_delete, post_save
+from solo.models import SingletonModel
 from base.fields import ValidatedRichTextField
 from menu.models import MenuItem, Menu
 from users.permissions import has_user_perm
 from frontpage.models import FrontPageItem
-from django.dispatch import receiver
-from django.db.models.signals import pre_delete, post_delete, post_save
 import pages.register as pregister
 
+
 PERMISSION_CHOICES = (
-    ("VIEW_PUBLIC", pregister.VIEW_PUBLIC),
-    ("VIEW_MEMBER", pregister.VIEW_MEMBER),
-    ("VIEW_BOARD", pregister.VIEW_BOARD),
+    (pregister.VIEW_PUBLIC, "Visible for everyone"),
+    (pregister.VIEW_MEMBER, "Visible for members"),
+    (pregister.VIEW_BOARD, "Visible for board members"),
 )
 
 
@@ -24,7 +26,7 @@ class InfoCategory(models.Model):
     # an info category has an associated menu item, which in turn has a submenu
     menu_item = models.ForeignKey(MenuItem, null=True, on_delete=models.SET_NULL)
 
-    permission = models.CharField(max_length=15, choices=PERMISSION_CHOICES, default="VIEW_PUBLIC")
+    permission = models.CharField(max_length=100, choices=PERMISSION_CHOICES, default="VIEW_PUBLIC")
 
     def __str__(self):
         return self.name
@@ -53,14 +55,11 @@ class InfoCategory(models.Model):
             info_menu.add_item(self.menu_item)
 
     def can_view(self, user):
-        return has_user_perm(user, self.get_permission_str())
+        return has_user_perm(user, self.permission)
 
     @staticmethod
     def can_edit(user):
         return has_user_perm(user, pregister.EDIT)
-
-    def get_permission_str(self):
-        return dict(PERMISSION_CHOICES)[self.permission]
 
     def slugify(self, attempt=None):
         slug = slugify(self.name)
@@ -111,14 +110,11 @@ class InfoPage(models.Model):
         super(InfoPage, self).save(*args, **kwargs)
 
     def can_view(self, user):
-        return has_user_perm(user, self.get_permission_str())
+        return has_user_perm(user, self.permission)
 
     @staticmethod
     def can_edit(user):
         return has_user_perm(user, pregister.EDIT)
-
-    def get_permission_str(self):
-        return dict(PERMISSION_CHOICES)[self.permission]
 
     def revisions(self):
         return InfoPageEdit.objects.filter(page=self)
@@ -189,7 +185,7 @@ def page_post_save(**kwargs):
                                                 app_name=__package__,
                                                 display_name=instance.title,
                                                 linked_object=instance,
-                                                permission=instance.get_permission_str())
+                                                permission=instance.permission)
     if instance.category:
         menu = instance.category.menu_item.submenu
         if not menu.contains(menu_item):
@@ -214,3 +210,12 @@ class InfoPageEdit(models.Model):
     def get_absolute_url(self):
         return reverse("pages_view_page", kwargs={'slug': self.page.slug,
                                                   'revision_id': self.id})
+
+
+class PagesSettings(SingletonModel):
+    is_setup = models.BooleanField(default=False)
+
+    @classmethod
+    def instance(cls):
+        instance, created = cls.objects.get_or_create()
+        return instance

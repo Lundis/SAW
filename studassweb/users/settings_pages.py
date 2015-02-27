@@ -1,19 +1,25 @@
 from django.conf.urls import patterns, url
 from django.contrib.auth.models import Group
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, Http404, HttpResponseNotAllowed
 from django.core.urlresolvers import reverse
-from .decorators import has_permission
-from .groups import group_names, get_permissions_in_group
-from .register import EDIT_LOGIN_SETTINGS, EDIT_PROFILE, EDIT_PERMISSIONS
-from .forms import UserBaseForm, ProfileForm, CustomGroupForm
-from .models import UserExtension, SAWPermission
 from settings.sections import SECTION_PERSONAL_SETTINGS, SECTION_USERS, Section
+from base.forms import DummyForm
+from .decorators import has_permission
+from .groups import group_names
+from .register import EDIT_LOGIN_SETTINGS, EDIT_PROFILE, EDIT_PERMISSIONS
+from .forms import UserBaseForm, ProfileForm, CustomGroupForm, PermissionEditorForm
+from .models import UserExtension, SAWPermission
+
 
 urlpatterns = patterns('',
     url(r'^%s/permissions/$' % SECTION_USERS,
         'users.settings_pages.edit_permissions',
         name='users_settings_edit_permissions'),
+
+    url(r'^%s/permissions/reset' % SECTION_USERS,
+        'users.settings_pages.reset_permissions',
+        name='users_settings_reset_permissions'),
 
     url(r'^%s/groups/$' % SECTION_USERS,
         'users.settings_pages.edit_groups',
@@ -53,15 +59,51 @@ def edit_permissions(request):
     """
     section = Section.get_section(SECTION_USERS)
     groups = Group.objects.filter(name__in=group_names)
-    group_list = []
+    group_dict = {}
+    initial_items = {}
+    orphans = {}
     for group in groups:
-        group_list += [{'name': group,
-                        'permissions': get_permissions_in_group(group)}]
-    # TODO: mega permission form
+        group_dict[group.name] = group
+        initial_items[group.name] = ()
+
+    sawps = SAWPermission.objects.all()
+    # Add each permission to its group
+    for sawp in sawps:
+        g = sawp.standard_group()
+        if g is None:
+            orphans += sawp,
+        else:
+            initial_items[g] += sawp,
+
+    form = PermissionEditorForm(request.POST or None,
+                                container_model=Group,
+                                child_model=SAWPermission,
+                                initial_items=initial_items,
+                                available_items=orphans,
+                                containers=group_dict,
+                                all_items=sawps)
+    if form.is_valid():
+        form.save()
+        return HttpResponseRedirect(reverse("users_settings_edit_permissions"))
+
     context = {'section': section,
-               'groups': group_list,
-               'modules': get_modules_with_permissions()}
-    return render(request, "users/settings/permission_settings.html", context)
+               'groups': groups,
+               'modules': get_modules_with_permissions(),
+               'form': form}
+    return render(request, "users/settings/permission_editor.html", context)
+
+
+@has_permission(EDIT_PERMISSIONS)
+def reset_permissions(request):
+    if request.POST is not None:
+        csrf_form = DummyForm(request.POST)
+        if csrf_form.is_valid():
+            sawps = SAWPermission.objects.all()
+            for sawp in sawps:
+                sawp.reset_to_default_group()
+            return HttpResponseRedirect(reverse("users_settings_edit_permissions"))
+    else:
+        return HttpResponseNotAllowed(['POST'])
 
 
 @has_permission(EDIT_PERMISSIONS)

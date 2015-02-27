@@ -1,5 +1,7 @@
 {% extends 'base/base.html' %}
 {% load i18n %}
+{% load sawp %}
+{% load sidemenu %}
 
 {% block title %}
     {% trans "Exams" %}
@@ -13,3 +15,23 @@
 {% block breadcrumb1 %}
     <li><a href="{% url "exams_main" %}">{% trans "Exams" %}</a></li>
 {% endblock %}
+
+
+{% block sidebar-panel5 %}
+    {% has_perm "exams" "CAN_UPLOAD_EXAMS" as can_upload_exams %}
+    {% if can_upload_exams%}
+        {% sidebarpanel "vertical_buttons" %}
+            {% trans "Add" %}
+            {% body %}
+            <a href="{% url 'exams_add_exam' %}" class="btn btn-primary">
+                {% trans "Add exam" %}
+            </a>
+            <a href="{% url 'exams_add_course' %}" class="btn btn-primary">
+                {% trans "Add course" %}
+            </a>
+            <a href="{% url 'exams_add_examinator' %}" class="btn btn-primary">
+                {% trans "Add examinator" %}
+            </a>
+        {% endsidebarpanel %}
+    {% endif %}
+{% endblock%}

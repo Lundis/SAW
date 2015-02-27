@@ -1,7 +1,6 @@
 from django.contrib.auth.models import Group, User
 from django.utils.translation import ugettext as _
 from base.utils import get_modules_with
-from users.permissions import add_perm_to_group
 from .models import SAWPermission
 import logging
 
@@ -50,7 +49,7 @@ def setup_default_groups_and_permissions():
                                      "\" wants to join a non-existing default group \"" +
                                      group + "\"")
                 if group_index != -1:
-                    add_perm_to_group(perm, groups[group_index])
+                    put_perm_in_standard_group(perm, groups[group_index])
 
 
 def is_perm_in_groups(perm, groups):
@@ -100,6 +99,57 @@ def put_user_in_standard_group(user, new_group_name):
     else:
         user.is_staff = False
     user.save()
+
+
+def _remove_sawp_from_all_standard_groups(permission):
+    """
+    :param permission: A Permission
+    :return:
+    """
+    for group_name in group_names:
+        group = Group.objects.get(name=group_name)
+        if permission in group.permissions.all():
+            group.permissions.remove(permission)
+
+
+def put_perm_in_standard_group(perm, group):
+    """
+    Adds a permission to a group.
+    :param perm: A permission string or a SAWPermission
+    :param group: A group name string or a Group
+    """
+    if isinstance(group, Group):
+        group_instance = group
+    else:
+        group_instance = Group.objects.get(name=group)
+    if isinstance(perm, SAWPermission):
+        sawp = perm
+    else:
+        sawp = SAWPermission.get(perm)
+    # Enforce that each permission only occurs in one of the standard groups
+    _remove_sawp_from_all_standard_groups(sawp.permission)
+    group_instance.permissions.add(sawp.permission)
+
+
+def get_standard_group_of_perm(perm):
+    """
+    :param perm: SAWPermission, Permission or string
+    :return: the name (str) of the standard group the permission belongs to, or None if it doesn't belong to anything
+    """
+    if isinstance(perm, SAWPermission):
+        perm = perm.permission
+    elif isinstance(perm, str):
+        perm = SAWPermission.get(perm).permission
+    # else assume it's a Permission
+
+    # iterate through them in reverse
+    for group_name in group_names:
+        group = Group.objects.get(name=group_name)
+        # TODO: this is a pretty inefficient query
+        if perm in group.permissions.all():
+            return group.name
+    # If it's not in any of the default groups:
+    return None
 
 
 def get_user_group(user):

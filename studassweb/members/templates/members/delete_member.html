@@ -1,0 +1,32 @@
+{% extends "members/base.html" %}
+
+{% load i18n %}
+{% load bootstrap3 %}
+{% load sidemenu %}
+
+{% block breadcrumb2 %}
+    <li class="active">
+        {% trans "Deleting member" %}:
+        {{ item.first_name }} {{ item.last_name }}
+        ({{ item.user_ext.user.username }})
+    </li>
+{% endblock %}
+
+{% block main_content %}
+    <form action="{{ form_url }}" method="post">
+        {% csrf_token %}
+        <p>
+            {% trans "Are you sure you want to delete" %}
+            "{{ item }}"?
+        </p>
+        {% if item.user_ext %}
+            <p>{% trans "The user will no longer be able to log on to this account" %}!</p>
+        {% endif %}
+        <button type="submit" class="btn btn-primary">
+            {% trans "Confirm" %}
+        </button>
+    </form>
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}
