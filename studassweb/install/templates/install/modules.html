@@ -11,6 +11,10 @@
 
 {% block content %}
     <p>{% trans "It's time to choose what functionality you want to have on your site" %}!</p>
+    <p>
+        {% trans "Hard to decide? You can go back to this later on once you have familiarized yourself with the different modules" %}.
+        {% trans "Most modules have some initial content that you can look at to get a feel for the module" %}.
+    </p>
     <form action="{% url "install.views.modules" %}" method="post">
         {% csrf_token %}
         {% bootstrap_form form %}
