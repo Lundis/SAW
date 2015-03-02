@@ -4,12 +4,24 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.dispatch import receiver
 from django.db.models.signals import pre_delete, post_delete, post_save, pre_save
+from base.utils import get_function_from_module
 
 
 class FrontPageItem(models.Model):
+    """
+    Represents a frontpage item. Choose between static content or a custom rendering function that
+    is called every time.
+    """
     identifier = models.CharField(max_length=100)
     title = models.TextField()
-    content = models.TextField()
+    content = models.TextField(null=True, blank=True)
+    template = models.CharField(max_length=200, default="")
+    # Which module this belongs to
+    module = models.CharField(max_length=50, blank=True, default="")
+    # an optional content rendering function (def func(front_page_item)),
+    # which resides in module.frontpage
+    render_function = models.CharField(max_length=50, blank=True, default="")
+
 
     MAINBAR = "MB"
     SIDEBAR = "SB"
@@ -56,6 +68,18 @@ class FrontPageItem(models.Model):
         """
         self._content_type = ContentType.objects.get_for_model(target)
         self._object_id = target.id
+
+    def render_content(self):
+        """
+        Renders the menu items using provided templates
+        :return:
+        """
+        if self.module and self.render_function:
+            render_func = get_function_from_module(self.module, "frontpage",
+                                                   self.render_function)
+            render_func(self)
+        else:
+            return self.content
 
     @classmethod
     def get_with_target(cls, target):
