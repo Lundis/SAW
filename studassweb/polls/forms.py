@@ -10,7 +10,7 @@ class PollForm(forms.ModelForm):
 
     class Meta:
         model = Poll
-        fields = ('name', 'description', 'publication', 'expiration', 'can_vote_on_many')
+        fields = ('name', 'description', 'expiration', 'can_vote_on_many', "permission_choice_view", "permission_choice_vote")
 
     def save(self, commit=True, user=None):
         poll = super(PollForm, self).save(commit=False)
