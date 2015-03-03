@@ -21,7 +21,11 @@
 
 <body>
 <div id="site-wrapper">
-    <div id="statusmessages">
+    {% block menu %}
+        {% load dynamic_menu %}
+        {% display_menu "main_menu" "" %}
+    {% endblock menu %}
+    <div id="statusmessages" class="container">
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }}">
@@ -31,11 +35,6 @@
             {% endfor %}
         {% endif %}
     </div>
-    {% block menu %}
-        {% load dynamic_menu %}
-        {% display_menu "main_menu" "" %}
-    {% endblock menu %}
-
     <div id="content-wrapper">
         {% block content %}
             <div class="container">
