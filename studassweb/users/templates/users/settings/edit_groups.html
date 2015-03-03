@@ -1,5 +1,6 @@
 {% extends "base/base.html" %}
 {% load i18n %}
+{% load sidemenu %}
 
 {% block breadcrumb1 %}
     <li class="active">
@@ -39,13 +40,13 @@
         <h3>{% trans "Members" %}</h3>
         {% with group.user_set.all as users %}
             {% if users.exists %}
-            <div class="list-group">
-                {% for user in users %}
-                    <div class="list-group-item">
-                        {{ user.full_name }} ( {{ user.username }} )
-                    </div>
-                {% endfor %}
-            </div>
+                <div class="list-group">
+                    {% for user in users %}
+                        <div class="list-group-item">
+                            {{ user.full_name }} ( {{ user.username }} )
+                        </div>
+                    {% endfor %}
+                </div>
             {% else %}
                 <p>{% trans "This group is empty" %}!</p>
             {% endif %}
@@ -63,29 +64,27 @@
 {% endblock %}
 
 {% block sidebar-panel1 %}
-    {# TODO new sidebar #}
-    {% trans "Actions" %}
-
-    <div class="btn-group-vertical btn-block">
+    {% sidebarpanel "vertical_buttons" %}
+        {% trans "Actions" %}
+        {% body %}
         <a class="btn btn-primary" href="{% url "users_settings_new_group" %}">
             {% trans "New group" %}
         </a>
-    </div>
+    {% endsidebarpanel %}
 {% endblock %}
 
 {% block sidebar-panel2 %}
-    {# TODO new sidebar #}
-    {% trans "Custom Groups" %}
-
-    {% if groups %}
+    {% sidebarpanel %}
+        {% trans "Custom Groups" %}
+        {% body %}
         {% for grp in groups %}
             <div class="btn-group-vertical btn-block">
                 <a class="btn btn-primary" href="{% url "users_settings_edit_group" group_id=grp.id %}">
                     {{ grp.name }}
                 </a>
             </div>
+        {% empty %}
+            <p>{% trans "No custom groups found!" %}</p>
         {% endfor %}
-    {% else %}
-        <p>{% trans "No custom groups found!" %}</p>
-    {% endif %}
+    {% endsidebarpanel %}
 {% endblock %}
