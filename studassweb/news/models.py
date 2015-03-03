@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import slugify
+from solo.models import SingletonModel
 
 from base.models import Comment
 from base.fields import ValidatedRichTextField
@@ -30,7 +31,8 @@ class Article(models.Model):
     created_time = models.TimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     # A small thumbnail used in the news feed
-    picture = models.ImageField(upload_to="news/article_thumbnails", blank=True, null=True)
+    picture = models.ImageField(upload_to="news/article_thumbnails", blank=True, null=True,
+                                help_text="A small picture used in the news feed")
     author = models.ForeignKey(User)
     categories = models.ManyToManyField(Category, blank=True)
 
@@ -79,3 +81,12 @@ class Article(models.Model):
         :return:
         """
         pass
+
+
+class NewsSettings(SingletonModel):
+    is_setup = models.BooleanField(default=False)
+
+    @classmethod
+    def instance(cls):
+        self, created = cls.objects.get_or_create()
+        return self
