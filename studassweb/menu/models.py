@@ -159,7 +159,8 @@ class MenuItem(models.Model):
 
     #app_name is used for checking if it belongs to a disabled module
     app_name = models.CharField(max_length=50, null=True, blank=True)
-    identifier = models.CharField(max_length=100, unique=True)
+    identifier = models.CharField(max_length=100, unique=True,
+                                  help_text="A unique identifier that is used to distinguish this item")
     display_name = models.CharField(max_length=30)
 
     # A field for referring to external URLs
@@ -171,7 +172,7 @@ class MenuItem(models.Model):
     object_id = models.PositiveIntegerField(null=True)
     link_target = GenericForeignKey('content_type', 'object_id')
 
-    submenu = models.ForeignKey(Menu, null=True)
+    submenu = models.ForeignKey(Menu, null=True, blank=True)
     view_permission = models.ForeignKey(SAWPermission, null=True, blank=True)
     # was the menu created by an app or a user?
     created_by = models.CharField(max_length=2, choices=TYPE_CHOICES, default=TYPE_APP)
@@ -182,10 +183,10 @@ class MenuItem(models.Model):
             logger.error("Menu Item (%s) has no URL!", self.id)
         return self.identifier
 
-    def clean(self, *args, **kwargs):
-        super(MenuItem, self).clean(*args, **kwargs)
-        if not self.url and not self.reverse_string and not self.item:
-            raise ValidationError("no link defined for the menu item")
+    def clean(self):
+        super(MenuItem, self).clean()
+        if not self.url() and not self.submenu:
+            raise ValidationError("Neither a URL nor a submenu has been selected")
 
     def save(self, *args, **kwargs):
         self.clean()
