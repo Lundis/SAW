@@ -174,6 +174,13 @@ class UserMenuItemForm(forms.ModelForm):
     def clean(self):
         super(UserMenuItemForm, self).clean()
         # We need to verify that that the user entered either an external url or a submenu
+        # However, that is done by the model's clean() function automatically (woo!)
+
+        # Next we need to check if the user put http:// in front of the url or not (this is required for it work)
+        url = self.cleaned_data['external_url']
+        if url is not None and len(url) > 0:
+            if not url.startswith("http://") and not url.startswith("https://"):
+                self.cleaned_data['external_url'] = "http://" + url
 
     def save(self, commit=True):
         new_item = not self.instance.pk
