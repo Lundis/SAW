@@ -42,11 +42,7 @@
 
 {% block scripts %}
     <script src="{% static "js/jquery-ui.min.js" %}"></script>
-    <script src="{% static "js/tmpl.min.js" %}"></script>
-    <script src="{% static "js/jquery.iframe-transport.js" %}"></script>
-    <script src="{% static "js/jquery.fileupload.js" %}"></script>
-    <script src="{% static "js/jquery.fileupload-ui.js" %}"></script>
-    <script src="{% static "multiuploader/scripts/collectfiles.js" %}"></script>
+
 
     {% multiuploader_form_script form_type="images" js_prefix="jQuery" send_button_selector="input[name=_edit]" wrapper_element_id="fileUploads" lock_while_uploading=True number_files_attached=forms.attached_count %}
 
