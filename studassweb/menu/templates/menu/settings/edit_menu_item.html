@@ -1,6 +1,15 @@
-{% extends "settings/base.html" %}
+{% extends "base/base.html" %}
 {% load i18n %}
 {% load bootstrap3 %}
+{% load sidemenu %}
+
+{% block breadcrumb1 %}
+    <li>
+        <a href="{% url "settings_main" %}">
+            {% trans "Settings" %}
+        </a>
+    </li>
+{% endblock %}
 
 {% block breadcrumb2 %}
     <li>
@@ -11,10 +20,21 @@
 {% endblock %}
 
 {% block breadcrumb3 %}
-    <li class="active">
+    <li>
         <a href="{% url "menu_settings_select_menu" %}">
             {% trans "Menu Editor" %}
         </a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb4 %}
+    <li class="active">
+        {% if menu_item %}
+            {% trans "Editing menu item" %}
+            {{ menu_item.display_name }}
+        {% else %}
+            {% trans "New Menu Item" %}
+        {% endif %}
     </li>
 {% endblock %}
 
@@ -22,19 +42,60 @@
 {% block main_content %}
     <h1>{% trans "Menu Item Editor" %}</h1>
     <p>{% trans "Select either a URL or a submenu." %}</p>
-    {% if menu_item %}
-        <form action="{% url "menu_settings_edit_menu_item" item_id=menu_item.id %}"  method="post">
-    {% else %}
-        <form action="{% url "menu_settings_new_menu_item" %}"  method="post">
-    {% endif %}
-{% csrf_token %}
-{% bootstrap_form form %}
-<button type="submit" value="Submit" class="btn btn-primary">
-    {% trans "Save" %}
-</button>
-<a href="{% url "menu_settings_select_menu" %}" class="btn btn-primary">{% trans "Back" %}</a>
-{% if menu_item %}
-    <a href="{% url "menu_settings_delete_menu_item" item_id=menu_item.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
-{% endif %}
-</form>
+
+    <form id="form"
+            {% if menu_item %}
+          action="{% url "menu_settings_edit_menu_item" item_id=menu_item.id%}"
+            {% else %}
+          action="{% url "menu_settings_new_menu_item" %}"
+            {% endif %}
+          method="post">
+
+        {% csrf_token %}
+        {% bootstrap_form form %}
+
+    </form>
+{% endblock %}
+
+
+{% block sidebar-panel1 %}
+    {% sidebarpanel "vertical_buttons" %}
+        {% trans "Actions" %}
+        {% body %}
+        <div id="submit-button" class="btn btn-primary">
+            {% trans "Save" %}
+        </div>
+        <a href="{% url "menu_settings_select_menu" %}" class="btn btn-primary">
+            {% trans "Back" %}
+        </a>
+        {% if menu_item.was_created_by_user %}
+            <a href="{% url "menu_settings_delete_menu_item" item_id=menu_item.id %}"
+               class="btn btn-danger">
+                {% trans "Delete" %}
+            </a>
+        {% endif %}
+    {% endsidebarpanel %}
+{% endblock %}
+
+{% block sidebar-panel-help %}
+    {% sidebarpanel "help" %}
+        {% trans "Help" %}
+        {% body %}
+        <p>
+            {% if not menu_item or menu_item.was_created_by_user %}
+                {% trans "A Menu item can either link to somewhere, or it can show a submenu. Pick one!" %}
+                {% trans "You can optionally set a permission that is required to view this item." %}
+            {% else %}
+                {% trans "You can edit the display name of the item. This is what is shown in menus." %}
+            {% endif %}
+        </p>
+    {% endsidebarpanel %}
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $("#submit-button").click(function(event) {
+            $("#form").submit()
+        });
+    </script>
 {% endblock %}

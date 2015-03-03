@@ -188,9 +188,11 @@ class UserMenuItemForm(forms.ModelForm):
         item.created_by = TYPE_USER
         if new_item:
             # find a unique identifier
+
             id = MenuItem.objects.filter(created_by=TYPE_USER).count() + 1
-            while MenuItem.objects.filter(id=id).exists():
+            while MenuItem.objects.filter(id=id, created_by=TYPE_USER).exists():
                 id += 1
+            logger.debug("Creating identifier for user-generated menu item. id %s" % id)
             item.identifier = "user-menu-item-%s" % id
         if commit:
             item.save()

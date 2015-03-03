@@ -192,6 +192,9 @@ class MenuItem(models.Model):
         self.clean()
         super(MenuItem, self).save(*args, **kwargs)
 
+    def was_created_by_user(self):
+        return self.created_by == TYPE_USER
+
     @classmethod
     def get_or_create(cls, identifier, app_name=None, display_name=None, reverse_string=None,
                       linked_object=None, url=None, permission=None, submenu=None):

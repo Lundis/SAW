@@ -4,7 +4,7 @@
     {% for menu_item in items %}
         <li id="menu-item-{{ menu_item.id }}"
             class="btn
-                    {% if menu_item.created_by == "US" %}
+                    {% if menu_item.was_created_by_user%}
                     btn-success
                     {% else %}
                     btn-primary

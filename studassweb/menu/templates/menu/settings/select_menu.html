@@ -35,15 +35,18 @@
                     </div>
                 </div>
                 <div class="panel-body">
-                    <div class="btn-group">
-                        {% for item in menu_items %}
-                            <a href="{% url "menu_settings_edit_menu_item" item_id=item.id %}"
-                               class="btn btn-primary"
-                               title="{{ item.get_absolute_url }}">
-                                {{ item.display_name }}
-                            </a>
-                        {% endfor %}
-                    </div>
+                    {% for item in menu_items %}
+                        <a href="{% url "menu_settings_edit_menu_item" item_id=item.id %}"
+                           class="btn {% if item.was_created_by_user %}
+                                  btn-success {% else %}
+                                  btn-primary {% endif %}"
+                           title="{{ item.get_absolute_url }}">
+                            {{ item.display_name }}
+                            {% if item.submenu %}
+                                <span class="caret"></span>
+                            {% endif %}
+                        </a>
+                    {% endfor %}
                 </div>
             </div>
         </div>

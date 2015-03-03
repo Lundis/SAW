@@ -3,6 +3,7 @@ from users.decorators import has_permission
 from django.shortcuts import render
 from django.http import Http404, HttpResponseRedirect, HttpResponseBadRequest
 from django.core.urlresolvers import reverse
+from django.core.exceptions import SuspiciousOperation
 from .models import Menu, MenuItem, TYPE_USER
 from .register import EDIT_MENUS
 from .forms import MenuForm, MenuCreationForm, UserMenuItemForm, AppMenuItemForm, MainMenuForm
@@ -139,15 +140,15 @@ def delete_menu_item(request, item_id):
     try:
         menu_item = MenuItem.objects.get(id=item_id)
     except MenuItem.DoesNotExist:
-        raise Http404
+        raise SuspiciousOperation("Tried to delete a non-existing menu item")
 
     if menu_item.created_by != TYPE_USER:
-        return HttpResponseBadRequest("Only user-managed menu items can be deleted")
+        raise SuspiciousOperation("Only user-managed menu items can be deleted")
 
     return delete_confirmation_view(request,
-                                    menu_item,
-                                    reverse("menu_settings_delete_menu", kwargs={'item_id': menu_item.id}),
-                                    reverse('menu_settings_select_menu'))
+                                    item=menu_item,
+                                    form_url=reverse("menu_settings_delete_menu_item", kwargs={'item_id': menu_item.id}),
+                                    redirect_url=reverse('menu_settings_select_menu'))
 
 
 @has_permission(EDIT_MENUS)
