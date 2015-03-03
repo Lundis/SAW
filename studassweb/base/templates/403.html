@@ -1,0 +1,22 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% trans "Access Denied" %}: {{ request_path }}
+{% endblock %}
+
+{% block menu %}
+    {% load dynamic_menu %}
+    {% display_menu "main_menu" "" %}
+{% endblock %}
+
+{% block breadcrumb %}{% endblock %}
+
+{% block main_content %}
+    <h3>{% trans "Access denied" %}</h3>
+    <p>
+        {% trans "You do not have the required permission to view that page!" %}
+    </p>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}

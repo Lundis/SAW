@@ -17,6 +17,7 @@ def get_started_text():
 def setup():
     settings = PagesSettings.instance()
     if not settings.is_setup:
+
         # create a "get started" info page visible only to board members
         page = InfoPage(title="Getting started",
                         text=get_started_text(),
