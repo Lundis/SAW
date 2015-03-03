@@ -51,7 +51,7 @@ def add_edit_album(request, slug = None):
         if form.is_valid():
             form.save(user=request.user)
             return HttpResponseRedirect(form.instance.get_absolute_url())
-    context = {'form': form, 'uploadForm': MultiUploadForm()}
+    context = {'form': form, 'uploadForm': MultiUploadForm(form_type="images")}
     return render(request, 'gallery/add_edit_album.html', context)
 
 

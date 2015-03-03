@@ -52,7 +52,7 @@ class MultiUploadForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         multiuploader_settings = getattr(settings, "MULTIUPLOADER_FORMS_SETTINGS", DEFAULTS.MULTIUPLOADER_FORMS_SETTINGS)
-        form_type = kwargs.pop("form_type", "default")
+        form_type = kwargs.pop("form_type", "defaultasdf")
 
         options = {
             'maxFileSize': multiuploader_settings[form_type]["MAX_FILE_SIZE"],

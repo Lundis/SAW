@@ -242,7 +242,7 @@ MULTIUPLOADER_FILES_FOLDER = 'multiuploader'
 MULTIUPLOADER_FILE_EXPIRATION_TIME = 3600
 
 MULTIUPLOADER_FORMS_SETTINGS = {
-    'default': {
+    'images': {
         'FILE_TYPES': ['jpg', 'jpeg', 'png', 'gif', 'svg', 'bmp', 'tiff'],
         'CONTENT_TYPES':
         [

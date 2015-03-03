@@ -10,6 +10,8 @@ from ..forms import MultiUploadForm
 
 register = template.Library()
 
+DEFAULT_TARGET_FORM_FIELDNME = "multiuploader_upload_form"
+
 
 @register.simple_tag(takes_context=True)
 def form_type(context, form_type):
@@ -43,8 +45,29 @@ def form_type(context, form_type):
         return mark_safe(u"")
 
 
+# TODO check if all variables are needed
 @register.simple_tag(takes_context=True)
-def multiuploader_form(context, form_type="default", template="multiuploader/form.html", target_form_fieldname=None,
+def multiuploader_form(context, form_type="default", template="multiuploader/form.html",
+                       target_form_fieldname=DEFAULT_TARGET_FORM_FIELDNME,
+                       js_prefix="jQuery", send_button_selector=None,
+                       wrapper_element_id="", lock_while_uploading=True, number_files_attached=0):
+    return render_to_string(template, {
+        'multiuploader_form': MultiUploadForm(form_type=form_type),
+        'csrf_token': context["csrf_token"],
+        'type': form_type,
+        'prefix': js_prefix,
+        'send_button_selector': send_button_selector,
+        'wrapper_element_id': wrapper_element_id,
+        'target_form_fieldname': target_form_fieldname,
+        'lock_while_uploading': lock_while_uploading,
+        'number_files_attached': number_files_attached
+    })
+
+
+# TODO check if all variables are needed
+@register.simple_tag(takes_context=True)
+def multiuploader_form_script(context, form_type="default", template="multiuploader/form_script.html",
+                              target_form_fieldname=DEFAULT_TARGET_FORM_FIELDNME,
                        js_prefix="jQuery", send_button_selector=None,
                        wrapper_element_id="", lock_while_uploading=True, number_files_attached=0):
     return render_to_string(template, {
