@@ -4,6 +4,8 @@ from django.http import HttpResponseNotFound, HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.forms.models import inlineformset_factory
+from django.utils.translation import ugettext as _
+from multiuploader.forms import MultiUploadForm
 import logging
 
 logger = logging.getLogger(__name__)
@@ -17,15 +19,15 @@ def view_gallery(request):
         'albums': albums, 'pictures': pictures},)
 
 
-def view_album(request, album_id):
+def view_album(request, slug):
     try:
-        album = Album.objects.get(id=album_id)
-        pictures = Photo.objects.filter(album_id = album_id).order_by('-uploaded')
+        album = Album.objects.get(slug=slug)
+        pictures = Photo.objects.filter(album=album).order_by('-uploaded')
         return render(request, 'gallery/view_album.html', {
             'album': album, 'pictures': pictures},)
     except Album.DoesNotExist:
-        logger.warning('Could not find album with id %s', album_id)
-        return HttpResponseNotFound('No album with that id found')
+        logger.warning('Could not find album with slug %s', slug)
+        return HttpResponseNotFound(_('No album with that id found'))
 
 
 def view_picture(request, photo_id):
@@ -38,26 +40,25 @@ def view_picture(request, photo_id):
         return HttpResponseNotFound('No photo with that id found')
 
 
-def add_edit_album(request, album_id=-1):
+def add_edit_album(request, slug = None):
     try:
-        album = Album.objects.get(id=album_id)
+        album = Album.objects.get(slug=slug)
     except Album.DoesNotExist:
-        album = None
+        album=None
     form = AlbumForm(instance=album)
-
     if request.method == 'POST':
         form = AlbumForm(request.POST, instance=album)
         if form.is_valid():
             form.save(user=request.user)
-            return HttpResponseRedirect(reverse("gallery_view_album", kwargs={'album_id': form.instance.pk}))
-    context = {'form': form}
+            return HttpResponseRedirect(form.instance.get_absolute_url())
+    context = {'form': form, 'uploadForm': MultiUploadForm(form_type="images")}
     return render(request, 'gallery/add_edit_album.html', context)
 
 
-def delete_album(request, album_id):
+def delete_album(request, slug):
     if request.method == 'POST':
         try:
-            album = Album.objects.get(id=album_id)
+            album = Album.objects.get(slug=slug)
             name = str(album)
             album.delete()
             messages.success(request, "Album "+name+" was sucessfully deleted!")

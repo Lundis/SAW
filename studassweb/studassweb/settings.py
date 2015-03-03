@@ -70,6 +70,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
+    'multiuploader.context_processors.booleans',
 )
 
 ROOT_URLCONF = 'studassweb.urls'
@@ -236,3 +237,25 @@ MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+MULTIUPLOADER_FILES_FOLDER = 'multiuploader'
+MULTIUPLOADER_FILE_EXPIRATION_TIME = 3600
+
+MULTIUPLOADER_FORMS_SETTINGS = {
+    'images': {
+        'FILE_TYPES': ['jpg', 'jpeg', 'png', 'gif', 'svg', 'bmp', 'tiff'],
+        'CONTENT_TYPES':
+        [
+            'image/gif',
+            'image/jpeg',
+            'image/pjpeg',
+            'image/png',
+            'image/svg+xml',
+            'image/tiff',
+            'image/vnd.wap.wbmp'
+        ],
+        'MAX_FILE_SIZE': 10485760,
+        'MAX_FILE_NUMBER': 500,
+        'AUTO_UPLOAD': True,
+    }
+}

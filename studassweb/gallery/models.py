@@ -14,7 +14,7 @@ class Album(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     def get_absolute_url(self):
-        return reverse("gallery.views.view_album", kwargs={'album_id': self.id})
+        return reverse("gallery.views.view_album", kwargs={'slug': self.slug})
 
     def __str__(self):
         return str(self.name)
