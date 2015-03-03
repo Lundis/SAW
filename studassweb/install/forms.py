@@ -52,20 +52,27 @@ class ModulesForm(forms.Form):
         modules = kwargs.pop('modules')
         super(ModulesForm, self).__init__(*args, **kwargs)
         for module in modules:
-            # If install has been ran before, use the current status of all modules
-            if install.models.InstallProgress.modules_set():
-                initial = DisabledModule.is_enabled(module)
-            else:
-                # Otherwise assume that the user wants to enable all modules
-                initial = True
-            self.fields[module] = forms.BooleanField(label=module,
-                                                     initial=initial,
-                                                     required=False)
-            description = get_attr_from_module(module, "register", "DESCRIPTION")
-            if description is not None:
-                self.fields[module].help_text = _(description)
-            else:
-                logger.error("DESCRIPTION missing from register.py in module %s", module)
+            try:
+                description = get_attr_from_module(module, "register", "DESCRIPTION")
+
+                if description is None:
+                    logger.error("DESCRIPTION missing from register.py in module %s", module)
+                    description = ""
+
+                # If install has been ran before, use the current status of all modules
+                if install.models.InstallProgress.modules_set():
+                    initial = DisabledModule.is_enabled(module)
+                else:
+                    # Otherwise assume that the user wants to enable all modules
+                    initial = True
+                self.fields[module] = forms.BooleanField(label=module,
+                                                         initial=initial,
+                                                         required=False,
+                                                         help_text=_(description))
+
+            except ImportError:
+                logger.warning("Module %s doesn't have a register.py", module)
+
 
     def apply(self):
         """

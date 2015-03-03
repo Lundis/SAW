@@ -1,9 +1,11 @@
 from django import forms
 from gallery.models import *
 from datetime import date
+from multiuploader.forms import MultiuploaderField
 
 
 class AlbumForm(forms.ModelForm):
+    uploadedFiles = MultiuploaderField(required=False)
 
     class Meta:
         model = Album
