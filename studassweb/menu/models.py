@@ -188,10 +188,6 @@ class MenuItem(models.Model):
         if not self.url() and not self.submenu:
             raise ValidationError("Neither a URL nor a submenu has been selected")
 
-    def save(self, *args, **kwargs):
-        self.clean()
-        super(MenuItem, self).save(*args, **kwargs)
-
     def was_created_by_user(self):
         return self.created_by == TYPE_USER
 
