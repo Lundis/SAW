@@ -96,7 +96,12 @@ def frontpage_item_pre_save(**kwargs):
 
     if not instance.ordering_index:
         # Put it last
-        instance.ordering_index = instance._count_in_location() + 1
+        last_index = instance._count_in_location() + 1
+        # Code defensively in case there are inconsistencies in the DB
+        while FrontPageItem.objects.filter(ordering_index=last_index, location=instance.location):
+            last_index += 1
+
+        instance.ordering_index = last_index
     else:
         try:
             # Get the object currently at the wanted position:
