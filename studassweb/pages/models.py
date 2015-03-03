@@ -41,18 +41,7 @@ class InfoCategory(models.Model):
         if not self.pk:
             self.slug = self.slugify()
         super(InfoCategory, self).save(*args, **kwargs)
-        # create a menu item if it doesn't exist
-        self.menu_item, created = MenuItem.get_or_create(identifier="pages/category/%d" % self.id,
-                                                         app_name=__package__,
-                                                         display_name=self.name,
-                                                         linked_object=self,
-                                                         permission=self.permission)
-        if created:
-            self.menu_item.submenu, created2 = Menu.get_or_create(__package__ + "_category_" + self.name)
-            self.menu_item.save()
-            self.save()
-            info_menu, created = Menu.get_or_create("pages_top_menu")
-            info_menu.add_item(self.menu_item)
+
 
     def can_view(self, user):
         return has_user_perm(user, self.permission)
@@ -74,6 +63,23 @@ class InfoCategory(models.Model):
             return self.slugify(attempt)
         except InfoCategory.DoesNotExist:
             return slug
+
+
+@receiver(post_save, sender=InfoCategory, dispatch_uid="category_post_save")
+def category_post_save(**kwargs):
+    instance = kwargs.pop("instance")
+    # create a menu item if it doesn't exist
+    instance.menu_item, created = MenuItem.get_or_create(identifier="pages/category/%d" % instance.id,
+                                                         app_name=__package__,
+                                                         display_name=instance.name,
+                                                         linked_object=instance,
+                                                         permission=instance.permission)
+    if created:
+        instance.menu_item.submenu, created2 = Menu.get_or_create(__package__ + "_category_" + instance.name)
+        instance.menu_item.save()
+        instance.save()
+        info_menu, created = Menu.get_or_create("pages_top_menu")
+        info_menu.add_item(instance.menu_item)
 
 
 @receiver(pre_delete, sender=InfoCategory, dispatch_uid="category_pre_delete")
