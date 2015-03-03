@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.template.defaultfilters import slugify
 from django.dispatch import receiver
-from django.db.models.signals import pre_delete, post_delete, post_save
+from django.db.models.signals import pre_delete, post_delete, pre_save, post_save
 from solo.models import SingletonModel
 from base.fields import ValidatedRichTextField
 from menu.models import MenuItem, Menu
@@ -37,12 +37,6 @@ class InfoCategory(models.Model):
     def pages(self):
         return InfoPage.objects.filter(category=self)
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            self.slug = self.slugify()
-        super(InfoCategory, self).save(*args, **kwargs)
-
-
     def can_view(self, user):
         return has_user_perm(user, self.permission)
 
@@ -65,6 +59,13 @@ class InfoCategory(models.Model):
             return slug
 
 
+@receiver(pre_save, sender=InfoCategory, dispatch_uid="category_pre_save")
+def category_pre_save(**kwargs):
+    instance = kwargs.pop("instance")
+    if not instance.pk:
+        instance.slug = instance.slugify()
+
+
 @receiver(post_save, sender=InfoCategory, dispatch_uid="category_post_save")
 def category_post_save(**kwargs):
     instance = kwargs.pop("instance")
@@ -78,8 +79,6 @@ def category_post_save(**kwargs):
         instance.menu_item.submenu, created2 = Menu.get_or_create(__package__ + "_category_" + instance.name)
         instance.menu_item.save()
         instance.save()
-        info_menu, created = Menu.get_or_create("pages_top_menu")
-        info_menu.add_item(instance.menu_item)
 
 
 @receiver(pre_delete, sender=InfoCategory, dispatch_uid="category_pre_delete")
