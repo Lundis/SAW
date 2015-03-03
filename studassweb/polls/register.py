@@ -11,7 +11,7 @@ CAN_VIEW_BOARD_POLLS = "can_view_board_polls"
 CAN_VOTE_PUBLIC_POLLS = "can_vote_public_polls"
 CAN_VOTE_MEMBER_POLLS = "can_vote_member_polls"
 CAN_VOTE_BOARD_POLLS = "can_vote_board_polls"
-CAN_DELETE_ALL_POLLS = "can_delete_all_polls"
+CAN_EDIT_ALL_POLLS = "can_edit_all_polls"
 
 
 def get_menu_items():
@@ -47,5 +47,5 @@ def get_permissions():
         (CAN_VOTE_PUBLIC_POLLS, GUEST, "Can vote in public polls"),
         (CAN_VOTE_MEMBER_POLLS, MEMBER, "Can vote in member polls"),
         (CAN_VOTE_BOARD_POLLS, BOARD_MEMBER, "Can vote in polls for board members"),
-        (CAN_DELETE_ALL_POLLS, BOARD_MEMBER, "Can delete other members polls"),
+        (CAN_EDIT_ALL_POLLS, BOARD_MEMBER, "Can edit other members polls"),
     )

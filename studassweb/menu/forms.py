@@ -5,6 +5,9 @@ from django.utils.translation import ugettext as _
 from .fields import HiddenMenuField
 from .models import MenuItem, Menu, TYPE_USER, MainMenuSettings, MenuTemplate
 import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 # dynamic menu field and form: http://stackoverflow.com/questions/6154580/django-dynamic-form-example
 
@@ -145,30 +148,62 @@ class MenuForm(forms.Form):
         return "updateHiddenFormFields();"
 
 
-
-
 class MenuCreationForm(forms.ModelForm):
     class Meta():
         model = Menu
         fields = ('menu_name',)
 
     def save(self, *args, **kwargs):
-        menu = super(MenuCreationForm, self).save(self, *args, **kwargs)
+        menu = super(MenuCreationForm, self).save(*args, **kwargs)
         menu.created_by = TYPE_USER
         menu.save()
         return menu
 
 
-class MenuItemForm(forms.ModelForm):
+class UserMenuItemForm(forms.ModelForm):
+    """
+    A form for creating and editing user-created menu items
+    """
     class Meta():
         model = MenuItem
-        fields = ('display_name', 'external_url', 'submenu', 'view_permission')
+        fields = ('display_name',
+                  'external_url',
+                  'submenu',
+                  'view_permission')
 
-    def save(self, *args, **kwargs):
-        item = super(MenuItemForm, self).save(self, *args, **kwargs)
+    def clean(self):
+        super(UserMenuItemForm, self).clean()
+        # We need to verify that that the user entered either an external url or a submenu
+        # However, that is done by the model's clean() function automatically (woo!)
+
+        # Next we need to check if the user put http:// in front of the url or not (this is required for it work)
+        url = self.cleaned_data['external_url']
+        if url is not None and len(url) > 0:
+            if not url.startswith("http://") and not url.startswith("https://"):
+                self.cleaned_data['external_url'] = "http://" + url
+
+    def save(self, commit=True):
+        new_item = not self.instance.pk
+        item = super(UserMenuItemForm, self).save(commit=False)
         item.created_by = TYPE_USER
-        item.save()
+        if new_item:
+            # find a unique identifier
+            id = MenuItem.objects.filter(created_by=TYPE_USER).count() + 1
+            while MenuItem.objects.filter(id=id).exists():
+                id += 1
+            item.identifier = "user-menu-item-%s" % id
+        if commit:
+            item.save()
         return item
+
+
+class AppMenuItemForm(forms.ModelForm):
+    """
+    A form to edit menu items created by apps. Only the display_name can be edited
+    """
+    class Meta():
+        model = MenuItem
+        fields = ('display_name',)
 
 
 class MainMenuForm(forms.ModelForm):

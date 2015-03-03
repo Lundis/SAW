@@ -4,7 +4,7 @@ from django.http import HttpResponseNotFound
 from polls.forms import *
 from users import permissions
 from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseRedirect, HttpResponseNotAllowed
-from .register import CAN_CREATE_POLLS, CAN_DELETE_ALL_POLLS
+from .register import CAN_CREATE_POLLS, CAN_EDIT_ALL_POLLS
 from django.forms.models import inlineformset_factory
 from django.contrib import messages
 import logging
@@ -77,7 +77,7 @@ def delete_poll(request, poll_id):
     if request.method == 'POST':
         try:
             poll = Poll.objects.get(id=poll_id)
-            if permissions.has_user_perm(request.user, CAN_DELETE_ALL_POLLS) or poll.created_by == request.user:
+            if poll.can_edit(request.user):
                 name = str(poll)
 
                 poll.delete()

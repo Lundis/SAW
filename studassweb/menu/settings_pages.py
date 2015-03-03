@@ -5,7 +5,7 @@ from django.http import Http404, HttpResponseRedirect, HttpResponseBadRequest
 from django.core.urlresolvers import reverse
 from .models import Menu, MenuItem, TYPE_USER
 from .register import EDIT_MENUS
-from .forms import MenuForm, MenuCreationForm, MenuItemForm, MainMenuForm
+from .forms import MenuForm, MenuCreationForm, UserMenuItemForm, AppMenuItemForm, MainMenuForm
 from .models import MainMenuSettings
 from base.views import delete_confirmation_view
 from settings.sections import SECTION_MENU, SECTION_APPEARANCE, Section
@@ -109,16 +109,22 @@ def edit_menu(request, menu_id):
 
 @has_permission(EDIT_MENUS)
 def edit_menu_item(request, item_id=None):
-    menu_item = None
-    try:
-        menu_item = MenuItem.objects.get(id=item_id)
-    except MenuItem.DoesNotExist:
-        pass
-    if menu_item and menu_item.created_by != TYPE_USER:
-        return HttpResponseBadRequest("Only user-managed menu items can be edited")
+    if item_id is None:
+        menu_item = None
+    else:
+        try:
+            menu_item = MenuItem.objects.get(id=item_id)
+        except MenuItem.DoesNotExist:
+            raise Http404("Menu item %s does not exist" % item_id)
 
-    form = MenuItemForm(request.POST or None,
-                        instance=menu_item)
+    # Any new forms are user forms
+    if menu_item is None or menu_item.created_by == TYPE_USER:
+        form = UserMenuItemForm(request.POST or None,
+                                instance=menu_item)
+    else:
+        form = AppMenuItemForm(request.POST or None,
+                               instance=menu_item)
+
     if form.is_valid():
         form.save()
         return HttpResponseRedirect(reverse("menu_settings_select_menu"))

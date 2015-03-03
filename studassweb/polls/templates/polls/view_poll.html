@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load bootstrap3 %}
 {% load sawp %}
+{% load sidemenu %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -40,8 +41,9 @@
                 <div class="row">
                     <div class="col-xs-8">
                         <div class="progress">
-                            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{ c.percentage }}%;">
-                            {{ c.name }}
+                            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0"
+                                 aria-valuemax="100" style="width: {{ c.percentage }}%; color: black;">
+                                {{ c.name }}
                             </div>
 
                         </div>
@@ -72,35 +74,29 @@
 
     </ul>
 {% endblock %}
-{% block sidebar %}
-    {% has_perm "polls" "CAN_CREATE_POLLS" as can_edit_polls %}
-    {% has_perm "polls" "CAN_CREATE_POLLS" as can_delete_polls %}
+{% block sidebar-panel1 %}
+
+    {% can_edit_object poll as can_edit_polls %}
     {% if can_edit_polls%}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Edit" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    {% if can_edit_polls%}
-                        <a href="{% url 'polls_edit_poll' poll.id %}">
-                            <div class="btn list-group-item">{% trans "Edit poll" %}</div>
-                        </a>
-                    {% endif %}
+        {% sidebarpanel %}
+            {% trans "Actions" %}
+            {% body %}
+
+            <form action="{% url 'polls_delete_poll' poll.id %}" method="post" onsubmit="return confirm('{% trans "Are you sure?" %}')">
+                {% csrf_token %}
+                <div class="btn-group-vertical btn-block">
+                    <a href="{% url 'polls_edit_poll' poll.id %}" class="btn btn-primary">
+                        {% trans "Edit poll" %}
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        {% trans "Remove this poll" %}
+                    </button>
 
                 </div>
-            </div>
-        </div>
-    {% endif %}
-    {% if can_delete_polls %}
-        <form action="{% url 'polls_delete_poll' poll.id %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
-            {% csrf_token %}
-            {% buttons %}
-                <button type="submit" class="btn btn-danger">
-                    {% trans "Remove this poll" %}
-                </button>
-            {% endbuttons %}
-        </form>
+
+            </form>
+        {% endsidebarpanel %}
+
     {% endif %}
 
 {% endblock %}
