@@ -46,7 +46,7 @@ def get_uploads_from_request(request):
 def get_uploads_from_temp(ids):
     """Method returns of uploaded files"""
 
-    from models import MultiuploaderFile
+    from .models import MultiuploaderFile
 
     ats = []
     files = MultiuploaderFile.objects.filter(pk__in=ids)
@@ -70,6 +70,8 @@ def get_uploads_from_model(instance, attr):
             
     return ats
 
+
+# Haha va i fitton :D
 def generate_safe_pk(self):
     def wrapped(self):
         while 1:

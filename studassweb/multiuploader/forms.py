@@ -74,7 +74,6 @@ class MultiUploadForm(forms.Form):
             options.pop('allowedContentTypes')
 
         self._options = options
-        print(options)
         self.options = json.dumps(options)
 
         super(MultiUploadForm, self).__init__(*args, **kwargs)
