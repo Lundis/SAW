@@ -3,7 +3,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ValidationError
-from .models import UserExtension
+from .models import UserExtension, KerberosServer
 from base.forms import SortingForm
 from base.validators import validate_password, validate_username
 from .groups import put_perm_in_standard_group
@@ -129,3 +129,9 @@ class PermissionEditorForm(SortingForm):
             for sawp_and_id in sawps_and_ids:
                 sawp = sawp_and_id['item']
                 put_perm_in_standard_group(sawp, group)
+
+
+class KerberosServerForm(forms.ModelForm):
+    class Meta:
+        model = KerberosServer
+        fields = ("hostname", "realm", "service")

@@ -1,0 +1,85 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load sidemenu %}
+{% load bootstrap3 %}
+
+{% block breadcrumb1 %}
+    <li>
+        <a href="{% url "settings_main" %}">
+            {% trans "Settings" %}
+        </a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb2 %}
+    <li class="active">
+        <a href="{{ section.get_absolute_url }}">
+            {% trans section.title %}
+        </a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb3 %}
+    <li class="active">
+        <a href="{% url "users_settings_edit_login" %}">
+            {% trans "Login Settings" %}
+        </a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb4 %}
+    <li class="active">
+        {% if server %}
+            {% trans "editing Kerberos server" %}
+            {{ server.hostname }}
+        {% else %}
+            {% trans "New Kerberos server" %}
+        {% endif %}
+    </li>
+{% endblock %}
+
+{% block main_content %}
+    <form method="post"
+            {% if server %}
+          action="{% url "users_settings_edit_kerberos_server" server_id=server.id %}"
+            {% else %}
+          action="{% url "users_settings_new_kerberos_server" %}"
+            {% endif %}
+            >
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <input type="submit" value="submit" />
+    </form>
+    {% if server %}
+        <h3>{% trans "Registered users" %}</h3>
+        {% with server.get_all_users as users  %}
+            {% if users %}
+                <div class="list-group">
+                    {% for user in users %}
+                        <div class="list-group-item">
+                            {{ user.user_ext.username }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {% trans "No users have signed in using this server" %}
+            {% endif %}
+        {% endwith %}
+    {% endif %}
+
+{% endblock %}
+
+{% block sidebar-panel-help %}
+    {% sidebarpanel "help" %}
+        {% trans "Help" %}
+        {% body %}
+        <p>
+            {% trans "Kerberoes is a protocol used for authentication" %}.
+            {% trans "If you want to provide Kerberos logins, you must get details about it from your provider" %}.
+        </p>
+        <p>
+            {% trans "Select a kerberos authentication entry or create a new one" %}.
+            {% trans "Then you can also view a list of all users who have registered using each host on that page" %}.
+        </p>
+    {% endsidebarpanel %}
+{% endblock %}

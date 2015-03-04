@@ -12,8 +12,11 @@
 
 
 {% block content %}
-    <p>{% trans "Set up your main menu, and the menu that will be shown when clicking on your name after logging in" %}.
-        {% trans "Drag and drop the menu items to the menu you want them in, in the order that you want them" %}.</p>
+    <div class="well">
+            {% trans "Set up your main menu, and the menu that will be shown when clicking on your name after logging in" %}.
+            {% trans "Drag and drop the menu items to the menu you want them in, in the order that you want them" %}.
+
+    </div>
     {% setvar form.rendered_menu_editors as menu_items %}
     <div class="panel panel-primary">
         <div class="panel-heading">{% trans "Main Menu" %}!</div>
