@@ -22,12 +22,29 @@
 {% endblock %}
 
 {% block sidebar-panel1 %}
-    {% sidebarpanel "vertical_buttons" %}
-        {% trans "Actions" %}
-    {% body %}
-        <a class="btn btn-danger"
-           href="{% url "members_delete_member" member_id=member.id %}">
-            {% trans "Delete" %}
-           </a>
+    {% if member %}
+        {% sidebarpanel "vertical_buttons" %}
+            {% trans "Actions" %}
+            {% body %}
+            <a class="btn btn-danger"
+               href="{% url "members_delete_member" member_id=member.id %}">
+                {% trans "Delete" %}
+            </a>
+        {% endsidebarpanel %}
+    {% endif %}
+{% endblock %}
+
+{% block sidebar-panel-help %}
+    {% sidebarpanel "help" %}
+        {% trans "Help" %}
+        {% body %}
+        {% if member %}
+            <p>{% trans "Don't change User ext unless you know what you're doing" %}</p>
+        {% else %}
+            <p>
+                {% trans "If you choose a User ext, it must be to an account that doesn't already have a member structure" %}.
+                {% trans "The only way to get such an account is to remove user ext from another" %}.
+            </p>
+        {% endif %}
     {% endsidebarpanel %}
 {% endblock %}
