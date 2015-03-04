@@ -17,6 +17,7 @@ from django.utils.timezone import now
 
 log = logging
 
+# TODO obsolete this file, here is mostly ugly things
 
 #Getting files here
 def format_file_extensions(extensions):

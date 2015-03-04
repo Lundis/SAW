@@ -4,6 +4,7 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+# TODO remove these after showroom!
 
 class Migration(SchemaMigration):
 

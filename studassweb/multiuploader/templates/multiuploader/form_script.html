@@ -39,20 +39,10 @@
         fd.append( 'form_type', "{{ type }}" );
         $('#{{ target_form_fieldname }}').fileupload({
             formData: fd,
-            //processData: false,
-            //contentType: 'multipart/form-data', //This fails when no files are attached.
-            //contentType: 'multipart/form-data; boundary=------border-------------',
-            //contentType: 'kuken',
-            //contentType: 'application/x-www-form-urlencoded;charset=utf-8',
             url: url,
             paramName: "file",
-            //dataType: 'json', //what data is coming back
-            //autoUpload: false,
-            //singleFileUploads: false,
-
             sequentialUploads: true,
-
-            /*var opts = {{ multiuploader_form.options|safe }};*/
+            /*var opts = {{ multiuploader_form.options|safe }};  TODO */
             acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
             maxFileSize: 5000000, // 5 MB
             // Enable image resizing, except for Android and Opera,

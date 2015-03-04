@@ -14,13 +14,14 @@ from django.utils.translation import ugettext as _
 from django.core.signing import Signer, BadSignature
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
+import os
 
 from .utils import FileResponse
 from .models import MultiuploaderFile
 from .forms import MultiUploadForm, MultiuploaderMultiDeleteForm
 
 # TODO change to the other thumbnail lib
-from sorl.thumbnail import get_thumbnail
+# from sorl.thumbnail import get_thumbnail
 
 log = logging.getLogger(__name__)
 
@@ -118,37 +119,56 @@ def multiuploader(request, noajax=False):
         log.debug('Get the file')
         file = request.FILES[u'file']
         wrapped_file = UploadedFile(file)
-        filename = wrapped_file.name
+        # TODO don't take extension from uploaded file, it should be hardcoded jpg/png/gif etc
+        filename = unique_id + '.' + wrapped_file.name.split('.')[-1]
         file_size = wrapped_file.file.size
+        upload_to_folder = os.path.join(settings.MEDIA_ROOT, "gallery") # TODO
 
         log.info('Got file: "%s"' % filename)
 
         #writing file manually into model
         #because we don't need form of any type.
 
-        fl = MultiuploaderFile()
-        fl.filename = filename
-        fl.file = file
-        fl.save()
+        #fl = MultiuploaderFile()
+        #fl.filename = filename
+        #fl.file = file
+        #fl.save()
+
+        # make dir if not exists already
+        if not os.path.exists(upload_to_folder):
+            os.makedirs(upload_to_folder)
+
+        filename = os.path.join(upload_to_folder, filename)
+        # open the file handler with write binary mode
+        destination = open(filename, "wb+")
+        # save file data into the disk
+        # use the chunk method in case the file is too big
+        # in order not to clutter the system memory
+        for chunk in file.chunks():
+            destination.write(chunk)
+        # close the file
+        destination.close()
+
 
         log.info('File saving done')
 
         thumb_url = ""
 
-        try:
-            im = get_thumbnail(fl.file, "80x80", quality=50)
-            thumb_url = im.url
-        except Exception as e:
-            log.error(e)
+        #try:
+        #    im = get_thumbnail(fl.file, "80x80", quality=50)
+        #    thumb_url = im.url
+        #except Exception as e:
+        #    log.error(e)
 
         #generating json response array
-        result = [{"id": fl.id,
+        result = [{#"id": fl.id,
                    "name": filename,
                    "size": file_size,
-                   "url": reverse('multiuploader_file_link', args=[fl.pk]),
-                   "thumbnail_url": thumb_url,
-                   "delete_url": reverse('multiuploader_delete', args=[fl.pk]),
-                   "delete_type": "POST", }]
+                   #"url": reverse('multiuploader_file_link', args=[fl.pk]),
+                   #"thumbnail_url": thumb_url,
+                  # "delete_url": reverse('multiuploader_delete', args=[fl.pk]),
+                  # "delete_type": "POST",
+                  }]
 
         response_data = json.dumps(result)
 
