@@ -26,8 +26,8 @@ def validate_password(password):
     """
     # minimum length
     if len(password) < 8:
-        raise ValidationError("Username is too short, it must be at least 3 letters")
+        raise ValidationError("Password is too short, it must be at least 8 letters")
     # maximum length
     if len(password) > 25:
-        raise ValidationError("Username is too long, it can be at most 25 letters")
+        raise ValidationError("Password is too long, it can be at most 25 letters")
     # No further restrictions for now
