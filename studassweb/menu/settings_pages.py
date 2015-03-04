@@ -86,6 +86,12 @@ def delete_menu(request, menu_id):
 
 @has_permission(EDIT_MENUS)
 def edit_menu(request, menu_id):
+    """
+    This is a drag and drop menu editor
+    :param request:
+    :param menu_id:
+    :return:
+    """
     try:
         menu = Menu.objects.get(id=menu_id)
     except Menu.DoesNotExist:
@@ -153,6 +159,11 @@ def delete_menu_item(request, item_id):
 
 @has_permission(EDIT_MENUS)
 def edit_menu_layout(request):
+    """
+    This is for editing the appearance of the menu (choosing template and logo etc)
+    :param request:
+    :return:
+    """
     form = MainMenuForm(request.POST or None,
                         request.FILES or None,
                         instance=MainMenuSettings.instance())
