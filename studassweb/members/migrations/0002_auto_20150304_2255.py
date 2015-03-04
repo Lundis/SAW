@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='member',
             name='user_ext',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, unique=True, to='users.UserExtension', null=True, blank=True),
+            field=models.ForeignKey(blank=True, to='users.UserExtension', on_delete=django.db.models.deletion.SET_NULL, null=True, unique=True),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(

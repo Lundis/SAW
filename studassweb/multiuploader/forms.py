@@ -15,6 +15,9 @@ from .utils import format_file_extensions
 
 import multiuploader.default_settings as DEFAULTS
 
+import logging
+log = logging.getLogger(__name__)
+
 
 class MultiuploadWidget(forms.MultipleHiddenInput):
     def __init__(self, attrs={}):
@@ -74,7 +77,6 @@ class MultiUploadForm(forms.Form):
             options.pop('allowedContentTypes')
 
         self._options = options
-        print(options)
         self.options = json.dumps(options)
 
         super(MultiUploadForm, self).__init__(*args, **kwargs)
@@ -94,7 +96,8 @@ class MultiUploadForm(forms.Form):
                 content_type = magic.from_buffer(content.read(1024), mime=True)
                 if content_type.lower() not in self._options['allowedContentTypes']:
                     raise forms.ValidationError("acceptFileTypes")
-
+            else:
+                log.warning("You don't have the magic library installed, file formats are not checked!")
             if content._size > self._options['maxFileSize']:
                     raise forms.ValidationError("maxFileSize")
 

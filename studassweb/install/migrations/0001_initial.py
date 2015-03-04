@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='InstallProgress',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
                 ('installed', models.BooleanField(default=False)),
                 ('site_name_ok', models.BooleanField(default=False)),
                 ('modules_ok', models.BooleanField(default=False)),

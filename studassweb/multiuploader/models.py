@@ -15,6 +15,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import now
 
 
+# TODO remove these after showroom!
 
 from multiuploader.utils import generate_safe_pk
 
@@ -43,6 +44,7 @@ class BaseAttachment(models.Model):
     def __unicode__(self):
         return u'%s' % self.filename
 
+
 class MultiuploaderFile(BaseAttachment):
     def _upload_to(instance, filename):
         upload_path = getattr(settings, 'MULTIUPLOADER_FILES_FOLDER', DEFAULTS.MULTIUPLOADER_FILES_FOLDER)
@@ -66,3 +68,4 @@ class MultiuploaderFile(BaseAttachment):
     class Meta:
         verbose_name = _('multiuploader file')
         verbose_name_plural = _('multiuploader files')
+

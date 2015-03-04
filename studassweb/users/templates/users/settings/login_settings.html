@@ -1,5 +1,14 @@
-{% extends "settings/base.html" %}
+{% extends "base/base.html" %}
 {% load i18n %}
+{% load sidemenu %}
+
+{% block breadcrumb1 %}
+    <li>
+        <a href="{% url "settings_main" %}">
+            {% trans "Settings" %}
+        </a>
+    </li>
+{% endblock %}
 
 {% block breadcrumb2 %}
     <li class="active"><a href="{{ section.get_absolute_url }}">
@@ -12,5 +21,59 @@
 {% endblock %}
 
 {% block main_content %}
-    <p>herro, this is login settings</p>
+    <h3>Kerberos</h3>
+    {% if kerberos_servers %}
+        <table class="table">
+            <tr>
+                <th>{% trans "Hostname" %}</th>
+                <th>{% trans "Realm" %}</th>
+                <th>{% trans "Service" %}</th>
+                <th>{% trans "View/Edit" %}</th>
+            </tr>
+
+            {% for server in kerberos_servers %}
+                <tr>
+                    <td>{{ server.hostname }}</td>
+                    <td>{{ server.realm }}</td>
+                    <td>{{ server.service }}</td>
+                    <td>
+                        <a href="{% url "users_settings_edit_kerberos_server" server_id=server.id %}">
+                            <span class="glyphicon glyphicon-edit"></span>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>
+            {% trans "There are no servers" %}!
+        </p>
+    {% endif %}
+
+{% endblock %}
+
+{% block sidebar-panel1 %}
+    {% sidebarpanel "vertical_buttons" %}
+        {% trans "Actions" %}
+        {% body %}
+        <a class="btn btn-primary"
+           href="{% url "users_settings_new_kerberos_server" %}">
+            {% trans "New Kerberos server" %}
+        </a>
+    {% endsidebarpanel %}
+{% endblock %}
+
+{% block sidebar-panel-help %}
+    {% sidebarpanel "help" %}
+        {% trans "Help" %}
+        {% body %}
+        <p>
+            {% trans "Kerberoes is a protocol used for authentication" %}.
+            {% trans "If you want to provide Kerberos logins, you must get details about it from your provider" %}.
+        </p>
+        <p>
+            {% trans "Select a kerberos authentication entry or create a new one" %}.
+            {% trans "Then you can also view a list of all users who have registered using each host on that page" %}.
+        </p>
+    {% endsidebarpanel %}
 {% endblock %}

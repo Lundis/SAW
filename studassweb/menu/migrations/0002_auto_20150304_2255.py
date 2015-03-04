@@ -15,17 +15,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='menuitem',
             name='view_permission',
-            field=models.ForeignKey(to='users.SAWPermission', null=True, blank=True),
+            field=models.ForeignKey(blank=True, null=True, to='users.SAWPermission'),
             preserve_default=True,
-        ),
-        migrations.AlterUniqueTogether(
-            name='menuitem',
-            unique_together=set([('app_name', 'display_name')]),
         ),
         migrations.AddField(
             model_name='menu',
             name='template',
-            field=models.ForeignKey(to='menu.MenuTemplate', null=True, blank=True),
+            field=models.ForeignKey(blank=True, null=True, to='menu.MenuTemplate'),
             preserve_default=True,
         ),
         migrations.AddField(

@@ -16,13 +16,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='boardmember',
             name='member',
-            field=models.ForeignKey(to='members.Member', on_delete=django.db.models.deletion.PROTECT),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='members.Member'),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='boardmember',
             name='role',
-            field=models.ForeignKey(to='boards.Role', on_delete=django.db.models.deletion.PROTECT),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='boards.Role'),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(
@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='board',
             name='boardtype',
-            field=models.ForeignKey(to='boards.BoardType', on_delete=django.db.models.deletion.PROTECT),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='boards.BoardType'),
             preserve_default=True,
         ),
     ]

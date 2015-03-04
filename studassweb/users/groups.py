@@ -96,7 +96,8 @@ def put_user_in_standard_group(user, new_group_name):
     # Give webmasters access to the admin pages
     if new_group_name == WEBMASTER:
         user.is_staff = True
-    else:
+    # Prevent randoms from removing staff rights to superusers
+    elif not user.is_superuser:
         user.is_staff = False
     user.save()
 

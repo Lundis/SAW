@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CustomEntry',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
                 ('content', models.TextField(default='')),
             ],
             options={
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CustomField',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=100, unique=True)),
             ],
             options={
@@ -34,12 +34,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Member',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
                 ('first_name', models.CharField(max_length=100)),
                 ('last_name', models.CharField(max_length=100)),
-                ('email', models.EmailField(max_length=75, null=True, blank=True)),
+                ('email', models.EmailField(blank=True, max_length=75, null=True)),
                 ('enrollment_year', models.IntegerField(null=True)),
-                ('graduation_year', models.IntegerField(null=True, blank=True)),
+                ('graduation_year', models.IntegerField(blank=True, null=True)),
                 ('confirmed', models.BooleanField(default=False)),
                 ('applying', models.BooleanField(default=False)),
                 ('can_apply_for_membership', models.BooleanField(default=True)),
@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Payment',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
                 ('member', models.ForeignKey(to='members.Member')),
             ],
             options={
@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PaymentPurpose',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
                 ('purpose', models.CharField(max_length=200)),
                 ('description', models.TextField(blank=True)),
             ],
