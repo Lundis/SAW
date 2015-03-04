@@ -1,11 +1,14 @@
 from django.db import models
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+from solo.models import SingletonModel
 from members.models import Member
 
 
 #Role of a board member, e.g. Festchef
 class Role(models.Model):
     name = models.CharField(max_length=100)
+    # TODO: add a description
 
     def __str__(self):
         return str(self.name)
@@ -17,6 +20,7 @@ class Role(models.Model):
 #Styrelsen, maskinutskottet etc.
 class BoardType(models.Model):
     name = models.CharField(max_length=100)
+    # TODO: add a description field
 
     def __str__(self):
         return str(self.name)
@@ -39,7 +43,7 @@ class BoardType(models.Model):
 
 class Board(models.Model):
     year = models.IntegerField()
-    photo = models.ImageField(upload_to='boards/photos', blank=True)
+    photo = models.ImageField(upload_to='boards/photos', blank=True, null=True)
     boardtype = models.ForeignKey(BoardType, on_delete=models.PROTECT)
 
     def __str__(self):
@@ -53,10 +57,11 @@ class Board(models.Model):
 
 
 class BoardMember(models.Model):
+    # TODO: rename to MemberInBoard
     board = models.ForeignKey(Board, on_delete=models.PROTECT)
     role = models.ForeignKey(Role, on_delete=models.PROTECT)
     member = models.ForeignKey(Member, on_delete=models.PROTECT)
-    photo = models.ImageField(upload_to='boards/photos', blank=True)
+    photo = models.ImageField(upload_to='boards/photos', blank=True, null=True)
 
     class Meta:
         unique_together = ("board", "role", "member")
@@ -68,5 +73,10 @@ class BoardMember(models.Model):
         return reverse("boards_view_boardmember", kwargs={'boardmember_id': self.id})
 
 
+class BoardSettings(SingletonModel):
+    is_setup = models.BooleanField(default=False, help_text="Tells us if the first-time setup has been done")
 
-
+    @classmethod
+    def instance(cls):
+        instance, created = cls.objects.get_or_create()
+        return instance

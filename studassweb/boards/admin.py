@@ -1,8 +1,9 @@
 from django.contrib import admin
-from .models import Role, BoardType, Board, BoardMember
+from .models import Role, BoardType, Board, BoardMember, BoardSettings
 
 
-admin.site.register(Role)
-admin.site.register(BoardType)
-admin.site.register(Board)
-admin.site.register(BoardMember)
+admin.site.register((Role,
+                     BoardType,
+                     Board,
+                     BoardMember,
+                     BoardSettings))
