@@ -16,9 +16,6 @@ def get_menu_items():
                                            display_name="Pages",
                                            reverse_string="pages_view_categories",
                                            permission=SAWPermission.get(VIEW_PUBLIC))
-    if not item.submenu:
-        item.submenu, created = Menu.objects.get_or_create(menu_name="pages_top_menu")
-        item.save()
 
     return [item], None, None
 
