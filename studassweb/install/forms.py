@@ -60,7 +60,7 @@ class ModulesForm(forms.Form):
                     description = ""
 
                 # If install has been ran before, use the current status of all modules
-                if install.models.InstallProgress.is_finished():
+                if install.models.InstallProgress.is_modules_set():
                     initial = DisabledModule.is_enabled(module)
                 else:
                     # Otherwise assume that the user wants to enable all modules
