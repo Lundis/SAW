@@ -3,7 +3,8 @@ from django.conf import settings
 from django.core.signing import Signer
 from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
-from django.utils.crypto import get_random_string
+from django.core.context_processors import csrf
+import uuid
 
 from .. import default_settings as DEFAULTS
 from ..forms import MultiUploadForm
@@ -70,9 +71,15 @@ def multiuploader_form_script(context, form_type="default", template="multiuploa
                               target_form_fieldname=DEFAULT_TARGET_FORM_FIELDNME,
                        js_prefix="jQuery", send_button_selector=None,
                        wrapper_element_id="", lock_while_uploading=True, number_files_attached=0):
+
+    # Generate CSRF token
+    context.update(csrf(context.get('request')))
+    unique_id = uuid.uuid4()
+
     return render_to_string(template, {
         'multiuploader_form': MultiUploadForm(form_type=form_type),
         'csrf_token': context["csrf_token"],
+        'unique_id': unique_id,
         'type': form_type,
         'prefix': js_prefix,
         'send_button_selector': send_button_selector,
