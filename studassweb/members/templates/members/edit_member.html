@@ -9,7 +9,9 @@
         {% if member %}
             {% trans "Editing member" %}
             {{ member.first_name }} {{ member.last_name }}
-            ( {{ member.user.user_ext.username }})
+            {% if member.user_ext %}
+                ({{ member.user_ext.user.username }})
+            {% endif %}
         {% else %}
             {% trans "Adding new member" %}
         {% endif %}
