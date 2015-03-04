@@ -36,19 +36,13 @@
         var fd = new FormData();
         fd.append( 'unique_id', "{{ unique_id }}" );
         fd.append( 'csrfmiddlewaretoken', "{{ csrf_token }}" );
+        fd.append( 'form_type', "{{ type }}" );
         $('#{{ target_form_fieldname }}').fileupload({
-                /*formData: [
-                    { name: "unique_id", value: "{{ unique_id }}"},
-                    { name: "csrfmiddlewaretoken", value: "{{ csrf_token }}"}
-                ],*/
             formData: fd,
-            processData: false,
-            //contentType: 'multipart/form-data',
-            contentType: 'kuken',
             url: url,
-            dataType: 'json',
-            autoUpload: false,
-            /*var opts = {{ multiuploader_form.options|safe }};*/
+            paramName: "file",
+            sequentialUploads: true,
+            /*var opts = {{ multiuploader_form.options|safe }};  TODO */
             acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
             maxFileSize: 5000000, // 5 MB
             // Enable image resizing, except for Android and Opera,
