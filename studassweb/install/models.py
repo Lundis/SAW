@@ -24,6 +24,11 @@ class InstallProgress(SingletonModel):
         progress.save()
 
     @classmethod
+    def is_site_name_set(cls):
+        progress, created = cls.objects.get_or_create()
+        return progress.site_name_ok
+
+    @classmethod
     def modules_set(cls):
         """
         Marks the modules as selected
@@ -32,6 +37,11 @@ class InstallProgress(SingletonModel):
         progress, created = cls.objects.get_or_create()
         progress.modules_ok = True
         progress.save()
+
+    @classmethod
+    def is_modules_set(cls):
+        progress, created = cls.objects.get_or_create()
+        return progress.modules_ok
 
     @classmethod
     def menu_set(cls):
