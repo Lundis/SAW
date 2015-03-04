@@ -25,10 +25,9 @@ def setup():
                         for_frontpage=True,
                         author=User.objects.all().first())
         page.save()
-        # Then put it at the top of the front page
+        # Put it in the main bar on the frontpage
         fp_item = FrontPageItem.get_with_target(page)
         fp_item.location = FrontPageItem.MAINBAR
-        fp_item.ordering_index = 1
         fp_item.save()
         # Mark the module as set up
         settings.is_setup = True

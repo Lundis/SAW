@@ -5,6 +5,9 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.dispatch import receiver
 from django.db.models.signals import pre_delete, post_delete, post_save, pre_save
 from base.utils import get_function_from_module
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class FrontPageItem(models.Model):
@@ -93,28 +96,25 @@ class FrontPageItem(models.Model):
 @receiver(pre_save, sender=FrontPageItem, dispatch_uid="frontpage_item_pre_save")
 def frontpage_item_pre_save(**kwargs):
     instance = kwargs.pop("instance")
-
     if not instance.ordering_index:
-        # Put it last
-        last_index = instance._count_in_location() + 1
-        # Code defensively in case there are inconsistencies in the DB
-        while FrontPageItem.objects.filter(ordering_index=last_index, location=instance.location):
-            last_index += 1
+        # just try to place it first
+        instance.ordering_index = 1
 
-        instance.ordering_index = last_index
-    else:
-        try:
-            # Get the object currently at the wanted position:
-            other = FrontPageItem.objects.get(location=instance.location,
-                                              ordering_index=instance.ordering_index)
-            # and move it forward
-            if instance.pk != other.pk:
-                other.ordering_index += 1
-                other.save()
-        except FrontPageItem.DoesNotExist:
-            pass
+    try:
+        logger.debug("Trying to save frontpage item at index %s" % instance.ordering_index)
+        # Get the object currently at the wanted position:
+        other = FrontPageItem.objects.get(location=instance.location,
+                                          ordering_index=instance.ordering_index)
+        # and move it forward
+        if instance.pk != other.pk:
+            logger.debug("Moving other frontpage item forward to position %s, saving self at %s" %
+                         (other.ordering_index+1, other.ordering_index))
+            other.ordering_index += 1
+            other.save()
+    except FrontPageItem.DoesNotExist:
+        pass
+
 
 @receiver(post_save, sender=FrontPageItem, dispatch_uid="frontpage_item_post_save")
 def frontpage_item_post_save(**kwargs):
     instance = kwargs.pop("instance")
-    instance._fix_indices()
