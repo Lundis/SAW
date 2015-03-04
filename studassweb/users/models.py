@@ -85,11 +85,14 @@ class KerberosServer(models.Model):
     """
     hostname = models.CharField(max_length=255, unique=True,
                                 help_text="Example: domain.com, as in user@domain.com")
-    realm = models.CharField(max_length=255, help_text="Example: srv.domain.com")
-    service = models.CharField(max_length=255, help_text="Example: krbtgt@srv.domain.com")
+    realm = models.CharField(max_length=255, help_text="Example: SRV.DOMAIN.COM")
+    service = models.CharField(max_length=255, help_text="Example: krbtgt@SRV.DOMAIN.COM")
 
     def __str__(self):
         return self.hostname
+
+    def get_all_users(self):
+        return KerberosLink.objects.filter(server=self)
 
 
 class KerberosLink(models.Model):

@@ -3,13 +3,14 @@ from django.contrib.auth.models import Group
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, Http404, HttpResponseNotAllowed
 from django.core.urlresolvers import reverse
+from django.core.exceptions import SuspiciousOperation
 from settings.sections import SECTION_PERSONAL_SETTINGS, SECTION_USERS, Section
 from base.forms import DummyForm
 from .decorators import has_permission
 from .groups import group_names
 from .register import EDIT_LOGIN_SETTINGS, EDIT_PROFILE, EDIT_PERMISSIONS
-from .forms import UserBaseForm, ProfileForm, CustomGroupForm, PermissionEditorForm
-from .models import UserExtension, SAWPermission
+from .forms import UserBaseForm, ProfileForm, CustomGroupForm, PermissionEditorForm, KerberosServerForm
+from .models import UserExtension, SAWPermission, KerberosServer
 
 
 urlpatterns = patterns('',
@@ -41,6 +42,14 @@ urlpatterns = patterns('',
     url(r'^%s/login/$' % SECTION_USERS,
         'users.settings_pages.edit_login',
         name='users_settings_edit_login'),
+
+    url(r'^%s/login/edit_kerberos_server/(?P<server_id>\d+)$' % SECTION_USERS,
+        'users.settings_pages.edit_kerberos_server',
+        name='users_settings_edit_kerberos_server'),
+
+    url(r'^%s/login/new_kerberos_server$' % SECTION_USERS,
+        'users.settings_pages.edit_kerberos_server',
+        name='users_settings_new_kerberos_server'),
 )
 
 
@@ -165,6 +174,26 @@ def edit_user(request):
 @has_permission(EDIT_LOGIN_SETTINGS)
 def edit_login(request):
     section = Section.get_section(SECTION_USERS)
-    context = {'section': section}
+    context = {'section': section,
+               'kerberos_servers': KerberosServer.objects.all()}
     return render(request, "users/settings/login_settings.html", context)
 
+
+@has_permission(EDIT_LOGIN_SETTINGS)
+def edit_kerberos_server(request, server_id=None):
+    section = Section.get_section(SECTION_USERS)
+    if server_id is not None:
+        try:
+            server = KerberosServer.objects.get(id=server_id)
+        except KerberosServer.DoesNotExist:
+            raise SuspiciousOperation("Tried to edit a non-existing Kerberos server")
+    else:
+        server = None
+    form = KerberosServerForm(request.POST or None, instance=server)
+    if form.is_valid():
+        form.save()
+        return HttpResponseRedirect(reverse("users_settings_edit_login"))
+    context = {'section': section,
+               'form': form,
+               'server': server}
+    return render(request, "users/settings/edit_kerberos_server.html", context)
