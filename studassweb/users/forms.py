@@ -2,8 +2,10 @@ from django import forms
 from django.utils.translation import ugettext as _
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User, Group
+from django.core.exceptions import ValidationError
 from .models import UserExtension
 from base.forms import SortingForm
+from base.validators import validate_password, validate_username
 from .groups import put_perm_in_standard_group
 from captcha.fields import ReCaptchaField
 import logging
@@ -32,7 +34,7 @@ class LoginForm(forms.Form):
 
     def login_user(self, request):
         user = authenticate(username=self.cleaned_data['user_name'], password=self.cleaned_data['password'])
-        #UserExtension is normally created when creating user, except for SuperUsers.
+        # UserExtension is normally created when creating user, except for SuperUsers.
         try:
             UserExtension.objects.get(user=user)
         except UserExtension.DoesNotExist:
@@ -51,20 +53,27 @@ class RegisterForm(forms.Form):
 
     captcha = ReCaptchaField()
 
+    def clean_user_name(self):
+        validate_username(self.cleaned_data['user_name'])
+        # check that the user doesn't exist already
+        if User.objects.filter(username=self.cleaned_data['user_name']).count() != 0:
+            raise ValidationError(_("The username is taken"))
+        return self.cleaned_data['user_name']
+
+    def clean_email(self):
+        # check that the email isn't already registered to an account
+        if User.objects.filter(email=self.cleaned_data['email']).count() != 0:
+            raise ValidationError(_("An account associated to this email already exists"))
+        return self.cleaned_data['email']
+
+    def clean_password(self):
+        validate_password(self.cleaned_data['password'])
+        return self.cleaned_data['password']
+
     def clean(self):
         super(RegisterForm, self).clean()
-        if not self.errors:
-            # check that the user doesn't exist already
-            if User.objects.filter(username=self.cleaned_data['user_name']).count() != 0:
-                self._errors['user_name'] = _("The username is taken")
-
-            # check that the email isn't already registered to an account
-            if User.objects.filter(email=self.cleaned_data['email']).count() != 0:
-                self._errors['email'] = _("An account associated to this email already exists")
-
-            # make sure the passwords are equal
-            if self.cleaned_data['password'] != self.cleaned_data['password_repeat']:
-                self._errors['password_repeat'] = _("The passwords do not match")
+        if 'password' in self.cleaned_data and self.cleaned_data['password_repeat'] != self.cleaned_data['password']:
+            self.add_error('password_repeat', _("The passwords are not equal"))
 
     def save(self):
         if self.is_valid():

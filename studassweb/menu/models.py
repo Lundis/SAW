@@ -136,6 +136,7 @@ class Menu(models.Model):
     def get(cls, name):
         """
         Returns the menu if it exists, otherwise None
+        TODO: remove
         """
         return cls.objects.get(menu_name=name)
 

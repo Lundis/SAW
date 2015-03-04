@@ -3,7 +3,7 @@ from django.template.loader import get_template
 from django.template import Context
 from django.utils.translation import ugettext as _
 from .fields import HiddenMenuField
-from .models import MenuItem, Menu, TYPE_USER, MainMenuSettings, MenuTemplate
+from .models import MenuItem, Menu, TYPE_USER, MainMenuSettings, MenuTemplate, TYPE_APP
 import re
 import logging
 
@@ -154,9 +154,16 @@ class MenuCreationForm(forms.ModelForm):
         fields = ('menu_name',)
 
     def save(self, *args, **kwargs):
+        new = not self.instance or not self.instance.pk
         menu = super(MenuCreationForm, self).save(*args, **kwargs)
         menu.created_by = TYPE_USER
         menu.save()
+        # Now create a menu item so that users can add it to other menus
+        if new:
+            MenuItem.objects.create(identifier="item_for_menu_%s" % menu.id,
+                                    display_name=menu.menu_name,
+                                    submenu=menu,
+                                    created_by=TYPE_APP)
         return menu
 
 
