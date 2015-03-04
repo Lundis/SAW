@@ -15,14 +15,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='FrontPageItem',
             fields=[
-                ('id', models.AutoField(auto_created=True, verbose_name='ID', serialize=False, primary_key=True)),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
                 ('identifier', models.CharField(max_length=100)),
                 ('title', models.TextField()),
-                ('content', models.TextField()),
-                ('location', models.CharField(choices=[('MB', 'Main bar'), ('SB', 'Side bar'), ('HD', 'Hidden')], max_length=2, default='HD')),
-                ('ordering_index', models.IntegerField(validators=django.core.validators.MinValueValidator(1))),
-                ('_object_id', models.PositiveIntegerField(null=True, blank=True)),
-                ('_content_type', models.ForeignKey(null=True, to='contenttypes.ContentType', blank=True)),
+                ('content', models.TextField(blank=True, null=True)),
+                ('template', models.CharField(default='', max_length=200)),
+                ('module', models.CharField(blank=True, default='', max_length=50)),
+                ('render_function', models.CharField(blank=True, default='', max_length=50)),
+                ('location', models.CharField(choices=[('MB', 'Main bar'), ('SB', 'Side bar'), ('HD', 'Hidden')], default='HD', max_length=2)),
+                ('ordering_index', models.IntegerField(validators=[django.core.validators.MinValueValidator(1)])),
+                ('_object_id', models.PositiveIntegerField(blank=True, null=True)),
+                ('_content_type', models.ForeignKey(blank=True, null=True, to='contenttypes.ContentType')),
             ],
             options={
                 'ordering': ('ordering_index',),
@@ -31,6 +34,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='frontpageitem',
-            unique_together=set([('location', 'ordering_index')]),
+            unique_together=set([('location', 'ordering_index'), ('_content_type', '_object_id')]),
         ),
     ]

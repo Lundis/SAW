@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 from django.conf import settings
-import ckeditor.fields
+import base.fields
 
 
 class Migration(migrations.Migration):
@@ -16,15 +16,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Article',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
                 ('title', models.CharField(max_length=100)),
-                ('summary', models.TextField(max_length=300, null=True, blank=True)),
+                ('summary', models.TextField(blank=True, max_length=300, null=True)),
                 ('slug', models.SlugField(editable=False)),
-                ('text', ckeditor.fields.RichTextField()),
+                ('text', base.fields.ValidatedRichTextField()),
                 ('created_date', models.DateField(auto_now_add=True)),
                 ('created_time', models.TimeField(auto_now_add=True)),
                 ('updated', models.DateTimeField(auto_now=True)),
-                ('picture', models.ImageField(null=True, upload_to='news/article_thumbnails', blank=True)),
+                ('picture', models.ImageField(blank=True, upload_to='news/article_thumbnails', help_text='A small picture used in the news feed', null=True)),
                 ('author', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
             options={
@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Category',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=100, unique=True)),
             ],
             options={
@@ -43,10 +43,21 @@ class Migration(migrations.Migration):
             },
             bases=(models.Model,),
         ),
+        migrations.CreateModel(
+            name='NewsSettings',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
+                ('is_setup', models.BooleanField(default=False)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
         migrations.AddField(
             model_name='article',
             name='categories',
-            field=models.ManyToManyField(to='news.Category', blank=True),
+            field=models.ManyToManyField(blank=True, to='news.Category'),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(
