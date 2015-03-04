@@ -12,7 +12,6 @@
 {% endblock %}
 
 {% block main_content %}
-    <p>{% trans "Please note that we currently do not support SSL, so we recommend that that you use a random password created specifically for this site" %}</p>
     <form action="{% url "users_register" %}" method="post">
         {% csrf_token %}
         {% bootstrap_form form %}
