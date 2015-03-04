@@ -19,6 +19,7 @@ from .utils import FileResponse
 from .models import MultiuploaderFile
 from .forms import MultiUploadForm, MultiuploaderMultiDeleteForm
 
+# TODO change to the other thumbnail lib
 from sorl.thumbnail import get_thumbnail
 
 log = logging
@@ -76,6 +77,13 @@ def multiuploader(request, noajax=False):
             response_data = [{"error": _("Error when detecting form type, form_type is missing")}]
             return HttpResponse(json.dumps(response_data))
 
+        # We get one request for each file, this id connects them.
+        if not request.POST[u"unique_id"]:
+            response_data = [{"error": _("unique_id is missing")}]
+            return HttpResponse(json.dumps(response_data))
+        unique_id = request.POST[u"unique_id"]
+
+        # Remove this, we use csrf
         signer = Signer()
 
         try:
