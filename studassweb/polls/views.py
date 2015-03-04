@@ -22,11 +22,13 @@ def home(request):
 def view_poll(request, poll_id):
     try:
         poll = Poll.objects.get(id=poll_id)
+        if not poll.can_view(request.user):
+            return HttpResponseForbidden("You do not have access to view this poll")
         choices = Choice.objects.filter(id_to_poll=poll_id)
 
         if poll.can_user_vote(request):
             if poll.can_vote_on_many:
-                form=ChoiceFormMultiple(request.POST or None, poll_choices=choices, poll = poll)
+                form = ChoiceFormMultiple(request.POST or None, poll_choices=choices, poll = poll)
 
             else:
                 form = ChoiceFormSingle(request.POST or None, poll_choices=choices, poll= poll)
