@@ -19,8 +19,6 @@
 {% endblock %}
 
 {% block main_content %}
-    <h1>{% trans "Welcome!" %}</h1>
-    <p>{% trans "This site is under heavy development. Don't worry if it's hard to understand right now, it will get better!" %}</p>
     <div id="mainbar-container" data-location-container="mainbar">
         {% for item in main_items %}
             {% display_frontpage_item item edit_mode "main" %}
