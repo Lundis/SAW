@@ -36,8 +36,8 @@
         </div>
         <div class="panel-body">
             <div class="btn-group-vertical btn-block">
-                <a href="{% url 'gallery_add_picture' %}" class="btn btn-primary">
-                    {% trans "Add picture to  album" %}
+                <a href="{% url 'gallery_manage_album' slug=album.slug %}" class="btn btn-primary">
+                    {% trans "Manage pictures in album" %}
                 </a>
             </div>
         </div>

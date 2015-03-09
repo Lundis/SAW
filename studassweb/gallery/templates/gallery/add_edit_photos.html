@@ -7,14 +7,12 @@
 
 {% block breadcrumb2 %}
     <li class="active">
-        {% if form.instance.pk %}
-            {% trans "Edit contents of " %} {{ album.name }}
-        {% endif %}
+        {% trans "Edit contents of " %} {{ album.name }}
     </li>
 {% endblock %}
 
 {% block main_content %}
-    <h1>{% trans "Edit contents of " %}{{ form.instance.name }}</h1>
+    <h1>{% trans "Edit contents of " %}{{ album.name }}</h1>
     <form action ="" method="post">
         {% csrf_token %}
 
@@ -25,5 +23,5 @@
 
 {% block scripts %}
     <script src="{% static "js/jquery-ui.min.js" %}"></script>
-    {% multiuploader_form_script form_type="images" js_prefix="jQuery" send_button_selector="input[name=_edit]" wrapper_element_id="fileUploads" lock_while_uploading=True number_files_attached=forms.attached_count album=form.instance%}
+    {% multiuploader_form_script form_type="images" js_prefix="jQuery" send_button_selector="input[name=_edit]" wrapper_element_id="fileUploads" lock_while_uploading=True number_files_attached=forms.attached_count album=album %}
 {% endblock %}
