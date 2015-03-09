@@ -37,7 +37,7 @@
         fd.append( 'unique_id', "{{ unique_id }}" );
         fd.append( 'csrfmiddlewaretoken', "{{ csrf_token }}" );
         fd.append( 'form_type', "{{ type }}" );
-        fd.append( 'album_pk', "{{ album.pk }}" );
+        fd.append( 'album_pk', "{{ album.slug }}" );
         $('#{{ target_form_fieldname }}').fileupload({
             formData: fd,
             url: url,

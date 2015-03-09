@@ -18,7 +18,7 @@ from .utils import FileResponse
 from .forms import MultiUploadForm, MultiuploaderMultiDeleteForm
 
 # TODO move this later
-from gallery.models import Photo
+from gallery.models import Album, Photo
 
 # TODO change to the other thumbnail lib
 # from sorl.thumbnail import get_thumbnail
@@ -47,20 +47,6 @@ def multiuploader_delete_multiple(request, ok=False):
         return HttpResponseBadRequest('Only POST accepted')
 
 
-def multiuploader_delete(request, pk):
-    if request.method == 'POST':
-        log.info('Called delete file. File id=' + str(pk))
-        fl = get_object_or_404(MultiuploaderFile, pk=pk)
-        fl.delete()
-        log.info('DONE. Deleted file id=' + str(pk))
-
-        return HttpResponse(1)
-
-    else:
-        log.info('Received not POST request to delete file view')
-        return HttpResponseBadRequest('Only POST accepted')
-
-
 def multiuploader(request, noajax=False):
     """
     Main Multiuploader module.
@@ -69,7 +55,6 @@ def multiuploader(request, noajax=False):
 
     if request.method == 'POST':
         log.info('received POST to main multiuploader view')
-        #print(request.POST)
 
         log.debug('Checking request.FILES')
         if request.FILES is None:
@@ -91,15 +76,18 @@ def multiuploader(request, noajax=False):
             return HttpResponse(json.dumps(response_data))
         unique_id = request.POST[u"unique_id"]
 
-        # Remove this, we use csrf + unique_id
-        #signer = Signer()
-        """
-        try:
-            form_type = signer.unsign(request.POST.get(u"form_type"))
-        except BadSignature:
-            response_data = [{"error": _("Tampering detected!")}]
+        if not request.POST[u"album_pk"]:
+            log.error('album_pk is missing')
+            response_data = [{"error": _("album_pk is missing")}]
             return HttpResponse(json.dumps(response_data))
-        """
+        album_pk = request.POST[u"album_pk"]
+
+        try:
+            album = Album.objects.get(slug=album_pk)
+        except Album.DoesNotExist:
+            log.error('Tried to add photos with wrong album_pk: {0}'.format(album_pk))
+            response_data = [{"error": _("album_pk is wrong!")}]
+            return HttpResponse(json.dumps(response_data))
 
         form_type = request.POST.get(u"form_type")
         form = MultiUploadForm(request.POST, request.FILES, form_type=form_type)
@@ -117,45 +105,14 @@ def multiuploader(request, noajax=False):
             return HttpResponse(json.dumps(response_data))
 
         log.debug('Get the file')
-        file = request.FILES[u'file']
-        wrapped_file = UploadedFile(file)
-        # TODO don't take extension from uploaded file, it should be hardcoded jpg/png/gif etc
-        filename = unique_id + '.' + wrapped_file.name.split('.')[-1]
-        file_size = wrapped_file.file.size
-        upload_to_folder = os.path.join(settings.MEDIA_ROOT, "gallery") # TODO
 
-        log.info('Got file: "%s"' % filename)
-
-        #writing file manually into model
-        #because we don't need form of any type.
-
-        #fl = MultiuploaderFile()
-        #fl.filename = filename
-        #fl.file = file
-        #fl.save()
-
-        # make dir if not exists already
-        if not os.path.exists(upload_to_folder):
-            os.makedirs(upload_to_folder)
-
-        destination = os.path.join(upload_to_folder, filename)
-        # open the file handler with write binary mode
-        fhandler = open(destination, "wb+")
-        # save file data into the disk
-        # use the chunk method in case the file is too big
-        # in order not to clutter the system memory
-        for chunk in file.chunks():
-            fhandler.write(chunk)
-        # close the file
-        fhandler.close()
-
-        log.info('File saving done')
-
+        log.info('saving in a Photo()')
         # Writing it into model:
         # TODO this should somehow be set somewhere else
         p = Photo()
-        p.image = filename
-        #p.album =
+        p.image = request.FILES[u'file']
+        p.album = album
+        p.save()
 
 
         thumb_url = ""
@@ -167,9 +124,9 @@ def multiuploader(request, noajax=False):
         #    log.error(e)
 
         #generating json response array
-        result = [{#"id": fl.id,
-                   "name": filename,
-                   "size": file_size,
+        result = [{"id": p.id,
+                   #"name": filename,
+                   #"size": file_size,
                    #"url": reverse('multiuploader_file_link', args=[fl.pk]),
                    #"thumbnail_url": thumb_url,
                   # "delete_url": reverse('multiuploader_delete', args=[fl.pk]),
