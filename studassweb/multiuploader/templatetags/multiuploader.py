@@ -70,11 +70,12 @@ def multiuploader_form(context, form_type="default", template="multiuploader/for
 def multiuploader_form_script(context, form_type="default", template="multiuploader/form_script.html",
                               target_form_fieldname=DEFAULT_TARGET_FORM_FIELDNME,
                        js_prefix="jQuery", send_button_selector=None,
-                       wrapper_element_id="", lock_while_uploading=True, number_files_attached=0):
+                       wrapper_element_id="", lock_while_uploading=True, number_files_attached=0, album=None):
 
     # Generate CSRF token
     context.update(csrf(context.get('request')))
     unique_id = uuid.uuid4()
+    album = album
 
     return render_to_string(template, {
         'multiuploader_form': MultiUploadForm(form_type=form_type),
@@ -86,7 +87,8 @@ def multiuploader_form_script(context, form_type="default", template="multiuploa
         'wrapper_element_id': wrapper_element_id,
         'target_form_fieldname': target_form_fieldname,
         'lock_while_uploading': lock_while_uploading,
-        'number_files_attached': number_files_attached
+        'number_files_attached': number_files_attached,
+        'album': album,
     })
 
 

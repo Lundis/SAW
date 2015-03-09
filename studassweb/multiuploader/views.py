@@ -8,17 +8,17 @@ try:
 except ImportError:
     import json
 from django.shortcuts import redirect
-from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
-from django.core.signing import Signer, BadSignature
 from django.core.files.uploadedfile import UploadedFile
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseBadRequest
 import os
 
 from .utils import FileResponse
-from .models import MultiuploaderFile
 from .forms import MultiUploadForm, MultiuploaderMultiDeleteForm
+
+# TODO move this later
+from gallery.models import Photo
 
 # TODO change to the other thumbnail lib
 # from sorl.thumbnail import get_thumbnail
@@ -138,19 +138,25 @@ def multiuploader(request, noajax=False):
         if not os.path.exists(upload_to_folder):
             os.makedirs(upload_to_folder)
 
-        filename = os.path.join(upload_to_folder, filename)
+        destination = os.path.join(upload_to_folder, filename)
         # open the file handler with write binary mode
-        destination = open(filename, "wb+")
+        fhandler = open(destination, "wb+")
         # save file data into the disk
         # use the chunk method in case the file is too big
         # in order not to clutter the system memory
         for chunk in file.chunks():
-            destination.write(chunk)
+            fhandler.write(chunk)
         # close the file
-        destination.close()
-
+        fhandler.close()
 
         log.info('File saving done')
+
+        # Writing it into model:
+        # TODO this should somehow be set somewhere else
+        p = Photo()
+        p.image = filename
+        #p.album =
+
 
         thumb_url = ""
 
