@@ -59,11 +59,6 @@
             $.each(data.files, function (index, file) {
                 var node = $('<p/>')
                         .append($('<span/>').text(file.name));
-                if (!index) {
-                    node
-                            .append('<br>')
-                            .append(uploadButton.clone(true).data(data));
-                }
                 node.appendTo(data.context);
             });
         }).on('fileuploadprocessalways', function (e, data) {
