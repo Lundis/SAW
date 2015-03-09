@@ -30,21 +30,6 @@
                 {% trans "Submit" %}
             </button>
         {% endbuttons %}
-
-        {% multiuploader_noscript form.uploadedFiles.html_name %}
     </form>
-
-
-    {% multiuploader_form form_type="images" js_prefix="jQuery" send_button_selector="input[name=_edit]" wrapper_element_id="fileUploads" lock_while_uploading=True number_files_attached=forms.attached_count %}
-
-
-{% endblock %}
-
-{% block scripts %}
-    <script src="{% static "js/jquery-ui.min.js" %}"></script>
-
-
-    {% multiuploader_form_script form_type="images" js_prefix="jQuery" send_button_selector="input[name=_edit]" wrapper_element_id="fileUploads" lock_while_uploading=True number_files_attached=forms.attached_count %}
-
 {% endblock %}
 
