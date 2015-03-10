@@ -1,11 +1,12 @@
 from django.db import models
-from django.core.validators import ValidationError
+from django.core.validators import ValidationError, MinValueValidator
 from django.utils.translation import ugettext as _
 from django.dispatch import receiver
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete, post_save
 from users.groups import put_user_in_standard_group, MEMBER
 from users.models import UserExtension
 from base.models import SiteConfiguration
+from django.utils import timezone
 
 
 class Member(models.Model):
@@ -70,12 +71,23 @@ class Member(models.Model):
                                   confirmed=confirmed)
 
 
-@receiver(post_delete, sender=Member, dispatch_uid="member_post_delete")
-def page_post_delete(**kwargs):
+@receiver(post_delete, sender=Member, dispatch_uid="member_post_save")
+def member_post_save(**kwargs):
     instance = kwargs.pop("instance")
     # Remove the UserExtension if it exists
     if instance.user_ext:
         instance.user_ext.delete()
+
+
+@receiver(post_save, sender=Member, dispatch_uid="member_post_delete")
+def member_post_delete(**kwargs):
+    instance = kwargs.pop("instance")
+    # Update first/last name of user if there's a mismatch
+    if instance.user_ext:
+        user = instance.user_ext.user
+        if user.first_name != instance.first_name or user.last_name != instance.last_name:
+            user.first_name = instance.first_name
+            user.last_name = instance.last_name
 
 
 class PaymentPurpose(models.Model):
@@ -86,6 +98,19 @@ class PaymentPurpose(models.Model):
 class Payment(models.Model):
     member = models.ForeignKey(Member)
     purpose = models.ForeignKey(PaymentPurpose)
+    date = models.DateField()
+    expires = models.DateField()
+    date_entered = models.DateTimeField(auto_now_add=True, editable=False)
+
+    class Meta:
+        ordering = ("-date",)
+
+    def has_expired(self):
+        return timezone.now() > self.expires
+
+    @classmethod
+    def get_latest(cls, purpose, member):
+        return cls.objects.filter(purpose=purpose, member=member).first()
 
 
 class CustomField(models.Model):

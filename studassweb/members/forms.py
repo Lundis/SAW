@@ -1,7 +1,8 @@
 from django import forms
-from .models import Member, PaymentPurpose, CustomField
+from .models import Member, PaymentPurpose, CustomField, Payment
 from users.groups import GROUP_CHOICES, get_user_group, put_user_in_standard_group
 from django.utils.translation import ugettext as _
+from django.utils import timezone
 
 
 class MemberApplicationForm(forms.ModelForm):
@@ -22,6 +23,26 @@ class CustomFieldForm(forms.ModelForm):
     class Meta:
         model = CustomField
         fields = ('name',)
+
+
+class PaymentForm(forms.ModelForm):
+
+    class Meta:
+        model = Payment
+        fields = ("purpose", "date", "expires")
+
+    def __init__(self, *args, **kwargs):
+        self._member = kwargs.pop("member")
+        super(PaymentForm, self).__init__(*args, **kwargs)
+        # Use now as the default time of payment
+        self.fields["date"].initial = timezone.now()
+
+    def save(self, commit=True):
+        payment = super(PaymentForm, self).save(commit=False)
+        payment.member = self._member
+        if commit:
+            payment.save()
+        return payment
 
 
 class MemberEditForm(forms.ModelForm):

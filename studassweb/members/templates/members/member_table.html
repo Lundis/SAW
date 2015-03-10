@@ -26,13 +26,14 @@
             <th class="col-graduation hidden">{% trans "Graduated" %}</th>
             <th class="col-groups">{% trans "Groups" %}</th>
             {% for column in extra_columns %}
-                <th class="col-{{ column.id }}">column.name</th>
+                <th class="col-{{ column.id }} hidden">{{ column.name }}</th>
             {% endfor %}
             <th class="col-edit"> {% trans "Edit" %}</th>
         </tr>
         {% for row in members_data %}
             {% setvar row.0 as member %}
             {% setvar row.1 as columns %}
+            {% setvar row.2 as payments %}
             <tr>
                 <td class="col-username">
                     {% if member.user_ext %}
@@ -82,7 +83,12 @@
                 </td>
                 {% for column in columns %}
                     <td class="{{ column.0 }} hidden">
-                        {{ column.1 }}
+                        {{ column.1.content }}
+                    </td>
+                {% endfor %}
+                {% for payment in payments %}
+                    <td class="{{ payment.0 }} hidden">
+                        {{ payment.1.date }}
                     </td>
                 {% endfor %}
                 <td>
@@ -136,20 +142,21 @@
         {% for column in extra_columns %}
             <div class="btn btn-info btn-block btn-xs col-checkbox"
                  id="col-{{ column.id }}-selector">
-                column.name
+                {{ column.name }}
             </div>
         {% endfor %}
     {% endsidebarpanel %}
     {% sidebarpanel "vertical_buttons" %}
         {% trans "Actions" %}
         {% body %}
-        <a href="{% url "members_create_custom_field" %}"
-           class="btn btn-primary"
-           id="new-column-button">{% trans "Create new column" %}
-        </a>
         <a href="{% url "members_add_member" %}" class="btn btn-primary" >
             {% trans "Add new member" %}
         </a>
+        <a href="{% url "members_create_custom_field" %}"
+           class="btn btn-primary" id="new-column-button">
+            {% trans "Create new column" %}
+        </a>
+
     {% endsidebarpanel %}
 {% endblock %}
 
