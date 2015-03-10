@@ -17,14 +17,6 @@
             <a href="{{ picture.image.url }}"><img class="img-thumbnail" src="{% thumbnail picture.image 100x100 crop=scale %}"/></a>
         {% empty %}
             <p>{% trans "no photos in album" %}<p/>
-            <form action="{% url 'gallery_delete_album' slug=album.slug %}" method="post">
-               {% csrf_token %}
-               {% buttons %}
-                   <button type="submit" class="btn btn-danger" onclick="return confirm('{% trans "Are you sure?" %}')">
-                       {% trans "remove album" %}
-                   </button>
-               {% endbuttons %}
-            </form>
         {% endfor %}
     </div>
 {% endblock %}

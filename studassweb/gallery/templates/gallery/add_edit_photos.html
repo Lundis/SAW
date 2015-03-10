@@ -4,6 +4,7 @@
 {% load bootstrap3 %}
 {% load static %}
 {% load multiuploader %}
+{% load thumbnail %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -13,6 +14,15 @@
 
 {% block main_content %}
     <h1>{% trans "Edit contents of " %}{{ album.name }}</h1>
+
+    <div class="list-group">
+        {% for picture in pictures %}
+            <a href="{{ picture.image.url }}"><img class="img-thumbnail" src="{% thumbnail picture.image 100x100 crop=scale %}"/></a>
+        {% empty %}
+            <p>{% trans "no photos in album" %}<p/>
+        {% endfor %}
+    </div>
+
     <form action ="" method="post">
         {% csrf_token %}
 
