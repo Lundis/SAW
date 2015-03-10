@@ -71,16 +71,16 @@ class Member(models.Model):
                                   confirmed=confirmed)
 
 
-@receiver(post_delete, sender=Member, dispatch_uid="member_post_save")
-def member_post_save(**kwargs):
+@receiver(post_delete, sender=Member, dispatch_uid="member_post_delete")
+def member_post_delete(**kwargs):
     instance = kwargs.pop("instance")
     # Remove the UserExtension if it exists
     if instance.user_ext:
         instance.user_ext.delete()
 
 
-@receiver(post_save, sender=Member, dispatch_uid="member_post_delete")
-def member_post_delete(**kwargs):
+@receiver(post_save, sender=Member, dispatch_uid="member_post_save")
+def member_post_save(**kwargs):
     instance = kwargs.pop("instance")
     # Update first/last name of user if there's a mismatch
     if instance.user_ext:
