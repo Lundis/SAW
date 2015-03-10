@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 from users.decorators import has_permission
 from users.models import UserExtension
 from .models import Member, PaymentPurpose, CustomField, CustomEntry
-from .forms import MemberApplicationForm, PaymentPurposeForm, MemberEditForm
+from .forms import MemberApplicationForm, PaymentPurposeForm, MemberEditForm, CustomFieldForm
 from .register import CAN_VIEW, CAN_EDIT
 from base.views import delete_confirmation_view
 
@@ -25,6 +25,8 @@ def view_members(request):
                'extra_columns': extra_columns}
     return render(request, 'members/member_table.html', context)
 
+
+# =================== Members add/edit/delete ===================
 
 @has_permission(CAN_EDIT)
 def edit_member(request, member_id=None):
@@ -57,6 +59,9 @@ def delete_member(request, member_id):
                                     redirect_url=reverse("members_home"),
                                     item=member,
                                     template="members/delete_member.html")
+
+
+# =================== Membership ===================
 
 @has_permission(CAN_EDIT)
 def confirm_membership(request, member_id):
@@ -103,6 +108,42 @@ def apply_membership(request):
             context['form'] = form
         return render(request, 'members/member_application.html', context)
 
+
+# =================== Custom Fields add/edit/delete ===================
+
+@has_permission(CAN_EDIT)
+def edit_custom_field(request, field_id=None):
+    if field_id is not None:
+        try:
+            field = CustomField.objects.get(id=field_id)
+        except CustomField.DoesNotExist:
+            raise Http404("")
+    else:
+        field = None
+
+    form = CustomFieldForm(request.POST or None, field)
+    if form.is_valid():
+        form.save()
+        return HttpResponseRedirect(reverse("members_home"))
+    context = {'form': form,
+               'field': field}
+    return render(request, "members/edit_custom_field.html", context)
+
+
+@has_permission(CAN_EDIT)
+def delete_custom_field(request, field_id):
+    try:
+        field = PaymentPurpose.objects.get(id=field_id)
+    except PaymentPurpose.DoesNotExist:
+        raise Http404("Field %s not found" % field_id)
+
+    return delete_confirmation_view(request,
+                                    form_url=reverse("members_delete_field"),
+                                    item=field,
+                                    redirect_url=reverse("members_home"))
+
+
+# =================== Payment Purpose add/edit/delete ===================
 
 @has_permission(CAN_EDIT)
 def add_paymentpurpose(request):

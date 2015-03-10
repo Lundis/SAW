@@ -1,5 +1,5 @@
 from django import forms
-from .models import Member, PaymentPurpose
+from .models import Member, PaymentPurpose, CustomField
 from users.groups import GROUP_CHOICES, get_user_group, put_user_in_standard_group
 from django.utils.translation import ugettext as _
 
@@ -16,6 +16,12 @@ class PaymentPurposeForm(forms.ModelForm):
     class Meta():
         model = PaymentPurpose
         fields = ('purpose', 'description')
+
+
+class CustomFieldForm(forms.ModelForm):
+    class Meta:
+        model = CustomField
+        fields = ('name',)
 
 
 class MemberEditForm(forms.ModelForm):

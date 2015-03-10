@@ -1,0 +1,22 @@
+{% extends "members/base.html" %}
+{% load i18n %}
+
+{% block breadcrumb2 %}
+    <li class="active">
+        {% if field %}
+            {% trans "Editing Field" %}
+            {{ field.name }}
+        {% else %}
+            {% trans "New Field" %}
+        {% endif %}
+    </li>
+{% endblock %}
+
+{% block main_content %}
+    <form action="" method="post">
+        {% csrf_token %}
+        <button class="btn btn-primary">
+            {% trans "Submit" %}
+        </button>
+    </form>
+{% endblock %}
