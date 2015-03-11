@@ -24,7 +24,7 @@
     <ul class="list-group">
         <li class="list-group-item">
             {% for examfile in images %}
-                <a href="{{ examfile.image.url }}"><img  class="img-thumbnail" src="{% thumbnail examfile.image 100x100 crop=scale %}"/></a>
+                <a href="{{ examfile.image.url }}"><img  class="img-thumbnail" src="{{ examfile.image|thumbnail_url:'standard' }}"/></a>
             {% endfor %}
         </li>
         <li class="list-group-item">{% trans "Name: " %}<a href="{% url 'exams_view_course' exam.course_id.id %}">{{ exam.course_id.name }}</a> </li>

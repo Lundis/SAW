@@ -13,10 +13,8 @@ logger = logging.getLogger(__name__)
 
 def view_gallery(request):
     albums = Album.objects.order_by('name')
-    pictures = Photo.objects.order_by('-uploaded')
 
-    return render(request, 'gallery/view_gallery.html', {
-        'albums': albums, 'pictures': pictures},)
+    return render(request, 'gallery/view_gallery.html', {'albums': albums, },)
 
 
 def view_album(request, slug):
@@ -62,7 +60,8 @@ def delete_album(request, slug):
 
 def manage_album(request, slug):
     album = Album.objects.get(slug=slug)
-    context = {'album': album, 'uploadForm': MultiUploadForm(form_type="images")}
+    pictures = Photo.objects.filter(album=album).order_by('-uploaded')
+    context = {'album': album, 'pictures': pictures, 'uploadForm': MultiUploadForm(form_type="images")}
     return render(request, 'gallery/add_edit_photos.html', context)
 
 

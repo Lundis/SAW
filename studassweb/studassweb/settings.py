@@ -109,6 +109,13 @@ CKEDITOR_CONFIGS = {
 
 
 THUMBNAIL_BASEDIR = "thumbnails"
+THUMBNAIL_ALIASES = {
+    '': {
+        'standard': {'size': (100, 100), 'crop': 'scale'},
+        'board': {'size': (300, 200), 'crop': 'scale'},
+        'panelheader': {'size': (80, 80), 'crop': 'scale'},
+    },
+}
 
 
 INSTALLED_APPS = (

@@ -24,14 +24,14 @@
     <div class="list-group">
         {% if board.photo %}
             <li class="list-group-item">
-                <a href="{{ board.photo.url }}"><img  class="img-thumbnail" src="{% thumbnail board.photo 300x200 crop=scale %}"/></a>
+                <a href="{{ board.photo.url }}"><img  class="img-thumbnail" src="{{ board.photo|thumbnail_url:'board' }}"/></a>
             </li>
         {% endif %}
         <li class="list-group-item">{% trans "Board members:" %}</li>
         {% for boardmember in boardmembers %}
             <li class="list-group-item"><a class="list-group-item" href="{{ boardmember.get_absolute_url }}">
                 {% if boardmember.photo %}
-                    <img  class="img-thumbnail" src="{% thumbnail boardmember.photo 100x100 crop=scale %}"/>
+                    <img  class="img-thumbnail" src="{{ boardmember.photo|thumbnail_url:'standard' }}"/>
                 {% endif %}
                 {{ boardmember }}
             </a></li>

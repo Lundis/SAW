@@ -1,5 +1,10 @@
 {% load i18n multiuploader staticfiles %}
 
+<script id="template-upload" type="text/x-tmpl" src="{% static "multiuploader/scripts/templateupload.js" %}" >
+</script>
+<script id="template-download" type="text/x-tmpl" src="{% static "multiuploader/scripts/templatedownload.js" %}" >
+</script>
+
 <script src="{% static "multiuploader/scripts/load-image.all.min.js" %}"></script>
 <script src="{% static "multiuploader/scripts/canvas-to-blob.min.js" %}"></script>
 <script src="{% static "multiuploader/scripts/jquery.iframe-transport.js" %}"></script>
@@ -7,6 +12,7 @@
 <script src="{% static "multiuploader/scripts/jquery.fileupload-process.js" %}"></script>
 <script src="{% static "multiuploader/scripts/jquery.fileupload-image.js" %}"></script>
 <script src="{% static "multiuploader/scripts/jquery.fileupload-validate.js" %}"></script>
+<!--<script src="{% static "multiuploader/scripts/jquery.fileupload-ui.js" %}"></script> -->
 <script src="{% static "multiuploader/scripts/jquery_fix_csrf.js" %}"></script>
 
 

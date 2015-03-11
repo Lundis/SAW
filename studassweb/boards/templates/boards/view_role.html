@@ -20,7 +20,7 @@
         {% for boardmember in boardmembers %}
             <a class="list-group-item" href="{{ boardmember.get_absolute_url }}">
                 {% if boardmember.photo %}
-                    <img  class="img-thumbnail" src="{% thumbnail boardmember.photo 100x100 crop=scale %}"/>
+                    <img  class="img-thumbnail" src="{{ boardmember.photo|thumbnail_url:'standard' }}"/>
                 {% endif %}
                 {{ boardmember.member.get_full_name }} ({{ boardmember.board}})
             </a>
