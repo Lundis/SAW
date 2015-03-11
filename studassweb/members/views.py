@@ -23,7 +23,7 @@ def view_members(request):
             row[1].append(('col-custom-%s' % field.id, value))
         for purpose in payment_purposes:
             try:
-                payment = Payment.objects.get(purpose=purpose, member=member)
+                payment = Payment.get_latest(purpose=purpose, member=member)
             except Payment.DoesNotExist:
                 payment = None
             row[2].append(('col-payment-%s' % purpose.id, payment))
