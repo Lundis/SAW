@@ -19,8 +19,8 @@ def view_members(request):
     for member in Member.objects.all():
         row = [member, [], []]
         for field in extra_columns:
-            value, created = CustomEntry.objects.get_or_create(field=field, member=member)
-            row[1].append(('col-custom-%s' % field.id, value))
+            entry, created = CustomEntry.objects.get_or_create(field=field, member=member)
+            row[1].append(('col-custom-%s' % field.id, entry))
         for purpose in payment_purposes:
             try:
                 payment = Payment.get_latest(purpose=purpose, member=member)

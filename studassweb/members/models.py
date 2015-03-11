@@ -49,10 +49,10 @@ class Member(models.Model):
         return "%s %s" % (self.first_name, self.last_name)
 
     def __str__(self):
-        return "{} {}[{}->{}]".format(self.first_name,
-                                      self.last_name,
-                                      str(self.enrollment_year),
-                                      str(self.graduation_year))
+        s = self.get_full_name()
+        if self.user_ext:
+            s += " (%s)" % self.user_ext.user.username
+        return s
 
     def clean(self):
         super(Member, self).clean()
@@ -132,3 +132,6 @@ class CustomEntry(models.Model):
 
     class Meta:
         unique_together = ("field", "member")
+
+    def __str__(self):
+        return self.field.name + " for " + str(self.member)

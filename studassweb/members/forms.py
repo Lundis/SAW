@@ -1,5 +1,5 @@
 from django import forms
-from .models import Member, PaymentPurpose, CustomField, Payment
+from .models import Member, PaymentPurpose, CustomField, Payment, CustomEntry
 from users.groups import GROUP_CHOICES, get_user_group, put_user_in_standard_group
 from django.utils.translation import ugettext as _
 from django.utils import timezone
@@ -73,6 +73,18 @@ class MemberEditForm(forms.ModelForm):
         self.fields['enrollment_year'].required = False
         # Should not add the required flag to the HTML
         self.fields['enrollment_year'].widget.is_required = False
+        # Add all custom fields
+        fields = CustomField.objects.all()
+        for field in fields:
+            f = forms.CharField(required=False,
+                                widget=forms.Textarea(),
+                                label=field.name)
+            # Populate the field with existing data if this is an existing member
+            if self.instance and self.instance.pk:
+                entry, created = CustomEntry.objects.get_or_create(field=field,
+                                                                   member=self.instance)
+                f.initial = entry.content
+            self.fields["custom-" + field.name] = f
 
     def save(self, commit=True):
         instance = super(MemberEditForm, self).save(commit)
@@ -82,5 +94,14 @@ class MemberEditForm(forms.ModelForm):
             put_user_in_standard_group(user, self.cleaned_data['group'])
             if commit:
                 user.save()
+        # Next save all custom fields
+        fields = CustomField.objects.all()
+        for field in fields:
+            if commit:
+                entry, created = CustomEntry.objects.get_or_create(field=field,
+                                                          member=instance)
+                entry.content = self.cleaned_data["custom-" + field.name]
+                entry.save()
+
         return instance
 
