@@ -17,7 +17,7 @@
     <h1>{{ boardmember }}</h1>
     <div class="list-group">
         {% if boardmember.photo %}
-            <a href="{{ boardmember.photo.url }}"><img  class="img-thumbnail" src="{% thumbnail boardmember.photo 100x100 crop=scale %}"/></a>
+            <a href="{{ boardmember.photo.url }}"><img  class="img-thumbnail" src="{{ boardmember.photo|thumbnail_url:'standard' }}"/></a>
         {% endif %}
         <br>{% trans "Member of the following boards:" %}
         {% for role_board in boards %}

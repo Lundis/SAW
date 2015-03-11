@@ -11,7 +11,7 @@
         {% for board in boards %}
             <li class="list-group-item">
                 {% if board.photo %}
-                    <img  class="img-thumbnail" src="{% thumbnail board.photo 100x100 crop=scale %}"/>
+                    <img  class="img-thumbnail" src="{{ board.photo|thumbnail_url:'standard' }}"/>
                 {% endif %}
                 <a href="{{ board.get_absolute_url }}">{{ board }}
                 <span class="badge">

@@ -65,7 +65,7 @@
                 <div class="row inherit-padding-left-right">
                     {% if article.picture %}
                         <div class="pull-left news-picture">
-                            <img src="{% thumbnail article.picture 80x80 crop=scale %}" class="img-responsive img-rounded" />
+                            <img src="{{ article.picture|thumbnail_url:'panelheader' }}" class="img-responsive img-rounded" />
                         </div>
                     {% endif %}
                     <div class="pull-left inherit-padding-left-right">

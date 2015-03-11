@@ -17,7 +17,7 @@
 
     <div class="list-group">
         {% for picture in pictures %}
-            <a href="{{ picture.image.url }}"><img class="img-thumbnail" src="{% thumbnail picture.image 100x100 crop=scale %}"/></a>
+            <a href="{{ picture.image.url }}"><img class="img-thumbnail" src="{{ picture.image|thumbnail_url:'standard' }}"/></a>
         {% empty %}
             <p>{% trans "no photos in album" %}<p/>
         {% endfor %}
