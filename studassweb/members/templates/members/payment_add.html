@@ -1,0 +1,37 @@
+{% extends 'members/base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% load setvar %}
+{% load sidemenu %}
+
+{% block breadcrumb2 %}
+    <li class="active">
+        <a href="{% url "members_view_payments" member_id=member.id %}">
+            {% trans "Payments for" %}
+            {{ member.get_full_name }}
+            {% if member.user_ext %}
+                ({{ member.user_ext.user.username }})
+            {% endif %}
+        </a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb3 %}
+    <li class="active">
+        {% trans "Adding payment" %}
+    </li>
+{% endblock %}
+
+{% block main_content %}
+    <div class="container">
+        <form action="" method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">
+                    {% trans "Submit" %}
+                </button>
+            {% endbuttons %}
+        </form>
+    </div>
+{% endblock %}

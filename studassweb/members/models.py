@@ -1,11 +1,13 @@
 from django.db import models
-from django.core.validators import ValidationError
+from django.core.validators import ValidationError, MinValueValidator
 from django.utils.translation import ugettext as _
 from django.dispatch import receiver
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete, post_save
+from django.contrib.auth.models import User
 from users.groups import put_user_in_standard_group, MEMBER
 from users.models import UserExtension
 from base.models import SiteConfiguration
+from django.utils import timezone
 
 
 class Member(models.Model):
@@ -47,10 +49,10 @@ class Member(models.Model):
         return "%s %s" % (self.first_name, self.last_name)
 
     def __str__(self):
-        return "{} {}[{}->{}]".format(self.first_name,
-                                      self.last_name,
-                                      str(self.enrollment_year),
-                                      str(self.graduation_year))
+        s = self.get_full_name()
+        if self.user_ext:
+            s += " (%s)" % self.user_ext.user.username
+        return s
 
     def clean(self):
         super(Member, self).clean()
@@ -71,21 +73,49 @@ class Member(models.Model):
 
 
 @receiver(post_delete, sender=Member, dispatch_uid="member_post_delete")
-def page_post_delete(**kwargs):
+def member_post_delete(**kwargs):
     instance = kwargs.pop("instance")
     # Remove the UserExtension if it exists
     if instance.user_ext:
         instance.user_ext.delete()
 
 
+@receiver(post_save, sender=Member, dispatch_uid="member_post_save")
+def member_post_save(**kwargs):
+    instance = kwargs.pop("instance")
+    # Update first/last name of user if there's a mismatch
+    if instance.user_ext:
+        user = instance.user_ext.user
+        if user.first_name != instance.first_name or user.last_name != instance.last_name:
+            user.first_name = instance.first_name
+            user.last_name = instance.last_name
+
+
 class PaymentPurpose(models.Model):
     purpose = models.CharField(max_length=200)
     description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.purpose
 
 
 class Payment(models.Model):
     member = models.ForeignKey(Member)
     purpose = models.ForeignKey(PaymentPurpose)
+    date = models.DateField()
+    expires = models.DateField()
+    date_entered = models.DateTimeField(auto_now_add=True, editable=False)
+    created_by = models.ForeignKey(User)
+
+    class Meta:
+        ordering = ("-expires",)
+
+    def has_expired(self):
+        return timezone.now() > self.expires
+
+    @classmethod
+    def get_latest(cls, purpose, member):
+        return cls.objects.filter(purpose=purpose, member=member).first()
 
 
 class CustomField(models.Model):
@@ -102,3 +132,6 @@ class CustomEntry(models.Model):
 
     class Meta:
         unique_together = ("field", "member")
+
+    def __str__(self):
+        return self.field.name + " for " + str(self.member)

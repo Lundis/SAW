@@ -5,8 +5,8 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from users.decorators import has_permission
 from users.models import UserExtension
-from .models import Member, PaymentPurpose, CustomField, CustomEntry
-from .forms import MemberApplicationForm, PaymentPurposeForm, MemberEditForm, CustomFieldForm
+from .models import Member, PaymentPurpose, CustomField, CustomEntry, Payment
+from .forms import MemberApplicationForm, PaymentPurposeForm, MemberEditForm, CustomFieldForm, PaymentForm
 from .register import CAN_VIEW, CAN_EDIT
 from base.views import delete_confirmation_view
 
@@ -15,14 +15,22 @@ from base.views import delete_confirmation_view
 def view_members(request):
     rows = []
     extra_columns = CustomField.objects.all()
+    payment_purposes = PaymentPurpose.objects.all()
     for member in Member.objects.all():
-        row = [member, []]
-        for column in extra_columns:
-            value = CustomEntry.objects.get_or_create(field=column, member=member)
-            row[1].append(('col-%s' % column.id, value))
+        row = [member, [], []]
+        for field in extra_columns:
+            entry, created = CustomEntry.objects.get_or_create(field=field, member=member)
+            row[1].append(('col-custom-%s' % field.id, entry))
+        for purpose in payment_purposes:
+            try:
+                payment = Payment.get_latest(purpose=purpose, member=member)
+            except Payment.DoesNotExist:
+                payment = None
+            row[2].append(('col-payment-%s' % purpose.id, payment))
         rows.append(row)
     context = {'members_data': rows,
-               'extra_columns': extra_columns}
+               'extra_columns': extra_columns,
+               'payment_purposes': payment_purposes}
     return render(request, 'members/member_table.html', context)
 
 
@@ -147,11 +155,10 @@ def delete_custom_field(request, field_id):
 
 @has_permission(CAN_EDIT)
 def add_paymentpurpose(request):
-    if request.method == 'POST':
-        form = PaymentPurposeForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('/members')  # TODO user probably wants feedback
+    form = PaymentPurposeForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return HttpResponseRedirect(reverse("members_home"))  # TODO user probably wants feedback
 
     form = PaymentPurposeForm()
     context = {'form': form}
@@ -187,3 +194,56 @@ def delete_paymentpurpose(request, paymentpurpose_id):
                                     # TODO: redirect to a page that lists all payment purposes?
                                     redirect_url=reverse("members_home"),
                                     template='members/delete_paymentpurpose.html')
+
+
+# =================== Payment view/add/delete ===================
+
+@has_permission(CAN_EDIT)
+def list_payments(request, member_id):
+    """
+    Lists all payments for a user
+    :param request:
+    :param member_id:
+    :return:
+    """
+    try:
+        member = Member.objects.get(id=member_id)
+    except Member.DoesNotExist:
+        raise Http404("Member with id %s does not exist" % member_id)
+    purposes_payments = ()
+    for purpose in PaymentPurpose.objects.all():
+        payments = Payment.objects.filter(member=member, purpose=purpose)
+        if payments.exists():
+            purposes_payments += (purpose, payments),
+    context = {'purposes_payments': purposes_payments,
+               'member': member}
+    return render(request, 'members/payments_list.html', context)
+
+
+@has_permission(CAN_EDIT)
+def add_payment(request, member_id):
+    try:
+        member = Member.objects.get(id=member_id)
+    except Member.DoesNotExist:
+        raise Http404("Member with id %s does not exist" % member_id)
+    form = PaymentForm(request.POST or None, user=request.user, member=member)
+    if form.is_valid():
+        form.save()
+        return HttpResponseRedirect(reverse("members_home"))
+
+    context = {'form': form,
+               'member': member}
+    return render(request, 'members/payment_add.html', context)
+
+
+@has_permission(CAN_EDIT)
+def delete_payment(request, payment_id):
+    try:
+        payment = Payment.objects.get(id=payment_id)
+    except Payment.DoesNotExist:
+        raise Http404("Payment with id %s does not exist" % payment_id)
+
+    return delete_confirmation_view(request,
+                                    form_url=reverse("members_delete_payment"),
+                                    item=payment,
+                                    redirect_url=reverse("members_list_payments", kwargs={"member_id": payment.member_id}))

@@ -1,5 +1,7 @@
 {% extends "members/base.html" %}
 {% load i18n %}
+{% load bootstrap3 %}
+{% load sidemenu %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -15,8 +17,17 @@
 {% block main_content %}
     <form action="" method="post">
         {% csrf_token %}
+        {% bootstrap_form form %}
         <button class="btn btn-primary">
             {% trans "Submit" %}
         </button>
     </form>
+{% endblock %}
+
+{% block sidebar-panel-help %}
+    {% sidebarpanel "help" %}
+        {% trans "Help" %}
+        {% body %}
+        <p>{% trans "Custom fields let you add arbitrary information to each member" %}</p>
+    {% endsidebarpanel %}
 {% endblock %}
