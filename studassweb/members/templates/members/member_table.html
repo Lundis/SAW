@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load bootstrap3 %}
 {% load setvar %}
+{% load sidemenu %}
 
 {% block breadcrumb1 %}
     <li class="active">
@@ -94,67 +95,62 @@
     </table>
 {% endblock %}
 
-{% block sidebar %}
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <h2 class="panel-title">{% trans "Show columns" %}</h2>
+{% block sidebar-panel1 %}
+    {% sidebarpanel %}
+        {% trans "Show columns" %}
+        {% body %}
+        <div class="btn btn-info btn-block btn-xs active col-checkbox"
+             id="col-username-selector"
+             data-toggle="button" aria-pressed="true">
+            {% trans "Username" %}
         </div>
-        <div class="panel-body">
-            <div type="button" class="btn btn-info btn-block btn-xs active col-checkbox"
-                 id="col-username-selector"
-                 data-toggle="button" aria-pressed="true">
-                {% trans "Username" %}
-            </div>
-            <div type="button" class="btn btn-info btn-block btn-xs active col-checkbox"
-                 id="col-realname-selector"
-                 data-toggle="button" aria-pressed="true">
-                {% trans "Real Name" %}
-            </div>
-            <div type="button" class="btn btn-info btn-block btn-xs active col-checkbox"
-                 id="col-applying-selector"
-                 data-toggle="button" aria-pressed="true">
-                {% trans "Applying" %}
-            </div>
-            <div type="button" class="btn btn-info btn-block btn-xs active col-checkbox"
-                 id="col-member-selector"
-                 data-toggle="button" aria-pressed="true">
-                {% trans "Member" %}?
-            </div>
-            <div type="button" class="btn btn-info btn-block btn-xs active col-checkbox"
-                 id="col-enrollment-selector"
-                 data-toggle="button" aria-pressed="true">
-                {% trans "Enrolled" %}?
-            </div>
-            <div type="button" class="btn btn-info btn-block btn-xs active col-checkbox"
-                 id="col-graduation-selector"
-                 data-toggle="button" aria-pressed="true">
-                {% trans "Graduated" %}?
-            </div>
-            <div type="button" class="btn btn-info btn-block btn-xs active col-checkbox"
-                 id="col-groups-selector"
-                 data-toggle="button" aria-pressed="true">{% trans "Groups" %}
-            </div>
-            {% for column in extra_columns %}
-                <div type="button" class="btn btn-info btn-block btn-xs col-checkbox"
-                     id="col-{{ column.id }}-selector">
-                    column.name
-                </div>
-            {% endfor %}
+        <div class="btn btn-info btn-block btn-xs active col-checkbox"
+             id="col-realname-selector"
+             data-toggle="button" aria-pressed="true">
+            {% trans "Real Name" %}
         </div>
-    </div>
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <h2 class="panel-title">{% trans "Actions" %}</h2>
+        <div class="btn btn-info btn-block btn-xs active col-checkbox"
+             id="col-applying-selector"
+             data-toggle="button" aria-pressed="true">
+            {% trans "Applying" %}
         </div>
-        <div class="panel-body">
-            <div type="button" class="btn btn-default btn-block btn-xs"
-                 id="new-column-button">{% trans "Create new column" %}
+        <div class="btn btn-info btn-block btn-xs active col-checkbox"
+             id="col-member-selector"
+             data-toggle="button" aria-pressed="true">
+            {% trans "Member" %}?
+        </div>
+        <div class="btn btn-info btn-block btn-xs col-checkbox"
+             id="col-enrollment-selector"
+             data-toggle="button" aria-pressed="true">
+            {% trans "Enrolled" %}?
+        </div>
+        <div class="btn btn-info btn-block btn-xs col-checkbox"
+             id="col-graduation-selector"
+             data-toggle="button" aria-pressed="true">
+            {% trans "Graduated" %}?
+        </div>
+        <div class="btn btn-info btn-block btn-xs active col-checkbox"
+             id="col-groups-selector"
+             data-toggle="button" aria-pressed="true">{% trans "Groups" %}
+        </div>
+        {% for column in extra_columns %}
+            <div class="btn btn-info btn-block btn-xs col-checkbox"
+                 id="col-{{ column.id }}-selector">
+                column.name
             </div>
-            <a href="{% url "members_add_member" %}" class="btn btn-default btn-block btn-xs" >
-                {% trans "Add new member" %}
-            </a>
-        </div>
-    </div>
+        {% endfor %}
+    {% endsidebarpanel %}
+    {% sidebarpanel "vertical_buttons" %}
+        {% trans "Actions" %}
+        {% body %}
+        <a href="{% url "members_create_custom_field" %}"
+           class="btn btn-primary"
+           id="new-column-button">{% trans "Create new column" %}
+        </a>
+        <a href="{% url "members_add_member" %}" class="btn btn-primary" >
+            {% trans "Add new member" %}
+        </a>
+    {% endsidebarpanel %}
 {% endblock %}
 
 {% block scripts %}

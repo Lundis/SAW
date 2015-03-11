@@ -50,3 +50,4 @@ def setup():
         chairman.save()
 
         settings.is_setup = True
+        settings.save()

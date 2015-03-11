@@ -158,7 +158,7 @@ class Menu(models.Model):
 
 class MenuItem(models.Model):
 
-    #app_name is used for checking if it belongs to a disabled module
+    # app_name is used for checking if it belongs to a disabled module
     app_name = models.CharField(max_length=50, null=True, blank=True)
     identifier = models.CharField(max_length=100, unique=True,
                                   help_text="A unique identifier that is used to distinguish this item")

@@ -8,7 +8,6 @@ from frontpage.models import FrontPageItem
 
 
 def get_started_text():
-    # TODO load from template
     context = Context()
     template = get_template("pages/getting_started_template.html")
     return template.render(context)
