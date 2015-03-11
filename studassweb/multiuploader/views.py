@@ -13,38 +13,16 @@ from django.utils.translation import ugettext as _
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpResponse, HttpResponseBadRequest
 import os
+from base.models import SiteConfiguration
 
-from .utils import FileResponse
-from .forms import MultiUploadForm, MultiuploaderMultiDeleteForm
+from .forms import MultiUploadForm
 
 # TODO move this later
 from gallery.models import Album, Photo
 
-# TODO change to the other thumbnail lib
-# from sorl.thumbnail import get_thumbnail
+from easy_thumbnails.files import get_thumbnailer
 
 log = logging.getLogger(__name__)
-
-
-def multiuploader_delete_multiple(request, ok=False):
-    if request.method == 'POST':
-
-        form = MultiuploaderMultiDeleteForm(request.POST)
-
-        if form.is_valid():
-            return redirect(request.META.get('HTTP_REFERER', None))
-        else:
-            pass
-
-        """fl = get_object_or_404(MultiuploaderFile, pk=pk)
-        fl.delete()
-        log.info('DONE. Deleted file id=' + str(pk))"""
-
-        return HttpResponse(1)
-
-    else:
-        log.info('Received not POST request to delete file view')
-        return HttpResponseBadRequest('Only POST accepted')
 
 
 def multiuploader(request, noajax=False):
@@ -114,26 +92,12 @@ def multiuploader(request, noajax=False):
         p.album = album
         p.save()
 
-
-        thumb_url = ""
-
-        #try:
-        #    im = get_thumbnail(fl.file, "80x80", quality=50)
-        #    thumb_url = im.url
-        #except Exception as e:
-        #    log.error(e)
-
-        #generating json response array
-        result = [{"id": p.id,
-                   #"name": filename,
-                   #"size": file_size,
-                   #"url": reverse('multiuploader_file_link', args=[fl.pk]),
-                   #"thumbnail_url": thumb_url,
-                  # "delete_url": reverse('multiuploader_delete', args=[fl.pk]),
-                  # "delete_type": "POST",
-                  }]
-
-        response_data = json.dumps(result)
+        site_config = SiteConfiguration.instance()
+        response_data = generate_output(os.path.basename(p.image.path),
+                                        p.image.size,
+                                        str(site_config.base_url + p.image.url),
+                                        str(site_config.base_url + get_thumbnailer(p.image)['standard'].url)
+                                        )
 
         #checking for json data type
         #big thanks to Guy Shapiro
@@ -151,6 +115,32 @@ def multiuploader(request, noajax=False):
         return HttpResponse('Only POST accepted')
 
 
-def multi_show_uploaded(request, pk):
-    fl = get_object_or_404(MultiuploaderFile, id=pk)
-    return FileResponse(request,fl.file.path, fl.filename)
+# Lol remove this when it's confirmed we don't need it.
+def jsonize_url(url):
+    return url
+    result = ''
+    for char in url:
+        if char == '/':
+            result += chr(92)  # That's a \
+            result += '/'
+        else:
+            result += char
+    return result
+
+
+def generate_output(name, size, url, thumbnailurl):
+    result = {'files': [
+        {"name": name,
+         "size": size,
+         "url": url,
+         "thumbnailUrl": thumbnailurl,
+         },
+        ]}
+    log.info(json.dumps(result))
+    return json.dumps(result)
+    # "delete_url": reverse('multiuploader_delete', args=[fl.pk]),
+    # "delete_type": "POST",
+
+
+def generate_error_output(error_message):
+    return "TODO"
