@@ -10,9 +10,7 @@ from django import forms
 from django.conf import settings
 
 from django.utils.html import mark_safe
-
 from .utils import format_file_extensions
-
 import multiuploader.default_settings as DEFAULTS
 
 import logging
@@ -57,27 +55,20 @@ class MultiUploadForm(forms.Form):
         multiuploader_settings = getattr(settings, "MULTIUPLOADER_FORMS_SETTINGS", DEFAULTS.MULTIUPLOADER_FORMS_SETTINGS)
         form_type = kwargs.pop("form_type", "defaultasdf")
 
-        options = {
-            'maxFileSize': multiuploader_settings[form_type]["MAX_FILE_SIZE"],
-            'acceptFileTypes': format_file_extensions(multiuploader_settings[form_type]["FILE_TYPES"]),
-            'maxNumberOfFiles': multiuploader_settings[form_type]["MAX_FILE_NUMBER"],
-            'allowedContentTypes': list(map(str.lower, multiuploader_settings[form_type]["CONTENT_TYPES"])),
-            'autoUpload': multiuploader_settings[form_type]["AUTO_UPLOAD"]
-        }
+        self.maxFileSize = multiuploader_settings[form_type]["MAX_FILE_SIZE"]
+        self.acceptFileTypes = format_file_extensions(multiuploader_settings[form_type]["FILE_TYPES"])
+        self.maxNumberOfFiles = multiuploader_settings[form_type]["MAX_FILE_NUMBER"]
+        self.allowedContentTypes = list(map(str.lower, multiuploader_settings[form_type]["CONTENT_TYPES"]))
+        self.autoUpload = multiuploader_settings[form_type]["AUTO_UPLOAD"]
 
         self.check_extension = True
         self.check_content_type = True
 
         if multiuploader_settings[form_type]["FILE_TYPES"] == '*':
             self.check_extension = False
-            options.update({'acceptFileTypes': []})
 
         if multiuploader_settings[form_type]["CONTENT_TYPES"] == '*':
             self.check_content_type = False
-            options.pop('allowedContentTypes')
-
-        self._options = options
-        self.options = json.dumps(options)
 
         super(MultiUploadForm, self).__init__(*args, **kwargs)
 
@@ -88,17 +79,17 @@ class MultiUploadForm(forms.Form):
         filename, extension = os.path.splitext(content.name)
 
         if self.check_extension:
-            if re.match(self._options['acceptFileTypes'], extension, flags=re.I) is None:
+            if re.match(self.acceptFileTypes, extension, flags=re.I) is None:
                 raise forms.ValidationError('acceptFileTypes')
 
         if self.check_content_type:
             if magic:
                 content_type = magic.from_buffer(content.read(1024), mime=True)
-                if content_type.lower() not in self._options['allowedContentTypes']:
+                if content_type.lower() not in self.allowedContentTypes:
                     raise forms.ValidationError("acceptFileTypes")
             else:
                 log.warning("You don't have the magic library installed, file formats are not checked!")
-            if content._size > self._options['maxFileSize']:
+            if content._size > self.maxFileSize:
                     raise forms.ValidationError("maxFileSize")
 
         return content

@@ -50,9 +50,8 @@
             paramName: "file",
             dataType: 'json',
             sequentialUploads: true,
-            /*var opts = {{ multiuploader_form.options|safe }};  TODO */
-            acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
-            maxFileSize: 5000000, // 5 MB
+            acceptFileTypes: /{{ multiuploader_form.acceptFileTypes|safe }}/,
+            maxFileSize: {{ multiuploader_form.maxFileSize|safe }},
             // Enable image resizing, except for Android and Opera,
             // which actually support image resizing, but fail to
             // send Blob objects via XHR requests:
@@ -64,12 +63,14 @@
         }).on('fileuploadadd', function (e, data) {
             /* It is invoked as soon as files are added to the fileupload widget -
              via file input selection, drag & drop or add API call. */
+
             data.context = $('<div/>').appendTo('#files');
-            $.each(data.files, function (index, file) {
+            /*$.each(data.files, function (index, file) {
                 var node = $('<p/>')
                         .append($('<span/>').text(file.name));
                 node.appendTo(data.context);
             });
+            */
         }).on('fileuploadprocessalways', function (e, data) {
             /* Callback for the end (done or fail) of an individual file processing queue. */
             var index = data.index,
@@ -110,7 +111,6 @@
                     $(imgnode).attr('src',file.thumbnailUrl).addClass('img-thumbnail');
                     $(imgnode).appendTo(imagelist);
 
-                    //TODO remove from "upload list"
 
                 } else if (file.error) {
                     var error = $('<span class="text-danger"/>').text(file.error);
