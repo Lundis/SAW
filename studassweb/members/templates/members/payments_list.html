@@ -1,0 +1,72 @@
+{% extends 'members/base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% load setvar %}
+{% load sidemenu %}
+
+{% block breadcrumb2 %}
+    <li class="active">
+        {% trans "Viewing payments for " %}
+        {{ member.get_full_name }}
+        {% if member.user_ext %}
+            ({{ member.user_ext.user.username }})
+        {% endif %}
+    </li>
+{% endblock %}
+
+{% block main_content %}
+    {% for purpose_payments in purposes_payments %}
+        <h3>{{ purpose_payments.0 }}</h3>
+        <table class="table">
+            <tr>
+                <th>{% trans "Paid" %}</th>
+                <th>{% trans "Expires" %}</th>
+                <th>{% trans "Entered" %}</th>
+                <th>{% trans "Delete" %}</th>
+            </tr>
+
+            {% for payment in purpose_payments.1 %}
+                <tr>
+                    <td>{{ payment.date }}</td>
+                    <td>{{ payment.expires }}</td>
+                    <td>
+                        {{ payment.date_entered }}
+                        {% trans "by" %}
+                        {{ payment.created_by }}
+                    </td>
+                    <td><a href="{% url "members_delete_payment" payment_id=payment.id %}"
+                           class="btn btn-xs btn-danger">
+                        {% trans "Delete" %}
+                    </a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% empty %}
+        <h3>{% trans "There are no payments for this user!" %}</h3>
+    {% endfor %}
+{% endblock %}
+
+{% block sidebar-panel1 %}
+    {% sidebarpanel "vertical_buttons" %}
+        {% trans "Actions" %}
+        {% body %}
+        <a href="{% url "members_add_payment" member_id=member.id %}"
+           class="btn btn-primary">
+            {% trans "Add new payment" %}
+        </a>
+        <a href="{% url "members_add_paymentpurpose" %}"
+           class="btn btn-primary">
+            {% trans "Add new payment purpose" %}
+        </a>
+    {% endsidebarpanel %}
+{% endblock %}
+
+{% block sidebar-panel-help %}
+    {% sidebarpanel "help" %}
+        {% trans "Help" %}
+        {% body %}
+        <p>
+            {% trans "help message goes here" %}
+        </p>
+    {% endsidebarpanel %}
+{% endblock %}

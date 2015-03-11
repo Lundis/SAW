@@ -33,6 +33,7 @@ class PaymentForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self._member = kwargs.pop("member")
+        self._user = kwargs.pop("user")
         super(PaymentForm, self).__init__(*args, **kwargs)
         # Use now as the default time of payment
         self.fields["date"].initial = timezone.now()
@@ -40,6 +41,7 @@ class PaymentForm(forms.ModelForm):
     def save(self, commit=True):
         payment = super(PaymentForm, self).save(commit=False)
         payment.member = self._member
+        payment.created_by = self._user
         if commit:
             payment.save()
         return payment

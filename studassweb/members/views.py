@@ -23,14 +23,14 @@ def view_members(request):
             row[1].append(('col-custom-%s' % field.id, value))
         for purpose in payment_purposes:
             try:
-                payment, created = Payment.objects.get(purpose=purpose, member=member)
-                last_paid = payment.date
+                payment = Payment.objects.get(purpose=purpose, member=member)
             except Payment.DoesNotExist:
-                last_paid = ""
-            row[2].append(('col-payment-%s' % purpose.id, last_paid))
+                payment = None
+            row[2].append(('col-payment-%s' % purpose.id, payment))
         rows.append(row)
     context = {'members_data': rows,
-               'extra_columns': extra_columns}
+               'extra_columns': extra_columns,
+               'payment_purposes': payment_purposes}
     return render(request, 'members/member_table.html', context)
 
 
@@ -196,7 +196,7 @@ def delete_paymentpurpose(request, paymentpurpose_id):
                                     template='members/delete_paymentpurpose.html')
 
 
-# =================== Payment add/delete ===================
+# =================== Payment view/add/delete ===================
 
 @has_permission(CAN_EDIT)
 def list_payments(request, member_id):
@@ -206,26 +206,34 @@ def list_payments(request, member_id):
     :param member_id:
     :return:
     """
-    form = PaymentPurposeForm(request.POST or None)
-    if form.is_valid():
-        form.save()
-        return HttpResponseRedirect(reverse("members_home"))
-
-    form = PaymentPurposeForm()
-    context = {'form': form}
-    return render(request, 'members/list_payments.html', context)
+    try:
+        member = Member.objects.get(id=member_id)
+    except Member.DoesNotExist:
+        raise Http404("Member with id %s does not exist" % member_id)
+    purposes_payments = ()
+    for purpose in PaymentPurpose.objects.all():
+        payments = Payment.objects.filter(member=member, purpose=purpose)
+        if payments.exists():
+            purposes_payments += (purpose, payments),
+    context = {'purposes_payments': purposes_payments,
+               'member': member}
+    return render(request, 'members/payments_list.html', context)
 
 
 @has_permission(CAN_EDIT)
 def add_payment(request, member_id):
-    form = PaymentForm(request.POST or None)
+    try:
+        member = Member.objects.get(id=member_id)
+    except Member.DoesNotExist:
+        raise Http404("Member with id %s does not exist" % member_id)
+    form = PaymentForm(request.POST or None, user=request.user, member=member)
     if form.is_valid():
         form.save()
         return HttpResponseRedirect(reverse("members_home"))
 
-    form = PaymentPurposeForm()
-    context = {'form': form}
-    return render(request, 'members/add_payment.html', context)
+    context = {'form': form,
+               'member': member}
+    return render(request, 'members/payment_add.html', context)
 
 
 @has_permission(CAN_EDIT)

@@ -26,9 +26,17 @@
             <th class="col-graduation hidden">{% trans "Graduated" %}</th>
             <th class="col-groups">{% trans "Groups" %}</th>
             {% for column in extra_columns %}
-                <th class="col-{{ column.id }} hidden">{{ column.name }}</th>
+                <th class="col-custom-{{ column.id }} hidden">
+                    {{ column.name }}
+                </th>
+            {% endfor %}
+            {% for purpose in payment_purposes %}
+                <th class="col-payment-{{ purpose.id }} hidden">
+                    {{ purpose.purpose }} ({% trans "expires" %})
+                </th>
             {% endfor %}
             <th class="col-edit"> {% trans "Edit" %}</th>
+            <th class="col-payments">{% trans "Payments" %}</th>
         </tr>
         {% for row in members_data %}
             {% setvar row.0 as member %}
@@ -88,12 +96,19 @@
                 {% endfor %}
                 {% for payment in payments %}
                     <td class="{{ payment.0 }} hidden">
-                        {{ payment.1.date }}
+                        {% if payment.1 %}
+                            {{ payment.1.expires }}
+                        {% endif %}
                     </td>
                 {% endfor %}
                 <td>
                     <a href="{% url "members_edit_member" member_id=member.id %}">
                         <span class="glyphicon glyphicon-pencil"></span>
+                    </a>
+                </td>
+                <td>
+                    <a href="{% url "members_view_payments" member_id=member.id %}">
+                        <span class="glyphicon glyphicon-euro"></span>
                     </a>
                 </td>
             </tr>
@@ -105,46 +120,58 @@
     {% sidebarpanel %}
         {% trans "Show columns" %}
         {% body %}
-        <div class="btn btn-info btn-block btn-xs active col-checkbox"
-             id="col-username-selector"
-             data-toggle="button" aria-pressed="true">
-            {% trans "Username" %}
-        </div>
-        <div class="btn btn-info btn-block btn-xs active col-checkbox"
-             id="col-realname-selector"
-             data-toggle="button" aria-pressed="true">
-            {% trans "Real Name" %}
-        </div>
-        <div class="btn btn-info btn-block btn-xs active col-checkbox"
-             id="col-applying-selector"
-             data-toggle="button" aria-pressed="true">
-            {% trans "Applying" %}
-        </div>
-        <div class="btn btn-info btn-block btn-xs active col-checkbox"
-             id="col-member-selector"
-             data-toggle="button" aria-pressed="true">
-            {% trans "Member" %}?
-        </div>
-        <div class="btn btn-info btn-block btn-xs col-checkbox"
-             id="col-enrollment-selector"
-             data-toggle="button" aria-pressed="true">
-            {% trans "Enrolled" %}?
-        </div>
-        <div class="btn btn-info btn-block btn-xs col-checkbox"
-             id="col-graduation-selector"
-             data-toggle="button" aria-pressed="true">
-            {% trans "Graduated" %}?
-        </div>
-        <div class="btn btn-info btn-block btn-xs active col-checkbox"
-             id="col-groups-selector"
-             data-toggle="button" aria-pressed="true">{% trans "Groups" %}
-        </div>
-        {% for column in extra_columns %}
-            <div class="btn btn-info btn-block btn-xs col-checkbox"
-                 id="col-{{ column.id }}-selector">
-                {{ column.name }}
+        <div class="btn-group-vertical btn-block">
+            <div class="btn btn-primary btn-sm active col-checkbox"
+                 id="col-username-selector"
+                 data-toggle="button" aria-pressed="true">
+                {% trans "Username" %}
             </div>
-        {% endfor %}
+            <div class="btn btn-primary btn-sm active col-checkbox"
+                 id="col-realname-selector"
+                 data-toggle="button" aria-pressed="true">
+                {% trans "Real Name" %}
+            </div>
+            <div class="btn btn-primary btn-sm active col-checkbox"
+                 id="col-applying-selector"
+                 data-toggle="button" aria-pressed="true">
+                {% trans "Applying" %}
+            </div>
+            <div class="btn btn-primary btn-sm active col-checkbox"
+                 id="col-member-selector"
+                 data-toggle="button" aria-pressed="true">
+                {% trans "Member" %}?
+            </div>
+            <div class="btn btn-primary btn-sm col-checkbox"
+                 id="col-enrollment-selector"
+                 data-toggle="button" aria-pressed="true">
+                {% trans "Enrolled" %}?
+            </div>
+            <div class="btn btn-primary btn-sm col-checkbox"
+                 id="col-graduation-selector"
+                 data-toggle="button" aria-pressed="true">
+                {% trans "Graduated" %}?
+            </div>
+            <div class="btn btn-primary btn-sm active col-checkbox"
+                 id="col-groups-selector"
+                 data-toggle="button" aria-pressed="true">{% trans "Groups" %}
+            </div>
+        </div>
+        <div class="btn-group-vertical btn-block">
+            {% for column in extra_columns %}
+                <div class="btn btn-primary btn-sm col-checkbox"
+                     id="col-custom-{{ column.id }}-selector">
+                    {{ column.name }}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="btn-group-vertical btn-block">
+            {% for purpose in payment_purposes %}
+                <div class="btn btn-primary btn-sm col-checkbox"
+                     id="col-payment-{{ purpose.id }}-selector">
+                    {{ purpose.purpose }}
+                </div>
+            {% endfor %}
+        </div>
     {% endsidebarpanel %}
     {% sidebarpanel "vertical_buttons" %}
         {% trans "Actions" %}

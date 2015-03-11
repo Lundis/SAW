@@ -3,6 +3,7 @@ from django.core.validators import ValidationError, MinValueValidator
 from django.utils.translation import ugettext as _
 from django.dispatch import receiver
 from django.db.models.signals import post_delete, post_save
+from django.contrib.auth.models import User
 from users.groups import put_user_in_standard_group, MEMBER
 from users.models import UserExtension
 from base.models import SiteConfiguration
@@ -94,6 +95,9 @@ class PaymentPurpose(models.Model):
     purpose = models.CharField(max_length=200)
     description = models.TextField(blank=True)
 
+    def __str__(self):
+        return self.purpose
+
 
 class Payment(models.Model):
     member = models.ForeignKey(Member)
@@ -101,9 +105,10 @@ class Payment(models.Model):
     date = models.DateField()
     expires = models.DateField()
     date_entered = models.DateTimeField(auto_now_add=True, editable=False)
+    created_by = models.ForeignKey(User)
 
     class Meta:
-        ordering = ("-date",)
+        ordering = ("-expires",)
 
     def has_expired(self):
         return timezone.now() > self.expires
