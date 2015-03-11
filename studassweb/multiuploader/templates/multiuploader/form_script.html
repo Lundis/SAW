@@ -48,6 +48,7 @@
             formData: fd,
             url: url,
             paramName: "file",
+            dataType: 'json',
             sequentialUploads: true,
             /*var opts = {{ multiuploader_form.options|safe }};  TODO */
             acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
@@ -62,29 +63,12 @@
             previewCrop: true
         }).on('fileuploadadd', function (e, data) {
             /* It is invoked as soon as files are added to the fileupload widget -
-            via file input selection, drag & drop or add API call. */
-            //<a href="asdf.jpg"><img class="img-thumbnail" src="asdf.jpg.100x100_q85_crop-scale.jpg"></a>
-            //<div><p><canvas height="100" width="100"></canvas><br><span>funny-green_377750.jpg</span></p></div></div>
-            //data.context = $('<div/>').appendTo('#files');
-
-            data.context = $('<a/>').appendTo('#imagelist');
+             via file input selection, drag & drop or add API call. */
+            data.context = $('<div/>').appendTo('#files');
             $.each(data.files, function (index, file) {
-                //create url
-                //var linknode = document.createElement('a');
-                /* TODO we don't have url, we have just filename! We need to add ze folder shit ourselves*/
-                alert(file.url);
-                data.context.attr('href',file.name).addClass('huora');
-
-                //create img
-                var imgnode = document.createElement('img');
-                $(imgnode).attr('href',file.thumbnailUrl).addClass('img-thumbnail');
-
-                $(imgnode).appendTo(data.context);
-                //$(linknode).appendTo('#imagelist');
-
-                //var node = $('<img/>')
-                //        .append(text(file.name));
-                //node.appendTo(data.context);
+                var node = $('<p/>')
+                        .append($('<span/>').text(file.name));
+                node.appendTo(data.context);
             });
         }).on('fileuploadprocessalways', function (e, data) {
             /* Callback for the end (done or fail) of an individual file processing queue. */
@@ -111,18 +95,23 @@
             var progress = parseInt(data.loaded / data.total * 100, 10);
             $('#progress .progress-bar').css(
                     'width',
-                            progress + '%'
+                    progress + '%'
             );
         }).on('fileuploaddone', function (e, data) {
             /* Callback for successful upload requests. */
-            //imagesdiv = $('#imagelist');
+            var imagelist = $('<a/>').appendTo('#imagelist');
             $.each(data.result.files, function (index, file) {
                 if (file.url) {
-                    var link = $('<a>')
-                            .attr('target', '_blank')
-                            .prop('href', file.url);
-                    $(data.context.children()[index])
-                            .wrap(link);
+                    //create url
+                    imagelist.attr('href',file.url).addClass('huora');
+
+                    //create img
+                    var imgnode = document.createElement('img');
+                    $(imgnode).attr('src',file.thumbnailUrl).addClass('img-thumbnail');
+                    $(imgnode).appendTo(imagelist);
+
+                    //TODO remove from "upload list"
+
                 } else if (file.error) {
                     var error = $('<span class="text-danger"/>').text(file.error);
                     $(data.context.children()[index])
