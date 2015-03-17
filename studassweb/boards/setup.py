@@ -1,4 +1,4 @@
-from .models import BoardSettings, Board, BoardMember, BoardType, Role
+from .models import BoardSettings, Board, MemberInBoard, BoardType, Role
 from members.models import Member
 
 
@@ -34,17 +34,17 @@ def setup():
                          last_name="McDuck")
         member3.save()
         # Add Xavier to the board
-        chairman = BoardMember(board=board,
+        chairman = MemberInBoard(board=board,
                                role=role_chairman,
                                member=member2)
         chairman.save()
         # Add Scrooge to the board
-        chairman = BoardMember(board=board,
+        chairman = MemberInBoard(board=board,
                                role=role_treasurer,
                                member=member3)
         chairman.save()
         # Add Kent to the board
-        chairman = BoardMember(board=board,
+        chairman = MemberInBoard(board=board,
                                role=role_random_dude,
                                member=member1)
         chairman.save()

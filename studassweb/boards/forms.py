@@ -27,7 +27,7 @@ class BoardForm(forms.ModelForm):
 class BoardMemberForm(forms.ModelForm):
 
     class Meta:
-        model = BoardMember
+        model = MemberInBoard
         fields = ('member', 'board', 'role', 'photo')
 
 

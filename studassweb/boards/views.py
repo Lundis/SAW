@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseRedirect, HttpResponseNotAllowed
-from .models import Board, Role, BoardMember, BoardType
+from .models import Board, Role, MemberInBoard, BoardType
 from users import permissions
 from .register import CAN_VIEW_BOARDS, CAN_EDIT_BOARDS, CAN_EDIT_ROLES, CAN_EDIT_BOARDTYPES
 from .forms import RoleForm, BoardTypeForm, BoardForm, BoardMemberForm
@@ -20,7 +20,7 @@ def boards_main(request):
 def view_role(request, role_id):
     try:
         role = Role.objects.get(id=role_id)
-        boardmembers = BoardMember.objects.filter(role=role_id)
+        boardmembers = MemberInBoard.objects.filter(role=role_id)
 
         return render(request, 'boards/view_role.html', {
             'role': role, 'boardmembers': boardmembers, },)
@@ -93,7 +93,7 @@ def delete_role(request, role_id):
 def view_board(request, board_id):
     try:
         board = Board.objects.get(id=board_id)
-        boardmembers = BoardMember.objects.filter(board=board_id)
+        boardmembers = MemberInBoard.objects.filter(board=board_id)
 
         return render(request, 'boards/view_board.html', {
             'board': board, 'boardmembers': boardmembers, },)
@@ -238,16 +238,16 @@ def delete_boardtype(request, boardtype_id):
 
 def view_boardmember(request, boardmember_id):
     try:
-        boardmember = BoardMember.objects.get(id=boardmember_id)
+        boardmember = MemberInBoard.objects.get(id=boardmember_id)
 
         boards = []
-        all_boardmembers = BoardMember.objects.filter(member=boardmember.member)
+        all_boardmembers = MemberInBoard.objects.filter(member=boardmember.member)
         for bm in all_boardmembers:
             boards.append({'role': bm.role, 'board': bm.board})
 
         return render(request, 'boards/view_boardmember.html', {
             'boardmember': boardmember, 'boards': boards},)
-    except BoardMember.DoesNotExist:
+    except MemberInBoard.DoesNotExist:
         logger.warning('Could not find board member with id %s', boardmember_id)
         return HttpResponseNotFound('No board member with that id found')
 
@@ -273,8 +273,8 @@ def edit_boardmember(request, boardmember_id):
             logger.warning('User %s tried to edit board member %s', request.user, boardmember_id)
             return HttpResponseForbidden('You don\'t have permission to edit this board member!')
     try:
-        boardmember = BoardMember.objects.get(id=boardmember_id)
-    except BoardMember.DoesNotExist:
+        boardmember = MemberInBoard.objects.get(id=boardmember_id)
+    except MemberInBoard.DoesNotExist:
         logger.warning('User %s tried to edit nonexistant board member id %s', request.user, boardmember_id)
         return HttpResponseNotFound('No such board member!')
 
@@ -293,7 +293,7 @@ def edit_boardmember(request, boardmember_id):
 def delete_boardmember(request, boardmember_id):
     if request.method == 'POST':
         try:
-            boardmember = BoardMember.objects.get(id=boardmember_id)
+            boardmember = MemberInBoard.objects.get(id=boardmember_id)
             if permissions.has_user_perm(request.user, CAN_EDIT_BOARDS):
                 name = str(boardmember)
                 boardmember.delete()
@@ -302,7 +302,7 @@ def delete_boardmember(request, boardmember_id):
             else:
                 logger.warning('User %s tried to delete board member %s', request.user, boardmember)
                 return HttpResponseForbidden('You don\'t have permission to remove this!')
-        except BoardMember.DoesNotExist:
+        except MemberInBoard.DoesNotExist:
             logger.warning('User %s tried to delete nonexistant board member id %s', request.user, boardmember_id)
             return HttpResponseNotFound('No such board member!')
     else:

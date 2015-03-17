@@ -5,10 +5,10 @@ from solo.models import SingletonModel
 from members.models import Member
 
 
-#Role of a board member, e.g. Festchef
+# Role of a board member, e.g. Chairman
 class Role(models.Model):
     name = models.CharField(max_length=100)
-    # TODO: add a description
+    description = models.TextField(default="", blank=True)
 
     def __str__(self):
         return str(self.name)
@@ -17,10 +17,10 @@ class Role(models.Model):
         return reverse("boards_view_role", kwargs={'role_id': self.id})
 
 
-#Styrelsen, maskinutskottet etc.
+# The board and any committees
 class BoardType(models.Model):
     name = models.CharField(max_length=100)
-    # TODO: add a description field
+    description = models.TextField(default="", blank=True)
 
     def __str__(self):
         return str(self.name)
@@ -53,11 +53,10 @@ class Board(models.Model):
         return reverse("boards_view_board", kwargs={'board_id': self.id})
 
     def get_member_count(self):
-        return str(BoardMember.objects.filter(board=self.id).count())
+        return str(MemberInBoard.objects.filter(board=self.id).count())
 
 
-class BoardMember(models.Model):
-    # TODO: rename to MemberInBoard
+class MemberInBoard(models.Model):
     board = models.ForeignKey(Board, on_delete=models.PROTECT)
     role = models.ForeignKey(Role, on_delete=models.PROTECT)
     member = models.ForeignKey(Member, on_delete=models.PROTECT)
