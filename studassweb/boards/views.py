@@ -35,7 +35,7 @@ def view_role(request, role_id):
 
 
 @has_permission(CAN_EDIT_BOARDS)
-def edit_role(request, role_id=None):
+def add_edit_role(request, role_id=None):
     if role_id is not None:
         try:
             role = Role.objects.get(id=role_id)
@@ -87,9 +87,8 @@ def view_board(request, board_id):
         'board': board, 'boardmembers': boardmembers, },)
 
 
-
 @has_permission(CAN_EDIT_BOARDS)
-def edit_board(request, board_id=None):
+def add_edit_board(request, board_id=None):
     if board_id is not None:
         try:
             board = Board.objects.get(id=board_id)
@@ -143,7 +142,7 @@ def view_boardtype(request, boardtype_id):
 
 
 @has_permission(CAN_EDIT_BOARDS)
-def edit_boardtype(request, boardtype_id=None):
+def add_edit_boardtype(request, boardtype_id=None):
     if boardtype_id is not None:
         try:
             boardtype = BoardType.objects.get(id=boardtype_id)
