@@ -48,10 +48,10 @@
             formData: fd,
             url: url,
             paramName: "file",
+            dataType: 'json',
             sequentialUploads: true,
-            /*var opts = {{ multiuploader_form.options|safe }};  TODO */
-            acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
-            maxFileSize: 5000000, // 5 MB
+            acceptFileTypes: /{{ multiuploader_form.acceptFileTypes|safe }}/,
+            maxFileSize: {{ multiuploader_form.maxFileSize|safe }},
             // Enable image resizing, except for Android and Opera,
             // which actually support image resizing, but fail to
             // send Blob objects via XHR requests:
@@ -61,13 +61,18 @@
             previewMaxHeight: 100,
             previewCrop: true
         }).on('fileuploadadd', function (e, data) {
+            /* It is invoked as soon as files are added to the fileupload widget -
+             via file input selection, drag & drop or add API call. */
+
             data.context = $('<div/>').appendTo('#files');
-            $.each(data.files, function (index, file) {
+            /*$.each(data.files, function (index, file) {
                 var node = $('<p/>')
                         .append($('<span/>').text(file.name));
                 node.appendTo(data.context);
             });
+            */
         }).on('fileuploadprocessalways', function (e, data) {
+            /* Callback for the end (done or fail) of an individual file processing queue. */
             var index = data.index,
                     file = data.files[index],
                     node = $(data.context.children()[index]);
@@ -87,19 +92,26 @@
                         .prop('disabled', !!data.files.error);
             }
         }).on('fileuploadprogressall', function (e, data) {
+            /* Callback for global upload progress events. */
             var progress = parseInt(data.loaded / data.total * 100, 10);
             $('#progress .progress-bar').css(
                     'width',
-                            progress + '%'
+                    progress + '%'
             );
         }).on('fileuploaddone', function (e, data) {
+            /* Callback for successful upload requests. */
+            var imagelist = $('<a/>').appendTo('#imagelist');
             $.each(data.result.files, function (index, file) {
                 if (file.url) {
-                    var link = $('<a>')
-                            .attr('target', '_blank')
-                            .prop('href', file.url);
-                    $(data.context.children()[index])
-                            .wrap(link);
+                    //create url
+                    imagelist.attr('href',file.url).addClass('huora');
+
+                    //create img
+                    var imgnode = document.createElement('img');
+                    $(imgnode).attr('src',file.thumbnailUrl).addClass('img-thumbnail');
+                    $(imgnode).appendTo(imagelist);
+
+
                 } else if (file.error) {
                     var error = $('<span class="text-danger"/>').text(file.error);
                     $(data.context.children()[index])
