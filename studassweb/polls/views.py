@@ -56,7 +56,7 @@ def add_poll(request):
 
     if request.method == 'POST':
         form = PollForm(request.POST)
-        choiceformset = choices_factory(request.POST, request.FILES, prefix='dynamix')
+        choiceformset = choices_factory(request.POST, prefix='dynamix')
         if form.is_valid() and choiceformset.is_valid():
             tmppoll = form.save(commit=False)
             tmppoll.created_by = request.user

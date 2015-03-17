@@ -48,11 +48,11 @@
 {% endblock %}
 {% block scripts %}
     <script src="{% static "js/base/jquery.formset.js" %}"></script>
-    <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+    <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
     <script type="text/javascript">
         $(function () {
-            //Set up dynamic adding of images
+            //Set up dynamic adding of choices
             $('.choicesformset_single').formset({
                 prefix: '{{ choicesformset.prefix }}',
                 formCssClass: 'dynamic-formasdf',
@@ -60,7 +60,11 @@
                 deleteText: '{% trans "Remove choice" %}'
             });
 
-
+            //Set up datepicker
+            $( "#id_expiration" ).datepicker({
+                firstDay: 1,
+                dateFormat: "yy-mm-dd"
+            });
         })
     </script>
 {% endblock %}

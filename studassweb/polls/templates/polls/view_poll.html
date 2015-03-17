@@ -14,17 +14,8 @@
 {% block main_content %}
     <h1>{{ poll.name }}</h1>
     <ul class="list-group">
-
-
-
         <li class="list-group-item"> {{ poll.description | safe }}</li>
-
-        {% if form%}
-
-
-
-
-
+        {% if form %}
             <form action="{% url 'polls_view_poll' poll.id %}" method="post">
                 {% csrf_token %}
                 {% bootstrap_form form %}
@@ -34,8 +25,6 @@
                     </button>
                 {% endbuttons %}
             </form>
-
-
         {% else %}
             {% for c in choices %}
                 <div class="row">
