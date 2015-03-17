@@ -28,7 +28,8 @@
                 </div>
                 <div class="panel-body">
                     <div class="pull-right text-right">
-                        {% if contact.messages.count > 0 %}
+                        {% has_perm "contact" "CAN_EDIT_CONTACT_SETTINGS" as can_edit_contacts %}
+                        {% if contact.messages.count > 0 and can_edit_contacts %}
                             {% with contact.unread_messages as unread_messages %}
                                 <a href="{% url "contact_view_messages" contact_id=contact.id %}" class="btn btn-primary">
                                     {% trans "View Messages" %}
@@ -38,7 +39,7 @@
                                 </a>
                             {% endwith %}
                         {% endif %}
-                        {% has_perm "contact" "CAN_EDIT_CONTACT_SETTINGS" as can_edit_contacts %}
+
                         {% if can_edit_contacts %}
                             <a href="{% url "contact_edit" contact_id=contact.id %}" class="btn btn-primary">
                                 {% trans "Edit" %}
