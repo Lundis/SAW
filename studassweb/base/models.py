@@ -14,6 +14,7 @@ import re
 from concurrent import futures
 from urllib.request import urlopen
 from urllib.parse import urlparse
+from urllib.error import HTTPError
 import logging
 from solo.models import SingletonModel
 from .utils import get_all_modules, get_modules_with
@@ -43,7 +44,11 @@ class BootswatchTheme(models.Model):
         # http://stackoverflow.com/questions/7243750/download-file-from-web-in-python-3
 
         # first download the image
-        preview_image_stream = BytesIO(urlopen(json_dict['thumbnail']).read())
+        try:
+            preview_image_stream = BytesIO(urlopen(json_dict['thumbnail']).read())
+        except HTTPError:
+            logger.error("Failed to fetch theme %s" % json_dict['name'])
+            return
         original_image_filename = urlparse(json_dict['thumbnail']).path.split("/")[-1]
 
         image_folder = os.path.join("base",
@@ -61,7 +66,11 @@ class BootswatchTheme(models.Model):
             shutil.copyfileobj(preview_image_stream, out_file)
 
         # same for the css file
-        theme_stream = BytesIO(urlopen(json_dict['cssMin']).read())
+        try:
+            theme_stream = BytesIO(urlopen(json_dict['cssMin']).read())
+        except HTTPError:
+            logger.error("Failed to fetch theme %s" % json_dict['name'])
+            return
         theme_filename = urlparse(json_dict['cssMin']).path.split("/")[-1]
         theme_folder = os.path.join(THEME_DIR, version, json_dict['name'])
         theme_absolute_folder = os.path.join(settings.STATIC_DIR, theme_folder)
@@ -136,14 +145,17 @@ class SiteConfiguration(SingletonModel):
 
     @classmethod
     def _update_bootswatch(cls):
-        data = urlopen("http://api.bootswatch.com/3/").read().decode()
+        try:
+            data = urlopen("http://api.bootswatch.com/3/").read().decode()
+        except HTTPError:
+            logger.error("Failed to fetch bootswatch theme descriptor %s")
+            return
         data_dict = json.loads(data)
         version = data_dict['version']
         with futures.ThreadPoolExecutor(max_workers=16) as executor:
             for theme_data in data_dict['themes']:
                 #BootswatchTheme.create_from_json(theme_data, version)
-                future = executor.submit(BootswatchTheme.create_from_json, theme_data, version)
-            print(future.result())
+                executor.submit(BootswatchTheme.create_from_json, theme_data, version)
 
         instance = cls.instance()
         instance.bootswatch_version = version
