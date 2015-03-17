@@ -62,6 +62,13 @@ To upgrade from a previous version, run:
     * install instructions:
         > pip install djangoajax
 
+===== Optional dependencies =====
+* pykerberos
+    * Kerberos lib for Python
+    * url: https://pypi.python.org/pypi/pykerberos
+    * install instructions:
+        > pip install pykerberos
+
 
 ===== Install Pycharm pro edition =====
 
