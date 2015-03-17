@@ -2,12 +2,10 @@ from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, BOARD_MEMBER
 
-DESCRIPTION = "Present who is on the board, or on other committees, both this year and in the past"
+DESCRIPTION = "Present who is on the board, or in other committees, both this year and in the past"
 
 CAN_VIEW_BOARDS = "can_view_boards"
 CAN_EDIT_BOARDS = "can_edit_boards"
-CAN_EDIT_ROLES = "can_edit_roles"
-CAN_EDIT_BOARDTYPES = "can_edit_boardtypes"
 
 
 def get_menu_items():
@@ -36,8 +34,6 @@ def get_permissions():
     :return: a list of tuples containing the permissions of this module and their default group
     """
     return (
-        (CAN_VIEW_BOARDS, GUEST, "Access to the page that shows the boards"),
-        (CAN_EDIT_BOARDS, BOARD_MEMBER, "Can add/edit the board/committees for each year"),
-        (CAN_EDIT_ROLES, BOARD_MEMBER, "Can add/edit the roles in a board"),
-        (CAN_EDIT_BOARDTYPES, BOARD_MEMBER, "Can add/edit the different board types"),
+        (CAN_VIEW_BOARDS, GUEST, "Can view boards/committees"),
+        (CAN_EDIT_BOARDS, BOARD_MEMBER, "Can edit the board/committees for each year"),
     )
