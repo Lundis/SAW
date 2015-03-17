@@ -7,24 +7,24 @@
 {% load thumbnail %}
 
 {% block main_content %}
-    <h3>Boards</h3>
+    <h3>{% trans "Boards and Committees" %}</h3>
     <div class="list-group">
         {% for board in boards %}
-            <li class="list-group-item">
+            <a href="{{ board.get_absolute_url }}" class="list-group-item">
                 {% if board.photo %}
                     <img  class="img-thumbnail" src="{{ board.photo|thumbnail_url:'standard' }}"/>
                 {% endif %}
-                <a href="{{ board.get_absolute_url }}">{{ board }}
+                {{ board }}
                 <span class="badge">
                     {{ board.get_member_count }}
                 </span>
-                </a>
-            </li>
+            </a>
         {% empty %}
-            <p>{% trans "No boards found!" %}</p>
+            <p>{% trans "No boards or committees found!" %}</p>
         {% endfor %}
     </div>
 {% endblock %}
+
 {% block sidebar-panel1 %}
     {% has_perm "boards" "CAN_EDIT_BOARDS" as can_edit_boards %}
     {% has_perm "boards" "CAN_EDIT_ROLES" as can_edit_roles %}
