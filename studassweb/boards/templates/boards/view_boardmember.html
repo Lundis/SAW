@@ -4,22 +4,25 @@
 {% load bootstrap3 %}
 {% load sawp %}
 {% load thumbnail %}
+{% load sidemenu %}
 
 {% block breadcrumb2 %}
-    <li>
-        <a href="{{ boardmember.get_absolute_url }}">
-            {{ boardmember }}
-        </a>
+    <li class="active">
+        {% trans "Viewing board member" %}
+        {{ boardmember }}
     </li>
 {% endblock %}
 
 {% block main_content %}
-    <h1>{{ boardmember }}</h1>
+    {% if member.user_ext %}
+        <a href="{% url "users_view_profile" username=member.user_ext.user.username %}">
+            <h1>{{ member.get_full_name }}</h1>
+        </a>
+    {% else %}
+        <h1>{{ member.get_full_name }}</h1>
+    {% endif %}
     <div class="list-group">
-        {% if boardmember.photo %}
-            <a href="{{ boardmember.photo.url }}"><img  class="img-thumbnail" src="{{ boardmember.photo|thumbnail_url:'standard' }}"/></a>
-        {% endif %}
-        <br>{% trans "Member of the following boards:" %}
+        <h5>{% trans "Member of the following boards:" %}</h5>
         {% for role_board in boards %}
             <a class="list-group-item" href="{{ role_board.board.get_absolute_url }}">
                 {{ role_board.board }}, {{ role_board.role }}
@@ -29,49 +32,13 @@
         {% endfor %}
     </div>
 {% endblock %}
-{% block sidebar %}
-    {% has_perm "boards" "CAN_EDIT_BOARDS" as can_edit_boards %}
-    {% has_perm "boards" "CAN_EDIT_ROLES" as can_edit_roles %}
-    {% has_perm "boards" "CAN_EDIT_BOARDTYPES" as can_edit_boardtypes %}
-    {% if can_edit_boards or can_edit_roles or can_edit_boardtypes%}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Edit" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    {% if can_edit_boards%}
-                        <a href="{% url 'boards_edit_boardmember' boardmember.id %}">
-                            <div class="btn list-group-item">{% trans "Edit this board member" %}</div>
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Add" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    {% if can_edit_boards%}
-                        <a href="{% url 'boards_add_boardmember' %}">
-                            <div class="btn list-group-item">{% trans "Add new board member" %}</div>
-                        </a>
-                        <a href="{% url 'boards_add_board' %}">
-                            <div class="btn list-group-item">{% trans "Add new board" %}</div>
-                        </a>
-                    {% endif %}
-                    {% if can_edit_boardtypes%}
-                        <a href="{% url 'boards_add_boardtype' %}">
-                            <div class="btn list-group-item">{% trans "Add new boardtype" %}</div>
-                        </a>
-                    {% endif %}
-                    {% if can_edit_roles%}
-                        <a href="{% url 'boards_add_role' %}">
-                            <div class="btn list-group-item">{% trans "Add new role" %}</div>
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+
+{% block sidebar-panel1 %}
+    {% has_perm "boards" "CAN_EDIT_BOARDS" as can_edit %}
+    {% if can_edit %}
+        {% sidebarpanel "vertical_buttons" %}
+            {% trans "Actions" %}
+            {% body %}
+        {% endsidebarpanel %}
     {% endif %}
 {% endblock %}

@@ -1,13 +1,15 @@
 from django.shortcuts import render
-from django.http import HttpResponseNotFound, HttpResponseRedirect, HttpResponseNotAllowed
+from django.http import HttpResponseNotFound, HttpResponseRedirect, HttpResponseNotAllowed, Http404
 from django.core.exceptions import SuspiciousOperation
-from .models import Board, Role, MemberInBoard, BoardType
-from users.decorators import has_permission
-from .register import CAN_VIEW_BOARDS, CAN_EDIT_BOARDS
-from .forms import RoleForm, BoardTypeForm, BoardForm, BoardMemberForm
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib import messages
+from users.decorators import has_permission
+from members.models import Member
+from .models import Board, Role, MemberInBoard, BoardType
+from .register import CAN_VIEW_BOARDS, CAN_EDIT_BOARDS
+from .forms import RoleForm, BoardTypeForm, BoardForm, BoardMemberForm
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -182,38 +184,49 @@ def delete_boardtype(request, boardtype_id):
 
 
 @has_permission(CAN_VIEW_BOARDS)
-def view_boardmember(request, boardmember_id):
+def view_boardmember(request, member_id):
     try:
-        boardmember = MemberInBoard.objects.get(id=boardmember_id)
+        member = Member.objects.get(id=member_id)
     except MemberInBoard.DoesNotExist:
-        return HttpResponseNotFound('No board member with id %s found' % boardmember_id)
+        return HttpResponseNotFound('No member with id %s found' % member_id)
 
     boards = []
-    all_boardmembers = MemberInBoard.objects.filter(member=boardmember.member)
+    all_boardmembers = MemberInBoard.objects.filter(member=member)
     for bm in all_boardmembers:
         boards.append({'role': bm.role, 'board': bm.board})
 
     return render(request, 'boards/view_boardmember.html', {
-        'boardmember': boardmember, 'boards': boards},)
+        'member': member, 'boards': boards},)
 
 
 @has_permission(CAN_EDIT_BOARDS)
-def add_edit_boardmember(request, boardmember_id=None):
+def add_edit_boardmember(request, boardmember_id=None, board_id=None):
     if boardmember_id is not None:
         try:
             boardmember = MemberInBoard.objects.get(id=boardmember_id)
+            board = boardmember.board
         except MemberInBoard.DoesNotExist:
             raise SuspiciousOperation('User %s tried to edit nonexistant board member with id %s' % (request.user,
                                                                                                      boardmember_id))
     else:
         boardmember = None
-
-    form = BoardMemberForm(request.POST or None, request.FILES, instance=boardmember)
+        if board_id is not None:
+            try:
+                board = Board.objects.get(id=board_id)
+            except Board.DoesNotExist:
+                raise Http404("Board not found")
+        else:
+            board = None
+    form = BoardMemberForm(request.POST or None, request.FILES,
+                           instance=boardmember,
+                           initial={"board": board})
     if form.is_valid():
         form.save()
-        return HttpResponseRedirect(reverse("boards_view_boardmember", args=[form.instance.id]))
+        return HttpResponseRedirect(reverse("boards_view_boardmember",
+                                            kwargs={"member_id": form.instance.member.id}))
 
-    context = {'form': form}
+    context = {'form': form,
+               'board': board}
     return render(request, 'boards/add_edit_boardmember.html', context)
 
 

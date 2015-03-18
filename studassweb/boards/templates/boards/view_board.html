@@ -30,78 +30,84 @@
     {% endif %}
     <div class="list-group">
         {% for boardmember in boardmembers %}
-            <a class="list-group-item " href="{{ boardmember.get_absolute_url }}">
+            <div class="list-group-item">
                 <div class="row" style="padding: 0 10px 0;">
 
-                    <div class="col-xs-6 col-md-5 col-lg-4 img-thumbnail" style="min-height: 100px;">
+                    <div class="col-xs-5 col-md-4 col-lg-3 img-thumbnail" style="min-height: 100px;">
                         {% if boardmember.photo %}
-                            <img class="img-responsive"
-                                 src="{{ boardmember.photo | thumbnail_url:'standard' }}"/>
+                            <a href="{{ boardmember.get_absolute_url }}">
+                                <img class="img-responsive"
+                                     src="{{ boardmember.photo | thumbnail_url:'standard' }}"/>
+                            </a>
                         {% endif %}
                     </div>
                     <div class="col-xs-6 col-md-7 col-lg-8">
                         <h5>{{ boardmember.role }}</h5>
-                        <h3>{{ boardmember }}</h3>
+                        <a href="{{ boardmember.get_absolute_url }}">
+                            <h3>{{ boardmember }}</h3>
+                        </a>
+                    </div>
+                    <div class="col-xs-1 pull-right text-right">
+                        <form id="delete-member-form-{{ boardmember.id }}"
+                              action="{% url 'boards_delete_boardmember' boardmember.id %}" method="post">
+                            {% csrf_token %}
+                        </form>
+                        <a href="#delete" style="display:block;">
+                                <span id="delete-icon-{{ boardmember.id }}" style="color: #ff0000;"
+                                      class="glyphicon glyphicon-remove delete-member-button"></span>
+                        </a>
+                        <a href="{% url "boards_edit_boardmember" boardmember_id=boardmember.id %}"
+                           style="display:block;">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a>
                     </div>
                 </div>
-            </a>
+            </div>
         {% empty %}
             <div class="list-group-item">
-                {% trans "No members added to this board!" %}
+                {% trans "No members have been added to this board!" %}
             </div>
-            <form action="{% url 'boards_delete_board' board.id %}" method="post">
-                {% csrf_token %}
-                {% buttons %}
-                    <button type="submit" class="btn btn-danger" onclick="return confirm('{% trans "Are you sure?" %}')">
-                        {% trans "Remove this board" %}
-                    </button>
-                {% endbuttons %}
-            </form>
         {% endfor %}
     </div>
 {% endblock %}
 
 {% block sidebar-panel1 %}
-    {% has_perm "boards" "CAN_EDIT_BOARDS" as can_edit_boards %}
-    {% has_perm "boards" "CAN_EDIT_ROLES" as can_edit_roles %}
-    {% has_perm "boards" "CAN_EDIT_BOARDTYPES" as can_edit_boardtypes %}
-    {% if can_edit_boards %}
+    {% has_perm "boards" "CAN_EDIT_BOARDS" as can_edit %}
+    {% if can_edit %}
         {% sidebarpanel "vertical_buttons" %}
-            {% trans "Edit" %}
+            {% trans "Actions" %}
             {% body %}
             <a class="btn btn-primary" href="{% url 'boards_edit_board' board.id %}">
                 {% trans "Edit this board" %}
             </a>
+            <a class="btn btn-primary" href="{% url 'boards_add_boardmember' board_id=board.id %}">
+                {% trans "Add new board member" %}
+            </a>
+            <a class="btn btn-primary" href="{% url 'boards_add_role' %}">
+                {% trans "Create new role" %}
+            </a>
+            {% if board.can_delete %}
+                <form action="{% url 'boards_delete_board' board.id %}" method="post">
+                    {% csrf_token %}
+                    {% buttons %}
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('{% trans "Are you sure?" %}')">
+                            {% trans "Remove this board" %}
+                        </button>
+                    {% endbuttons %}
+                </form>
+            {% endif %}
         {% endsidebarpanel %}
     {% endif %}
 {% endblock %}
 
-{% block sidebar-panel2 %}
-    {% has_perm "boards" "CAN_EDIT_BOARDS" as can_edit_boards %}
-    {% has_perm "boards" "CAN_EDIT_ROLES" as can_edit_roles %}
-    {% has_perm "boards" "CAN_EDIT_BOARDTYPES" as can_edit_boardtypes %}
-    {% if can_edit_boards or can_edit_boardtypes or can_edit_roles %}
-        {% sidebarpanel "vertical_buttons" %}
-            {% trans "Add" %}
-            {% body %}
-            {% if can_edit_boards%}
-                <a class="btn btn-primary" href="{% url 'boards_add_boardmember' %}">
-                    {% trans "Add new board member" %}
-                </a>
-                <a class="btn btn-primary" href="{% url 'boards_add_board' %}">
-                    {% trans "Add new board" %}
-                </a>
-            {% endif %}
-            {% if can_edit_boardtypes%}
-                <a class="btn btn-primary" href="{% url 'boards_add_boardtype' %}">
-                    {% trans "Add new boardtype" %}
-                </a>
-            {% endif %}
-            {% if can_edit_roles%}
-                <a class="btn btn-primary" href="{% url 'boards_add_role' %}">
-                    {% trans "Add new role" %}
-                </a>
-            {% endif %}
-        {% endsidebarpanel %}
-    {% endif %}
+{% block scripts %}
+    <script>
+        $(".delete-member-button").click(function(event) {
+            if (confirm("{% trans "Are you sure?" %}")) {
+                var member_id = event.target.getAttribute("id").split("-");
+                member_id = member_id[member_id.length - 1];
+                $("#delete-member-form-" + member_id).submit();
+            }
+        });
+    </script>
 {% endblock %}

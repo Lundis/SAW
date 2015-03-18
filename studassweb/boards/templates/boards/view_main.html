@@ -26,28 +26,20 @@
 {% endblock %}
 
 {% block sidebar-panel1 %}
-    {% has_perm "boards" "CAN_EDIT_BOARDS" as can_edit_boards %}
-    {% has_perm "boards" "CAN_EDIT_ROLES" as can_edit_roles %}
-    {% has_perm "boards" "CAN_EDIT_BOARDTYPES" as can_edit_boardtypes %}
-    {% if can_edit_boards or can_edit_roles or can_edit_boardtypes %}
+    {% has_perm "boards" "CAN_EDIT_BOARDS" as can_edit %}
+    {% if can_edit %}
         {% sidebarpanel "vertical_buttons" %}
             {% trans "Add" %}
             {% body %}
-            {% if can_edit_boards%}
-                <a class="btn btn-primary" href="{% url 'boards_add_board' %}">
-                    {% trans "Add new board" %}
-                </a>
-            {% endif %}
-            {% if can_edit_boardtypes%}
-                <a class="btn btn-primary" href="{% url 'boards_add_boardtype' %}">
-                    {% trans "Add new boardtype" %}
-                </a>
-            {% endif %}
-            {% if can_edit_roles%}
-                <a class="btn btn-primary" href="{% url 'boards_add_role' %}">
-                    {% trans "Add new role" %}
-                </a>
-            {% endif %}
+            <a class="btn btn-primary" href="{% url 'boards_add_board' %}">
+                {% trans "Add new board" %}
+            </a>
+            <a class="btn btn-primary" href="{% url 'boards_add_boardtype' %}">
+                {% trans "Add new boardtype" %}
+            </a>
+            <a class="btn btn-primary" href="{% url 'boards_add_role' %}">
+                {% trans "Add new role" %}
+            </a>
         {% endsidebarpanel %}
     {% endif %}
 {% endblock %}

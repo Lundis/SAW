@@ -20,7 +20,7 @@ def has_perm(context, app, perm_constant):
     """
     perm = get_str_from_module(app, "register", perm_constant)
     if perm is None:
-        logger.error("has_perm couldn't find {0} in {1}", perm_constant, app)
+        logger.error("has_perm couldn't find %s in %s", perm_constant, app)
     user = context['user']
     return has_user_perm(user, perm)
 

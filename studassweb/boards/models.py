@@ -16,6 +16,9 @@ class Role(models.Model):
     def get_absolute_url(self):
         return reverse("boards_view_role", kwargs={'role_id': self.id})
 
+    def can_delete(self):
+        return not MemberInBoard.objects.filter(role=self).exists()
+
 
 # The board and any committees
 class BoardType(models.Model):
@@ -29,7 +32,7 @@ class BoardType(models.Model):
         return reverse("boards_view_boardtype", kwargs={'boardtype_id': self.id})
 
     def get_board_count(self):
-        return str(Board.objects.filter(boardtype=self.id).count())
+        return Board.objects.filter(boardtype=self.id).count()
 
     def get_member_count(self):
         # We might not need this function
@@ -39,6 +42,9 @@ class BoardType(models.Model):
         for board in all_boards:
             member_sum += board.get_member_count()
         return member_sum
+
+    def can_delete(self):
+        return self.get_member_count() == 0
 
 
 class Board(models.Model):
@@ -53,7 +59,10 @@ class Board(models.Model):
         return reverse("boards_view_board", kwargs={'board_id': self.id})
 
     def get_member_count(self):
-        return str(MemberInBoard.objects.filter(board=self.id).count())
+        return MemberInBoard.objects.filter(board=self.id).count()
+
+    def can_delete(self):
+        return self.get_member_count() == 0
 
 
 class MemberInBoard(models.Model):
@@ -66,10 +75,10 @@ class MemberInBoard(models.Model):
         unique_together = ("board", "role", "member")
 
     def __str__(self):
-        return str(self.member.get_full_name())
+        return self.member.get_full_name()
 
     def get_absolute_url(self):
-        return reverse("boards_view_boardmember", kwargs={'boardmember_id': self.id})
+        return reverse("boards_view_boardmember", kwargs={'member_id': self.member.id})
 
 
 class BoardSettings(SingletonModel):

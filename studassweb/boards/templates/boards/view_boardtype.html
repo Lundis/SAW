@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load bootstrap3 %}
 {% load sawp %}
+{% load sidemenu %}
 
 {% block breadcrumb2 %}
     <li>
@@ -20,65 +21,39 @@
             <a class="list-group-item" href="{{ board.get_absolute_url }}">
                 {{ board.year }}
                 <span class="badge">
-                    {{ board.get_member_count }}
+                    members: {{ board.get_member_count }}
                 </span>
             </a>
         {% empty %}
             <p>{% trans "No boards with this board type found!" %}</p>
-            <form action="{% url 'boards_delete_boardtype' boardtype.id %}" method="post">
-                {% csrf_token %}
-                {% buttons %}
-                    <button type="submit" class="btn btn-danger" onclick="return confirm('{% trans "Are you sure?" %}')">
-                        {% trans "Remove this board type" %}
-                    </button>
-                {% endbuttons %}
-            </form>
+
         {% endfor %}
     </div>
 {% endblock %}
-{% block sidebar %}
-    {% has_perm "boards" "CAN_EDIT_BOARDS" as can_edit_boards %}
-    {% has_perm "boards" "CAN_EDIT_ROLES" as can_edit_roles %}
-    {% has_perm "boards" "CAN_EDIT_BOARDTYPES" as can_edit_boardtypes %}
-    {% if can_edit_boards or can_edit_roles or can_edit_boardtypes%}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Edit" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    {% if can_edit_boards%}
-                        <a href="{% url 'boards_edit_boardtype' boardtype.id %}">
-                            <div class="btn list-group-item">{% trans "Edit this boardtype" %}</div>
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Add" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    {% if can_edit_boards%}
-                        <a href="{% url 'boards_add_boardmember' %}">
-                            <div class="btn list-group-item">{% trans "Add new board member" %}</div>
-                        </a>
-                        <a href="{% url 'boards_add_board' %}">
-                            <div class="btn list-group-item">{% trans "Add new board" %}</div>
-                        </a>
-                    {% endif %}
-                    {% if can_edit_boardtypes%}
-                        <a href="{% url 'boards_add_boardtype' %}">
-                            <div class="btn list-group-item">{% trans "Add new boardtype" %}</div>
-                        </a>
-                    {% endif %}
-                    {% if can_edit_roles%}
-                        <a href="{% url 'boards_add_role' %}">
-                            <div class="btn list-group-item">{% trans "Add new role" %}</div>
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+
+{% block sidebar-panel1 %}
+    {% has_perm "boards" "CAN_EDIT_BOARDS" as can_edit %}
+    {% if can_edit %}
+        {% sidebarpanel "vertical_buttons" %}
+            {% trans "Actions" %}
+            {% body %}
+            <a class="btn btn-primary" href="{% url 'boards_add_board' %}">
+                {% trans "Add new board" %}
+            </a>
+            <a class="btn btn-primary"  href="{% url 'boards_edit_boardtype' boardtype.id %}">
+                {% trans "Edit this boardtype" %}
+            </a>
+            <a class="btn btn-primary" href="{% url 'boards_add_boardtype' %}">
+                {% trans "Add new boardtype" %}
+            </a>
+            {% if boardtype.can_delete %}
+                <form action="{% url 'boards_delete_boardtype' boardtype.id %}" method="post">
+                    {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-block" onclick="return confirm('{% trans "Are you sure?" %}')">
+                            {% trans "Remove this board type" %}
+                        </button>
+                </form>
+            {% endif %}
+        {% endsidebarpanel %}
     {% endif %}
 {% endblock %}
