@@ -19,7 +19,10 @@
             <input type="submit" value="Submit" />
 
         </form>
-        <p>{% trans "Don't have an account? Register"%} <a href="{% url "users_register" %}">{% trans "here" %}</a></p>
+        <p>
+            {% trans "Don't have an account? Register"%} <a href="{% url "users_register" %}">{% trans "here" %}</a>.
+            {% trans "Forgotten your password? Reset it"%} <a href="{% url "users_password_reset" %}">{% trans "here" %}</a>.
+        </p>
     {% else %}
         <p>You are already logged on!</p>
     {% endif %}
