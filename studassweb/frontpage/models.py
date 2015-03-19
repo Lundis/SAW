@@ -18,6 +18,7 @@ class FrontPageItem(models.Model):
     identifier = models.CharField(max_length=100)
     title = models.TextField()
     content = models.TextField(null=True, blank=True)
+    # TODO: figure out if template can be removed
     template = models.CharField(max_length=200, default="")
     # Which module this belongs to
     module = models.CharField(max_length=50, blank=True, default="")
