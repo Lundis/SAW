@@ -57,6 +57,7 @@
 {% block sidebar-panel1 %}
 
     {% sidebarpanel %}
+        {% trans "Actions" %}
         {% body %}
         <form action="{% url "menu_settings_edit_menu" menu.id %}"
               id="{{ form.get_form_id }}" method="post"
