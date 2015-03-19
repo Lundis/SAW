@@ -1,6 +1,14 @@
-{% extends "settings/base.html" %}
+{% extends "base/base.html" %}
 {% load i18n %}
 {% load bootstrap3 %}
+
+{% block breadcrumb1 %}
+    <li>
+        <a href="{% url "settings_main" %}">
+            {% trans "Settings" %}
+        </a>
+    </li>
+{% endblock %}
 
 {% block breadcrumb2 %}
     <li>
@@ -26,4 +34,7 @@
             {% trans "Submit" %}
         </button>
     </form>
+{% endblock %}
+
+{% block sidebar %}
 {% endblock %}
