@@ -57,6 +57,7 @@ class ChoiceFormSingle(forms.Form):
         choice = Choice.objects.get(id=int(choice_id))
         if choice.id_to_poll != self.poll:
             raise ValidationError("Selected choice is not in poll")
+        return choice_id
 
     def save(self, request, commit=True):
         if self.is_valid():
