@@ -23,11 +23,8 @@
             <th class="col-realname">
                 <span class="btn btn-link" data-toggle="sort-column">{% trans "Real name" %}</span>
             </th>
-            <th class="col-applying">
-                <span data-toggle="sort-column" class="btn btn-link">{% trans "Applying for membership" %}</span>
-            </th>
             <th class="col-member">
-                <span data-toggle="sort-column" class="btn btn-link">{% trans "Member?" %}</span>
+                <span data-toggle="sort-column" class="btn btn-link">{% trans "Membership" %}</span>
             </th>
             <th class="col-enrollment hidden">
                 <span data-toggle="sort-column" class="btn btn-link">{% trans "Enrolled" %}</span>
@@ -69,9 +66,12 @@
                 <td class="col-realname">
                     <span class="data-text">{{ member.get_full_name }}</span>
                 </td>
-                <td class="col-applying">
-                    {% if member.applying %}
-                        <<span class="data-text hidden">a</span>
+                <td class="col-member">
+                    {% if member.confirmed %}
+                        <span class="data-text hidden">a</span>
+                        <span class="glyphicon glyphicon-ok"></span>
+                    {% elif member.applying %}
+                        <span class="data-text hidden">a</span>
                         <a href="{% url "members_confirm_membership" member_id=member.id %}">
                             <span class="glyphicon glyphicon-ok-circle"></span>
                         </a>
@@ -79,15 +79,8 @@
                             <span class="glyphicon glyphicon-remove-circle"></span>
                         </a>
                     {% else %}
-                        <span class="data-text">-</span>
-                    {% endif %}
-                </td>
-                <td class="col-member">
-                    {% if member.confirmed %}
-                        <span class="data-text hidden">a</span>
-                        <span class="glyphicon glyphicon-ok"></span>
-                    {% else %}
-                        <span class="data-text">-</span>
+                        <span class="data-text"></span>
+                        <span class="glyphicon glyphicon-remove"></span>
                     {% endif %}
                 </td>
                 <td class="col-enrollment hidden">
@@ -149,11 +142,6 @@
                  id="col-realname-selector"
                  data-toggle="button" aria-pressed="true">
                 {% trans "Real Name" %}
-            </div>
-            <div class="btn btn-primary btn-sm active col-checkbox"
-                 id="col-applying-selector"
-                 data-toggle="button" aria-pressed="true">
-                {% trans "Applying" %}
             </div>
             <div class="btn btn-primary btn-sm active col-checkbox"
                  id="col-member-selector"
