@@ -116,6 +116,8 @@
                     <td class="{{ payment.0 }} hidden">
                         {% if payment.1 %}
                             <span class="data-text">{{ payment.1.expires }}</span>
+                        {% else %}
+                            <span class="data-text"></span>
                         {% endif %}
                     </td>
                 {% endfor %}
@@ -176,7 +178,8 @@
         <div class="btn-group-vertical btn-block">
             {% for column in extra_columns %}
                 <div class="btn btn-primary btn-sm col-checkbox"
-                     id="col-custom-{{ column.id }}-selector">
+                     id="col-custom-{{ column.id }}-selector"
+                     data-toggle="button">
                     {{ column.name }}
                 </div>
             {% endfor %}
@@ -184,7 +187,8 @@
         <div class="btn-group-vertical btn-block">
             {% for purpose in payment_purposes %}
                 <div class="btn btn-primary btn-sm col-checkbox"
-                     id="col-payment-{{ purpose.id }}-selector">
+                     id="col-payment-{{ purpose.id }}-selector"
+                     data-toggle="button">
                     {{ purpose.purpose }}
                 </div>
             {% endfor %}
