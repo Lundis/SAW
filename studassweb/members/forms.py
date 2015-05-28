@@ -36,7 +36,13 @@ class PaymentForm(forms.ModelForm):
         self._user = kwargs.pop("user")
         super(PaymentForm, self).__init__(*args, **kwargs)
         # Use now as the default time of payment
-        self.fields["date"].initial = timezone.now()
+        self.fields["date"] = forms.DateField(
+            widget=forms.DateInput(format='%d.%m.%Y'),
+            input_formats=('%d.%m.%Y',),
+            initial=timezone.now())
+        self.fields["expires"] = forms.DateField(
+            widget=forms.DateInput(format='%d.%m.%Y'),
+            input_formats=('%d.%m.%Y',))
 
     def save(self, commit=True):
         payment = super(PaymentForm, self).save(commit=False)

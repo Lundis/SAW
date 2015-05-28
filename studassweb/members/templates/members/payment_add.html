@@ -3,6 +3,7 @@
 {% load bootstrap3 %}
 {% load setvar %}
 {% load sidemenu %}
+{% load static %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -34,4 +35,23 @@
             {% endbuttons %}
         </form>
     </div>
+{% endblock %}
+
+{% block scripts %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/base/jquery.datetimepicker.css" %}"/>
+    <script src="{% static "js/base/jquery.datetimepicker.js" %}"></script>
+    <script type="text/javascript">
+        $(function () {
+
+            //Set up datetimepicker
+            $( "#{{ form.date.id_for_label }}" ).datetimepicker({
+                dayOfWeekStart: 1,
+                format: "d.n.Y"
+            });
+            $( "#{{ form.expires.id_for_label }}" ).datetimepicker({
+                dayOfWeekStart: 1,
+                format: "d.n.Y"
+            });
+        })
+    </script>
 {% endblock %}
