@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import Http404, HttpResponseRedirect, HttpResponseNotAllowed
+from django.http import Http404, HttpResponseRedirect, HttpResponseNotAllowed, HttpResponseForbidden
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.utils.timezone import datetime
@@ -36,7 +36,12 @@ def view_page(request, slug, revision_id=None):
     :param request:
     :return:
     """
-    page = InfoPage.objects.get(slug=slug)
+    try:
+        page = InfoPage.objects.get(slug=slug)
+    except InfoPage.DoesNotExist:
+        raise Http404("Page " + slug + " not found")
+    if not page.can_view(request.user):
+        return HttpResponseForbidden("User " + str(request.user) + " Does not have access to page" + slug)
     category = page.category
     revisions = page.revisions()
     if revision_id is None:
