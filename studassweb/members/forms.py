@@ -92,7 +92,6 @@ class MemberEditForm(forms.ModelForm):
             old_confirmed = m.confirmed
         else:
             old_confirmed = False
-        print("old:" + str(old_confirmed))
         instance = super(MemberEditForm, self).save(commit)
         # update permissions if this user is a registered member
         if instance.user_ext is not None:

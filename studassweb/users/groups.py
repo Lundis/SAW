@@ -35,10 +35,8 @@ def pick_least_powerful_group(group1, group2):
 def pick_most_powerful_group(group1, group2):
     for g in reversed(group_names):
         if g == group1:
-            print(g)
             return group1
         if g == group2:
-            print(g)
             return group2
     raise ValueError("The specified groups were invalid")
 
