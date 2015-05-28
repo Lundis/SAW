@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block main_content %}
-    <h1>{{ page.title }}</h1>
+    <h1>{{ current_revision.title }}</h1>
     <div class="panel panel-default">
         <div class="panel-body">
             {{ current_revision.text | safe}}
@@ -58,9 +58,21 @@
             </div>
             <div class="panel-body">
                 <div class="btn-group-vertical btn-block">
-                    <a href="{% url "pages_edit_page" page.id %}" class="btn btn-primary">
-                        {% trans "Edit this page" %}
-                    </a>
+                    {% if  current_revision.is_latest %}
+                        <a href="{% url "pages_edit_page" page.id %}" class="btn btn-primary">
+                            {% trans "Edit this page" %}
+                        </a>
+                    {% else %}
+                        <a href="{% url "pages_edit_page" page.id current_revision.id %}" class="btn btn-primary">
+                            {% trans "Edit from this revision" %}
+                        </a>
+                        <form action="{% url "pages_revert_page" current_revision.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary btn-block">
+                                {% trans "Revert to this revision" %}
+                            </button>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         {% endif %}

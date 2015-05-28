@@ -183,7 +183,10 @@ def page_post_save(**kwargs):
     instance = kwargs.pop("instance")
     # create an edit object if this is a new object of if the text has changed
     if not instance.revisions().exists() or instance.revisions().first().text != instance.text:
-        edit = InfoPageEdit(author=instance.author, text=instance.text, page=instance)
+        edit = InfoPageEdit(author=instance.author,
+                            title=instance.title,
+                            text=instance.text,
+                            page=instance)
         edit.save()
     # create a menu item if it doesn't exist
     menu_item, created = MenuItem.get_or_create(identifier="pages/page/%d" % instance.id,
@@ -202,6 +205,7 @@ def page_post_save(**kwargs):
 
 class InfoPageEdit(models.Model):
     page = models.ForeignKey(InfoPage)
+    title = models.CharField(max_length=50)
     author = models.ForeignKey(User)
     text = ValidatedRichTextField()
     date = models.DateTimeField('Date edited', auto_now_add=True)
@@ -215,6 +219,9 @@ class InfoPageEdit(models.Model):
     def get_absolute_url(self):
         return reverse("pages_view_page", kwargs={'slug': self.page.slug,
                                                   'revision_id': self.id})
+
+    def is_latest(self):
+        return not InfoPageEdit.objects.filter(date__gt=self.date).exists()
 
 
 class PagesSettings(SingletonModel):

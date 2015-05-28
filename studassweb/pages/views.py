@@ -1,7 +1,8 @@
 from django.shortcuts import render
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponseNotAllowed
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from django.utils.timezone import datetime
 from users.decorators import has_permission
 from users.permissions import has_user_perm
 from base.views import delete_confirmation_view
@@ -39,7 +40,7 @@ def view_page(request, slug, revision_id=None):
     category = page.category
     revisions = page.revisions()
     if revision_id is None:
-        current_revision = page.revisions().first()
+        current_revision = revisions.first()
     else:
         try:
             current_revision = revisions.get(id=revision_id)
@@ -51,7 +52,7 @@ def view_page(request, slug, revision_id=None):
 
 
 @has_permission(EDIT)
-def edit_page(request, category_id=None, page_id=None):
+def edit_page(request, category_id=None, page_id=None, revision_id=None):
     """
     edit or create a page
     :param request:
@@ -71,6 +72,13 @@ def edit_page(request, category_id=None, page_id=None):
             category = InfoCategory.objects.get(id=category_id)
         except InfoCategory.DoesNotExist:
             pass
+    if revision_id is not None and request.method == "GET" and page is not None:
+        try:
+            revision = InfoPageEdit.objects.get(id=revision_id)
+            page.title = revision.title
+            page.text = revision.text
+        except InfoPageEdit.DoesNotExist:
+            raise Http404("Revision not found")
 
     form = InfoPageForm(request.POST or None,
                         instance=page,
@@ -84,6 +92,24 @@ def edit_page(request, category_id=None, page_id=None):
                                                         'page': page,
                                                         'form': form})
 
+@has_permission(EDIT)
+def revert_page(request,  revision_id):
+    """
+    revert a page to a previous revision by simply changing the date on that revision to now
+    :param request:
+    :return:
+    """
+
+    if request.method == "POST":
+        try:
+            revision = InfoPageEdit.objects.get(id=revision_id)
+            revision.date = datetime.now()
+            revision.save()
+        except InfoPageEdit.DoesNotExist:
+            raise Http404("Revision not found")
+        return HttpResponseRedirect(revision.page.get_absolute_url())
+    else:
+        return HttpResponseNotAllowed(["POST"])
 
 @has_permission(VIEW_PUBLIC)
 def view_category(request, slug):
