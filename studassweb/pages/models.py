@@ -182,7 +182,8 @@ def page_post_delete(**kwargs):
 def page_post_save(**kwargs):
     instance = kwargs.pop("instance")
     # create an edit object if this is a new object of if the text has changed
-    if not instance.revisions().exists() or instance.revisions().first().text != instance.text:
+    if not instance.revisions().exists() or instance.revisions().first().text != instance.text\
+            or instance.revisions().first().title != instance.title:
         edit = InfoPageEdit(author=instance.author,
                             title=instance.title,
                             text=instance.text,
@@ -194,6 +195,12 @@ def page_post_save(**kwargs):
                                                 display_name=instance.title,
                                                 linked_object=instance,
                                                 permission=instance.permission)
+    # Update the menu item
+    if not created:
+        menu_item.display_name = instance.title
+        menu_item.permission = instance.permission
+        menu_item.save()
+
     if instance.category:
         menu = instance.category.menu_item.submenu
         if not menu.contains(menu_item):
