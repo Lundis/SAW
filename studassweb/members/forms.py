@@ -1,6 +1,6 @@
 from django import forms
 from .models import Member, PaymentPurpose, CustomField, Payment, CustomEntry
-from users.groups import GROUP_CHOICES, get_user_group, put_user_in_standard_group
+from users.groups import GROUP_CHOICES, get_user_group, put_user_in_standard_group, MEMBER, pick_most_powerful_group
 from django.utils.translation import ugettext as _
 from django.utils import timezone
 
@@ -87,11 +87,24 @@ class MemberEditForm(forms.ModelForm):
             self.fields["custom-" + field.name] = f
 
     def save(self, commit=True):
+        if self.instance:
+            m = Member.objects.get(pk=self.instance.pk)
+            old_confirmed = m.confirmed
+        else:
+            old_confirmed = False
+        print("old:" + str(old_confirmed))
         instance = super(MemberEditForm, self).save(commit)
-        # update permissions if this user
+        # update permissions if this user is a registered member
         if instance.user_ext is not None:
             user = instance.user_ext.user
-            put_user_in_standard_group(user, self.cleaned_data['group'])
+            new_group = self.cleaned_data['group']
+            # Put newly confirmed members in the members group unless they have been put manually
+            # in a better group
+            if instance.confirmed and instance.confirmed != old_confirmed:
+                new_group = pick_most_powerful_group(MEMBER, new_group)
+
+            put_user_in_standard_group(user, new_group)
+
             if commit:
                 user.save()
         # Next save all custom fields
@@ -99,7 +112,7 @@ class MemberEditForm(forms.ModelForm):
         for field in fields:
             if commit:
                 entry, created = CustomEntry.objects.get_or_create(field=field,
-                                                          member=instance)
+                                                                   member=instance)
                 entry.content = self.cleaned_data["custom-" + field.name]
                 entry.save()
 

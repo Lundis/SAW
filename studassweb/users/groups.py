@@ -23,6 +23,26 @@ GROUP_CHOICES = ((GUEST, _(GUEST)),
                  (WEBMASTER, _(WEBMASTER)))
 
 
+def pick_least_powerful_group(group1, group2):
+    for g in group_names:
+        if g == group1:
+            return group1
+        if g == group2:
+            return group2
+    raise ValueError("The specified groups were invalid")
+
+
+def pick_most_powerful_group(group1, group2):
+    for g in reversed(group_names):
+        if g == group1:
+            print(g)
+            return group1
+        if g == group2:
+            print(g)
+            return group2
+    raise ValueError("The specified groups were invalid")
+
+
 def setup_default_groups_and_permissions():
     """
     Creates all permissions and sets up all groups
