@@ -9,6 +9,7 @@ from solo.models import SingletonModel
 from base.fields import ValidatedRichTextField
 from menu.models import MenuItem, Menu
 from users.permissions import has_user_perm
+from users.models import SAWPermission
 from frontpage.models import FrontPageItem
 import pages.register as pregister
 
@@ -198,7 +199,7 @@ def page_post_save(**kwargs):
     # Update the menu item
     if not created:
         menu_item.display_name = instance.title
-        menu_item.permission = instance.permission
+        menu_item.view_permission = SAWPermission.get(instance.permission)
         menu_item.save()
 
     if instance.category:
