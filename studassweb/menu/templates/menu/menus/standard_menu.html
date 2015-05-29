@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load solo_tags %}
 {% load setvar %}
+{% load sawp %}
 {% get_solo 'base.SiteConfiguration' as site_config %}
 {% get_solo 'menu.MainMenuSettings' as menu_settings %}
 {% setvar menu_settings.image_ratio as ratio %}
@@ -67,29 +68,36 @@
                                     </a>
                                     <ul class="dropdown-menu multi-level">
                                         {% for subitem in item.submenu.items %}
-                                            {% if subitem.submenu and subitem.submenu.count != 0 %}
-                                                <li class="dropdown-submenu">
-                                                    <a href="#">
-                                                        {% trans subitem.display_name %}
-                                                    </a>
-                                                    <ul class="dropdown-menu">
-                                                        {% for subsubitem in subitem.submenu.items %}
-                                                            <li>
-                                                                <a href="{{ subsubitem.url }}">
-                                                                    {% trans subsubitem.display_name %}
-                                                                </a>
-                                                            </li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                </li>
-                                            {% else %}
-                                                <li>
-                                                    <a href="{{ subitem.url }}">
-                                                        {% trans subitem.display_name %}
-                                                    </a>
-                                                </li>
+                                            {% can_view_object subitem as can_view_subitem %}
+                                            {% if can_view_subitem %}
+                                                {% if subitem.submenu and subitem.submenu.count != 0 %}
+                                                    <li class="dropdown-submenu">
+                                                        <a href="#">
+                                                            {% trans subitem.display_name %}
+                                                        </a>
+                                                        <ul class="dropdown-menu">
+                                                            {% for subsubitem in subitem.submenu.items %}
+                                                                {% can_view_object subsubitem as can_view_subsubitem %}
+                                                                {% if can_view_subsubitem %}
+                                                                    <li>
+                                                                        <a href="{{ subsubitem.url }}">
+                                                                            {% trans subsubitem.display_name %}
+                                                                        </a>
+                                                                    </li>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </ul>
+                                                    </li>
+                                                {% else %}
+                                                    <li>
+                                                        <a href="{{ subitem.url }}">
+                                                            {% trans subitem.display_name %}
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
                                             {% endif %}
                                         {% endfor %}
+
                                     </ul>
                                 </li>
                             {% else %}

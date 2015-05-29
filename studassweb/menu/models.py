@@ -120,7 +120,7 @@ class Menu(models.Model):
         return [item_in_menu.item for
                 item_in_menu in
                 ItemInMenu.objects.filter(menu=self)
-                if not user or item_in_menu.item.can_user_view(user)]
+                if not user or item_in_menu.item.can_view(user)]
 
     def count(self):
         return ItemInMenu.objects.filter(menu=self).count()
@@ -249,7 +249,7 @@ class MenuItem(models.Model):
         """
         return cls.objects.filter(default_menu=menu_id)
 
-    def can_user_view(self, user):
+    def can_view(self, user):
         """
         :return: True if this item has no associated permission or if the user has the permission
         """
