@@ -1,7 +1,7 @@
 {% extends "pages/base.html" %}
 {% load i18n %}
 {% load sawp %}
-
+{% load sidemenu %}
 
 
 {% block main_content %}
@@ -44,36 +44,35 @@
 
 {% endblock %}
 
-{% block sidebar %}
+{% block sidebar-panel1 %}
     {% has_perm "pages" "EDIT" as can_edit %}
     {% if can_edit %}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Actions" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="btn-group-vertical btn-block" >
-                    <a href="{% url "pages_new_category" %}" class="btn btn-primary">
-                        {% trans "Create a new category" %}
-                    </a>
-                    <a href="{% url "pages_new_page" %}" class="btn btn-primary">
-                        {% trans "Create a new page" %}
-                    </a>
-                </div>
-            </div>
-            <div class= "panel-heading">
-                <h2 class="panel-title" data-toggle="collapse" data-target="#helptext">
-                    {% trans "Help" %}
-                    <span class="glyphicon caret pull-right"></span>
-                </h2>
-            </div>
-            <div id="helptext" class="panel-collapse collapse helptext-collapse">
-                <div class="panel-body">
-                        <p>{% trans "This is where you can create pages with custom information for your association." %}</p>
-                        <p>{% trans "Custom pages are placed in categories for easier navigation." %}</p>
-                        <p>{% trans "Custom page can be accessed via categories in the menu" %}</p>
-                </div>
-            </div>
-        </div>
+        {% sidebarpanel "vertical_buttons" %}
+
+            {% trans "Actions" %}
+            {% body %}
+            <a href="{% url "pages_new_category" %}" class="btn btn-primary">
+                {% trans "Create a new category" %}
+            </a>
+            <a href="{% url "pages_new_page" %}" class="btn btn-primary">
+                {% trans "Create a new page" %}
+            </a>
+        {% endsidebarpanel %}
     {% endif %}
-{% endblock sidebar %}
+{% endblock %}
+
+{% block sidebar-panel-help %}
+    {% has_perm "pages" "EDIT" as can_edit %}
+    {% if can_edit %}
+        {% sidebarpanel "help" %}
+            {% trans "Help" %}
+            {% body %}
+            <p>{% trans "This is where you can create pages with all kinds of information for your association." %}</p>
+            <p>{% trans "Custom pages can be placed in categories for easier navigation." %}</p>
+            <p>
+                {% trans "Custom pages can be accessed via the menu, which can be edited " %}
+                <a href="{% url "menu_settings_select_menu" %}">{% trans "here" %}</a>.
+            </p>
+        {% endsidebarpanel %}
+    {% endif %}
+{% endblock %}

@@ -1,6 +1,7 @@
 {% extends "pages/base.html" %}
 {% load i18n %}
 {% load sawp %}
+{% load sidemenu %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -24,25 +25,36 @@
     {% else %}
         <p>{% trans "This category is empty" %}</p>
     {% endif %}
-    {% endblock main_content %}
-{% block sidebar %}
+{% endblock main_content %}
+
+{% block sidebar-panel1 %}
+    {% has_perm "pages" "EDIT" as show_edit_buttons %}
+    {% if show_edit_buttons %}
+        {% sidebarpanel "vertical_buttons" %}
+            {% trans "Actions" %}
+            {% body %}
+            <a class="btn btn-primary" href="{% url "pages_new_page" category_id=category.id %}">
+                {% trans "Create a new page" %}
+            </a>
+            <a class="btn btn-primary" href="{% url "pages_edit_category" category.id %}">
+                {% trans "Edit this category" %}
+            </a>
+        {% endsidebarpanel %}
+
+    {% endif %}
+{% endblock %}
+
+{% block sidebar-panel-help %}
+
+    {% sidebarpanel "help" %}
+        {% trans "Help" %}
+        {% body %}
+        <p>{% trans "Click on a page to view it." %}</p>
         {% has_perm "pages" "EDIT" as show_edit_buttons %}
         {% if show_edit_buttons %}
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h2 class="panel-title">{% trans "Edit" %}</h2>
-                </div>
-                <div class="panel-body">
-                    <div class="btn-group-vertical btn-block">
-                        <a class="btn btn-primary" href="{% url "pages_new_page" category_id=category.id %}">
-                            {% trans "Create a new page" %}
-                        </a>
-                        <a class="btn btn-primary" href="{% url "pages_edit_category" category.id %}">
-                            {% trans "Edit this category" %}
-                        </a>
-                    </div>
-                </div>
-            </div>
-
+            <p>{% trans "You can add additional pages or change the name and visibility of this category in the menu above" %}.</p>
+            <p>{% trans "To delete or edit a page, click on it" %}.</p>
         {% endif %}
-{% endblock sidebar %}
+
+    {% endsidebarpanel %}
+{% endblock %}

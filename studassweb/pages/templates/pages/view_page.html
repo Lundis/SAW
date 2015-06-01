@@ -1,6 +1,7 @@
 {% extends "pages/base.html" %}
 {% load sawp %}
 {% load i18n %}
+{% load sidemenu %}
 
 {% block breadcrumb2 %}
     {% if category %}
@@ -23,11 +24,11 @@
 
 {% block main_content %}
     <h1>{{ current_revision.title }}</h1>
-    <div class="panel panel-default">
-        <div class="panel-body">
+    <div  class="panel panel-default">
+        <div id="page-content" class="panel-body">
             {{ current_revision.text | safe}}
         </div>
-        <div class="panel-body">
+        <div id="page-footer" class="panel-body">
             <div class="pull-right">
                 {% trans "Updated" %}
                 {{ current_revision.date}}
@@ -38,71 +39,97 @@
     </div>
 {% endblock main_content %}
 
-{% block sidebar %}
-    <div class="panel panel-primary">
-        {% if category.pages %}
-            <div class="panel-heading">
-                <a href="{{ category.get_absolute_url }}" class="panel-title">{{ category.name }}</a>
-            </div>
-            <div class="panel-body">
-                <div class="btn-group-vertical btn-block">
-                    {% for page_ in category.pages %}
-                        {% can_view_object page_ as show_page %}
-                        {% if show_page %}
-                            <a href="{{ page_.get_absolute_url}}" class="btn btn-primary">
-                                {{ page_.title }}
+{% block sidebar-panel1 %}
+    {% if category.pages %}
+        {% sidebarpanel "vertical_buttons" %}
+            {{ category.name }}
+            {% body %}
+            {% for page_ in category.pages %}
+                {% can_view_object page_ as show_page %}
+                {% if show_page %}
+                    <a href="{{ page_.get_absolute_url}}" class="btn btn-primary">
+                        {{ page_.title }}
+                    </a>
+                {% endif %}
+            {% endfor %}
+        {% endsidebarpanel %}
+    {% endif %}
+{% endblock %}
+
+{% block sidebar-panel2 %}
+    {% can_edit_object page as show_edit_buttons %}
+    {% if show_edit_buttons %}
+        {% sidebarpanel "vertical_buttons" %}
+            {% trans "Actions" %}
+            {% body %}
+            {% if  current_revision.is_latest %}
+                <a href="{% url "pages_edit_page" page.id %}" class="btn btn-primary">
+                    {% trans "Edit this page" %}
+                </a>
+            {% else %}
+                <a href="{% url "pages_edit_page" page.id current_revision.id %}" class="btn btn-primary">
+                    {% trans "Edit from this revision" %}
+                </a>
+                <form action="{% url "pages_revert_page" current_revision.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-block">
+                        {% trans "Revert to this revision" %}
+                    </button>
+                </form>
+            {% endif %}
+        {% endsidebarpanel %}
+    {% endif %}
+{% endblock %}
+
+{% block sidebar-panel3 %}
+    {% can_edit_object page as show_edit_buttons %}
+    {% with page.revisions as revisions %}
+        {% if show_edit_buttons and revisions.count > 1 %}
+            {% sidebarpanel %}
+                {% trans "Revisions" %}
+                {% body %}
+                <div class="btn-group-vertical btn-block" style="height: auto; max-height: 200px; overflow-x: hidden; padding:0;">
+                    {% for revision in revisions %}
+                        {% if revision == current_revision %}
+                            <a href="#" class="btn btn-primary btn-block active">
+                                {{ revision.date }}
+                            </a>
+                        {% else %}
+                            <a href="{{ revision.get_absolute_url}}" class="btn btn-primary btn-block active">
+                                {{ revision.date }}
                             </a>
                         {% endif %}
                     {% endfor %}
                 </div>
-            </div>
+            {% endsidebarpanel %}
         {% endif %}
-        {% can_edit_object page as show_edit_buttons %}
-        {% if show_edit_buttons %}
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Edit" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="btn-group-vertical btn-block">
-                    {% if  current_revision.is_latest %}
-                        <a href="{% url "pages_edit_page" page.id %}" class="btn btn-primary">
-                            {% trans "Edit this page" %}
-                        </a>
-                    {% else %}
-                        <a href="{% url "pages_edit_page" page.id current_revision.id %}" class="btn btn-primary">
-                            {% trans "Edit from this revision" %}
-                        </a>
-                        <form action="{% url "pages_revert_page" current_revision.id %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary btn-block">
-                                {% trans "Revert to this revision" %}
-                            </button>
-                        </form>
-                    {% endif %}
-                </div>
-            </div>
-        {% endif %}
-        {% with page.revisions as revisions %}
-            {% if show_edit_buttons and revisions.count > 1 %}
-                <div class="panel-heading">
-                    <h2 class="panel-title">{% trans "Revisions" %}</h2>
-                </div>
-                <div class="panel-body">
-                    <div class="btn-group-vertical btn-block">
-                        {% for revision in revisions %}
-                            {% if revision == current_revision %}
-                                <a href="#" class="btn btn-primary active">
-                                    {{ revision.date }}
-                                </a>
-                            {% else %}
-                                <a href="{{ revision.get_absolute_url}}" class="btn btn-primary">
-                                    {{ revision.date }}
-                                </a>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
-        {% endwith %}
-    </div>
+    {% endwith %}
+{% endblock %}
+
+{% block sidebar-panel-help %}
+    {% can_edit_object page as show_edit_buttons %}
+    {% if show_edit_buttons %}
+        {% sidebarpanel "help" %}
+            {% trans "Help" %}
+            {% body %}
+            <p>{% trans "You can edit or delete the page by clicking the edit button" %}.</p>
+            <p>
+                {% trans "You can also see past revisions of the page, and revert back to them" %}.
+                {% trans "Additionally, it's possible to edit using an old revision as a base" %}.
+            </p>
+        {% endsidebarpanel %}
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $("#page-content").resize(expand_content).ready(expand_content);
+        function expand_content(event) {
+            var content = $("#page-content");
+            var free_space = $("#footer-container").offset().top -
+                    content.offset().top - $("#page-footer").outerHeight() -
+                    (content.outerHeight() - content.height()) ;
+            content.css("min-height", "" + (free_space - 20) + "px");
+        }
+    </script>
 {% endblock %}
