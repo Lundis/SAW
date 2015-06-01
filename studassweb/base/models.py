@@ -257,7 +257,7 @@ class Feedback(models.Model):
 
     user = models.ForeignKey(User, blank=True, null=True)
     url = models.CharField(max_length=300)
-    ip_address = models.IPAddressField()
+    ip_address = models.GenericIPAddressField()
     type = models.CharField(max_length=10, choices=FEEDBACK_CHOICES)
     response = models.CharField(max_length=10, choices=RESPONSE_CHOICES)
     date = models.DateTimeField(auto_now_add=True)

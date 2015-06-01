@@ -114,7 +114,7 @@ class SAWPermission(models.Model):
     """
     This model wraps Django's built-in Permission object, providing a description.
     """
-    permission = models.ForeignKey(Permission, unique=True)
+    permission = models.OneToOneField(Permission, unique=True)
     description = models.CharField(max_length=200)
     default_group = models.ForeignKey(Group, null=True, default=None)
     module = models.CharField(max_length=100)

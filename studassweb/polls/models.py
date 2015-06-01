@@ -7,17 +7,14 @@ from .register import CAN_VIEW_PUBLIC_POLLS, CAN_VIEW_MEMBER_POLLS, \
 
 from base.fields import ValidatedRichTextField
 
-# Create your models here.
-
 PERMISSION_CHOICES_VIEW = (
-    ( CAN_VIEW_PUBLIC_POLLS,"Everyone"),
-    ( CAN_VIEW_MEMBER_POLLS,"Members"),
-    (CAN_VIEW_BOARD_POLLS,"The board"),
+    (CAN_VIEW_PUBLIC_POLLS, "Everyone"),
+    (CAN_VIEW_MEMBER_POLLS, "Members"),
+    (CAN_VIEW_BOARD_POLLS, "The board"),
 )
 
-
 PERMISSION_CHOICES_VOTE = (
-    (CAN_VOTE_PUBLIC_POLLS,"Everyone"),
+    (CAN_VOTE_PUBLIC_POLLS, "Everyone"),
     (CAN_VOTE_MEMBER_POLLS, "Members"),
     (CAN_VOTE_BOARD_POLLS, "The board"),
 )
@@ -32,9 +29,11 @@ class Poll(models.Model):
     can_vote_on_many = models.BooleanField(default=False)
 
     permission_choice_view = models.CharField(max_length=100, choices=PERMISSION_CHOICES_VIEW,
-                                              verbose_name="Who can view this poll?", default="CAN_VIEW_PUBLIC_POLLS")
+                                              verbose_name="Who can view this poll?",
+                                              default="CAN_VIEW_PUBLIC_POLLS")
     permission_choice_vote = models.CharField(max_length=100, choices=PERMISSION_CHOICES_VOTE,
-                                              verbose_name="Who can vote on this poll?", default="CAN_VOTE_PUBLIC_POLLS")
+                                              verbose_name="Who can vote on this poll?",
+                                              default="CAN_VOTE_PUBLIC_POLLS")
 
     def count_votes(self):
         return Votes.objects.filter(choice_id__id_to_poll=self).count()
@@ -51,7 +50,6 @@ class Poll(models.Model):
     def can_edit(self, user):
         return self.created_by == user or has_user_perm(user, CAN_EDIT_ALL_POLLS)
 
-
     def can_user_vote(self, request):
         if not has_user_perm(request.user, self.permission_choice_vote):
             return False
@@ -63,7 +61,6 @@ class Poll(models.Model):
 
     def has_user_voted(self, request):
         return not self.can_user_vote(request) #TODO STUFF ENNU NOGO
-
 
 
 class Choice(models.Model):
@@ -81,7 +78,7 @@ class Choice(models.Model):
 
     def percentage(self):
         total_votes_for_poll = self.id_to_poll.count_votes()
-        total_votes_for_specific_choice=Votes.objects.filter(choice_id=self).count()
+        total_votes_for_specific_choice = Votes.objects.filter(choice_id=self).count()
         if total_votes_for_poll == 0:
             total_votes_for_poll = 1
         percent= total_votes_for_specific_choice/total_votes_for_poll
@@ -90,8 +87,8 @@ class Choice(models.Model):
 
 class Votes(models.Model):
     choice_id = models.ForeignKey(Choice)
-    user = models.ForeignKey(User,null=True)
-    ip_address = models.IPAddressField(default=None)
+    user = models.ForeignKey(User, null=True)
+    ip_address = models.GenericIPAddressField(default=None)
 
 
 

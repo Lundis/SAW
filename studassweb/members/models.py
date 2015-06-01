@@ -11,7 +11,7 @@ from django.utils import timezone
 
 
 class Member(models.Model):
-    user_ext = models.ForeignKey(UserExtension, null=True, blank=True, unique=True, on_delete=models.SET_NULL)
+    user_ext = models.OneToOneField(UserExtension, null=True, blank=True, unique=True, on_delete=models.SET_NULL)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField(null=True, blank=True)
