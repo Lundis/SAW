@@ -13,7 +13,9 @@ def display_menu(context, menu_name, active_tab):
 
 def render_menu(menu_name, active_tab, http_context):
     menu = Menu.get(menu_name)
-    context = {'menuitems': menu.items(http_context['user']), 'active_tab': active_tab}
+    context = {'menuitems': menu.items(http_context['user']),
+               'active_tab': active_tab,
+               'user': http_context['user']}
 
     if menu.template and menu.template.path:
         template_path = menu.template.path
@@ -21,9 +23,7 @@ def render_menu(menu_name, active_tab, http_context):
         raise ValueError("You cannot render a menu without a template using display_menu")
 
     template = get_template(template_path)
-    request_context = RequestContext(http_context, context)
-    request_context['user'] = http_context['user']
-    result = template.render(request_context)
+    result = template.render(context)
     return result
 
 
