@@ -93,7 +93,7 @@ class MemberEditForm(forms.ModelForm):
             self.fields["custom-" + field.name] = f
 
     def save(self, commit=True):
-        if self.instance:
+        if self.instance and self.instance.pk:
             m = Member.objects.get(pk=self.instance.pk)
             old_confirmed = m.confirmed
         else:
