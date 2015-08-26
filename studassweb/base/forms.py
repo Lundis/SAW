@@ -33,7 +33,7 @@ class BootswatchThemeSelectForm(forms.Form):
     def save(self):
         settings = SiteConfiguration.instance()
         theme = BootswatchTheme.objects.get(name=self.cleaned_data['theme'])
-        settings.bootstrap_theme_url = theme.theme_path
+        settings.bootstrap_theme_url = theme.bs_css_url
         settings.bootstrap_theme_mod_url = None
         settings.save()
 

@@ -27,72 +27,32 @@ THEME_DIR = os.path.join("css", "bootswatch_themes")
 
 class BootswatchTheme(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    theme_path = models.CharField(max_length=200)
-    preview_image = models.ImageField(upload_to="base/bootswatch")
+    bs_css_url = models.URLField(max_length=200)
+    preview_image_url = models.URLField()
     preview_url = models.URLField()
 
     def __str__(self):
         return self.name
 
     @classmethod
-    def create_from_json(cls, json_dict, version):
+    def create_from_json(cls, json_dict):
         """
         Parses the theme data from the JSON
         :param json_dict:
         :return:
         """
-        # http://stackoverflow.com/questions/7243750/download-file-from-web-in-python-3
-
-        # first download the image
-        try:
-            preview_image_stream = BytesIO(urlopen(json_dict['thumbnail']).read())
-        except HTTPError:
-            logger.error("Failed to fetch theme %s" % json_dict['name'])
-            return
-        original_image_filename = urlparse(json_dict['thumbnail']).path.split("/")[-1]
-
-        image_folder = os.path.join("base",
-                                    "bootswatch",
-                                    version)
-        image_absolute_folder = os.path.join(settings.MEDIA_ROOT, image_folder)
-        if not os.path.exists(image_absolute_folder):
-            os.makedirs(image_absolute_folder)
-        image_filename = json_dict['name'] + "_" + original_image_filename
-        image_absolute_path = os.path.join(image_absolute_folder, image_filename)
-        image_relative_path = os.path.join(image_folder, image_filename)
-        # save the image to disk - overwrite old file (it shouldn't exist)
-        with open(image_absolute_path, 'wb') as out_file:
-            logger.info("Saving preview image: %s", image_absolute_path)
-            shutil.copyfileobj(preview_image_stream, out_file)
-
-        # same for the css file
-        try:
-            theme_stream = BytesIO(urlopen(json_dict['cssMin']).read())
-        except HTTPError:
-            logger.error("Failed to fetch theme %s" % json_dict['name'])
-            return
-        theme_filename = urlparse(json_dict['cssMin']).path.split("/")[-1]
-        theme_folder = os.path.join(THEME_DIR, version, json_dict['name'])
-        theme_absolute_folder = os.path.join(settings.STATIC_DIR, theme_folder)
-        if not os.path.exists(theme_absolute_folder):
-            os.makedirs(theme_absolute_folder)
-        theme_absolute_path = os.path.join(theme_absolute_folder, theme_filename)
-        theme_relative_path = os.path.join(theme_folder, theme_filename)
-        with open(theme_absolute_path, 'wb') as out_file:
-            logger.info("Saving theme css: %s", theme_absolute_path)
-            shutil.copyfileobj(theme_stream, out_file)
 
         try:
             # update old entry if it exists
             bst = cls.objects.get(name=json_dict['name'])
-            bst.theme_path = theme_relative_path
-            bst.preview_image = image_relative_path
+            bst.bs_css_url = json_dict['cssMin']
+            bst.preview_image_url = json_dict['thumbnail']
             bst.preview_url = json_dict['preview']
         except cls.DoesNotExist:
             # otherwise create a new one
             bst = BootswatchTheme(name=json_dict['name'],
-                                  theme_path=theme_relative_path,
-                                  preview_image=image_relative_path,
+                                  bs_css_url=json_dict['cssMin'],
+                                  preview_image_url=json_dict['thumbnail'],
                                   preview_url=json_dict['preview'])
 
         return bst.save()
@@ -151,11 +111,11 @@ class SiteConfiguration(SingletonModel):
             logger.error("Failed to fetch bootswatch theme descriptor %s")
             return
         data_dict = json.loads(data)
+        logger.debug(data_dict)
         version = data_dict['version']
         with futures.ThreadPoolExecutor(max_workers=16) as executor:
             for theme_data in data_dict['themes']:
-                #BootswatchTheme.create_from_json(theme_data, version)
-                executor.submit(BootswatchTheme.create_from_json, theme_data, version)
+                executor.submit(BootswatchTheme.create_from_json, theme_data)
 
         instance = cls.instance()
         instance.bootswatch_version = version
