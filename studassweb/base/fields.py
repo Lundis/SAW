@@ -31,12 +31,28 @@ class ValidatedRichTextFormField(RichTextFormField):
     def clean(self, value):
         """
         Closes any open tags on the value.
+        Removes any trailing "<p>&nbsp;</p>" lines.
         :param value:
         :return:
         """
         cleaned = super(ValidatedRichTextFormField, self).clean(value)
         html, closing_tags = complete_html(cleaned)
-        return html + closing_tags
+        return self.remove_trailing_stupid_lines(html + closing_tags)
+
+    @staticmethod
+    def remove_trailing_stupid_lines(text):
+        lines = text.replace("\r", "").split("\n")
+        good_line_found = False
+        result = ""
+        for i in range(len(lines)-1, 0, -1):
+            if not lines[i].strip() in ("", "<p>&nbsp;</p>"):
+                good_line_found = True
+            if good_line_found:
+                result = lines[i] + "\n" + result
+        print("removed:\n" + text[len(result):])
+        return result
+
+
 
 
 class HiddenModelField(forms.IntegerField):
