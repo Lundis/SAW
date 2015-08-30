@@ -97,6 +97,7 @@ def edit_page(request, category_id=None, page_id=None, revision_id=None):
                                                         'page': page,
                                                         'form': form})
 
+
 @has_permission(EDIT)
 def revert_page(request,  revision_id):
     """
@@ -115,6 +116,7 @@ def revert_page(request,  revision_id):
         return HttpResponseRedirect(revision.page.get_absolute_url())
     else:
         return HttpResponseNotAllowed(["POST"])
+
 
 @has_permission(VIEW_PUBLIC)
 def view_category(request, slug):
