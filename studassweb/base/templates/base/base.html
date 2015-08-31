@@ -2,6 +2,7 @@
 {% load static %}
 {% load solo_tags %}
 {% load setvar %}
+{% load cssmap %}
 {% get_solo 'base.SiteConfiguration' as site_config %}
 {% get_solo 'menu.MainMenuSettings' as menu_settings %}
 <!DOCTYPE html >
@@ -55,7 +56,7 @@
                     </div>
                     <div class="col-sm-4 col-md-3">
                         {% block sidebar %}
-                            <div class="panel panel-primary">
+                            <div class="{% get_css "sawpanel_sidebar" %}">
                                 {% block sidebar-panel1 %}
                                 {% endblock %}
                                 {% block sidebar-panel2 %}

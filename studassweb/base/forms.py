@@ -1,8 +1,9 @@
 from django import forms
 from django.forms import ValidationError
+from django.forms.widgets import Textarea
 from django.template.loader import get_template
 from django.template import Context
-from .models import SiteConfiguration, BootswatchTheme, Feedback
+from .models import SiteConfiguration, BootswatchTheme, Feedback, CSSOverrideFile, CSSOverrideContent
 from .fields import HiddenModelField
 import re
 
@@ -288,3 +289,26 @@ class SortingForm(forms.Form):
     def get_submit_js():
         return "updateSortingFields();"
 
+
+class CSSOverrideFileForm(forms.ModelForm):
+
+    class Meta:
+        model = CSSOverrideFile
+        fields = ("name",)
+
+
+class CSSOverrideContentForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(CSSOverrideContentForm, self).__init__(self, *args, **kwargs)
+        self.fields['css'].widget = Textarea(attrs={'cols': '80', 'rows': '50'})
+
+    class Meta:
+        model = CSSOverrideContent
+        fields = ("description", "css")
+
+    def save(self, user=None, file=None, commit=True):
+        instance = super(CSSOverrideContentForm, self).save(commit=False)
+        instance.file = file
+        instance.author = user
+        return instance.save(commit=commit)

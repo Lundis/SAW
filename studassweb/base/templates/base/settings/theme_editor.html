@@ -1,5 +1,8 @@
 {% extends "settings/base.html" %}
 {% load i18n %}
+{% load sawpanels %}
+{% load sidemenu %}
+{% load cssmap %}
 
 {% block breadcrumb2 %}
     <li><a href="{{ section.get_absolute_url }}">
@@ -14,34 +17,42 @@
 {% endblock %}
 
 {% block main_content %}
-    <h1>Theme editor</h1>
-    <form action="{% url "base_settings_set_default_theme" %}" method="post">
-        {% csrf_token %}
-        <button type="submit" value="Submit" class="btn btn-primary">
-            {% trans "Set default theme" %}
-        </button>
-    </form>
+    <h1>{% trans "Theme editor" %}</h1>
     <div class="row">
         {% for theme in themes %}
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
                 <div class="panel panel-primary">
-                    <div class="panel-heading">
+                    {% sawpanel "primary" %}
                         {{ theme.name }}
-                        <form action="{% url "base_settings_set_bootswatch_theme" %}" method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="theme" value="{{ theme.name }}" />
-                            <button type="submit" value="Submit" class="btn btn-primary ">
-                                {% trans "Use this theme" %}
-                            </button>
-                        </form>
-                    </div>
-                    <div class="panel-body">
+                        {% body %}
                         <a href="{{ theme.preview_url }}" target="_blank">
                             <img src="{{ theme.preview_image_url }}" class="img-responsive" />
                         </a>
-                    </div>
+                        {% footer %}
+
+                        <form action="{% url "base_settings_set_bootswatch_theme" %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="theme" value="{{ theme.name }}" />
+                            <button type="submit" value="Submit" class="{% get_css "sawbutton_primary" %}">
+                                {% trans "Use this theme" %}
+                            </button>
+                        </form>
+                    {% endsawpanel %}
                 </div>
             </div>
         {% endfor %}
     </div>
+{% endblock %}
+
+{% block sidebar-panel1 %}
+    {% sidebarpanel "vertical_buttons" %}
+        {% trans "Actions" %}
+        {% body %}
+        <form action="{% url "base_settings_set_default_theme" %}" method="post">
+            {% csrf_token %}
+            <button type="submit" value="Submit" class="{% get_css "sawbutton_primary" %} btn-block">
+                {% trans "Set default theme" %}
+            </button>
+        </form>
+    {% endsidebarpanel %}
 {% endblock %}

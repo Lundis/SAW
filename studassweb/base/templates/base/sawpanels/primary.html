@@ -1,0 +1,23 @@
+{% load cssmap %}
+
+<div class="{% get_css "sawpanel_primary" %}" {{ attrs }}>
+    {% if title %}
+        <div class="panel-heading">
+            <div class="panel-title">
+                {{ title }}
+            </div>
+        </div>
+    {% endif %}
+
+    {% if body %}
+        <div class="panel-body">
+            {{ body }}
+        </div>
+    {% endif %}
+
+    {% if footer %}
+        <div class="panel-footer">
+            {{ footer }}
+        </div>
+    {% endif %}
+</div>

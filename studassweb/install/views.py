@@ -2,9 +2,9 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from base.models import DisabledModule
+from base.setup import setup_css_map
 from install.forms import AssociationForm, ModulesForm
 from users.forms import LoginForm
-from users.models import SAWPermission
 from menu.logic import get_all_menu_items
 from menu.models import Menu
 from menu.forms import MenuForm
@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 def welcome(request):
     setup_default_groups_and_permissions()
+    setup_css_map()
     context = {}
     if not request.user.is_authenticated():
         login_form = LoginForm(request.POST or None)

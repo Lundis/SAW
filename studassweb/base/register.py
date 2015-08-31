@@ -39,3 +39,16 @@ def register_settings_pages():
                         reverse_lazy('base_settings_edit_theme'),
                         EDIT_THEME)
     return theme_editor,
+
+
+def get_css_map_keys():
+    """
+    Returns a tuple of tuples of
+        (css_key, css_default_value, description)
+    :return:
+    """
+    return (
+        ("sawpanel_primary", "panel panel-primary sawpanel sawpanel-primary", "Primary panels"),
+        ("sawpanel_sidebar", "panel panel-primary sawpanel sawpanel-sidebar", "Sidebar panels"),
+        ("sawbutton_primary", "btn btn-primary sawbutton sawbutton-primary", "Regular buttons"),
+    )

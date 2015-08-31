@@ -5,24 +5,55 @@ from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.utils.translation import ugettext as _
+from django.core.exceptions import ValidationError
 import json
-from io import BytesIO
-import shutil
 import os
 import datetime
 import re
 from concurrent import futures
 from urllib.request import urlopen
-from urllib.parse import urlparse
 from urllib.error import HTTPError
 import logging
 from solo.models import SingletonModel
 from .utils import get_all_modules, get_modules_with
+from string import ascii_letters, digits
 
 
 logger = logging.getLogger(__name__)
 
 THEME_DIR = os.path.join("css", "bootswatch_themes")
+
+CSS_OVERRIDE_FILE_PATH = os.path.join(settings.STATIC_DIR,
+                                      "css",
+                                      "base",
+                                      "")
+
+
+class CSSOverrideFile(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def get_latest_content(self):
+        try:
+            CSSOverrideContent.objects.filter(file=self).first()
+        except CSSOverrideContent.DoesNotExist:
+            return None
+
+    def __str__(self):
+        return self.name
+
+
+class CSSOverrideContent(models.Model):
+    file = models.ForeignKey(CSSOverrideFile, on_delete=models.CASCADE)
+    description = models.TextField(max_length=200)
+    css = models.TextField()
+    author = models.ForeignKey(User, editable=False)
+    timestamp = models.DateTimeField(auto_now_add=True, editable=False)
+
+    class Meta:
+        ordering = ["-timestamp"]
+
+    def __str__(self):
+        return self.file.name + " [" + str(self.timestamp) + "]"
 
 
 class BootswatchTheme(models.Model):
@@ -76,6 +107,8 @@ class SiteConfiguration(SingletonModel):
 
     show_feedback_helptext = models.BooleanField(default=True)
 
+    current_css_override = models.ForeignKey(CSSOverrideContent, null=True, default=None)
+
     @classmethod
     def instance(cls):
         obj, created = cls.objects.get_or_create()
@@ -121,6 +154,22 @@ class SiteConfiguration(SingletonModel):
         instance.bootswatch_version = version
         instance.bootswatch_last_checked = timezone.datetime.now()
         instance.save()
+
+    @classmethod
+    def set_css_override(cls, override):
+        """
+        Saves the text of the override to the static override file.
+        if override is None, clear the file.
+        :param override:
+        :return:
+        """
+        instance = cls.instance()
+        instance.current_css_override = override
+        instance.save()
+
+        with open(CSS_OVERRIDE_FILE_PATH, "w") as f:
+            if override is not None:
+                f.write(override.css)
 
 
 class DisabledModule(models.Model):
@@ -259,3 +308,55 @@ class Feedback(models.Model):
         :return:
         """
         self.url = self.strip_url(self.url)
+
+
+class CSSMap(models.Model):
+    """
+    This model represents a hashmap of css keywords and values
+    """
+    key = models.CharField(max_length=50, unique=True, primary_key=True)
+    value = models.CharField(max_length=250, default="")
+    default = models.CharField(max_length=250, default="")
+    default_has_changed = models.BooleanField(default=False)
+    description = models.TextField(default="")
+
+    def __str__(self):
+        return self.key
+
+    def clean(self):
+        self.key = self.key.lower()
+        if not all(c in ascii_letters + digits + '-' + '_' for c in self.key):
+            raise ValidationError("CSS map key must be alphanumeric or - or _")
+
+    @classmethod
+    def get(cls, key):
+        pair, created = cls.objects.get_or_create(key=key)
+        if created:
+            logger.warn("CSSMap.get() created pair with key=" + key)
+
+        return pair.value
+
+    @classmethod
+    def put(cls, key, value):
+        pair, created = cls.objects.get_or_create(key=key)
+        pair.value = value
+        pair.save()
+
+    @classmethod
+    def register(cls, key, default, description):
+        pair, created = cls.objects.get_or_create(key=key)
+        if created:
+            pair.value = default
+        else:
+            if pair.default == default:
+                # nothing to do
+                pass
+            elif pair.value == pair.default:  # not manually edited
+                pair.value = default
+            else:
+                # manually edited, mark it instead
+                pair.default_has_changed = True
+
+        pair.default = default
+        pair.description = description
+        pair.save()

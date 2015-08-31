@@ -33,7 +33,6 @@ class PanelNode(Node):
             raise ValueError("Template name only allows alphanumeric-_ chars ")
 
 
-
 @register.tag('sidebarpanel')
 def do_panel(parser, token):
     """

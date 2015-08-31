@@ -53,8 +53,6 @@ class ValidatedRichTextFormField(RichTextFormField):
         return result
 
 
-
-
 class HiddenModelField(forms.IntegerField):
     """
     A menu field for interpreting the order of a model
