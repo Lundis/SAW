@@ -17,28 +17,26 @@
 {% endblock %}
 
 {% block main_content %}
-    <h1>{% trans "Theme editor" %}</h1>
+    <p>{% trans "These themes are provided by " %}<a href="https://bootswatch.com/">Bootswatch</a>.</p>
     <div class="row">
         {% for theme in themes %}
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-                <div class="panel panel-primary">
-                    {% sawpanel "primary" %}
-                        {{ theme.name }}
-                        {% body %}
-                        <a href="{{ theme.preview_url }}" target="_blank">
-                            <img src="{{ theme.preview_image_url }}" class="img-responsive" />
-                        </a>
-                        {% footer %}
+                {% sawpanel "primary" %}
+                    {{ theme.name }}
+                    {% body %}
+                    <a href="{{ theme.preview_url }}" target="_blank">
+                        <img src="{{ theme.preview_image_url }}" class="img-responsive" />
+                    </a>
+                    {% footer %}
 
-                        <form action="{% url "base_settings_set_bootswatch_theme" %}" method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="theme" value="{{ theme.name }}" />
-                            <button type="submit" value="Submit" class="{% get_css "sawbutton_primary" %}">
-                                {% trans "Use this theme" %}
-                            </button>
-                        </form>
-                    {% endsawpanel %}
-                </div>
+                    <form action="{% url "base_settings_set_bootswatch_theme" %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="theme" value="{{ theme.name }}" />
+                        <button type="submit" value="Submit" class="{% get_css "sawbutton_primary" %}">
+                            {% trans "Use this theme" %}
+                        </button>
+                    </form>
+                {% endsawpanel %}
             </div>
         {% endfor %}
     </div>
@@ -54,5 +52,17 @@
                 {% trans "Set default theme" %}
             </button>
         </form>
+    {% endsidebarpanel %}
+{% endblock %}
+
+{% block sidebar-panel-help %}
+    {% sidebarpanel "help" %}
+        {% trans "Help" %}
+    {% body %}
+        <p>{% trans "Pick a theme. It can later be modified using a css override file." %}</p>
+        <p>
+            {% trans "If nothing is visible, Bootswatch might be having issues." %}
+            {% trans "You can then revert to the default theme using the button above." %}
+        </p>
     {% endsidebarpanel %}
 {% endblock %}
