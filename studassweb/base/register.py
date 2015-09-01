@@ -38,7 +38,12 @@ def register_settings_pages():
                         SECTION_APPEARANCE,
                         reverse_lazy('base_settings_edit_theme'),
                         EDIT_THEME)
-    return theme_editor,
+    css_overrides = Page("CSS Override",
+                         "Change simple visuals using CSS",
+                         SECTION_APPEARANCE,
+                         reverse_lazy('base_settings_view_css_overrides'),
+                         EDIT_THEME)
+    return theme_editor, css_overrides
 
 
 def get_css_map_keys():

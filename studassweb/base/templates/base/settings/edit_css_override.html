@@ -3,8 +3,12 @@
 {% load sidemenu %}
 {% load i18n %}
 {% load cssmap %}
+{% load bootstrap3 %}
+{% load static %}
 
-
+{% block head %}
+    <link rel="stylesheet" href="{% static "css/base/codemirror.css"%}">
+{% endblock %}
 
 {% block title %}
     {% trans "View CSS Override Files" %}
@@ -18,25 +22,31 @@
 
 {% block breadcrumb3 %}
     <li class="active">
-        {% trans "CSS Override Files" %}
+        <a href="{% url "base_settings_view_css_overrides" %}">
+            {% trans "CSS Override Files" %}
+        </a>
+    </li>
+{% endblock %}
+
+{% block breadcrumb4 %}
+    <li class="active">
+        {% if file %}
+            {% trans "Editing" %}
+            {{ file.name }}
+        {% else %}
+            {% trans "New file" %}
+        {% endif %}
     </li>
 {% endblock %}
 
 {% block main_content %}
-    {% if files %}
-        <div class="list-group">
-            {% for file in files %}
-                <div class="list-group-item {% if file.pk == current_override.file.pk %}active{% endif %}">
-
-                    <a href=""> {{ file.name }}</a>
-                    <p>{{ file.description }}</p>
-
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p>{% trans "No CSS files have been created yet!" %}</p>
-    {% endif %}
+    <form method="post" id="form"
+          action="{% if file %}{% url "base_settings_save_css_override" file_id=file.id %}{% else %}{% url "base_settings_save_css_override"%}{% endif %}"
+            >
+        {% csrf_token %}
+        {% bootstrap_form file_form %}
+        {% bootstrap_form content_form %}
+    </form>
 
 {% endblock %}
 
@@ -63,4 +73,12 @@
             {% trans "You can then revert to the default theme using the button above." %}
         </p>
     {% endsidebarpanel %}
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static "js/base/codemirror-css-compressed.js" %}"></script>
+    <script>
+        var myTextArea = document.getElementById("id_css");
+        var myCodeMirror = CodeMirror.fromTextArea(myTextArea);
+    </script>
 {% endblock %}

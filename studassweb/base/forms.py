@@ -292,20 +292,24 @@ class SortingForm(forms.Form):
 
 class CSSOverrideFileForm(forms.ModelForm):
 
+    def __init__(self, *args, **kwargs):
+        super(CSSOverrideFileForm, self).__init__(*args, **kwargs)
+        self.fields['description'].widget = Textarea(attrs={'cols': '80', 'rows': '5'})
+
     class Meta:
         model = CSSOverrideFile
-        fields = ("name",)
+        fields = ("name", "description")
 
 
 class CSSOverrideContentForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
-        super(CSSOverrideContentForm, self).__init__(self, *args, **kwargs)
-        self.fields['css'].widget = Textarea(attrs={'cols': '80', 'rows': '50'})
+        super(CSSOverrideContentForm, self).__init__(*args, **kwargs)
+        self.fields['css'].widget = Textarea(attrs={'cols': '80', 'rows': '30'})
 
     class Meta:
         model = CSSOverrideContent
-        fields = ("description", "css")
+        fields = ("css",)
 
     def save(self, user=None, file=None, commit=True):
         instance = super(CSSOverrideContentForm, self).save(commit=False)

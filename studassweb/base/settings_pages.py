@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, Http404, HttpResponseNotAllowed
 from django.core.urlresolvers import reverse
 from users.decorators import has_permission
 from .models import SiteConfiguration, BootswatchTheme, THEME_DEFAULT_CSS, THEME_DEFAULT_CSS_MOD, \
@@ -16,18 +16,42 @@ urlpatterns = patterns('',
     url(r'^%s/edit_themes$' % SECTION_APPEARANCE,
         'base.settings_pages.edit_theme',
         name='base_settings_edit_theme'),
+
     url(r'^%s/set_bootswatch_theme$' % SECTION_APPEARANCE,
         'base.settings_pages.set_bootswatch_theme',
         name='base_settings_set_bootswatch_theme'),
+
     url(r'^%s/set_theme$' % SECTION_APPEARANCE,
         'base.settings_pages.set_default_theme',
         name='base_settings_set_default_theme'),
+
     url(r'^%s/css_overrides$' % SECTION_APPEARANCE,
         'base.settings_pages.view_css_overrides',
         name='base_settings_view_css_overrides'),
+
+    url(r'^%s/css_overrides/new/from(/(?P<copy_id>\d+))?$' % SECTION_APPEARANCE,
+        'base.settings_pages.edit_css_override',
+        name='base_settings_new_css_override'),
+
+    url(r'^%s/css_overrides/new$' % SECTION_APPEARANCE,
+        'base.settings_pages.edit_css_override',
+        name='base_settings_new_css_override'),
+
     url(r'^%s/css_overrides/(?P<file_id>\d+)$' % SECTION_APPEARANCE,
         'base.settings_pages.edit_css_override',
-        name='base_settings_edit_css_override'),
+        name='base_settings_edit_css_file'),
+
+    url(r'^%s/css_overrides/(?P<file_id>\d+)$' % SECTION_APPEARANCE,
+        'base.settings_pages.edit_css_override',
+        name='base_settings_save_css_override'),
+
+    url(r'^%s/css_overrides$' % SECTION_APPEARANCE,
+        'base.settings_pages.edit_css_override',
+        name='base_settings_save_css_override'),
+
+    url(r'^%s/css_overrides/set/(?P<override_id>\d+)$' % SECTION_APPEARANCE,
+        'base.settings_pages.set_css_override',
+        name='base_settings_set_css_override'),
 )
 
 
@@ -74,9 +98,11 @@ def view_css_overrides(request):
     """
     files = CSSOverrideFile.objects.all()
     section = Section.get_section(SECTION_APPEARANCE)
+    current_override = SiteConfiguration.get_css_override()
     return render(request, "base/settings/view_css_overrides.html",
                   {'files': files,
-                   'section': section})
+                   'section': section,
+                   'current_override': current_override})
 
 
 @has_permission(EDIT_THEME)
@@ -97,6 +123,7 @@ def edit_css_override(request, file_id=None, copy_id=None):
             content = file.get_latest_content()
         except CSSOverrideFile.DoesNotExist:
             raise Http404("Could not find specified file")
+
     if copy_id is not None:
         try:
             content = CSSOverrideContent.objects.get(id=copy_id)
@@ -128,3 +155,25 @@ def edit_css_override(request, file_id=None, copy_id=None):
                    'content_form': content_form,
                    'section': section})
 
+
+@has_permission(EDIT_THEME)
+def set_css_override(request, override_id):
+    """
+
+    :param override_id:
+    :return:
+    """
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+
+    if override_id is None:
+        raise Http404("override_id was null!")
+
+    try:
+        override = CSSOverrideContent.objects.get(id=override_id)
+    except CSSOverrideContent.DoesNotExist:
+        raise Http404("override_id doesn't point to an existing CSSOverrideContent")
+
+    SiteConfiguration.set_css_override(override)
+
+    return HttpResponseRedirect(reverse('base_settings_view_css_overrides'))

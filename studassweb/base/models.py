@@ -31,6 +31,7 @@ CSS_OVERRIDE_FILE_PATH = os.path.join(settings.STATIC_DIR,
 
 class CSSOverrideFile(models.Model):
     name = models.CharField(max_length=50, unique=True)
+    description = models.TextField(max_length=200, default="")
 
     def get_latest_content(self):
         try:
@@ -44,7 +45,6 @@ class CSSOverrideFile(models.Model):
 
 class CSSOverrideContent(models.Model):
     file = models.ForeignKey(CSSOverrideFile, on_delete=models.CASCADE)
-    description = models.TextField(max_length=200)
     css = models.TextField()
     author = models.ForeignKey(User, editable=False)
     timestamp = models.DateTimeField(auto_now_add=True, editable=False)
@@ -170,6 +170,10 @@ class SiteConfiguration(SingletonModel):
         with open(CSS_OVERRIDE_FILE_PATH, "w") as f:
             if override is not None:
                 f.write(override.css)
+
+    @classmethod
+    def get_css_override(cls):
+         return cls.instance().current_css_override
 
 
 class DisabledModule(models.Model):
