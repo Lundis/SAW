@@ -41,7 +41,11 @@
 
 {% block main_content %}
     <form method="post" id="form"
-          action="{% if file %}{% url "base_settings_save_css_override" file_id=file.id %}{% else %}{% url "base_settings_save_css_override"%}{% endif %}"
+          {% if file %}
+              action="{% url "base_settings_save_css_override" file_id=file.id %}"
+          {% else %}
+              action="{% url "base_settings_save_css_override"%}"
+          {% endif %}
             >
         {% csrf_token %}
         {% bootstrap_form file_form %}
@@ -55,9 +59,14 @@
     {% sidebarpanel "vertical_buttons" %}
         {% trans "Actions" %}
         {% body %}
-        <a href="{% url "base_settings_new_css_override" %}" class="{% get_css "sawbutton_primary" %}">
-            {% trans "Create new file" %}
-        </a>
+        <div class="{% get_css "sawbutton_primary" %}" id="save_button">
+            {% trans "Save and use" %}
+        </div>
+        {% if content %}
+            <a href="{% url "base_settings_new_css_override" copy_id=content.id%}" class="{% get_css "sawbutton_primary" %}">
+                {% trans "Copy file" %}
+            </a>
+        {% endif %}
     {% endsidebarpanel %}
 {% endblock %}
 
@@ -66,11 +75,8 @@
         {% trans "Help" %}
         {% body %}
         <p>
-            {% trans "Click a file to view/edit it." %}
-        </p>
-        <p>
-            {% trans "If nothing is visible, Bootswatch might be having issues." %}
-            {% trans "You can then revert to the default theme using the button above." %}
+            {% trans "Click a file to view/edit it" %}.
+            {% trans "The file currently in use is highlighted" %}.
         </p>
     {% endsidebarpanel %}
 {% endblock %}
@@ -81,5 +87,9 @@
         var myTextArea = document.getElementById("id_css");
         var myCodeMirror = CodeMirror.fromTextArea(myTextArea);
         $(".CodeMirror").addClass("form-control");
+
+        $("#save_button").click(function (event) {
+            $("#form").submit();
+        });
     </script>
 {% endblock %}

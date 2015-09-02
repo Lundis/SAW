@@ -26,12 +26,13 @@
     {% if files %}
         <div class="list-group">
             {% for file in files %}
-                <div class="list-group-item {% if file.pk == current_override.file.pk %}active{% endif %}">
+                <a class="list-group-item {% if file.pk == current_override.file.pk %}active{% endif %}"
+                   href="{{ file.get_absolute_url }}">
 
-                    <a href=""> {{ file.name }}</a>
+                    <h3> {{ file.name }}</h3>
                     <p>{{ file.description }}</p>
 
-                </div>
+                </a>
             {% endfor %}
         </div>
     {% else %}
@@ -56,11 +57,7 @@
         {% trans "Help" %}
         {% body %}
         <p>
-            {% trans "Click a file to view/edit it." %}
-        </p>
-        <p>
-            {% trans "If nothing is visible, Bootswatch might be having issues." %}
-            {% trans "You can then revert to the default theme using the button above." %}
+            {% trans "The copy button lets you save this file with a different name" %}.
         </p>
     {% endsidebarpanel %}
 {% endblock %}

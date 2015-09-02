@@ -29,7 +29,7 @@ urlpatterns = patterns('',
         'base.settings_pages.view_css_overrides',
         name='base_settings_view_css_overrides'),
 
-    url(r'^%s/css_overrides/new/from(/(?P<copy_id>\d+))?$' % SECTION_APPEARANCE,
+    url(r'^%s/css_overrides/new/from/(?P<copy_id>\d+)$' % SECTION_APPEARANCE,
         'base.settings_pages.edit_css_override',
         name='base_settings_new_css_override'),
 
@@ -41,11 +41,11 @@ urlpatterns = patterns('',
         'base.settings_pages.edit_css_override',
         name='base_settings_edit_css_file'),
 
-    url(r'^%s/css_overrides/(?P<file_id>\d+)$' % SECTION_APPEARANCE,
+    url(r'^%s/css_overrides/save/(?P<file_id>\d+)$' % SECTION_APPEARANCE,
         'base.settings_pages.edit_css_override',
         name='base_settings_save_css_override'),
 
-    url(r'^%s/css_overrides$' % SECTION_APPEARANCE,
+    url(r'^%s/css_overrides/save$' % SECTION_APPEARANCE,
         'base.settings_pages.edit_css_override',
         name='base_settings_save_css_override'),
 
@@ -135,7 +135,6 @@ def edit_css_override(request, file_id=None, copy_id=None):
     initial = {}
 
     if content is not None:
-        initial["description"] = content.description
         initial["css"] = content.css
 
     content_form = CSSOverrideContentForm(request.POST or None,
@@ -152,6 +151,7 @@ def edit_css_override(request, file_id=None, copy_id=None):
     return render(request, "base/settings/edit_css_override.html",
                   {'file': file,
                    'file_form': file_form,
+                   'content': content,
                    'content_form': content_form,
                    'section': section})
 

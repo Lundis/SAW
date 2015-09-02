@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.utils.translation import ugettext as _
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 import json
 import os
 import datetime
@@ -26,7 +27,7 @@ THEME_DIR = os.path.join("css", "bootswatch_themes")
 CSS_OVERRIDE_FILE_PATH = os.path.join(settings.STATIC_DIR,
                                       "css",
                                       "base",
-                                      "")
+                                      "override.css")
 
 
 class CSSOverrideFile(models.Model):
@@ -35,9 +36,13 @@ class CSSOverrideFile(models.Model):
 
     def get_latest_content(self):
         try:
-            CSSOverrideContent.objects.filter(file=self).first()
+            return CSSOverrideContent.objects.filter(file=self).first()
         except CSSOverrideContent.DoesNotExist:
             return None
+
+    def get_absolute_url(self):
+        return reverse("base_settings_edit_css_file",
+                       kwargs={'file_id': self.id})
 
     def __str__(self):
         return self.name
@@ -166,14 +171,17 @@ class SiteConfiguration(SingletonModel):
         instance = cls.instance()
         instance.current_css_override = override
         instance.save()
-
+        # ensure that the directory exists
+        if not os.path.exists(os.path.dirname(CSS_OVERRIDE_FILE_PATH)):
+            os.makedirs(os.path.dirname(CSS_OVERRIDE_FILE_PATH))
+        # overwrite the old file
         with open(CSS_OVERRIDE_FILE_PATH, "w") as f:
             if override is not None:
                 f.write(override.css)
 
     @classmethod
     def get_css_override(cls):
-         return cls.instance().current_css_override
+        return cls.instance().current_css_override
 
 
 class DisabledModule(models.Model):

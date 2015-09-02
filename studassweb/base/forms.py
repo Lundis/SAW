@@ -5,6 +5,7 @@ from django.template.loader import get_template
 from django.template import Context
 from .models import SiteConfiguration, BootswatchTheme, Feedback, CSSOverrideFile, CSSOverrideContent
 from .fields import HiddenModelField
+from string import ascii_letters, digits
 import re
 
 
@@ -300,6 +301,17 @@ class CSSOverrideFileForm(forms.ModelForm):
         model = CSSOverrideFile
         fields = ("name", "description")
 
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if len(name) < 5:
+            raise ValidationError("Name must be atleast 5 letters")
+        if not all(c in ascii_letters + digits + ' ' for c in name):
+            raise ValidationError("Name can only contain alphanumeric letters and spaces")
+
+        if all(c == ' ' for c in name):
+            raise ValidationError("Name cannot only be spaces")
+        return name
+
 
 class CSSOverrideContentForm(forms.ModelForm):
 
@@ -315,4 +327,6 @@ class CSSOverrideContentForm(forms.ModelForm):
         instance = super(CSSOverrideContentForm, self).save(commit=False)
         instance.file = file
         instance.author = user
-        return instance.save(commit=commit)
+        if commit:
+            instance.save()
+        return instance
