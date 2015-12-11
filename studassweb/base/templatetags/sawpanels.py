@@ -1,13 +1,14 @@
-from django.template.base import Context, Library, Node
+from django.template.base import Context, Node
 from django import template
 from django.template.loader import get_template
-from django.template.base import kwarg_re, TemplateSyntaxError
+from django.template.base import kwarg_re
 from string import ascii_letters, digits
 
 __author__ = 'Lundis'
 # Based on Magnus' similar sidemenu.py
 
-register = Library()
+register = template.Library()
+
 PANEL_PRE = "base/sawpanels/"
 DEFAULT_PANEL_TEMPLATE = "\"primary\""
 PANEL_TEMPLATE_POST = ".html"
@@ -104,7 +105,7 @@ def sawpanel(parser, token):
         for bit in arguments[2:]:
             match = kwarg_re.match(bit)
             if not match:
-                raise TemplateSyntaxError("Malformed arguments to url tag")
+                raise template.TemplateSyntaxError("Malformed arguments to url tag")
             name, value = match.groups()
             if name:
                 kwargs[name] = parser.compile_filter(value)

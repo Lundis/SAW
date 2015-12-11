@@ -1,10 +1,10 @@
-from django.template.base import (Context, Library, Node)
+from django.template.base import Context,  Node
 from django import template
 from django.template.loader import get_template
 from string import ascii_letters, digits
 
 
-register = Library()
+register = template.Library()
 PANEL_TEMPLATE_PRE = "base/sidemenu/sidemenupanel_"
 DEFAULT_PANEL_TEMPLATE = "\"default\""
 PANEL_TEMPLATE_POST = ".html"

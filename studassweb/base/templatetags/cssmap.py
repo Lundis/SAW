@@ -1,7 +1,7 @@
-from django.template.base import Library
+from django import template
 from base.models import CSSMap
 
-register = Library()
+register = template.Library()
 
 
 @register.simple_tag

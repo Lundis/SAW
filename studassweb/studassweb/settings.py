@@ -37,6 +37,7 @@ EXTERNAL_APPS = (
     'solo',  # singleton models. pip install django-solo
     'bootstrap3',  # bootstrap templates
     'ckeditor',
+    'ckeditor_uploader',
     'easy_thumbnails',  # you need to run "python manage.py migrate easy_thumbnails" after installing
     'captcha',
     'django_ajax',

@@ -1,8 +1,8 @@
-from django.template import Library
+from django import template
 
-register = Library()
+register = template.Library()
 
 
-@register.assignment_tag()
+@register.simple_tag()
 def setvar(value):
     return value
