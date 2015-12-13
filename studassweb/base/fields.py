@@ -44,7 +44,8 @@ class ValidatedRichTextFormField(RichTextUploadingFormField):
         lines = text.replace("\r", "").split("\n")
         good_line_found = False
         result = ""
-        for i in range(len(lines)-1, 0, -1):
+        # iterate backwards through the lines
+        for i in range(len(lines)-1, -1, -1):  # stop when at index -1
             if not lines[i].strip() in ("", "<p>&nbsp;</p>"):
                 good_line_found = True
             if good_line_found:
