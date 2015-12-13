@@ -51,6 +51,10 @@ def view_page(request, slug, revision_id=None):
             current_revision = revisions.get(id=revision_id)
         except InfoPageEdit.DoesNotExist:
             raise Http404(_("The requested revision could not be found"))
+        # Only let users with edit permission see old revisions
+        if not has_user_perm(request.user, EDIT):
+            return HttpResponseForbidden("User " + request.user.username + " is not allowed to view old revisions")
+
     return render(request, 'pages/view_page.html', {'category': category,
                                                     'page': page,
                                                     'current_revision': current_revision})
