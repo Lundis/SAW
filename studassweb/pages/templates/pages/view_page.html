@@ -3,8 +3,12 @@
 {% load i18n %}
 {% load sidemenu %}
 
+
+
+
 {% block breadcrumb2 %}
-    {% if category %}
+    {% has_perm "pages" "EDIT" as can_edit %}
+    {% if category and can_edit %}
         <li>
             <a href="{{ category.get_absolute_url }}">
                 {{ category.name }}
@@ -14,12 +18,15 @@
 {% endblock %}
 
 {% block breadcrumb3 %}
-    <li class="active">
-        {{ page.title }}
-        {% if not current_revision.is_latest %}
-            ({% trans "Old revision" %})
-        {% endif %}
-    </li>
+    {% has_perm "pages" "EDIT" as can_edit %}
+    {% if can_edit %}
+        <li class="active">
+            {{ page.title }}
+            {% if not current_revision.is_latest %}
+                ({% trans "Old revision" %})
+            {% endif %}
+        </li>
+    {% endif %}
 {% endblock %}
 
 {% block main_content %}

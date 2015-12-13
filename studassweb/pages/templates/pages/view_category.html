@@ -4,9 +4,12 @@
 {% load sidemenu %}
 
 {% block breadcrumb2 %}
-    <li class="active">
-        {{ category.name }}
-    </li>
+    {% has_perm "pages" "EDIT" as can_edit %}
+    {% if can_edit %}
+        <li class="active">
+            {{ category.name }}
+        </li>
+    {% endif %}
 {% endblock %}
 
 {% block main_content %}

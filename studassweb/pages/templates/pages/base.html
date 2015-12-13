@@ -1,5 +1,6 @@
 {% extends "base/base.html" %}
 {% load i18n %}
+{% load sawp %}
 
 {% block menu %}
     {% load dynamic_menu %}
@@ -7,5 +8,8 @@
 {% endblock menu %}
 
 {% block breadcrumb1 %}
-    <li class="active"><a href="{% url "pages_view_categories" %}">{% trans "Pages" %}</a></li>
+    {% has_perm "pages" "EDIT" as can_edit %}
+    {% if can_edit %}
+        <li class="active"><a href="{% url "pages_view_categories" %}">{% trans "Pages" %}</a></li>
+    {% endif %}
 {% endblock %}
