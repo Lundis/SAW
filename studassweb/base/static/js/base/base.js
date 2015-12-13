@@ -23,3 +23,14 @@ $(function(){
 		root.find('.sub-menu:visible').hide();
 	});
 });
+
+// remove empty breadcrumbs
+$(function() {
+    var breadcrumbs = document.getElementsByClassName("breadcrumb");
+    for (var i = 0; i < breadcrumbs.length; i++) {
+        var text = breadcrumbs[i].innerHTML;
+        if (text.trim() == "") {
+            breadcrumbs[i].parentNode.removeChild(breadcrumbs[i]);
+        }
+    }
+});
