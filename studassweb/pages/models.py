@@ -229,7 +229,7 @@ class InfoPageEdit(models.Model):
                                                   'revision_id': self.id})
 
     def is_latest(self):
-        return not InfoPageEdit.objects.filter(date__gt=self.date).exists()
+        return not InfoPageEdit.objects.filter(date__gt=self.date, page=self.page).exists()
 
 
 class PagesSettings(SingletonModel):
