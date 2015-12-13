@@ -1,9 +1,9 @@
-from ckeditor.fields import RichTextField, RichTextFormField
+from ckeditor_uploader.fields import RichTextUploadingField, RichTextUploadingFormField
 from django import forms
 from .html_tag_closer import complete_html
 
 
-class ValidatedRichTextField(RichTextField):
+class ValidatedRichTextField(RichTextUploadingField):
     """
     This class changes the default form field, to use a custom one that automatically closes HTML tags.
     """
@@ -26,7 +26,7 @@ class ValidatedRichTextField(RichTextField):
         return summary
 
 
-class ValidatedRichTextFormField(RichTextFormField):
+class ValidatedRichTextFormField(RichTextUploadingFormField):
 
     def clean(self, value):
         """
