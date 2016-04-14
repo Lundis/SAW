@@ -2,6 +2,8 @@
 {% load i18n %}
 {% load sawp %}
 {% load thumbnail %}
+{% load cssmap %}
+{% load sidemenu %}
 
 {% block breadcrumb1 %}
     {% if category %}
@@ -18,47 +20,6 @@
 {% endblock %}
 
 {% block main_content %}
-    {% if paginator.num_pages > 0 %}
-        <nav>
-            <ul class="pagination">
-                {% if page.has_previous %}
-                    {% if category %}
-                        {% url "news_home" category_name=category.name page=page.previous_page_number as previous_url %}
-                    {% else %}
-                        {% url "news_home" page=page.previous_page_number as previous_url %}
-                    {% endif %}
-                {% endif %}
-                <li {% if not page.has_previous %} class="disabled" {% endif %}>
-                    <a href="{% if previous_url %} {{ previous_url  }} {% else %} # {% endif %}" aria-label="Previous">
-                        <span aria-hidden="true" class="glyphicon glyphicon-backward"></span>
-                    </a>
-                </li>
-                {% for page_number in paginator.page_range %}
-                    <li {% if page_number == page.number %} class="active" {% endif %}>
-                        <a {% if category %}
-                            href="{% url "news_home" category_name=category.name page=page_number %}"
-                        {% else %}
-                            href="{% url "news_home" page=page_number %}"
-                        {% endif %}>
-                            {{ page_number }}
-                        </a></li>
-
-                {% endfor %}
-                <li {% if not page.has_next %} class="disabled" {% endif %}>
-                    {% if page.has_next %}
-                        {% if category %}
-                            {% url "news_home" category_name=category.name page=page.next_page_number as next_url %}
-                        {% else %}
-                            {% url "news_home" page=page.next_page_number as next_url %}
-                        {% endif %}
-                    {% endif %}
-                    <a href="{% if next_url %} {{ next_url  }} {% else %} # {% endif %}" aria-label="Next">
-                        <span aria-hidden="true" class="glyphicon glyphicon-forward"></span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    {% endif %}
     {% for article in articles %}
         <div class="panel panel-primary">
             <div class="panel-heading">
@@ -100,56 +61,117 @@
             </div>
         </div>
     {% endfor %}
+    {% if paginator.num_pages > 0 %}
+        <nav>
+            <ul class="pagination">
+                {% if page.has_previous %}
+                    {% if category %}
+                        {% url "news_home" category_name=category.name page=page.previous_page_number as previous_url %}
+                    {% else %}
+                        {% url "news_home" page=page.previous_page_number as previous_url %}
+                    {% endif %}
+                {% endif %}
+                <li {% if not page.has_previous %} class="disabled" {% endif %}>
+                    <a href="{% if previous_url %} {{ previous_url  }} {% else %} # {% endif %}" aria-label="Previous">
+                        <span aria-hidden="true" class="glyphicon glyphicon-backward"></span>
+                    </a>
+                </li>
+                {% for page_number in paginator.page_range %}
+                    <li {% if page_number == page.number %} class="active" {% endif %}>
+                        <a {% if category %}
+                            href="{% url "news_home" category_name=category.name page=page_number %}"
+                        {% else %}
+                            href="{% url "news_home" page=page_number %}"
+                        {% endif %}>
+                            {{ page_number }}
+                        </a>
+                    </li>
+                {% endfor %}
+                <li {% if not page.has_next %} class="disabled" {% endif %}>
+                    {% if page.has_next %}
+                        {% if category %}
+                            {% url "news_home" category_name=category.name page=page.next_page_number as next_url %}
+                        {% else %}
+                            {% url "news_home" page=page.next_page_number as next_url %}
+                        {% endif %}
+                    {% endif %}
+                    <a href="{% if next_url %} {{ next_url  }} {% else %} # {% endif %}" aria-label="Next">
+                        <span aria-hidden="true" class="glyphicon glyphicon-forward"></span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    {% endif %}
 {% endblock %}
 
 {% block sidebar %}
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            {% trans "search/sort" %}
-        </div>
-        <div class="panel-body">
-        </div>
+    <div class="{% get_css "sawpanel_default" %}">
+        <input type="text" class="form-control"
+               placeholder="{% trans "Search" %}" name="search-input" id="search-input"/>
     </div>
-    <div class="panel panel-primary">
-        <div class="panel-heading">
+    <div class="{% get_css "sawpanel_sidebar" %}">
+        {% sidebarpanel "vertical_buttons" %}
             {% trans "Categories" %}
-        </div>
-        <div class="panel-body">
-            <a class="btn btn-default btn-block {% if not category %}active{% endif %}"
+            {% body %}
+            <a class="{% get_css "sawbutton_sidebar" %} {% if not category %}active{% endif %}"
                href="{% url "news_home" %}">
                 {% trans "Show all" %}
             </a>
             {% for cat in categories %}
-                <a class="btn btn-default btn-block {% if cat.name == category.name %}active{% endif %}"
+                <a class="{% get_css "sawbutton_sidebar" %} {% if cat.name == category.name %}active{% endif %}"
                    href="{{ cat.get_absolute_url }}">
                     {{ cat.name }}
                 </a>
             {% endfor %}
+        {% endsidebarpanel %}
 
-        </div>
-    </div>
-    {% has_perm "news" "EDIT" as show_edit_panel %}
-    {% if show_edit_panel %}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
+        {% has_perm "news" "EDIT" as show_edit_panel %}
+        {% if show_edit_panel %}
+            {% sidebarpanel "vertical_buttons" %}
                 {% trans "Actions" %}
-            </div>
-            <div class="panel-body">
-                <a class="btn btn-default btn-block"
+                {% body %}
+                <a class="{% get_css "sawbutton_sidebar" %}"
                    href="{% url "news_add_article" %}">
                     {% trans "Create new article" %}
                 </a>
-                <a class="btn btn-default btn-block"
+                <a class="{% get_css "sawbutton_sidebar" %}"
                    href="{% url "news_add_category" %}">
                     {% trans "Create new category" %}
                 </a>
                 {% if category %}
-                    <a class="btn btn-default btn-block"
+                    <a class="{% get_css "sawbutton_sidebar" %}"
                        href="{% url "news_edit_category" category_id=category.id %}">
                         {% trans "Edit Category" %}
                     </a>
                 {% endif %}
-            </div>
-        </div>
-    {% endif %}
+            {% endsidebarpanel %}
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $('#search-input').bind('keypress', function(e) {
+            var code = e.keyCode || e.which;
+            if (code == 13) { //Enter keycode
+                var search_string = document.getElementById('search-input').value;
+                if (search_string == "") {
+                    {% if category %}
+                        window.location.href = "{% url "news_home" category_name=category.name %}";
+                    {% else %}
+                        window.location.href = "{% url "news_home" %}";
+                    {% endif %}
+                } else {
+                    var url = "";
+                    {% if category %}
+                        url = "{% url "news_search" category_name=category.name search_string="REPLACEME" %}";
+                    {% else %}
+                        url = "{% url "news_search" search_string="REPLACEME" %}";
+                    {% endif %}
+
+                    window.location.href = url.replace("REPLACEME", search_string);
+                }
+            }
+        });
+    </script>
 {% endblock %}

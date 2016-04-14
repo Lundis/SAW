@@ -3,9 +3,12 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import slugify
 from solo.models import SingletonModel
+from django.dispatch import receiver
+from django.db.models.signals import pre_delete, post_delete, pre_save, post_save
 
 from base.models import Comment
 from base.fields import ValidatedRichTextField
+from base.html_stripper import strip_html
 
 
 class Category(models.Model):
@@ -26,6 +29,7 @@ class Article(models.Model):
     summary = models.TextField(max_length=300, blank=True, null=True)
     slug = models.SlugField(editable=False)
     text = ValidatedRichTextField()
+    search_text = models.TextField(editable=False, blank=True)
     # split the date and time in order to make fetching articles based on date easier
     created_date = models.DateField(auto_now_add=True)
     created_time = models.TimeField(auto_now_add=True)
@@ -62,16 +66,6 @@ class Article(models.Model):
                                                     'month': self.created_date.month,
                                                     'day': self.created_date.day})
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            self.slug = slugify(self.title)
-        super(Article, self).save(*args, **kwargs)
-        self.update_frontpage_items()
-
-    def delete(self, using=None):
-        super(Article, self).delete(using)
-        self.update_frontpage_items()
-
     def __str__(self):
         return self.title
 
@@ -80,7 +74,30 @@ class Article(models.Model):
         Makes sure the N latest items exist as frontpage items
         :return:
         """
+        # TODO Make sure the N latest items exist as frontpage items
         pass
+
+
+@receiver(pre_save, sender=Article, dispatch_uid="article_pre_save")
+def article_pre_save(**kwargs):
+    instance = kwargs.pop("instance")
+    # create slug at creation
+    if not instance.pk:
+        instance.slug = slugify(instance.title)
+    # create search text
+    instance.search_text = strip_html(instance.text).replace('\n', '').replace('\r', '')
+
+
+@receiver(post_save, sender=Article, dispatch_uid="article_post_save")
+def article_post_save(**kwargs):
+    instance = kwargs.pop("instance")
+    instance.update_frontpage_items()
+
+
+@receiver(post_delete, sender=Article, dispatch_uid="article_post_delete")
+def article_pre_delete(**kwargs):
+    instance = kwargs.pop("instance")
+    instance.update_frontpage_items()
 
 
 class NewsSettings(SingletonModel):

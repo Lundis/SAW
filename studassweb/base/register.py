@@ -55,5 +55,8 @@ def get_css_map_keys():
     return (
         ("sawpanel_primary", "panel panel-primary sawpanel sawpanel-primary", "Primary panels"),
         ("sawpanel_sidebar", "panel panel-primary sawpanel sawpanel-sidebar", "Sidebar panels"),
+        ("sawpanel_default", "panel panel-default sawpanel sawpanel-default", "Default panels"),
         ("sawbutton_primary", "btn btn-primary sawbutton sawbutton-primary", "Regular buttons"),
+        ("sawbutton_default", "btn btn-default sawbutton sawbutton-default", "Less visible than regular buttons"),
+        ("sawbutton_sidebar", "btn btn-default sawbutton sawbutton-default", "Sidebar buttons"),
     )

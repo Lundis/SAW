@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.core.paginator import Paginator
+from django.db.models import Q
 from users.decorators import has_permission
 from .models import Article, Category
 from .forms import ArticleForm, CategoryForm
@@ -16,15 +17,9 @@ logger = logging.getLogger(__name__)
 ARTICLES_PER_PAGE = 10
 
 
-def home(request, page=1, category_name=None):
-    context = {}
+def _get_articles_by_category(category_name):
     category = None
-    if not isinstance(page, int):
-        try:
-            page = int(page)
-        except TypeError:
-            page = 1
-
+    articles = None
     if category_name is not None:
         try:
             category = Category.objects.get(name=category_name)
@@ -33,8 +28,35 @@ def home(request, page=1, category_name=None):
             raise Http404(_("The category does not exist!"))
     if category is None:
         articles = Article.objects.all()
-    else:
-        context['category'] = category
+
+    return articles, category
+
+
+def _list_articles(request, articles, page, category):
+    if not isinstance(page, int):
+        try:
+            page = int(page)
+        except TypeError:
+            page = 1
+
+    # restrict to chosen category
+    paginator = Paginator(articles, ARTICLES_PER_PAGE)
+    current_page = paginator.page(page)
+    categories = Category.objects.all()
+    context = {
+        'category': category,
+        'categories': categories,
+        'articles': current_page.object_list,
+        'page': current_page,
+        'paginator': paginator,
+    }
+    return render(request, "news/view_news.html", context)
+
+
+def home(request, page=1, category_name=None):
+
+    articles, category = _get_articles_by_category(category_name)
+
     if request.GET.get('year', None) is not None:
         try:
             year = int(request.GET['year'])
@@ -53,14 +75,27 @@ def home(request, page=1, category_name=None):
             articles = articles.filter(created_date__day=day)
         except ValueError:
             pass
-    paginator = Paginator(articles, ARTICLES_PER_PAGE)
-    current_page = paginator.page(page)
-    categories = Category.objects.all()
-    context['articles'] = current_page.object_list
-    context['categories'] = categories
-    context['page'] = current_page
-    context['paginator'] = paginator
-    return render(request, "news/view_news.html", context)
+
+    return _list_articles(request, articles, page, category)
+
+
+def search(request, search_string, category_name=None, page=None):
+    """
+    A simple search view
+
+    :param request:
+    :param search_string:
+    :param category_name:
+    :param page:
+    :return:
+    """
+
+    articles, category = _get_articles_by_category(category_name)
+
+    articles = articles.filter(Q(title__contains=search_string) |
+                               Q(search_text__icontains=search_string))
+
+    return _list_articles(request, articles, page, category)
 
 
 def view_article(request, year, month, day, slug):

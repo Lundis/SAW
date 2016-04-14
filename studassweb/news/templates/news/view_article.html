@@ -1,6 +1,8 @@
 {% extends 'news/base.html' %}
 {% load i18n %}
 {% load sawp %}
+{% load cssmap %}
+{% load sidemenu %}
 
 {% block title %}
     {{ article.title }}
@@ -9,35 +11,38 @@
 {% block breadcrumb2 %}
     <li class="active">{{ article.title }}</li>
 {% endblock %}
+
 {% block main_content %}
     <h2>{{ article.title }}</h2>
     <div>{{ article.text | safe }}</div>
 {% endblock %}
 
-{% block sidebar %}
+{% block sidebar-panel1 %}
 
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            {% trans "Categories" %}
-        </div>
-        <div class="panel-body">
-            {% for cat in categories %}
-                <a class="btn btn-default btn-block"
-                   href="{% url "news_home" category_name=cat.name %}">
-                    {{ cat.name }}
-                </a>
-            {% endfor %}
-        </div>
-    </div>
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            {% trans "Actions" %}
-        </div>
-        <div class="panel-body">
-            <a class="btn btn-default btn-block"
-               href="{% url "news_edit_article" article.id %}">
-                {% trans "Edit" %}
+    {% sidebarpanel "vertical_buttons" %}
+        {% trans "Categories" %}
+        {% body %}
+        <a class="{% get_css "sawbutton_sidebar" %} {% if not category %}active{% endif %}"
+           href="{% url "news_home" %}">
+            {% trans "Show all" %}
+        </a>
+        {% for cat in categories %}
+            <a class="{% get_css "sawbutton_sidebar" %}"
+               href="{% url "news_home" category_name=cat.name %}">
+                {{ cat.name }}
             </a>
-        </div>
-    </div>
+        {% endfor %}
+    {% endsidebarpanel %}
+{% endblock %}
+
+
+{% block sidebar-panel2 %}
+    {% sidebarpanel "vertical_buttons" %}
+        {% trans "Actions" %}
+        {% body %}
+        <a class="{% get_css "sawbutton_sidebar" %}"
+           href="{% url "news_edit_article" article.id %}">
+            {% trans "Edit" %}
+        </a>
+    {% endsidebarpanel %}
 {% endblock %}
