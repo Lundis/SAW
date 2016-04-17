@@ -117,11 +117,13 @@ class Event(models.Model):
         """
         if self.start.year == self.stop.year:
             if self.start.month == self.stop.month:
+                if self.start.day == self.stop.day:
+                    return "{0}.{1}.{2}".format(self.stop.day, self.stop.month, self.stop.year)
                 return "{0} - {1}.{2}.{3}".format(self.start.day,
                                                   self.stop.day, self.stop.month, self.stop.year)
             return "{0}.{1} - {2}.{3}.{4}".format(self.start.day, self.start.month,
                                                   self.stop.day, self.stop.month, self.stop.year)
-
+        # note: does the following ever make sense?
         elif self.start.day == self.stop.day and self.start.month == self.stop.month:
             return "{0}.{1}.{2} - {3}".format(self.start.day, self.start.month, self.start.year,
                                               self.stop.year)
