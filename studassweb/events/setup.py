@@ -1,4 +1,5 @@
 import events.models as emodels
+from frontpage.models import FrontPageItem
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.utils.timezone import datetime, timedelta
@@ -42,3 +43,12 @@ def setup():
         # Mark the module as set up
         esettings.is_setup = True
         esettings.save()
+
+    # Make sure that the new frontpage item exists
+    item, created = FrontPageItem.objects.get_or_create(identifier="events/upcoming_events_v2")
+    if created:
+        item.title = "Upcoming Events"
+        item.module = "events"
+        item.render_function = "render_upcoming_events"
+        item.save()
+

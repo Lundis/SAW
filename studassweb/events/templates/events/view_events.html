@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block main_content %}
-    <h3>Events</h3>
+    <h3>{% trans "Events" %}</h3>
     {% for event in events %}
         <div class="panel panel-primary">
             <div class="panel-heading">
@@ -28,7 +28,7 @@
                 {{ event.get_summary|safe }}
             </div>
         </div>
-    {% empty %}
+        {% empty %}
         <p>{% trans "No events found!" %}</p>
     {% endfor %}
 
@@ -36,10 +36,13 @@
 {% endblock %}
 
 {% block sidebar-panel-help %}
-    {% sidebarpanel "help" %}
-        {% trans "Help" %}
-        {% body %}
-        <p>{% trans "Here you can see available events." %}</p>
-        <p>{% trans "Event items are custom fields for signup. They can make your event easier to manage." %}</p>
-    {% endsidebarpanel %}
+    {% has_perm "events" "CAN_CREATE_EVENTS" as show_help %}
+    {% if show_help %}
+        {% sidebarpanel "help" %}
+            {% trans "Help" %}
+            {% body %}
+            <p>{% trans "Here you can see available events." %}</p>
+            <p>{% trans "Event items are custom fields for signup. They can make your event easier to manage." %}</p>
+        {% endsidebarpanel %}
+    {% endif %}
 {% endblock %}

@@ -73,15 +73,15 @@ class FrontPageItem(models.Model):
         self._content_type = ContentType.objects.get_for_model(target)
         self._object_id = target.id
 
-    def render_content(self):
+    def render_content(self, context={}) -> str:
         """
-        Renders the menu items using provided templates
+        Renders the menu item
         :return:
         """
         if self.module and self.render_function:
             render_func = get_function_from_module(self.module, "frontpage",
                                                    self.render_function)
-            render_func(self)
+            return render_func(context)
         else:
             return self.content
 

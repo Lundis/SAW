@@ -13,7 +13,6 @@ from solo.models import SingletonModel
 import events.register as eregister
 from users import permissions
 from base.fields import ValidatedRichTextField
-from frontpage.models import FrontPageItem
 import itertools
 from django.core import exceptions
 import logging
@@ -92,11 +91,6 @@ class Event(models.Model):
 
             self.slug = temp_slug
         super(Event, self).save(*args, **kwargs)
-        self.update_frontpage_item()
-
-    def delete(self, using=None):
-        super(Event, self).delete(using)
-        self.update_frontpage_item()
 
     @classmethod
     def current_events(cls):
@@ -105,18 +99,6 @@ class Event(models.Model):
         :return:
         """
         return cls.objects.filter(stop__gte=timezone.now())
-
-    @classmethod
-    def update_frontpage_item(cls):
-        event_item, created = FrontPageItem.objects.get_or_create(identifier="events/upcoming_events")
-        if created:
-            event_item.location = FrontPageItem.HIDDEN
-            event_item.title = "Upcoming Events"
-        context = Context({'events': cls.current_events().order_by("start")})
-        print(context)
-        template = get_template("events/frontpage_content.html")
-        event_item.content = template.render(context)
-        event_item.save()
 
     def get_items(self):
         return ItemInEvent.objects.filter(event=self).order_by('item__id')

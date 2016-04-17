@@ -66,14 +66,11 @@
         {% sidebarpanel "vertical_buttons" %}
             {% trans "Delete" %}
             {% body %}
-            {# FIXME this button looks odd compared to the others #}
             <form action="{% url 'events_delete_event' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
                 {% csrf_token %}
-                {% buttons %}
-                    <button type="submit" class="btn btn-danger btn-block">
-                        {% trans "Remove this event" %}
-                    </button>
-                {% endbuttons %}
+                <button type="submit" class="btn btn-danger btn-block">
+                    {% trans "Remove this event" %}
+                </button>
             </form>
         {% endsidebarpanel %}
     {% endif %}
@@ -84,6 +81,6 @@
         {% trans "Help" %}
         {% body %}
         <p>{% trans "This is where you create events." %}</p>
-        <p>{% trans "Each field except event items (eitems) is required by default." %}</p>
+        <p>{% trans "All fields except for event items are required by default." %}</p>
     {% endsidebarpanel %}
 {% endblock %}

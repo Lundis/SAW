@@ -1,6 +1,6 @@
 
 
-class InfoFrontPageItem():
+class InfoFrontPageItem:
 
     def __init__(self, page):
         self.page = page

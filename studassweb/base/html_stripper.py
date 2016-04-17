@@ -21,7 +21,7 @@ class _HTMLStripper(HTMLParser):
 
 def strip_html(html: str) -> str:
     """
-    Analyzes the given string and returns a string where any unclosed tags are closed at the end
+    Removed all HTML from a string
     :param html:
     :return:
     """
