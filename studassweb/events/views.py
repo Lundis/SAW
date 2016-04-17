@@ -123,12 +123,19 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
             # redirect to avoid duplicated signups on refresh
             return HttpResponseRedirect(reverse("events_view_event", kwargs={'slug': event.slug}))
 
-    signups = EventSignup.objects.filter(event=event)
-    show_reserve_list = len(signups) > event.max_participants
+    signups = EventSignup.objects.filter(event=event, on_reserve_list=False)
+    reserve_list = EventSignup.objects.filter(event=event, on_reserve_list=True)
 
-    return render(request, 'events/event.html',
-                  {'event': event, 'signupform': signupform, 'signupitemsform': signupitemsform, 'signups': signups,
-                   'show_reserve_list': show_reserve_list})
+    context = {
+        'event': event,
+        'signupform': signupform,
+        'signupitemsform': signupitemsform,
+        'signups': signups,
+        'reserve_list': reserve_list
+    }
+
+    return render(request, 'events/event.html', context)
+
 
 
 @has_permission(eregister.CAN_CREATE_EVENTS)

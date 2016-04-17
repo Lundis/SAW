@@ -7,8 +7,6 @@
                 <a href="{{ event.get_absolute_url }}">
                     {{ event.title }}
                 </a>
-
-
                     {% now "Y" as today_year %}
                     {% if event.start|date:"Y" != today_year %}
                         ({{ event.start | date:"j N"}} {{ event.start.year }})

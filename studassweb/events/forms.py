@@ -27,14 +27,21 @@ class EventSignupForm(forms.ModelForm):
         if self.event.is_past_signup_deadline():
             raise ValidationError("It's already past the deadline!")
 
-    def save(self, commit=True, user=None,):
+    def save(self, commit=True, user=None):
         temp_signup = super(EventSignupForm, self).save(commit=False)
         temp_signup.event = self.event
-        temp_signup.auth_code = generate_email_ver_code()
-        while EventSignup.objects.filter(auth_code=temp_signup.auth_code).exists():
-            temp_signup.auth_code = generate_email_ver_code()
+
         if not user.is_anonymous():
             temp_signup.user = user
+
+        if not temp_signup.pk:
+            temp_signup.auth_code = generate_email_ver_code()
+            while EventSignup.objects.filter(auth_code=temp_signup.auth_code).exists():
+                temp_signup.auth_code = generate_email_ver_code()
+            if EventSignup.objects.filter(event=self.event, on_reserve_list=False).count() >= \
+                    self.event.max_participants:
+                temp_signup.on_reserve_list = True
+
         if commit:
             temp_signup.save()
         return temp_signup
@@ -62,7 +69,7 @@ class EventForm(forms.ModelForm):
     class Meta:
         model = Event
         fields = ('title', 'text', 'max_participants', 'signup_start', 'signup_deadline', 'start', 'stop', 'permission',
-                  'use_captcha', 'send_email_for_reserves'
+                  'use_captcha', 'send_email_for_reserves', 'allow_late_reserve_changes'
                   )
 
     def clean(self):

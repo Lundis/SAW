@@ -8,13 +8,14 @@ from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext as _
 from django.core.mail import send_mail
 from django.conf import settings
+from django.dispatch import receiver
+from django.db.models.signals import pre_delete, post_delete, pre_save, post_save
 import django.utils.timezone as timezone
 from solo.models import SingletonModel
 import events.register as eregister
 from users import permissions
 from base.fields import ValidatedRichTextField
 import itertools
-from django.core import exceptions
 import logging
 
 from operator import attrgetter
@@ -31,7 +32,7 @@ PERMISSION_CHOICES = (
 # This is used when the user has been adding event items to an event after signups has been made
 VALUE_DOES_NOT_EXIST = "not_set"
 
-# This should maybe be put in base or something
+
 # TODO if the field is a boolean, it should return False / True
 # TODO if the field is a integer or float, it should return appropriate type!
 class MultiInputField(models.CharField, metaclass=models.SubfieldBase):
@@ -61,7 +62,12 @@ class Event(models.Model):
     send_email_for_reserves = models.BooleanField(
         default=True,
         verbose_name="Send email when someone is moved from reserve list to attending"
-        )
+    )
+    allow_late_reserve_changes = models.BooleanField(
+        default=True,
+        verbose_name="Allow moving someone from reserve to attending when the event is about to start. " +
+                     "(set to 5 hours by default)"
+    )
 
     def __str__(self):
         return str(self.title)
@@ -138,6 +144,20 @@ class Event(models.Model):
         else:
             return self.text
 
+    def is_late(self):
+        late_time = EventSettings.instance().late_signup_time_hours
+        late = self.start - timezone.now() < timezone.timedelta(hours=late_time)
+        return late
+
+    def can_reserve_person_attend(self):
+        """
+        Checks if this event allows moving a person from the reserve list to attending right now
+        :return:
+        """
+        return self.send_email_for_reserves and \
+               (not self.is_late() or self.allow_late_reserve_changes) and \
+               self.start < timezone.now()
+
 
 # Each user which signs up creates one of these
 # We need both user and name as we need to allow non-signed in users to sign up
@@ -148,7 +168,7 @@ class EventSignup(models.Model):
     email = models.EmailField()
     created = models.DateTimeField(auto_now_add=True, blank=True)
     auth_code = models.CharField(max_length=32, unique=True)  # Edit and delete for anonymous users
-    order_id = models.IntegerField(validators=MinValueValidator(1), default=1)
+    on_reserve_list = models.BooleanField(default=False)
 
     class Meta:
         ordering = "created",
@@ -160,31 +180,20 @@ class EventSignup(models.Model):
             return False
 
     def __str__(self):
-        return "{0}:{1} has registered to {2}".format(self.created, self.user, self.event)
+        return "{0}:{1} has signed up for {2}".format(self.created, self.user, self.event)
 
-    def save(self, *args, **kwargs):
-        super(EventSignup, self).save(*args, **kwargs)
-        self.fix_indices()
+    def send_reserve_email(self, old_signup):
+        """
 
-    def delete(self, using=None):
-        super(EventSignup, self).delete(using)
-        if self.event.send_email_for_reserves:
-            # Notify a user on the reserve list that they're in by email
-            # Can't allow delete() to throw an exception related to the email
-            try:
-                signups = EventSignup.objects.filter(event=self.event)
-                if self.event.max_participants <= signups.count():
-                    # Get the signup that just got below the participant limit
-                    reserve_signup = signups[self.event.max_participants - 1]
-                    reserve_signup.send_reserve_email()
-            except Exception as e:
-                logger.error("Sending reserve email failed (%s)", e)
+        :param old_signup: The signup that was canceled
+        :return:
+        """
 
-            # update indices
-            self.fix_indices()
-
-    def send_reserve_email(self):
-        context = Context({'event': self.event})
+        context = Context({
+            'event': self.event,
+            'old_signup': old_signup,
+            'late': self.event.is_late()
+        })
         template = get_template("events/emails/reserve_notify.html")
         message = template.render(context)
         title = _("Reserve notification for") + " " + self.event.title
@@ -193,42 +202,24 @@ class EventSignup(models.Model):
         send_mail(title, message, from_email, to_emails)
 
     def build_email_content(self, request):
-        context = Context(
-            {'request': request,
-             'event': self.event,
-             'signup': self,
-             'signup_edit_url':
-                 request.build_absolute_uri(reverse("events_view_event_edit_signup_by_code",
-                                                    kwargs={'event_id': self.event.id,
-                                                            'auth_code': self.auth_code})),
-             'signup_cancel_url':
-                 request.build_absolute_uri(reverse("events_delete_event_signup_by_code",
-                                                    kwargs={'auth_code': self.auth_code}))}
-        )
+        context = Context({
+            'request': request,
+            'event': self.event,
+            'signup': self,
+            'signup_edit_url':
+                request.build_absolute_uri(reverse("events_view_event_edit_signup_by_code",
+                                                   kwargs={'event_id': self.event.id,
+                                                           'auth_code': self.auth_code})),
+            'signup_cancel_url':
+                request.build_absolute_uri(reverse("events_delete_event_signup_by_code",
+                                                   kwargs={'auth_code': self.auth_code})),
+        })
 
-        template = get_template("events/email.html")
+        template = get_template("events/emails/signup_email.html")
         return template.render(context)
 
     def is_reserve(self):
-        signups = EventSignup.objects.filter(event=self.event)
-        for index, item in enumerate(signups):
-            if item.pk == self.pk:
-                return index >= self.event.max_participants
-        logger.error("is_reserve couldn't find itself in the list")
-
-    def is_first_reserve(self):
-        signups = EventSignup.objects.filter(event=self.event)
-        for index, item in enumerate(signups):
-            if item.pk == self.pk:
-                return index == self.event.max_participants
-        logger.error("is_first_reserve couldn't find itself in the list")
-
-    def fix_indices(self):
-        signups = EventSignup.objects.filter(event=self.event)
-        for index, item in enumerate(signups):
-            if item.order_id != index + 1:
-                item.order_id = index + 1
-                item.save()
+        return self.on_reserve_list
 
     def get_items(self):
         return ItemInSignup.objects.filter(signup=self).order_by('item__id')
@@ -240,7 +231,7 @@ class EventSignup(models.Model):
         items_in_event = ItemInEvent.objects.filter(event=self.event)
         items_in_event_itemonly = ItemInEvent.objects.filter(event=self.event).values('item')
 
-        items_in_signup = ItemInSignup.objects.filter(signup=self).\
+        items_in_signup = ItemInSignup.objects.filter(signup=self). \
             filter(item__in=items_in_event_itemonly).order_by('item__id')
 
         items_in_signup_items = items_in_signup.values('item')
@@ -259,6 +250,27 @@ class EventSignup(models.Model):
         # Needs to be sorted to get in right column
         result.sort(key=attrgetter('item.id'))
         return result
+
+
+@receiver(post_delete, sender=EventSignup, dispatch_uid="events_cancel_signup")
+def signups_cancel_signup(**kwargs):
+    """
+    When a signup is canceled, check if there's anyone on the reserve list.
+    :param kwargs:
+    :return:
+    """
+    instance = kwargs.pop("instance")
+
+    if instance.event.can_reserve_person_attend() and not instance.is_reserve():
+        # Notify a user on the reserve list that they're in by email
+        try:
+            signups = EventSignup.objects.filter(event=instance.event)
+            if instance.event.max_participants <= signups.count():
+                # Get the signup that just got below the participant limit
+                reserve_signup = signups[instance.event.max_participants - 1]
+                reserve_signup.send_reserve_email(instance)
+        except Exception as e:
+            logger.error("Sending reserve email failed (%s)", e)
 
 
 class EventItem(models.Model):
@@ -281,14 +293,16 @@ class EventItem(models.Model):
                                  verbose_name=_("Is this field shown to everyone?",))
     hide_in_print_view = models.BooleanField(default=False,
                                              verbose_name=_("Is this field hidden from the print view?",))
-    type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=TYPE_INT,
-                            verbose_name="Data type",
-                            help_text=_("Decides what kind of data is allowed in this field. The options are:<br />" +
-                                        "Checkbox: A simple checkbox (yes/no)<br />" +
-                                        "Text (one line): A text field with one line <br />" +
-                                        "Text (multiple lines): A larger resizeable text field that allows multiple lines<br />" +
-                                        "Integer: A number<br />" +
-                                        "Choice: A multiple-choices field. syntax for name: question//alternative1//alternative2//alternative3")
+    type = models.CharField(
+        max_length=1, choices=TYPE_CHOICES, default=TYPE_INT,
+        verbose_name="Data type",
+        help_text=_("Decides what kind of data is allowed in this field. The options are:<br />" +
+                    "Checkbox: A simple checkbox (yes/no)<br />" +
+                    "Text (one line): A text field with one line <br />" +
+                    "Text (multiple lines): A larger resizeable text field that allows multiple lines<br />" +
+                    "Integer: A number<br />" +
+                    "Choice: A multiple-choices field. syntax for name: " +
+                    "question//alternative1//alternative2//alternative3")
     )
 
     def __str__(self):
@@ -341,6 +355,9 @@ class ItemInSignup(models.Model):
 
 class EventSettings(SingletonModel):
     is_setup = models.BooleanField(default=False)
+    # The amount of hours, before an event starts, that is considered late
+    # This is used when deciding whether to tell people on the reserve list to print the notification email.
+    late_signup_time_hours = models.IntegerField(default=5)
 
     @classmethod
     def instance(cls):
