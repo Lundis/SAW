@@ -1,6 +1,5 @@
-{% load i18n %}
-{% load baseurl %}
-{% trans "You have previously signed up for a reserve position at" %} {{ event.title }}. {{ old_signup.name }}{% trans "has unregistered, and you are now on the list!" %}
+{% load i18n %} {% load baseurl %}
+{% trans "You have previously signed up for a reserve position at" %} {{ event.title }}. {{ old_signup.name }} {% trans "has unregistered, and you are now on the list!" %}
 {% if late %}
 {% trans "Please print this or remember whose position you have taken to avoid problems at the checkin." %}
 {% endif %}

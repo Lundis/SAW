@@ -154,9 +154,9 @@ class Event(models.Model):
         Checks if this event allows moving a person from the reserve list to attending right now
         :return:
         """
-        return self.send_email_for_reserves and \
-               (not self.is_late() or self.allow_late_reserve_changes) and \
-               self.start < timezone.now()
+        too_late = self.is_late() and not self.allow_late_reserve_changes
+        already_started = self.start < timezone.now()
+        return self.send_email_for_reserves and not too_late and not already_started
 
 
 # Each user which signs up creates one of these
@@ -180,7 +180,7 @@ class EventSignup(models.Model):
             return False
 
     def __str__(self):
-        return "{0}:{1} has signed up for {2}".format(self.created, self.user, self.event)
+        return "{0}:{1} has signed up for {2}".format(self.created, self.name, self.event)
 
     def send_reserve_email(self, old_signup):
         """
@@ -264,11 +264,15 @@ def signups_cancel_signup(**kwargs):
     if instance.event.can_reserve_person_attend() and not instance.is_reserve():
         # Notify a user on the reserve list that they're in by email
         try:
-            signups = EventSignup.objects.filter(event=instance.event)
-            if instance.event.max_participants <= signups.count():
+            signups = EventSignup.objects.filter(event=instance.event, on_reserve_list=False)
+            if signups.count() < instance.event.max_participants:
                 # Get the signup that just got below the participant limit
-                reserve_signup = signups[instance.event.max_participants - 1]
-                reserve_signup.send_reserve_email(instance)
+                first_on_reserve = EventSignup.objects.filter(event=instance.event,
+                                                              on_reserve_list=True
+                                                              ).order_by("created").first()
+                first_on_reserve.send_reserve_email(instance)
+                first_on_reserve.on_reserve_list = False
+                first_on_reserve.save()
         except Exception as e:
             logger.error("Sending reserve email failed (%s)", e)
 

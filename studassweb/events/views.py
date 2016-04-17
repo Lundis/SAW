@@ -137,7 +137,6 @@ def view_event(request, event_id=None, slug=None, signup_id=None, auth_code=None
     return render(request, 'events/event.html', context)
 
 
-
 @has_permission(eregister.CAN_CREATE_EVENTS)
 def add_edit_event(request, event_id=None):
     if event_id is not None:
