@@ -1,13 +1,20 @@
 {% load i18n %}
 
 {% if events.count > 0 %}
-    <ul style="list-style-type:disc;">
+    <ul style="list-style-type:disc; padding-left: 10px;">
         {% for event in events.list %}
             <li>
                 <a href="{{ event.get_absolute_url }}">
                     {{ event.title }}
-                    {{ event.start }}
                 </a>
+
+
+                    {% now "Y" as today_year %}
+                    {% if event.start|date:"Y" != today_year %}
+                        ({{ event.start | date:"j N"}} {{ event.start.year }})
+                    {% else %}
+                        ({{ event.start | date:"j N"}})
+                    {% endif %}
             </li>
         {% endfor %}
     </ul>
