@@ -3,7 +3,9 @@ from django.forms import ValidationError
 from django.forms.widgets import Textarea
 from django.template.loader import get_template
 from django.template import Context
-from .models import SiteConfiguration, BootswatchTheme, Feedback, CSSOverrideFile, CSSOverrideContent, CSSMap2
+from django.core.exceptions import SuspiciousOperation
+from .models import SiteConfiguration, BootswatchTheme, Feedback, \
+    CSSOverrideFile, CSSOverrideContent, CSSMap2
 from .fields import HiddenModelField
 from string import ascii_letters, digits
 import re
@@ -337,3 +339,17 @@ class CSSClassForm(forms.ModelForm):
     class Meta:
         model = CSSMap2
         fields = "value",
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.default_has_changed = False
+
+        if not instance.pk:
+            raise SuspiciousOperation("Someone tried to manually create a CSS Class")
+
+        if commit:
+            instance.save()
+        return instance

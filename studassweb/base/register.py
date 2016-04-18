@@ -43,7 +43,12 @@ def register_settings_pages():
                          SECTION_APPEARANCE,
                          reverse_lazy('base_settings_view_css_overrides'),
                          EDIT_THEME)
-    return theme_editor, css_overrides
+    css_classes = Page("CSS Classes",
+                         "Change which CSS classes are used for what components",
+                         SECTION_APPEARANCE,
+                         reverse_lazy('base_settings_view_css_classes'),
+                         EDIT_THEME)
+    return theme_editor, css_overrides, css_classes
 
 
 def get_css_map_keys():

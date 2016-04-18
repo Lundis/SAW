@@ -1,0 +1,73 @@
+{% extends "settings/base.html" %}
+{% load sawpanels %}
+{% load sidemenu %}
+{% load i18n %}
+{% load cssmap %}
+
+
+
+{% block title %}
+    {% trans "View and Edit CSS Classes" %}
+{% endblock %}
+
+{% block breadcrumb2 %}
+    <li><a href="{{ section.get_absolute_url }}">
+        {% trans section.title %}
+    </a></li>
+{% endblock %}
+
+{% block breadcrumb3 %}
+    <li class="active">
+        {% trans "CSS Classes" %}
+    </li>
+{% endblock %}
+
+{% block main_content %}
+    {% if changed_classes %}
+        <h2>{% trans "Components with updated defaults" %}</h2>
+        <div class="list-group">
+            {% for class in changed_classes %}
+                <div class="list-group-item">
+                    <h4 class="cssmap-key"> {{ class.key }}</h4>
+                    <p class="cssmap-description">{{ class.description }}</p>
+                    <p class="cssmap-value">{{ class.value }}</p>
+                    <p class="cssmap-default-value">{{ class.default }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if classes %}
+
+        <h2>{% trans "Components" %}</h2>
+        <div class="list-group">
+            {% for class in classes %}
+                <div class="list-group-item">
+                    <h4 class="cssmap-key"> {{ class.key }}</h4>
+                    <p class="cssmap-description">{{ class.description }}</p>
+                    <p class="cssmap-value">{{ class.value }}</p>
+                    <p class="cssmap-default-value">{{ class.default }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+{% endblock %}
+
+{% block sidebar-panel-help %}
+    {% sidebarpanel "help" %}
+        {% trans "Help" %}
+        {% body %}
+        <p>
+            {% trans "This page lets you change what css classes are used for what components on the site" %}.
+        </p>
+        <p>
+            {% trans "Once you change something, the default value will also be shown" %}.
+            {% trans "If a default has changed during an update, you will be asked to verify if you still want to keep your change" %}.
+        </p>
+    {% endsidebarpanel %}
+{% endblock %}
+
+{% block scripts %}
+
+{% endblock %}

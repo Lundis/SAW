@@ -325,7 +325,6 @@ class Feedback(models.Model):
 class CSSMap2(models.Model):
     """
     This model represents a hashmap of css keywords and values
-    This one has an automatic primary key
     """
     key = models.CharField(max_length=50, unique=True)
     value = models.CharField(max_length=250, default="")
@@ -343,10 +342,7 @@ class CSSMap2(models.Model):
 
     @classmethod
     def get(cls, key):
-        pair, created = cls.objects.get_or_create(key=key)
-        if created:
-            logger.warn("CSSMap.get() created pair with key=" + key)
-
+        pair = cls.objects.get(key=key)
         return pair.value
 
     @classmethod

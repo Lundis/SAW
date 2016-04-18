@@ -4,9 +4,9 @@ from django.http import HttpResponseRedirect, Http404, HttpResponseNotAllowed
 from django.core.urlresolvers import reverse
 from users.decorators import has_permission
 from .models import SiteConfiguration, BootswatchTheme, THEME_DEFAULT_CSS, THEME_DEFAULT_CSS_MOD, \
-    CSSOverrideContent, CSSOverrideFile
+    CSSOverrideContent, CSSOverrideFile, CSSMap2
 from .register import EDIT_THEME
-from .forms import BootswatchThemeSelectForm, CSSOverrideFileForm, CSSOverrideContentForm
+from .forms import BootswatchThemeSelectForm, CSSOverrideFileForm, CSSOverrideContentForm, CSSClassForm
 from settings.sections import SECTION_APPEARANCE, Section
 import logging
 
@@ -52,6 +52,14 @@ urlpatterns = patterns('',
     url(r'^%s/css_overrides/set/(?P<override_id>\d+)$' % SECTION_APPEARANCE,
         'base.settings_pages.set_css_override',
         name='base_settings_set_css_override'),
+
+    url(r'^%s/css_classes$' % SECTION_APPEARANCE,
+        'base.settings_pages.view_css_classes',
+        name='base_settings_view_css_classes'),
+
+    url(r'^%s/css_overrides/set/(?P<class_id>\d+)$' % SECTION_APPEARANCE,
+        'base.settings_pages.update_css_class',
+        name='base_settings_update_css_class'),
 )
 
 
@@ -177,3 +185,46 @@ def set_css_override(request, override_id):
     SiteConfiguration.set_css_override(override)
 
     return HttpResponseRedirect(reverse('base_settings_view_css_overrides'))
+
+
+@has_permission(EDIT_THEME)
+def update_css_class(request, class_id):
+    """
+
+    :param request:
+    :param class_id:
+    :return:
+    """
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+
+    if class_id is None:
+        raise Http404("class_id was null!")
+
+    try:
+        css_class = CSSMap2.objects.get(id=class_id)
+    except CSSMap2.DoesNotExist:
+        raise Http404("class_id doesn't point to an existing CSSOverrideContent")
+
+    form = CSSClassForm(request.POST, instance=css_class)
+    if form.is_valid():
+        form.save()
+
+    return HttpResponseRedirect(reverse('base_settings_view_css_classes'))
+
+
+@has_permission(EDIT_THEME)
+def view_css_classes(request):
+
+    classes_with_new_default = CSSMap2.objects.filter(default_has_changed=True)
+    classes_without_new_default = CSSMap2.objects.filter(default_has_changed=False)
+
+    section = Section.get_section(SECTION_APPEARANCE)
+
+    context = {
+        'classes': classes_without_new_default,
+        'changed_classes': classes_with_new_default,
+        'section': section
+    }
+
+    return render(request, "base/settings/view_css_classes.html", context)
