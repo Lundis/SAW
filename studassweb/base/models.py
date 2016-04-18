@@ -322,11 +322,12 @@ class Feedback(models.Model):
         self.url = self.strip_url(self.url)
 
 
-class CSSMap(models.Model):
+class CSSMap2(models.Model):
     """
     This model represents a hashmap of css keywords and values
+    This one has an automatic primary key
     """
-    key = models.CharField(max_length=50, unique=True, primary_key=True)
+    key = models.CharField(max_length=50, unique=True)
     value = models.CharField(max_length=250, default="")
     default = models.CharField(max_length=250, default="")
     default_has_changed = models.BooleanField(default=False)

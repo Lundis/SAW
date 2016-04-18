@@ -1,7 +1,7 @@
-__author__ = 'Lundis'
 from .utils import get_modules_with
-from .models import CSSMap
+from .models import CSSMap2
 
+__author__ = 'Lundis'
 
 def setup_css_map():
     """
@@ -14,4 +14,4 @@ def setup_css_map():
             key = pair[0]
             default_value = pair[1]
             description = pair[2]
-            CSSMap.register(key, default_value, description)
+            CSSMap2.register(key, default_value, description)
