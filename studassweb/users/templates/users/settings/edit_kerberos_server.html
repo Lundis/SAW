@@ -55,9 +55,11 @@
         {% with server.get_all_users as users  %}
             {% if users %}
                 <div class="list-group">
-                    {% for user in users %}
+                    {% for user_ext in users %}
                         <div class="list-group-item">
-                            {{ user.user_ext.username }}
+                            {{ user_ext.user.username }} -
+                            {{ user_ext.user.first_name }}
+                            {{ user_ext.user.last_name }}
                         </div>
                     {% endfor %}
                 </div>
