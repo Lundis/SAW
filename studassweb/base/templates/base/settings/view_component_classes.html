@@ -18,7 +18,7 @@
 
 {% block breadcrumb3 %}
     <li class="active">
-        {% trans "CSS Classes" %}
+        {% trans "Component Classes" %}
     </li>
 {% endblock %}
 
@@ -27,9 +27,9 @@
         <h2>{% trans "Components with updated defaults" %}</h2>
         <div class="list-group">
             {% for class in changed_classes %}
-                <div class="list-group-item">
+                <div class="list-group-item" id="component-{{ class.id }}">
                     <h4 class="cssmap-key"> {{ class.key }}</h4>
-                    <p class="cssmap-description">{{ class.description }}</p>
+                    <p class="cssmap-description">{% trans class.description %}</p>
                     <p class="cssmap-value">{{ class.value }}</p>
                     <p class="cssmap-default-value">{{ class.default }}</p>
                 </div>
@@ -42,9 +42,9 @@
         <h2>{% trans "Components" %}</h2>
         <div class="list-group">
             {% for class in classes %}
-                <div class="list-group-item">
+                <div class="list-group-item" id="component-{{ class.id }}">
                     <h4 class="cssmap-key"> {{ class.key }}</h4>
-                    <p class="cssmap-description">{{ class.description }}</p>
+                    <p class="cssmap-description">{% trans class.description %}</p>
                     <p class="cssmap-value">{{ class.value }}</p>
                     <p class="cssmap-default-value">{{ class.default }}</p>
                 </div>

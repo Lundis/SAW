@@ -54,12 +54,12 @@ urlpatterns = patterns('',
         name='base_settings_set_css_override'),
 
     url(r'^%s/css_classes$' % SECTION_APPEARANCE,
-        'base.settings_pages.view_css_classes',
-        name='base_settings_view_css_classes'),
+        'base.settings_pages.view_component_classes',
+        name='base_settings_view_component_classes'),
 
     url(r'^%s/css_overrides/set/(?P<class_id>\d+)$' % SECTION_APPEARANCE,
-        'base.settings_pages.update_css_class',
-        name='base_settings_update_css_class'),
+        'base.settings_pages.update_component_class',
+        name='base_settings_update_component_class'),
 )
 
 
@@ -188,7 +188,7 @@ def set_css_override(request, override_id):
 
 
 @has_permission(EDIT_THEME)
-def update_css_class(request, class_id):
+def update_component_class(request, class_id):
     """
 
     :param request:
@@ -210,11 +210,11 @@ def update_css_class(request, class_id):
     if form.is_valid():
         form.save()
 
-    return HttpResponseRedirect(reverse('base_settings_view_css_classes'))
+    return HttpResponseRedirect(reverse('base_settings_view_component_classes'))
 
 
 @has_permission(EDIT_THEME)
-def view_css_classes(request):
+def view_component_classes(request):
 
     classes_with_new_default = CSSMap2.objects.filter(default_has_changed=True)
     classes_without_new_default = CSSMap2.objects.filter(default_has_changed=False)
@@ -227,4 +227,4 @@ def view_css_classes(request):
         'section': section
     }
 
-    return render(request, "base/settings/view_css_classes.html", context)
+    return render(request, "base/settings/view_component_classes.html", context)
