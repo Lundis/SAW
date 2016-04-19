@@ -55,7 +55,7 @@ class Member(models.Model):
         return s
 
     def clean(self):
-        super(Member, self).clean()
+        super().clean()
         if self.enrollment_year is not None:
             if self.enrollment_year < SiteConfiguration.founded():
                 raise ValidationError(_("Enrollment year cannot be before the association was founded"))

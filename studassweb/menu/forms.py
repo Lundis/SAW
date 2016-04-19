@@ -39,7 +39,7 @@ class MenuForm(forms.Form):
         self.default_items = initial_items
 
         self.available_items = available_items
-        super(MenuForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # the first argument is the post data
         if len(args) > 0 and args[0]:
             self.add_menu_fields(args[0])
@@ -155,7 +155,7 @@ class MenuCreationForm(forms.ModelForm):
 
     def save(self, *args, **kwargs):
         new = not self.instance or not self.instance.pk
-        menu = super(MenuCreationForm, self).save(*args, **kwargs)
+        menu = super().save(*args, **kwargs)
         menu.created_by = TYPE_USER
         menu.save()
         # Now create a menu item so that users can add it to other menus
@@ -179,7 +179,7 @@ class UserMenuItemForm(forms.ModelForm):
                   'view_permission')
 
     def clean(self):
-        super(UserMenuItemForm, self).clean()
+        super().clean()
         # We need to verify that that the user entered either an external url or a submenu
         # However, that is done by the model's clean() function automatically (woo!)
 
@@ -191,7 +191,7 @@ class UserMenuItemForm(forms.ModelForm):
 
     def save(self, commit=True):
         new_item = not self.instance.pk
-        item = super(UserMenuItemForm, self).save(commit=False)
+        item = super().save(commit=False)
         item.created_by = TYPE_USER
         if new_item:
             # find a unique identifier
@@ -229,17 +229,17 @@ class MainMenuForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         kwargs['initial'] = {'template': Menu.get("main_menu").template}
-        super(MainMenuForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def clean(self):
-        super(MainMenuForm, self).clean()
+        super().clean()
         template = self.cleaned_data['template']
         if template.uses_image:
             if 'image' not in self.cleaned_data:
                 raise forms.ValidationError(_("You need to specify an image for the requested layout"))
 
     def save(self, commit=True):
-        menu_settings = super(MainMenuForm, self).save(commit)
+        menu_settings = super().save(commit)
         main_menu = Menu.get("main_menu")
         main_menu.template = self.cleaned_data['template']
         if commit:

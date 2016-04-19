@@ -224,7 +224,7 @@ class DeleteEventSignupByCodeView(DeleteView):
     def get(self, request, *args, **kwargs):
         if not self.get_object():
             return HttpResponseRedirect(reverse("events_home"))
-        return super(DeleteEventSignupByCodeView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -248,14 +248,14 @@ class AddEventItemView(CreateView):
 
     def dispatch(self, request, *args, **kwargs):
         if permissions.has_user_perm(request.user, eregister.CAN_CREATE_EVENTS):
-            return super(AddEventItemView, self).dispatch(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
         messages.error(request, _("You don't have permission to add event items"))
         return HttpResponseRedirect(reverse("events_home"))
 
     def form_valid(self, form):
         # This method is called when valid form data has been POSTed.
         messages.success(self.request, _("Succesfully added event item"))
-        return super(AddEventItemView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class EditEventItemView(UpdateView):
@@ -265,13 +265,13 @@ class EditEventItemView(UpdateView):
 
     def dispatch(self, request, *args, **kwargs):
         if permissions.has_user_perm(request.user, eregister.CAN_CREATE_EVENTS):
-            return super(EditEventItemView, self).dispatch(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
         return HttpResponseForbidden(_("You don't have permission to edit event items"))
 
     def form_valid(self, form):
         # This method is called when valid form data has been POSTed.
         messages.success(self.request, _("Succesfully updated event item"))
-        return super(EditEventItemView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class DeleteEventItemView(DeleteView):
@@ -280,13 +280,13 @@ class DeleteEventItemView(DeleteView):
 
     def dispatch(self, request, *args, **kwargs):
         if permissions.has_user_perm(request.user, eregister.CAN_CREATE_EVENTS):
-            return super(DeleteEventItemView, self).dispatch(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
         return HttpResponseForbidden(_("You don't have permission to add event items"))
 
     def form_valid(self, form):
         # This method is called when valid form data has been POSTed.
         messages.success(self.request, _("Succesfully removed event item"))
-        return super(DeleteEventItemView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class ListEventItemsView(ListView):
@@ -294,5 +294,5 @@ class ListEventItemsView(ListView):
 
     def dispatch(self, request, *args, **kwargs):
         if permissions.has_user_perm(request.user, eregister.CAN_CREATE_EVENTS):
-            return super(ListEventItemsView, self).dispatch(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
         return HttpResponseForbidden(_("You don't have permission to view event items"))

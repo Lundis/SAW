@@ -185,7 +185,7 @@ class MenuItem(models.Model):
         return self.identifier
 
     def clean(self):
-        super(MenuItem, self).clean()
+        super().clean()
         if not self.url() and not self.submenu:
             raise ValidationError("Neither a URL nor a submenu has been selected")
 

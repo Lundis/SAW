@@ -18,7 +18,7 @@ class LoginForm(forms.Form):
     password = forms.CharField(label=_('Password'), widget=forms.PasswordInput())
 
     def clean(self):
-        super(LoginForm, self).clean()
+        super().clean()
         # https://docs.djangoproject.com/en/1.7/topics/auth/default/#auth-web-requests
 
         # if username or password is missing, there's already an error, so just skip trying to authenticate.
@@ -71,7 +71,7 @@ class RegisterForm(forms.Form):
         return self.cleaned_data['password']
 
     def clean(self):
-        super(RegisterForm, self).clean()
+        super().clean()
         if 'password' in self.cleaned_data and self.cleaned_data['password_repeat'] != self.cleaned_data['password']:
             self.add_error('password_repeat', _("The passwords are not equal"))
 
@@ -88,7 +88,7 @@ class RegisterForm(forms.Form):
 class UserBaseForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
-        super(UserBaseForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['first_name'].required = True
         self.fields['last_name'].required = True
 
@@ -102,7 +102,7 @@ class UserBaseForm(forms.ModelForm):
         :param commit:
         :return:
         """
-        user = super(UserBaseForm, self).save(commit=commit)
+        user = super().save(commit=commit)
         user_ext = UserExtension.objects.get(user=user)
         user_ext.incomplete = False
         if commit:

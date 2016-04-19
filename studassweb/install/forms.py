@@ -18,7 +18,7 @@ class AssociationForm(forms.Form):
     founded = forms.IntegerField(label=_('Founded year'), min_value=0, max_value=datetime.datetime.now().year)
 
     def __init__(self, *args, **kwargs):
-        super(AssociationForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['name'].initial = SiteConfiguration.instance().association_name
         self.fields['contact_email'].initial = SiteConfiguration.instance().association_contact_email
         self.fields['founded'].initial = SiteConfiguration.founded()
@@ -50,7 +50,7 @@ class ModulesForm(forms.Form):
         :return:
         """
         modules = kwargs.pop('modules')
-        super(ModulesForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         for module in modules:
             try:
                 description = get_attr_from_module(module, "register", "DESCRIPTION")

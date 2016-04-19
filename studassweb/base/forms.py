@@ -22,10 +22,10 @@ class BootswatchThemeSelectForm(forms.Form):
     theme = forms.CharField(required=True)
 
     def __init__(self, *args, **kwargs):
-        super(BootswatchThemeSelectForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def clean(self):
-        super(BootswatchThemeSelectForm, self).clean()
+        super().clean()
         if not 'theme' in self.cleaned_data:
             raise ValidationError("No theme was specified")
         theme_name = self.cleaned_data['theme']
@@ -51,10 +51,10 @@ class FeedbackForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request')
         self.type = kwargs.pop('type')
-        super(FeedbackForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def is_valid(self):
-        super(FeedbackForm, self).is_valid()
+        super().is_valid()
         if Feedback.can_user_give_feedback(user=self.request.user,
                                            ip=self.request.META.get('REMOTE_ADDR'),
                                            type=self.type,
@@ -65,7 +65,7 @@ class FeedbackForm(forms.ModelForm):
             raise ValidationError("You cannot give feedback on this element")
 
     def save(self, commit=True):
-        feedback = super(FeedbackForm, self).save(commit=False)
+        feedback = super().save(commit=False)
         feedback.type = self.type
         if self.request.user.is_authenticated:
             feedback.user = self.request.user
@@ -108,7 +108,7 @@ class SortingForm(forms.Form):
         self._verify_arguments()
         if initial_items is not None:
             self._add_indices()
-        super(SortingForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # the first argument is the post data
         if post_items is not None:
             # Use post data to populate items if it's provided
@@ -159,7 +159,7 @@ class SortingForm(forms.Form):
                 raise ValueError("key '%s' is not in containers" % key)
             for item in items_in_container:
                 if not isinstance(item, self.child_model):
-                    raise ValueError("item {0} in container {1} is not a {3}" % (str(item), key, self.child_model))
+                    raise ValueError("item {0} in container {1} is not a {2}" % (str(item), key, self.child_model))
 
         # TODO: verify that all items are in self.all_items
 
@@ -200,7 +200,7 @@ class SortingForm(forms.Form):
 
     def clean(self):
         # Super cleans the individual fields using HiddenModelField's validation
-        super(SortingForm, self).clean()
+        super().clean()
         # We organize the resulting data into self.items
         containers_strings = self.containers.keys()
         container_regex = '|'.join(containers_strings)
@@ -296,7 +296,7 @@ class SortingForm(forms.Form):
 class CSSOverrideFileForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
-        super(CSSOverrideFileForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['description'].widget = Textarea(attrs={'cols': '80', 'rows': '5'})
 
     class Meta:
@@ -318,7 +318,7 @@ class CSSOverrideFileForm(forms.ModelForm):
 class CSSOverrideContentForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
-        super(CSSOverrideContentForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['css'].widget = Textarea(attrs={'cols': '80', 'rows': '30'})
 
     class Meta:
@@ -326,7 +326,7 @@ class CSSOverrideContentForm(forms.ModelForm):
         fields = ("css",)
 
     def save(self, user=None, file=None, commit=True):
-        instance = super(CSSOverrideContentForm, self).save(commit=False)
+        instance = super().save(commit=False)
         instance.file = file
         instance.author = user
         if commit:

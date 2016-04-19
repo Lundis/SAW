@@ -19,10 +19,10 @@ log = logging.getLogger(__name__)
 
 class MultiuploadWidget(forms.MultipleHiddenInput):
     def __init__(self, attrs={}):
-        super(MultiuploadWidget, self).__init__(attrs)
+        super().__init__(attrs)
 
     def render(self, name, value, attrs=None, choices=()):
-        widget_ = super(MultiuploadWidget, self).render(name, value, attrs)
+        widget_ = super().render(name, value, attrs)
         output = '<div id="hidden_container" style="display:none;">%s</div>' % widget_
         return mark_safe(output)
 
@@ -32,13 +32,13 @@ class MultiuploaderField(forms.MultiValueField):
 
     def formfield(self, **kwargs):
         kwargs['widget'] = MultiuploadWidget
-        return super(MultiuploaderField, self).formfield(**kwargs)
+        return super().formfield(**kwargs)
 
     def validate(self, values):
-        super(MultiuploaderField, self).validate(values)
+        super().validate(values)
 
     def clean(self, values):
-        super(MultiuploaderField, self).clean(values)
+        super().clean(values)
         return values
 
     def compress(self, value):
@@ -70,7 +70,7 @@ class MultiUploadForm(forms.Form):
         if multiuploader_settings[form_type]["CONTENT_TYPES"] == '*':
             self.check_content_type = False
 
-        super(MultiUploadForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.fields["file"].widget = forms.FileInput(attrs={'multiple': True})
 

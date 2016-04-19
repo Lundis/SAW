@@ -10,7 +10,7 @@ class HiddenMenuField(forms.IntegerField):
     """
     def __init__(self, *args, **kwargs):
         name = kwargs.pop('name')
-        super(HiddenMenuField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.name = name
 
     def clean(self, value):
@@ -19,7 +19,7 @@ class HiddenMenuField(forms.IntegerField):
         :param value: The value attribute of the field
         :return: clean value
         """
-        cleaned_num = super(HiddenMenuField, self).clean(value)
+        cleaned_num = super().clean(value)
         # Check that the id is positive and that the menu item actually exists
         if cleaned_num < 0:
             raise forms.ValidationError("Menu item index below 0")

@@ -34,7 +34,7 @@ class ContactInfo(models.Model):
         if old_with_index and old_with_index.id != self.id:
             old_with_index.ordering_index += 1
             old_with_index.save()
-        super(ContactInfo, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

@@ -14,7 +14,7 @@ class EventSignupForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop("event")
         self.user = kwargs.pop('user')
-        super(EventSignupForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.event.use_captcha and not self.user.is_authenticated():
             self.fields['captcha'] = ReCaptchaField()
 
@@ -23,12 +23,12 @@ class EventSignupForm(forms.ModelForm):
         fields = ('name', 'email')
 
     def clean(self):
-        super(EventSignupForm, self).clean()
+        super().clean()
         if self.event.is_past_signup_deadline():
             raise ValidationError("It's already past the deadline!")
 
     def save(self, commit=True, user=None):
-        temp_signup = super(EventSignupForm, self).save(commit=False)
+        temp_signup = super().save(commit=False)
         temp_signup.event = self.event
 
         if not user.is_anonymous():
@@ -73,7 +73,7 @@ class EventForm(forms.ModelForm):
                   )
 
     def clean(self):
-        super(EventForm, self).clean()
+        super().clean()
         if self.cleaned_data['signup_start'] > self.cleaned_data['signup_deadline']:
             self.add_error('signup_deadline', _("The signup deadline can't be before it starts"))
 
@@ -83,7 +83,7 @@ class EventForm(forms.ModelForm):
     def save(self, commit=True, user=None):
         if user is None:
             raise ValueError("Argument 'user' is missing")
-        event = super(EventForm, self).save(commit=False)
+        event = super().save(commit=False)
         event.author = user
         if commit:
             event.save()
@@ -104,7 +104,7 @@ class EventItemsForm(forms.Form):
             for tmp in selected_event_items:
                 selected_eitems.append(tmp.item.id)
 
-        super(EventItemsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         all_event_items = EventItem.objects.filter()
         # Create a 'choices' variable with all event items, in the right format
@@ -122,7 +122,7 @@ class EventItemsForm(forms.Form):
         )
 
     def clean(self):
-        super(EventItemsForm, self).clean()
+        super().clean()
         ids_of_event_items = self.cleaned_data[EITEMS]
         # Check that all event items added to event exists
         for id_ei in ids_of_event_items:
@@ -159,7 +159,7 @@ class SignupItemsForm(forms.Form):
             for signup_item in selected_signup_items:
                 selected_eitems[signup_item.item.id] = signup_item.get_value()
 
-        super(SignupItemsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         # So every field's id is (static string for event items)+(id for the event item)
         # The static string in the beginning is to ensure we are not mixing form inputs or anything similar.

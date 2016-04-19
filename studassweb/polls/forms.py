@@ -15,7 +15,7 @@ class PollForm(forms.ModelForm):
                   'can_vote_on_many', "permission_choice_view", "permission_choice_vote")
 
     def save(self, commit=True, user=None):
-        poll = super(PollForm, self).save(commit=False)
+        poll = super().save(commit=False)
         if not hasattr(poll, "created_by") and user is not None:
             poll.created_by = user
         if commit:
@@ -45,7 +45,7 @@ class ChoiceFormSingle(forms.Form):
     def __init__(self, *args, **kwargs):
         self.poll = kwargs.pop("poll")
         poll_choices = kwargs.pop("poll_choices")
-        super(ChoiceFormSingle, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         choices = ()
         for choice in poll_choices:
             choices += (str(choice.id), choice.name),
@@ -88,7 +88,7 @@ class ChoiceFormMultiple(forms.Form):
     def __init__(self, *args, **kwargs):
         self.poll = kwargs.pop("poll")
         poll_choices = kwargs.pop("poll_choices")
-        super(ChoiceFormMultiple, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         choices = ()
         for choice in poll_choices:
             choices += (str(choice.id), choice.name),

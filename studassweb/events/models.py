@@ -42,7 +42,7 @@ class MultiInputField(models.CharField, metaclass=models.SubfieldBase):
     # Please increment counter as a warning to future programmers.
 
     def __init__(self, *args, **kwargs):
-        super(MultiInputField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 # This is an actual event, for example a Christmas party
@@ -96,7 +96,7 @@ class Event(models.Model):
                 temp_slug = "%s-%d" % (orig[:max_length - len(str(x)) - 1], x)
 
             self.slug = temp_slug
-        super(Event, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     @classmethod
     def current_events(cls):

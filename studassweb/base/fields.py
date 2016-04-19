@@ -12,7 +12,7 @@ class ValidatedRichTextField(RichTextUploadingField):
         # Change the default form field
         if 'form_class' not in kwargs:
             kwargs['form_class'] = ValidatedRichTextFormField
-        return super(ValidatedRichTextField, self).formfield(**kwargs)
+        return super().formfield(**kwargs)
 
     @staticmethod
     def get_summary(text, length):
@@ -35,7 +35,7 @@ class ValidatedRichTextFormField(RichTextUploadingFormField):
         :param value:
         :return:
         """
-        cleaned = super(ValidatedRichTextFormField, self).clean(value)
+        cleaned = super().clean(value)
         html, closing_tags = complete_html(cleaned)
         return self.remove_trailing_stupid_lines(html + closing_tags)
 
@@ -63,7 +63,7 @@ class HiddenModelField(forms.IntegerField):
     def __init__(self, *args, **kwargs):
         name = kwargs.pop('name')
         model = kwargs.pop('model')
-        super(HiddenModelField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.name = name
         self.model = model
 
@@ -73,7 +73,7 @@ class HiddenModelField(forms.IntegerField):
         :param value: The value attribute of the field
         :return: clean value
         """
-        cleaned_num = super(HiddenModelField, self).clean(value)
+        cleaned_num = super().clean(value)
         # Check that the id is positive and that the menu item actually exists
         if cleaned_num < 0:
             raise forms.ValidationError("Menu item index below 0")

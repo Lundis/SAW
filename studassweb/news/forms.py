@@ -9,7 +9,7 @@ class ArticleForm(forms.ModelForm):
         fields = ["title", "text", "picture", "categories", "summary"]
 
     def save(self, commit=True, user=None):
-        article = super(ArticleForm, self).save(commit=False)
+        article = super().save(commit=False)
         if not hasattr(article, "author") and user is not None:
             article.author = user
         if commit:

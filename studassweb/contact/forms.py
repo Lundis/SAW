@@ -15,7 +15,7 @@ class MessageForm(forms.ModelForm):
             user = kwargs.pop('user')
         else:
             user = None
-        super(MessageForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if user is not None and user.is_authenticated():
             logger.debug("MessageForm user: \"%s\"" % user)
             logger.debug("MessageForm user email: \"%s\"" % user.email)
@@ -34,11 +34,11 @@ class MessageForm(forms.ModelForm):
         :param contact:
         :return:
         """
-        obj = super(MessageForm, self).save(commit=False)
+        obj = super().save(commit=False)
         obj.contact = contact
         if from_person and from_person.is_authenticated():
             obj.from_person = from_person
-        super(MessageForm, self).save(commit=commit)
+        super().save(commit=commit)
 
 
 class ContactSettingsForm(forms.ModelForm):

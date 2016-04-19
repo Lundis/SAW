@@ -36,7 +36,7 @@ class Album(models.Model):
                 temp_slug = "%s-%d" % (orig[:max_length - len(str(x)) - 1], x)
 
             self.slug = temp_slug
-        super(Album, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
 class Photo(models.Model):

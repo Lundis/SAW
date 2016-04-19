@@ -34,7 +34,7 @@ class PaymentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self._member = kwargs.pop("member")
         self._user = kwargs.pop("user")
-        super(PaymentForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # Use now as the default time of payment
         self.fields["date"] = forms.DateField(
             widget=forms.DateInput(format='%d.%m.%Y'),
@@ -45,7 +45,7 @@ class PaymentForm(forms.ModelForm):
             input_formats=('%d.%m.%Y',))
 
     def save(self, commit=True):
-        payment = super(PaymentForm, self).save(commit=False)
+        payment = super().save(commit=False)
         payment.member = self._member
         payment.created_by = self._user
         if commit:
@@ -68,7 +68,7 @@ class MemberEditForm(forms.ModelForm):
                   "can_apply_for_membership",)
 
     def __init__(self, *args, **kwargs):
-        super(MemberEditForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # if this is an instance and the user hasn't already entered data
         if 'instance' in kwargs and not args[0]:
             instance = kwargs['instance']
@@ -98,7 +98,7 @@ class MemberEditForm(forms.ModelForm):
             old_confirmed = m.confirmed
         else:
             old_confirmed = False
-        instance = super(MemberEditForm, self).save(commit)
+        instance = super().save(commit)
         # update permissions if this user is a registered member
         if instance.user_ext is not None:
             user = instance.user_ext.user

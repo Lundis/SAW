@@ -113,7 +113,7 @@ class InfoPage(models.Model):
             old_page = None
             # Create a slug for new pages
             self.slug = self.slugify()
-        super(InfoPage, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def can_view(self, user):
         return has_user_perm(user, self.permission)

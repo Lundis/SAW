@@ -7,7 +7,7 @@ from datetime import date
 class ExamForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
-        super(ExamForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['course_id'].label_from_instance = lambda obj: "%s" % obj.name
         self.fields['examinator'].label_from_instance = lambda obj: "%s" % obj.name
 
