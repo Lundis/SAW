@@ -6,7 +6,7 @@ from users.decorators import has_permission
 from .models import SiteConfiguration, BootswatchTheme, THEME_DEFAULT_CSS, THEME_DEFAULT_CSS_MOD, \
     CSSOverrideContent, CSSOverrideFile, CSSMap2
 from .register import EDIT_THEME
-from .forms import BootswatchThemeSelectForm, CSSOverrideFileForm, CSSOverrideContentForm, CSSClassForm
+from .forms import BootswatchThemeSelectForm, CSSOverrideFileForm, CSSOverrideContentForm, ComponentCSSClassForm
 from settings.sections import SECTION_APPEARANCE, Section
 import logging
 
@@ -54,12 +54,8 @@ urlpatterns = patterns('',
         name='base_settings_set_css_override'),
 
     url(r'^%s/css_classes$' % SECTION_APPEARANCE,
-        'base.settings_pages.view_component_classes',
-        name='base_settings_view_component_classes'),
-
-    url(r'^%s/css_overrides/set/(?P<class_id>\d+)$' % SECTION_APPEARANCE,
-        'base.settings_pages.update_component_class',
-        name='base_settings_update_component_class'),
+        'base.settings_pages.edit_component_classes',
+        name='base_settings_edit_component_classes'),
 )
 
 
@@ -188,43 +184,23 @@ def set_css_override(request, override_id):
 
 
 @has_permission(EDIT_THEME)
-def update_component_class(request, class_id):
-    """
-
-    :param request:
-    :param class_id:
-    :return:
-    """
-    if request.method != 'POST':
-        return HttpResponseNotAllowed(['POST'])
-
-    if class_id is None:
-        raise Http404("class_id was null!")
-
-    try:
-        css_class = CSSMap2.objects.get(id=class_id)
-    except CSSMap2.DoesNotExist:
-        raise Http404("class_id doesn't point to an existing CSSOverrideContent")
-
-    form = CSSClassForm(request.POST, instance=css_class)
-    if form.is_valid():
-        form.save()
-
-    return HttpResponseRedirect(reverse('base_settings_view_component_classes'))
-
-
-@has_permission(EDIT_THEME)
-def view_component_classes(request):
+def edit_component_classes(request):
 
     classes_with_new_default = CSSMap2.objects.filter(default_has_changed=True)
     classes_without_new_default = CSSMap2.objects.filter(default_has_changed=False)
 
     section = Section.get_section(SECTION_APPEARANCE)
 
+    form = ComponentCSSClassForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return HttpResponseRedirect(reverse("base_settings_edit_component_classes"))
+
     context = {
         'classes': classes_without_new_default,
         'changed_classes': classes_with_new_default,
-        'section': section
+        'section': section,
+        'form': form
     }
 
     return render(request, "base/settings/view_component_classes.html", context)

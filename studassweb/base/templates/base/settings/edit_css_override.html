@@ -59,11 +59,11 @@
     {% sidebarpanel "vertical_buttons" %}
         {% trans "Actions" %}
         {% body %}
-        <div class="{% get_css "sawbutton_primary" %}" id="save_button">
+        <div class="{% get_css "sawbutton_sidebar" %}" id="save_button">
             {% trans "Save and use" %}
         </div>
         {% if content %}
-            <a href="{% url "base_settings_new_css_override" copy_id=content.id%}" class="{% get_css "sawbutton_primary" %}">
+            <a href="{% url "base_settings_new_css_override" copy_id=content.id%}" class="{% get_css "sawbutton_sidebar" %}">
                 {% trans "Copy file" %}
             </a>
         {% endif %}

@@ -1,6 +1,7 @@
 from ckeditor_uploader.fields import RichTextUploadingField, RichTextUploadingFormField
 from django import forms
 from .html_tag_closer import complete_html
+import re
 
 
 class ValidatedRichTextField(RichTextUploadingField):
@@ -84,3 +85,30 @@ class HiddenModelField(forms.IntegerField):
             raise forms.ValidationError("%s with id %d does not exist!", self.model, item_id)
         # else return the cleaned menu index
         return cleaned_num
+    
+    
+class HiddenComponentClassField(forms.CharField):
+    """
+    A menu field for interpreting the order of a model
+    POST.field.name must be in the form *-<id>, where id is a valid id
+    POST.field.value must be an integer >= 0
+    """
+    def __init__(self, *args, **kwargs):
+        name = kwargs.pop('name')
+        super().__init__(*args, **kwargs)
+        self.name = name
+
+    def clean(self, value):
+        """
+
+        :param value: The value attribute of the field
+        :return: clean value
+        """
+        cleaned_css_classes = super().clean(value)
+        if not re.match(r"^[a-zA-Z0-9\- ]*$", cleaned_css_classes):
+            raise forms.ValidationError("Invalid character found")
+        if len(cleaned_css_classes) > 250:
+            raise forms.ValidationError("Classes string too long")
+
+        return cleaned_css_classes
+    

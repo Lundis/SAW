@@ -46,7 +46,7 @@ def register_settings_pages():
     css_classes = Page("Component CSS Classes",
                        "Change which CSS classes are used for what components",
                        SECTION_APPEARANCE,
-                       reverse_lazy('base_settings_view_component_classes'),
+                       reverse_lazy('base_settings_edit_component_classes'),
                        EDIT_THEME)
     return theme_editor, css_overrides, css_classes
 
@@ -58,10 +58,11 @@ def get_css_map_keys():
     :return:
     """
     return (
-        ("sawpanel_primary", "panel panel-primary sawpanel sawpanel-primary", "Primary panels"),
+        ("sawpanel_main", "panel panel-primary sawpanel sawpanel-main", "Regular panels"),
         ("sawpanel_sidebar", "panel panel-primary sawpanel sawpanel-sidebar", "Sidebar panels"),
-        ("sawpanel_default", "panel panel-default sawpanel sawpanel-default", "Default panels"),
-        ("sawbutton_primary", "btn btn-primary sawbutton sawbutton-primary", "Regular buttons"),
-        ("sawbutton_default", "btn btn-default sawbutton sawbutton-default", "Less visible than regular buttons"),
-        ("sawbutton_sidebar", "btn btn-default sawbutton sawbutton-default", "Sidebar buttons"),
+
+        ("sawbutton_main", "btn btn-primary sawbutton sawbutton-main", "Regular buttons"),
+        ("sawbutton_sidebar", "btn btn-default sawbutton sawbutton-sidebar", "Sidebar buttons"),
+        ("sawbutton_save", "btn btn-success sawbutton sawbutton-save", "Save buttons"),
+        ("sawbutton_delete", "btn btn-danger sawbutton sawbutton-delete", "Delete buttons"),
     )

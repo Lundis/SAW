@@ -48,3 +48,8 @@ body {
     padding-left:inherit;
     padding-right:inherit;
 }
+
+
+input[pattern]:invalid{
+    color:red;
+}

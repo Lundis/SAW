@@ -6,7 +6,7 @@ from django.template import Context
 from django.core.exceptions import SuspiciousOperation
 from .models import SiteConfiguration, BootswatchTheme, Feedback, \
     CSSOverrideFile, CSSOverrideContent, CSSMap2
-from .fields import HiddenModelField
+from .fields import HiddenModelField, HiddenComponentClassField
 from string import ascii_letters, digits
 import re
 
@@ -334,22 +334,50 @@ class CSSOverrideContentForm(forms.ModelForm):
         return instance
 
 
-class CSSClassForm(forms.ModelForm):
-
-    class Meta:
-        model = CSSMap2
-        fields = "value",
+class ComponentCSSClassForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
+        if len(args) > 0:
+            post_items = args[0]
+        else:
+            post_items = None
         super().__init__(*args, **kwargs)
+        # the first argument is the post data
+        if post_items is not None:
+            # Use post data to populate items if it's provided
+            self._interpret_post_data(args[0])
+
+    def _interpret_post_data(self, post_data):
+        """
+        Create
+        :param post_data:
+        :return:
+        """
+        for component_id, value in post_data.items():
+            matches = re.match(r"^component-(\d+)$", component_id)
+            # If it's a relevant entry (there are also stuff like csrf-tokens)
+            # Ignore duplicates
+            if matches and component_id not in self.fields.keys() and \
+                    CSSMap2.objects.filter(id=component_id.split("-")[-1]).exists():
+                # Add the field
+                self.fields[component_id] = HiddenComponentClassField(name=component_id,
+                                                                      initial=value,
+                                                                      required=True)
 
     def save(self, commit=True):
-        instance = super().save(commit=False)
-        instance.default_has_changed = False
+        """
 
-        if not instance.pk:
-            raise SuspiciousOperation("Someone tried to manually create a CSS Class")
-
-        if commit:
-            instance.save()
-        return instance
+        :param commit:
+        :return:
+        """
+        changed_items = []
+        for key, value in self.cleaned_data.items():
+            if re.match(r"^component-(\d+)$", key):
+                component_id = key.split("-")[-1]
+                instance = CSSMap2.objects.get(id=component_id)
+                instance.default_has_changed = False
+                instance.value = value
+                if commit:
+                    instance.save()
+                changed_items.append(instance)
+        return changed_items

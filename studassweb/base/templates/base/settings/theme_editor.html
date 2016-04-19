@@ -32,7 +32,7 @@
                     <form action="{% url "base_settings_set_bootswatch_theme" %}" method="post">
                         {% csrf_token %}
                         <input type="hidden" name="theme" value="{{ theme.name }}" />
-                        <button type="submit" value="Submit" class="{% get_css "sawbutton_primary" %}">
+                        <button type="submit" value="Submit" class="{% get_css "sawbutton_main" %}">
                             {% trans "Use this theme" %}
                         </button>
                     </form>
@@ -48,7 +48,7 @@
         {% body %}
         <form action="{% url "base_settings_set_default_theme" %}" method="post">
             {% csrf_token %}
-            <button type="submit" value="Submit" class="{% get_css "sawbutton_primary" %} btn-block">
+            <button type="submit" value="Submit" class="{% get_css "sawbutton_sidebar" %} btn-block">
                 {% trans "Set default theme" %}
             </button>
         </form>

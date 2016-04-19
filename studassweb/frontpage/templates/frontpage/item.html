@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load cssmap %}
 
-<div id="item_{{ item.id }}" class="{% get_css "sawpanel_primary" %}" data-location="{{ placement }}" >
+<div id="item_{{ item.id }}" class="{% get_css "sawpanel_main" %}" data-location="{{ placement }}" >
     <div class="panel-heading">
         <div class="panel-title">
             {{ item.title }}
@@ -15,32 +15,32 @@
             <form id="item_form_{{ item.id }}" method="post" action="{% url "frontpage_move_item" %}">
                 {% csrf_token %}
                 <div id="move_up_button_{{ item.id }}"
-                     class="{% get_css "sawbutton_primary" %} move_up_button
+                     class="{% get_css "sawbutton_main" %} move_up_button
                      {% if placement == "hidden" %}hidden{% endif %}
                      ">
                     {% trans "Move up" %}
                 </div>
                 <div id="move_down_button_{{ item.id }}"
-                     class="{% get_css "sawbutton_primary" %} move_down_button
+                     class="{% get_css "sawbutton_main" %} move_down_button
                      {% if placement == "hidden" %}hidden{% endif %}
                      ">
                     {% trans "Move down" %}
                 </div>
 
                 <div id="move_to_hidden_button_{{ item.id }}"
-                     class="{% get_css "sawbutton_primary" %} move_location_button
+                     class="{% get_css "sawbutton_main" %} move_location_button
                      {% if placement == "hidden" %}hidden{% endif %}
                      " data-location-target="hidden">
                     {% trans "Remove" %}
                 </div>
                 <div id="move_to_main_button_{{ item.id }}"
-                     class="{% get_css "sawbutton_primary" %} move_location_button
+                     class="{% get_css "sawbutton_main" %} move_location_button
                      {% if placement == "main" %}hidden{% endif %}
                      " data-location-target="mainbar">
                     {% trans "Move to main bar" %}
                 </div>
                 <div id="move_to_side_button_{{ item.id }}"
-                     class="{% get_css "sawbutton_primary" %} move_location_button
+                     class="{% get_css "sawbutton_main" %} move_location_button
                      {% if placement == "side" %}hidden{% endif %}
                      " data-location-target="sidebar">
                     {% trans "Move to sidebar" %}
