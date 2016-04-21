@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load bootstrap3 %}
+{% load cssmap %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -15,7 +16,7 @@
         {% csrf_token %}
         {% bootstrap_form form %}
         {% buttons %}
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="{% get_css "sawbutton_save" %}">
                 {% trans "Submit" %}
             </button>
         {% endbuttons %}

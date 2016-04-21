@@ -4,6 +4,7 @@
 {% load bootstrap3 %}
 {% load sawp %}
 {% load cssmap %}
+{% load sidemenu %}
 
 {% block breadcrumb1 %}
     <li class="active">
@@ -32,7 +33,7 @@
                         {% has_perm "contact" "CAN_EDIT_CONTACT_SETTINGS" as can_edit_contacts %}
                         {% if contact.messages.count > 0 and can_edit_contacts %}
                             {% with contact.unread_messages as unread_messages %}
-                                <a href="{% url "contact_view_messages" contact_id=contact.id %}" class="btn btn-primary">
+                                <a href="{% url "contact_view_messages" contact_id=contact.id %}" class="{% get_css "sawbutton_main" %}">
                                     {% trans "View Messages" %}
                                     {% if unread_messages.count > 0 %}
                                         <span class="badge">{{ unread_messages.count }}</span>
@@ -42,12 +43,12 @@
                         {% endif %}
 
                         {% if can_edit_contacts %}
-                            <a href="{% url "contact_edit" contact_id=contact.id %}" class="btn btn-primary">
+                            <a href="{% url "contact_edit" contact_id=contact.id %}" class="{% get_css "sawbutton_main" %}">
                                 {% trans "Edit" %}
                             </a>
                         {% endif %}
                         {% if contact.has_recipients %}
-                            <a href="{% url "contact_write_message" contact_id=contact.id %}" class="btn btn-primary">
+                            <a href="{% url "contact_write_message" contact_id=contact.id %}" class="{% get_css "sawbutton_main" %}">
                                 {% trans "Send message" %}
                             </a>
                         {% endif %}
@@ -61,38 +62,31 @@
     {% endif %}
 {% endblock %}
 
-{% block sidebar %}
-    {% has_perm "contact" "CAN_USE_CONTACT_FORM" as can_use_contact_form %}
+{% block sidebar-panel1 %}
     {% has_perm "contact" "CAN_EDIT_CONTACT_SETTINGS" as can_edit_contact_settings %}
-    <div class="panel panel-primary">
-        {% if can_edit_contact_settings %}
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Actions" %}</h2>
-            </div>
-            <div class="panel-body">
-                <a href="{% url 'contact_create' %}" class="btn btn-primary btn-block">
-                    {% trans "Create a new contact" %}
-                </a>
-            </div>
-        {% endif %}
-        <div class="panel-heading">
-            <h2 class="panel-title" data-toggle="collapse" data-target="#helptext">
-                {% trans "Help" %}
-                <span class="glyphicon caret pull-right"></span>
-            </h2>
-        </div>
-        <div id="helptext" class="panel-collapse collapse helptext-collapse">
-            <div class="panel-body">
-                <p>
-                    {% if can_use_contact_form %}
-                        {% trans "Select who you want to contact!" %}
-                    {% else %}
-                        {% trans "You do not have permission to use the built-in messaging system." %}
-                    {% endif %}
-                </p>
-                {% load feedback %}
-                {% helptext_feedback %}
-            </div>
-        </div>
-    </div>
+    {% if can_edit_contact_settings %}
+        {% sidebarpanel "vertical_buttons" %}
+            {% trans "Actions" %}
+            {% body %}
+            <a href="{% url 'contact_create' %}" class="{% get_css "sawbutton_sidebar" %}">
+                {% trans "Create a new contact" %}
+            </a>
+        {% endsidebarpanel %}
+    {% endif %}
+{% endblock %}
+
+{% block sidebar-panel-help %}
+    {% has_perm "contact" "CAN_USE_CONTACT_FORM" as can_use_contact_form %}
+    {% sidebarpanel "help" %}
+        {% trans "Help" %}
+        {% body %}
+        <p>
+            {% if can_use_contact_form %}
+                {% trans "Select who you want to contact!" %}
+            {% else %}
+                {% trans "You do not have permission to use the built-in messaging system." %}
+            {% endif %}
+        </p>
+    {% endsidebarpanel %}
+
 {% endblock %}

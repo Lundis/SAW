@@ -1,6 +1,8 @@
 {% extends "contact/base.html" %}
 {% load i18n %}
 {% load bootstrap3 %}
+{% load cssmap %}
+{% load sidemenu %}
 
 {% block breadcrumb2 %}
     {% if contact %}
@@ -16,24 +18,21 @@
         {{ form.media }}
         {{ form.as_p }}
         {% buttons %}
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="{% get_css "sawbutton_main" %}">
                 {% trans "Save" %}
             </button>
         {% endbuttons %}
     </form>
 {% endblock %}
 
-{% block sidebar %}
+{% block sidebar-panel1 %}
     {% if contact %}
-    <div class="panel panel-primary">
-        <div class="panel-heading">
+        {% sidebarpanel "vertical_buttons" %}
             {% trans "Actions" %}
-        </div>
-        <div class="panel-body">
-            <a class="btn btn-danger btn-block" href="{% url "contact_delete" contact_id=contact.id %}">
+            {% body %}
+            <a class="{% get_css "sawbutton_delete" %}btn-block" href="{% url "contact_delete" contact_id=contact.id %}">
                 {% trans "Delete" %}
             </a>
-        </div>
-    </div>
+        {% endsidebarpanel %}
     {% endif %}
 {% endblock %}
