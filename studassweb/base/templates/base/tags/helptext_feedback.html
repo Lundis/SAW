@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load static %}
+{% load cssmap %}
 
 {% if id %}
     <div id="feedback_wrapper_{{ id }}">
@@ -7,15 +8,15 @@
             {% csrf_token %}
             {% trans "Did you find this text helpful?" %}
             <div id="feedback_yes_button_{{ id }}"
-                 class="btn btn-primary btn-sm btn-block feedback_button_{{ id }}">
+                 class="{% get_css "sawbutton_main" %} btn-sm btn-block feedback_button_{{ id }}">
                 {% trans "Yes" %}
             </div>
             <div id="feedback_no_button_{{ id }}"
-                 class="btn btn-primary btn-sm btn-block feedback_button_{{ id }}">
+                 class="{% get_css "sawbutton_main" %} btn-sm btn-block feedback_button_{{ id }}">
                 {% trans "No" %}
             </div>
             <div id="feedback_unnecessary_button_{{ id }}"
-                 class="btn btn-primary btn-sm btn-block feedback_button_{{ id }}">
+                 class="{% get_css "sawbutton_main" %} btn-sm btn-block feedback_button_{{ id }}">
                 {% trans "It's unnecessary" %}
             </div>
         </form>
