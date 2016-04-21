@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load bootstrap3 %}
 {% load static %}
+{% load cssmap %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -16,9 +17,9 @@
     <div>
         {% for message in msgs %}
             <div {% if message.handled %}
-                class="panel panel-default"
+                class="{% get_css "sawpanel_secondary" %}"
             {% else %}
-                class="panel panel-primary"
+                class="{% get_css "sawpanel_main" %}"
             {% endif %} >
                 <div class="panel-heading">
                     <div class="row inherit-padding-left-right">

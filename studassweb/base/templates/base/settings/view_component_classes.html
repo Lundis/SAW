@@ -28,16 +28,33 @@
         <div class="list-group">
             {% for class in changed_classes %}
                 <div class="list-group-item" id="edit-component-{{ class.id }}">
-                    <p class="component-description">{% trans class.description %}</p>
+                    {% if class.default|slice:":4" == "btn " %}
+                        <div class="{{ class.value }}">{% trans class.description %}</div>
+                        {% elif class.default|slice:":6" == "panel " %}
+                        <div class="{{ class.value }}">
+                            <div class="panel-heading">{% trans class.description %}</div>
+                        </div>
+                    {% else %}
+                        <p class="component-description">{% trans class.description %}</p>
+                    {% endif %}
                     <input type="text" class="form-control component-value"
                            id="component-input-{{ class.id }}"
                            name="component-{{ class.id }}" value="{{ class.value }}"
                            pattern="[a-zA-Z0-9\- ]*"
                            data-changed="false"
                            maxlength="250"/>
-                    <p class="component-default-value">{% trans "Default" %}: {{ class.default }}</p>
-                    <div class="mark-as-changed-button" id="mark-as-changed-button-{{ class.id }}">
-                        {% trans "Mark as validated" %}
+                    <div class="component-default-value-holder" id="component-default-value-holder-{{ class.id }}">
+                        <div class="btn-group">
+                            <div class="mark-as-changed-button {% get_css "sawbutton_main" %}" id="mark-as-changed-button-{{ class.id }}">
+                                {% trans "Mark as validated" %}
+                            </div>
+                            <div class="{% get_css "sawbutton_secondary"  %} component-reset-button" id="component-reset-button-{{ class.id }}">
+                                {% trans "Reset to default" %}:
+                            </div>
+                        </div>
+                        <span id="component-default-value-{{ class.id }}" class="component-default-value">
+                            {{ class.default }}
+                        </span>
                     </div>
                 </div>
             {% endfor %}
@@ -50,17 +67,31 @@
         <div class="list-group">
             {% for class in classes %}
                 <div class="list-group-item" id="edit-component-{{ class.id }}">
-                    <p class="component-description">{% trans class.description %}</p>
+
+                    {% if class.default|slice:":4" == "btn " %}
+                        <div class="{{ class.value }}">{% trans class.description %}</div>
+                        {% elif class.default|slice:":6" == "panel " %}
+                        <div class="{{ class.value }}">
+                            <div class="panel-heading">{% trans class.description %}</div>
+                        </div>
+                    {% else %}
+                        <p class="component-description">{% trans class.description %}</p>
+                    {% endif %}
                     <input type="text" class="form-control component-value"
                            id="component-input-{{ class.id }}"
                            name="component-{{ class.id }}" value="{{ class.value }}"
                            pattern="[a-zA-Z0-9\- ]*"
                            data-changed="false"
                            maxlength="250"/>
-                    <p class="component-default-value {% if class.value == class.default %}invisible{% endif %}"
-                       id="component-default-value-{{ class.id }}">
-                        {% trans "Default" %}: {{ class.default }}
-                    </p>
+                    <div class="{% if class.value == class.default %}invisible{% endif %} component-default-value-holder"
+                         id="component-default-value-holder-{{ class.id }}">
+                        <div class="{% get_css "sawbutton_secondary"  %} component-reset-button" id="component-reset-button-{{ class.id }}">
+                            {% trans "Reset to default" %}:
+                        </div>
+                        <span id="component-default-value-{{ class.id }}" class="component-default-value">
+                            {{ class.default }}
+                        </span>
+                    </div>
                 </div>
             {% endfor %}
         </div>
@@ -117,13 +148,21 @@
 
             $(this).val($(this).val().trim());
             var default_id = "#component-default-value-" + id;
+            var default_holder_id = "#component-default-value-holder-" + id;
             var default_element = $(default_id);
-            var default_value = default_element.html().split(":")[1].trim();
+            var default_value = default_element.html().trim();
             if ($(this).val() == default_value) {
-                default_element.addClass("invisible");
+                $(default_holder_id).addClass("invisible");
             } else {
-                default_element.removeClass("invisible");
+                $(default_holder_id).removeClass("invisible");
             }
+        });
+
+        $(".component-reset-button").click(function() {
+            var id = this.id.split("-")[3];
+            var default_id = "#component-default-value-" + id;
+            var input_id = "#component-input-" + id;
+            $(input_id).val($(default_id).html().trim()).change();
         });
 
         $("#save-button").click(function() {
@@ -138,5 +177,6 @@
             // submit
             $("#component-form").submit();
         });
+
     </script>
 {% endblock %}

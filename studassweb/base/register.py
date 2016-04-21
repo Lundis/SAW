@@ -59,10 +59,13 @@ def get_css_map_keys():
     """
     return (
         ("sawpanel_main", "panel panel-primary sawpanel sawpanel-main", "Regular panels"),
+        ("sawpanel_secondary", "panel panel-default sawpanel sawpanel-main", "Less eye-catching than regular panels"),
         ("sawpanel_sidebar", "panel panel-primary sawpanel sawpanel-sidebar", "Sidebar panels"),
 
         ("sawbutton_main", "btn btn-primary sawbutton sawbutton-main", "Regular buttons"),
+        ("sawbutton_secondary", "btn btn-default sawbutton sawbutton-secondary", "Less important regular buttons"),
         ("sawbutton_sidebar", "btn btn-default sawbutton sawbutton-sidebar", "Sidebar buttons"),
         ("sawbutton_save", "btn btn-success sawbutton sawbutton-save", "Save buttons"),
         ("sawbutton_delete", "btn btn-danger sawbutton sawbutton-delete", "Delete buttons"),
+        ("sawbutton_caution", "btn btn-warning sawbutton sawbutton-caution", "Buttons that one should be wary of"),
     )

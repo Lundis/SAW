@@ -21,7 +21,7 @@
 
 {% block main_content %}
     {% for article in articles %}
-        <div class="panel panel-primary">
+        <div class="{% get_css "sawpanel_main" %}">
             <div class="panel-heading">
                 <div class="row inherit-padding-left-right">
                     {% if article.picture %}

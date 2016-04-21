@@ -1,6 +1,7 @@
 {% extends "settings/base_full_width.html" %}
 {% load i18n %}
 {% load static %}
+{% load cssmap %}
 
 {% block title %}
     {% trans "Settings" %}
@@ -21,7 +22,7 @@
         {% for section in sections %}
             <div class="col-xs-6 col-sm-4">
                 <a href="{{ section.get_absolute_url }}">
-                    <div class="panel panel-primary" style="min-height: 150px;">
+                    <div class="{% get_css "sawpanel_main" %}" style="min-height: 150px;">
                         <div class="panel-heading">
                             {{ section.title }}
                         </div>

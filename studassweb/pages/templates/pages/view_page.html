@@ -2,6 +2,7 @@
 {% load sawp %}
 {% load i18n %}
 {% load sidemenu %}
+{% load cssmap %}
 
 
 
@@ -31,7 +32,7 @@
 
 {% block main_content %}
     <h1>{{ current_revision.title }}</h1>
-    <div  class="panel panel-default">
+    <div  class="{% get_css "sawpanel_secondary" %}">
         <div id="page-content" class="panel-body">
             {{ current_revision.text | safe}}
         </div>

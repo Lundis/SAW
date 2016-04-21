@@ -3,6 +3,7 @@
 {% load setvar %}
 {% load bootstrap3 %}
 {% load sawp %}
+{% load cssmap %}
 
 {% block menu %}
     {% load dynamic_menu %}
@@ -12,7 +13,7 @@
 {% block main_content %}
     <div class="row">
         <div class="col-sm-5">
-            <div class="panel panel-primary">
+            <div class="{% get_css "sawpanel_main" %}">
                 <div class="panel-heading">
                     <small>{% trans "User" %} </small><strong>{{ user_ext.user.username }}</strong>
                 </div>
@@ -26,7 +27,7 @@
             </div>
         </div>
         <div class="col-sm-7">
-            <div class="panel panel-primary">
+            <div class="{% get_css "sawpanel_main" %}">
                 <div class="panel-heading">
                     <strong>{% trans "General Information" %}</strong>
                 </div>
@@ -78,7 +79,7 @@
                     </table>
                 </div>
             </div>
-            <div class="panel panel-primary">
+            <div class="{% get_css "sawpanel_main" %}">
                 <div class="panel-heading">
                     <strong>{% trans "About me" %}</strong>
                 </div>

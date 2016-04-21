@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load bootstrap3 %}
 {% load sawp %}
+{% load cssmap %}
 
 {% block breadcrumb1 %}
     <li class="active">
@@ -13,7 +14,7 @@
 {% block main_content %}
     {% if contacts %}
         {% for contact in contacts %}
-            <div class="panel panel-primary">
+            <div class="{% get_css "sawpanel_main" %}">
                 <div class="panel-heading">
                     <div class="row inherit-padding-left-right">
                         <div class="pull-left inherit-padding-left-right">

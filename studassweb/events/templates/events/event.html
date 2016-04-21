@@ -5,6 +5,7 @@
 {% load sawp %}
 {% load events_templatetags %}
 {% load sidemenu %}
+{% load cssmap %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -13,7 +14,7 @@
 {% endblock %}
 
 {% block main_content %}
-    <div class="panel panel-primary">
+    <div class="{% get_css "sawpanel_main" %}">
         <div class="panel-heading">
             <h1 class="h3">
                 {{ event }}
@@ -34,7 +35,7 @@
         </div>
     </div>
 
-    <div class="panel panel-default">
+    <div class="{% get_css "sawpanel_secondary" %}">
         <div class="panel-heading">
             <div class="panel-title">
                 {% if signupform.instance.pk %}
@@ -85,7 +86,7 @@
 
     {% has_perm "events" "CAN_VIEW_SIGNUP_INFO" as can_view_signup_info %}
 
-    <div class="panel panel-default">
+    <div class="{% get_css "sawpanel_secondary" %}">
         <div class="panel-heading">
             <div class="panel-title">
                 {% trans "Attending" %}
@@ -180,7 +181,7 @@
             {% endif %}
         </div>
     </div>
-    <div class="panel panel-default">
+    <div class="{% get_css "sawpanel_secondary" %}">
         <div class="panel-heading">
             <div class="panel-title">
                 {% trans "Reserve list" %}
