@@ -5,6 +5,7 @@
 {% load sawp %}
 {% load sidemenu %}
 {% load thumbnail %}
+{% load cssmap %}
 
 {% block main_content %}
     <h3>{% trans "Boards and Committees" %}</h3>
@@ -31,13 +32,13 @@
         {% sidebarpanel "vertical_buttons" %}
             {% trans "Add" %}
             {% body %}
-            <a class="btn btn-primary" href="{% url 'boards_add_board' %}">
+            <a class="{% get_css "sawbutton_sidebar" %}" href="{% url 'boards_add_board' %}">
                 {% trans "Add new board" %}
             </a>
-            <a class="btn btn-primary" href="{% url 'boards_add_boardtype' %}">
+            <a class="{% get_css "sawbutton_sidebar" %}" href="{% url 'boards_add_boardtype' %}">
                 {% trans "Add new boardtype" %}
             </a>
-            <a class="btn btn-primary" href="{% url 'boards_add_role' %}">
+            <a class="{% get_css "sawbutton_sidebar" %}" href="{% url 'boards_add_role' %}">
                 {% trans "Add new role" %}
             </a>
         {% endsidebarpanel %}

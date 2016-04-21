@@ -78,13 +78,13 @@
         {% sidebarpanel "vertical_buttons" %}
             {% trans "Actions" %}
             {% body %}
-            <a class="btn btn-primary" href="{% url 'boards_edit_board' board.id %}">
+            <a class="{% get_css "sawbutton_sidebar" %}" href="{% url 'boards_edit_board' board.id %}">
                 {% trans "Edit this board" %}
             </a>
-            <a class="btn btn-primary" href="{% url 'boards_add_boardmember' board_id=board.id %}">
+            <a class="{% get_css "sawbutton_sidebar" %}" href="{% url 'boards_add_boardmember' board_id=board.id %}">
                 {% trans "Add new board member" %}
             </a>
-            <a class="btn btn-primary" href="{% url 'boards_add_role' %}">
+            <a class="{% get_css "sawbutton_sidebar" %}" href="{% url 'boards_add_role' %}">
                 {% trans "Create new role" %}
             </a>
             {% if board.can_delete %}
