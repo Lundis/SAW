@@ -23,8 +23,7 @@ RECAPTCHA_PRIVATE_KEY = '6LfLEgETAAAAABn7oXGubvizc-QBd8g-zvOEBDgc'
 # Note: this should be changed to true later
 RECAPTCHA_USE_SSL = False
 # Use the new awesome captcha
-# There is still a python3-bug in the official version, so let's disable it for now
-NOCAPTCHA = False
+NOCAPTCHA = True
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
