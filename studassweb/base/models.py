@@ -12,7 +12,7 @@ import os
 import datetime
 import re
 from concurrent import futures
-from urllib.request import urlopen
+from urllib.request import urlopen, Request
 from urllib.error import HTTPError
 import logging
 from solo.models import SingletonModel
@@ -94,8 +94,8 @@ class BootswatchTheme(models.Model):
         return bst.save()
 
 
-THEME_DEFAULT_CSS = "css/themes/bootstrap.min.css"
-THEME_DEFAULT_CSS_MOD = "css/themes/bootstrap-theme.min.css"
+THEME_DEFAULT_CSS = "css/bootstrap.min.css"
+THEME_DEFAULT_CSS_MOD = "css/bootstrap-theme.min.css"
 
 
 class SiteConfiguration(SingletonModel):
@@ -144,7 +144,9 @@ class SiteConfiguration(SingletonModel):
     @classmethod
     def _update_bootswatch(cls):
         try:
-            data = urlopen("http://api.bootswatch.com/3/").read().decode()
+            r = Request(url="http://api.bootswatch.com/3/")
+            r.add_header('User-Agent', 'SAW')
+            data = urlopen(r).read().decode()
         except HTTPError:
             logger.error("Failed to fetch bootswatch theme descriptor %s")
             return
