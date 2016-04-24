@@ -4,6 +4,7 @@
 {% load bootstrap3 %}
 {% load sawp %}
 {% load sidemenu %}
+{% load cssmap %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -28,7 +29,7 @@
         {% bootstrap_form form %}
 
         {% buttons %}
-            <button type="submit" class="btn btn-confirm">
+            <button type="submit" class="{% get_css "sawbutton_save" %}">
                 {% if form.instance.pk %}
                     {% trans "Update" %}
                 {% else %}
@@ -39,6 +40,8 @@
     </form>
 
 {% endblock %}
+
+{% block sidebar-panel5 %}{% endblock %}
 
 {% block sidebar-panel-help %}
     {% sidebarpanel "help" %}

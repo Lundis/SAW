@@ -4,6 +4,7 @@
 {% load bootstrap3 %}
 {% load sawp %}
 {% load sidemenu %}
+{% load cssmap %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -53,11 +54,18 @@
                         {% endif %}
                     </td>
                     <td>
-                        <a class="btn btn-primary" href="{% url "events_edit_eventitem" eitem.id %}">Edit</a>
-                        <a class="btn btn-danger" href="{% url "events_delete_eventitem" eitem.id %}">Delete</a>
+                        <a class="{% get_css "sawbutton_main" %}" href="{% url "events_edit_eventitem" eitem.id %}">
+                            {% trans "Edit" %}
+                        </a>
+                        <form action="{% url "events_delete_eventitem" eitem.id %}" method="post"
+                              onclick="return confirm('{% trans "Are you sure?" %}');">
+                            {% csrf_token %}
+                            <input type="submit" value="{% trans "Delete" %}"
+                                   class="{% get_css "sawbutton_delete" %}" />
+                        </form>
                     </td>
                 </tr>
-            {% empty %}
+                {% empty %}
 
                 <tr>
                     <td>
@@ -73,18 +81,13 @@
 
 
 
-{% block sidebar-panel5 %}
-    {% sidebarpanel "vertical_buttons" %}
-        {% trans "Add" %}
-        {% body %}
-        <a href="{% url 'events_add_eventitem' %}" class="btn btn-primary">
-            {% trans "Add new event item" %}
-        </a>
-    {% endsidebarpanel %}
+{% block extrabuttons_in_panel5 %}
+    <a href="{% url 'events_add_eventitem' %}" class="{% get_css "sawbutton_main" %}">
+        {% trans "Add new event item" %}
+    </a>
 {% endblock%}
 
-{% block sidebar-panel6 %}
-{% endblock %}
+{% block configure_event_items %}{% endblock %}
 
 {% block sidebar-panel-help %}
     {% sidebarpanel "help" %}

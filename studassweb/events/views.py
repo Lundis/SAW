@@ -285,7 +285,7 @@ class DeleteEventItemView(DeleteView):
 
     def form_valid(self, form):
         # This method is called when valid form data has been POSTed.
-        messages.success(self.request, _("Succesfully removed event item"))
+        messages.success(self.request, _("Successfully removed event item"))
         return super().form_valid(form)
 
 

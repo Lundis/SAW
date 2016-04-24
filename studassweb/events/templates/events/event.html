@@ -67,8 +67,8 @@
                             {% bootstrap_field signupform.captcha %}
                         {% endif %}
                         {% buttons %}
-                            <button type="submit" class="btn btn-primary">
-                                {% trans "Submit" %}
+                            <button type="submit" class="{% get_css "sawbutton_save" %}">
+                                {% trans "Sign up" %}
                             </button>
                         {% endbuttons %}
                     </form>
@@ -76,11 +76,11 @@
 
             {% endif %}
         </div>
-        <div class="panel-footer">
-            {% if event.is_past_signup_deadline %}
-                ({% trans "closes " %} {{ event.signup_deadline|date:"d.m.Y H:i" }} )
-            {% endif %}
-        </div>
+        {% if event.is_past_signup_deadline %}
+            <div class="panel-footer">
+                ({% trans "The signup deadline was" %} {{ event.signup_deadline|date:"d.m.Y H:i" }} )
+            </div>
+        {% endif %}
 
     </div>
 
@@ -149,14 +149,15 @@
                                 {% user_can_edit signup user as can_edit_signup %}
                                 {% if can_edit_signup %}
                                     <a href="{% url 'events_view_event_edit_signup_by_id' event_id=event.id signup_id=signup.id %}">
-                                        <button class="btn btn-primary">
+                                        <button class="{% get_css "sawbutton_main" %}">
                                             {% trans "Edit" %}
                                         </button>
                                     </a>
-                                    <form action="{% url 'events_delete_event_signup' signup.id %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
+                                    <form action="{% url 'events_delete_event_signup' signup.id %}" method="post"
+                                          onclick="return confirm('{% trans "Are you sure?" %}')">
                                         {% csrf_token %}
                                         {% buttons %}
-                                            <button type="submit" class="btn btn-danger">
+                                            <button type="submit" class="{% get_css "sawbutton_delete" %}">
                                                 {% trans "Delete" %}
                                             </button>
                                         {% endbuttons %}
@@ -173,13 +174,13 @@
                 </tbody>
             </table>
         </div>
-        <div class="panel-footer">
-            {% if can_view_signup_info %}
-                <div id="print-toggle-button" class="btn btn-primary">
+        {% if can_view_signup_info %}
+            <div class="panel-footer">
+                <div id="print-toggle-button" class="{% get_css "sawbutton_main" %}">
                     {% trans "Print mode" %}
                 </div>
-            {% endif %}
-        </div>
+            </div>
+        {% endif %}
     </div>
     <div class="{% get_css "sawpanel_secondary" %}">
         <div class="panel-heading">
@@ -244,14 +245,15 @@
                                 {% user_can_edit signup user as can_edit_signup %}
                                 {% if can_edit_signup %}
                                     <a href="{% url 'events_view_event_edit_signup_by_id' event_id=event.id signup_id=signup.id %}">
-                                        <button class="btn btn-primary">
+                                        <button class="{% get_css "sawbutton_save" %}">
                                             {% trans "Edit" %}
                                         </button>
                                     </a>
-                                    <form action="{% url 'events_delete_event_signup' signup.id %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
+                                    <form action="{% url 'events_delete_event_signup' signup.id %}" method="post"
+                                          onclick="return confirm('{% trans "Are you sure?" %}')">
                                         {% csrf_token %}
                                         {% buttons %}
-                                            <button type="submit" class="btn btn-danger">
+                                            <button type="submit" class="{% get_css "sawbutton_delete" %}">
                                                 {% trans "Delete" %}
                                             </button>
                                         {% endbuttons %}
@@ -274,7 +276,7 @@
 {% block extrabuttons_in_panel5 %}
     {% has_perm "events" "CAN_CREATE_EVENTS" as can_create_events %}
     {% if can_create_events %}
-        <a href="{% url 'events_edit_event' event.id%}" class="btn btn-primary">
+        <a href="{% url 'events_edit_event' event.id%}" class="{% get_css "sawbutton_sidebar" %}">
             {% trans "Edit this event" %}
         </a>
     {% endif %}

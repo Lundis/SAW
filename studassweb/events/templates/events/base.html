@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load sawp %}
 {% load sidemenu %}
+{% load cssmap %}
 
 {% block title %}
     {% trans "Events" %}
@@ -27,22 +28,16 @@
             {% trans "Actions" %}
             {% body %}
             {% block extrabuttons_in_panel5 %}{% endblock %}
-            <a href="{% url 'events_add_event' %}" class="btn btn-primary">
-                {% trans "Add new event" %}
-            </a>
-        {% endsidebarpanel %}
-    {% endif %}
-{% endblock%}
-
-{% block sidebar-panel6 %}
-    {% has_perm "events" "CAN_CREATE_EVENTS" as can_create_events %}
-    {% if can_create_events%}
-        {% sidebarpanel "vertical_buttons" %}
-            {% trans "Settings" %}
-            {% body %}
-            <a href="{% url 'events_list_eventitems' %}" class="btn btn-primary">
-                {% trans "Configure event items" %}
-            </a>
+            {% block add_new_event %}
+                <a href="{% url 'events_add_event' %}" class="{% get_css "sawbutton_sidebar" %}">
+                    {% trans "Add new event" %}
+                </a>
+            {% endblock %}
+            {% block configure_event_items %}
+                <a href="{% url 'events_list_eventitems' %}" class="{% get_css "sawbutton_sidebar" %}">
+                    {% trans "Configure event items" %}
+                </a>
+            {% endblock %}
         {% endsidebarpanel %}
     {% endif %}
 {% endblock%}

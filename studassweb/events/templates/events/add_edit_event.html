@@ -4,6 +4,7 @@
 {% load bootstrap3 %}
 {% load static %}
 {% load sidemenu %}
+{% load cssmap %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -24,7 +25,7 @@
         {% bootstrap_form form %}
         {% bootstrap_form form_items %}
         {% buttons %}
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="{% get_css "sawbutton_save" %}">
                 {% trans "Submit" %}
             </button>
         {% endbuttons %}
@@ -59,20 +60,14 @@
     </script>
 {% endblock %}
 
-
-
-{% block sidebar-panel4 %}
+{% block extrabuttons_in_panel5 %}
     {% if form.instance.pk %}
-        {% sidebarpanel "vertical_buttons" %}
-            {% trans "Delete" %}
-            {% body %}
-            <form action="{% url 'events_delete_event' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger btn-block">
-                    {% trans "Remove this event" %}
-                </button>
-            </form>
-        {% endsidebarpanel %}
+        <form action="{% url 'events_delete_event' form.instance.pk %}" method="post" onclick="return confirm('{% trans "Are you sure?" %}')">
+            {% csrf_token %}
+            <button type="submit" class="{% get_css "sawbutton_delete" %} btn-block">
+                {% trans "Remove this event" %}
+            </button>
+        </form>
     {% endif %}
 {% endblock %}
 
