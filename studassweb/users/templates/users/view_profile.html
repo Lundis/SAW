@@ -4,6 +4,7 @@
 {% load bootstrap3 %}
 {% load sawp %}
 {% load cssmap %}
+{% load sidemenu %}
 
 {% block menu %}
     {% load dynamic_menu %}
@@ -29,7 +30,7 @@
         <div class="col-sm-7">
             <div class="{% get_css "sawpanel_main" %}">
                 <div class="panel-heading">
-                    <strong>{% trans "General Information" %}</strong>
+                    {% trans "General Information" %}
                 </div>
                 <div class="panel-body">
                     <table class="table">
@@ -43,7 +44,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>Member</td>
+                            <td>{% trans "Member" %}</td>
                             <td>
                                 {% setvar user_ext.member as member %}
                                 {% if member %}
@@ -81,7 +82,7 @@
             </div>
             <div class="{% get_css "sawpanel_main" %}">
                 <div class="panel-heading">
-                    <strong>{% trans "About me" %}</strong>
+                    {% trans "About me" %}
                 </div>
                 <div class="panel-body">
                     <p>{{ user_ext.description }}</p>
@@ -91,19 +92,14 @@
     </div>
 {% endblock %}
 
-{% block sidebar %}
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <strong>{% trans "Actions" %}</strong>
-        </div>
-        <div class="panel-body">
-            {% has_perm "users" "EDIT_PERMISSIONS" as show_group_edit %}
-            {% if show_group_edit %}
-                group settings goes here
-            {% endif %}
-            {% if user_ext.user == user %}
-                <a class="button" href="{% url "users_settings_edit_user" %}">Edit Profile</a>
-            {% endif %}
-        </div>
-    </div>
+
+{% block sidebar-panel1 %}
+    {% sidebarpanel "vertical_buttons" %}
+        {% trans "Actions" %}
+        {% body %}
+        {% if user_ext.user == user %}
+            <a class="{% get_css "sawbutton_sidebar" %}" href="{% url "users_settings_edit_user" %}">Edit Profile</a>
+        {% endif %}
+    {% endsidebarpanel %}
+
 {% endblock %}

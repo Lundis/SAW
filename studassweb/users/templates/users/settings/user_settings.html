@@ -1,6 +1,7 @@
 {% extends "settings/base_full_width.html" %}
 {% load i18n %}
 {% load bootstrap3 %}
+{% load cssmap %}
 
 {% block breadcrumb2 %}
     <li class="active"><a href="{{ section.get_absolute_url }}">
@@ -18,7 +19,7 @@
         {% csrf_token %}
         {% bootstrap_form profile_form %}
         {% bootstrap_form user_form %}
-        <button type="submit" class="btn btn-primary">
+        <button type="submit" class="{% get_css "sawbutton_save" %} ">
             {% trans "Submit" %}
         </button>
     </form>

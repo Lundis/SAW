@@ -40,14 +40,17 @@ def register_settings_pages():
                        SECTION_USERS,
                        reverse_lazy("users_settings_edit_permissions"),
                        EDIT_PERMISSIONS)
+    """
     groups = Page("Custom groups",
                   "Make your own groups with specialized permissions",
                   SECTION_USERS,
                   reverse_lazy("users_settings_edit_groups"),
                   EDIT_PERMISSIONS)
+    """
     login = Page("Login settings",
                  "Change how users can log in",
                  SECTION_USERS,
                  reverse_lazy("users_settings_edit_login"),
                  EDIT_LOGIN_SETTINGS)
-    return profile, permissions, login, groups
+    return profile, permissions, login,  # groups
+

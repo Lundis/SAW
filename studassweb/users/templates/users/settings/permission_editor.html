@@ -44,7 +44,7 @@
                                  style="min-width:100%; min-height:100px;">
                                 {% for perm_and_id in perms %}
                                     <li id="{{ perm_and_id.id }}"
-                                        class="btn btn-primary sort-item ui-sortable-handle module-{{ perm_and_id.item.module }}"
+                                        class="{% get_css "sawbutton_main" %} sort-item ui-sortable-handle module-{{ perm_and_id.item.module }}"
                                         title="{{ perm_and_id.item.description }}">
                                         {{ perm_and_id.item.permission.name }}
                                     </li>
@@ -67,7 +67,7 @@
                          style="min-width:100%; min-height:100px;">
                         {% for perm_and_id in form.available_items %}
                             <li id="{{ perm_and_id.id }}"
-                                class="btn btn-primary sort-item ui-sortable-handle module-{{ perm_and_id.item.module }}"
+                                class="{% get_css "sawbutton_main" %} sort-item ui-sortable-handle module-{{ perm_and_id.item.module }}"
                                 title="{{ perm_and_id.item.description }}">
                                 {{ perm_and_id.item.permission.name }}
                             </li>
@@ -80,52 +80,47 @@
 {% endblock %}
 
 {% block sidebar-panel1 %}
-    {% sidebarpanel %}
+    {% sidebarpanel "vertical_buttons" %}
         {% trans "Actions"%}
         {% body %}
         <form id="{{ form.get_form_id }}" action="{% url "users_settings_edit_permissions" %}"
               method="post" onsubmit="{{ form.get_submit_js }}">
             {% csrf_token %}
             {{ form.render_javascript }}
-            <div class="btn-group-vertical btn-block">
-                <button type="submit" class="btn btn-primary">
-                    {% trans "Save" %}
-                </button>
+            <button type="submit" class="{% get_css "sawbutton_save" %} btn-block">
+                {% trans "Save" %}
+            </button>
 
-            </div>
         </form>
-        <div class="btn-group-vertical btn-block" style="margin-top: 10px;">
-            <a href="{% url "users_settings_reset_permissions" %}" class="btn btn-warning">
-                {% trans "Reset all permissions" %}
-            </a>
-        </div>
+        <a href="{% url "users_settings_reset_permissions" %}" class="{% get_css "sawbutton_caution" %}" style="margin-top: 10px;">
+            {% trans "Reset all permissions" %}
+        </a>
     {% endsidebarpanel %}
 {% endblock %}
 
 {% block sidebar-panel2 %}
-    {% sidebarpanel "vertical_buttons"%}
+    {% sidebarpanel %}
         {% trans "Show from modules"%}
         {% body %}
-        <div class="panel-body" style="padding-top: 0px; padding-bottom: 0px;">
-            <div class="row">
+            <div class="row " style="margin-left: inherit; margin-right: inherit;">
                 {% for module in modules %}
-                    <div class="btn btn-primary btn-small col-xs-6 active"
+                    <div class="{% get_css "sawbutton_main" %} btn-small col-xs-6 active"
                          data-toggle="hide" data-target="module-{{ module }}">
                         {{ module }}
                     </div>
                 {% endfor %}
-                <div class="btn btn-info btn-small col-xs-6"
+                <div class="{% get_css "sawbutton_secondary" %} btn-small col-xs-6"
                      id="hide_all_button">
                     {% trans "Hide all" %}
                 </div>
-                <div class="btn btn-info btn-small col-xs-6"
+                <div class="{% get_css "sawbutton_secondary" %} btn-small col-xs-6"
                      id="show_all_button">
                     {% trans "Show all" %}
                 </div>
             </div>
-        </div>
     {% endsidebarpanel %}
 {% endblock %}
+
 {% block sidebar-panel3 %}
     {% sidebarpanel %}
         {% trans "Description"%}
@@ -142,7 +137,7 @@
         <p>
             {% trans "You can see what permissions are in which group" %}.
             {% trans "Drag and drop the permissions between groups to change them" %}.
-            </p>
+        </p>
         <p>
             {% trans "Use the menu above to more easily find the permissions you're looking for" %}.
         </p>
