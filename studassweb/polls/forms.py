@@ -3,7 +3,7 @@ from django.core.validators import ValidationError
 # Here you want some form
 # Google for inline formset https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#inline-formsets
 # or look at install/forms.py, maybe easier
-from polls.models import *
+from polls.models import Poll, Choice, Vote
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -11,7 +11,7 @@ class PollForm(forms.ModelForm):
 
     class Meta:
         model = Poll
-        fields = ('name', 'description', 'expiration',
+        fields = ('title', 'description', 'expiration',
                   'can_vote_on_many', "permission_choice_view", "permission_choice_vote")
 
     def save(self, commit=True, user=None):
@@ -30,9 +30,6 @@ class ChoiceForm(forms.ModelForm):
     class Meta:
         model = Choice
         fields = ('name',)
-        labels = {
-            'name': _('Choice'),
-        }
 
     def clean_name(self):
         name = self.cleaned_data['name']
@@ -68,9 +65,9 @@ class ChoiceFormSingle(forms.Form):
                 user = request.user
             else:
                 user = None
-            vote = Votes(choice_id=choice,
-                         user=user,
-                         ip_address=request.META['REMOTE_ADDR'])
+            vote = Vote(choice_id=choice,
+                        user=user,
+                        ip_address=request.META['REMOTE_ADDR'])
             if commit:
                 vote.save()
             return vote
@@ -78,9 +75,6 @@ class ChoiceFormSingle(forms.Form):
     class Meta:
         model = Choice
         fields = ('name',)
-        labels = {
-            'name': _('Choice'),
-        }
 
 
 class ChoiceFormMultiple(forms.Form):
@@ -104,6 +98,7 @@ class ChoiceFormMultiple(forms.Form):
                     raise ValidationError("Selected choice is not in poll")
             except Choice.DoesNotExist:
                 raise ValidationError("Selected choice(s) do not exist!?")
+        return choice_id
 
     def save(self, request, commit=True):
         if self.is_valid():
@@ -116,10 +111,10 @@ class ChoiceFormMultiple(forms.Form):
             for id_choice in ids_of_choices:
                 choice = Choice.objects.get(id=id_choice)
 
-                vote = Votes(choice_id=choice,
-                             user=user,
-                             ip_address=request.META['REMOTE_ADDR'])
+                vote = Vote(choice_id=choice,
+                            user=user,
+                            ip_address=request.META['REMOTE_ADDR'])
                 if commit:
                     vote.save()
-                votes += vote
+                votes += (vote,)
             return votes

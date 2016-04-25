@@ -16,7 +16,7 @@
     <div class="{% get_css "sawpanel_main" %}">
         <div class="panel-heading">
             <h4>
-                {{ poll.name }}
+                {{ poll.title }}
             </h4>
         </div>
         <div class="panel-body">
@@ -27,8 +27,8 @@
                     {% csrf_token %}
                     {% bootstrap_form form %}
                     {% buttons %}
-                        <button type="submit" class="btn btn-danger">
-                            {% trans "Make a choice" %}
+                        <button type="submit" class="{% get_css "sawbutton_save" %}">
+                            {% trans "Vote" %}
                         </button>
                     {% endbuttons %}
                 </form>

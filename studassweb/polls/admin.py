@@ -3,4 +3,4 @@ from .models import *
 
 admin.site.register(Poll)
 admin.site.register(Choice)
-admin.site.register(Votes)
+admin.site.register(Vote)

@@ -21,7 +21,7 @@ PERMISSION_CHOICES_VOTE = (
 
 
 class Poll(models.Model):
-    name = models.CharField(max_length=100)
+    title = models.CharField(max_length=100)
     description = ValidatedRichTextField(max_length=300)
     publication = models.DateTimeField('Date published', auto_now_add=True)
     expiration = models.DateTimeField('Poll closes')
@@ -36,10 +36,10 @@ class Poll(models.Model):
                                               default="CAN_VOTE_PUBLIC_POLLS")
 
     def count_votes(self):
-        return Votes.objects.filter(choice_id__id_to_poll=self).count()
+        return Vote.objects.filter(choice_id__id_to_poll=self).count()
 
     def __str__(self):
-        return self.name
+        return self.title
 
     def get_absolute_url(self):
         return reverse("polls_view_poll", kwargs={'poll_id': self.id})
@@ -54,17 +54,17 @@ class Poll(models.Model):
         if not has_user_perm(request.user, self.permission_choice_vote):
             return False
         if request.user.is_authenticated():
-            object = Votes.objects.filter(choice_id__id_to_poll=self, user=request.user)
+            object = Vote.objects.filter(choice_id__id_to_poll=self, user=request.user)
             return not object.exists()
         else:
-            return not Votes.objects.filter(choice_id__id_to_poll=self, ip_address=request.META['REMOTE_ADDR']).exists()
+            return not Vote.objects.filter(choice_id__id_to_poll=self, ip_address=request.META['REMOTE_ADDR']).exists()
 
     def has_user_voted(self, request):
         return not self.can_user_vote(request) #TODO STUFF ENNU NOGO
 
 
 class Choice(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, verbose_name="Option")
     id_to_poll = models.ForeignKey(Poll)
 
     def __str__(self):
@@ -74,18 +74,18 @@ class Choice(models.Model):
         return reverse("polls.views.set_user_choice", kwargs={'choice_id': self.id})
 
     def count_votes(self):
-        return Votes.objects.filter(choice_id=self.id).count()
+        return Vote.objects.filter(choice_id=self.id).count()
 
     def percentage(self):
         total_votes_for_poll = self.id_to_poll.count_votes()
-        total_votes_for_specific_choice = Votes.objects.filter(choice_id=self).count()
+        total_votes_for_specific_choice = Vote.objects.filter(choice_id=self).count()
         if total_votes_for_poll == 0:
             total_votes_for_poll = 1
-        percent= total_votes_for_specific_choice/total_votes_for_poll
+        percent = total_votes_for_specific_choice/total_votes_for_poll
         return percent*100
 
 
-class Votes(models.Model):
+class Vote(models.Model):
     choice_id = models.ForeignKey(Choice)
     user = models.ForeignKey(User, null=True)
     ip_address = models.GenericIPAddressField(default=None)

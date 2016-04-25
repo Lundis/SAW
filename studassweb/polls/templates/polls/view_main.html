@@ -4,6 +4,8 @@
 {% load bootstrap3 %}
 {% load sawp %}
 {% load polls_templatetags %}
+{% load sidemenu %}
+{% load cssmap %}
 
 {% block breadcrumb1 %}
     <li class="active">
@@ -12,9 +14,7 @@
 {% endblock %}
 
 {% block main_content %}
-    <h3></h3>
-
-
+    <h3>{% trans "Polls" %}</h3>
 
     {% for p in all_polls %}
         {% can_view_object p as poll_is_visible %}
@@ -23,54 +23,42 @@
             <a class="list-group-item" href="{% url 'polls_view_poll' p.id %}">
                 <div class="row">
 
-
                     <div class="col-xs-8">
                         {% has_user_voted p request as show_voted_sign %}
                         {% if show_voted_sign %}
-                            <span class="glyphicon glyphicon-ok">
-
-                    </span>
+                            <span class="glyphicon glyphicon-ok"></span>
                         {% else %}
-                            <span class="glyphicon glyphicon-remove">
-
-                    </span>
-
+                            <span class="glyphicon glyphicon-question-sign"></span>
                         {% endif %}
-                        {{ p.name }}
+                        {{ p.title }}
 
                     </div>
                     <div class="col-xs-4 text-right">
+                        {% trans "Deadline" %}:
                         {{ p.expiration }}
                     </div>
                 </div>
             </a>
 
         {% endif %}
-    {% empty %}
+        {% empty %}
         <p>{% trans "No polls found!" %}</p>
 
     {% endfor %}
 
-
-
 {% endblock %}
-{% block sidebar %}
+
+{% block sidebar-panel1 %}
     {% has_perm "polls" "CAN_CREATE_POLLS" as can_create_polls %}
     {% if can_create_polls%}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 class="panel-title">{% trans "Add" %}</h2>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    {% if can_create_polls%}
-                        <a href="{% url 'polls_add_poll' %}">
-                            <div class="btn list-group-item">{% trans "Add new poll" %}</div>
-                        </a>
-                    {% endif %}
 
-                </div>
-            </div>
-        </div>
+        {% sidebarpanel %}
+            {% trans "Add" %}
+            {% body %}
+            <a href="{% url 'polls_add_poll' %}">
+                <div class="{% get_css "sawbutton_sidebar" %} btn-block">{% trans "Add new poll" %}</div>
+            </a>
+
+        {% endsidebarpanel %}
     {% endif %}
 {% endblock %}

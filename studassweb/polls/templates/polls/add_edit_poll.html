@@ -3,23 +3,36 @@
 {% load i18n %}
 {% load bootstrap3 %}
 {% load static %}
+{% load cssmap %}
 
 {% block breadcrumb2 %}
-    <li class="active">
-        {% if form.instance.pk %}
-            {% trans "Editing " %}
-            {{ form.instance.name }}
-        {% else %}
+    {% if form.instance.pk %}
+        <li>
+            <a href="{{ form.instance.get_absolute_url }}">
+                {{ form.instance.title }}
+            </a>
+        </li>
+    {% else %}
+        <li class="active">
             {% trans "New poll" %}
-        {% endif %}
-    </li>
+        </li>
+    {% endif %}
+{% endblock %}
+
+
+{% block breadcrumb3 %}
+    {% if form.instance.pk %}
+        <li class="active">
+            {% trans "Editing " %}
+        </li>
+    {% endif %}
 {% endblock %}
 
 {% block main_content %}
     {% if form.instance.pk %}
-        <h1>Edit {{ form.instance.name }}</h1>
+        <h1>{% trans "Editing" %} {{ form.instance.title }}</h1>
     {% else %}
-        <h1>Add Poll</h1>
+        <h1>{% trans "Add poll" %}</h1>
     {% endif %}
 
     <form action="" method="post" enctype="multipart/form-data">
@@ -38,7 +51,7 @@
         </div>
         {{ choicesformset.management_form }}
         {% buttons %}
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="{% get_css "sawbutton_save" %}">
                 {% trans "Submit" %}
             </button>
         {% endbuttons %}
