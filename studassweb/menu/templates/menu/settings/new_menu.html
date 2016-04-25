@@ -1,5 +1,7 @@
-{% extends "settings/base_full_width.html" %}
+{% extends "settings/base.html" %}
 {% load i18n %}
+{% load cssmap %}
+{% load bootstrap3 %}
 
 {% block breadcrumb2 %}
     <li>
@@ -20,8 +22,8 @@
 {% block main_content %}
     <form action="{% url "menu_settings_new_menu" %}" method="post" >
         {% csrf_token %}
-        {{ form }}
-        <button type="submit" value="Submit" class="btn btn-primary">
+        {% bootstrap_form form %}
+        <button type="submit" value="Submit" class="{% get_css "sawbutton_save" %}">
             {% trans "Create" %}
         </button>
     </form>

@@ -1,5 +1,6 @@
 {% extends "base/base.html" %}
 {% load i18n %}
+{% load cssmap %}
 {% load bootstrap3 %}
 
 {% block breadcrumb1 %}
@@ -30,7 +31,7 @@
     <form action="{% url "menu_settings_edit_menu_layout" %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% bootstrap_form  form %}
-        <button type="submit" class="btn btn-primary">
+        <button type="submit" class="{% get_css "sawbutton_save" %}">
             {% trans "Submit" %}
         </button>
     </form>

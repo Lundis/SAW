@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load bootstrap3 %}
 {% load sidemenu %}
+{% load cssmap %}
 
 {% block breadcrumb1 %}
     <li>
@@ -53,7 +54,6 @@
 
         {% csrf_token %}
         {% bootstrap_form form %}
-
     </form>
 {% endblock %}
 
@@ -62,15 +62,15 @@
     {% sidebarpanel "vertical_buttons" %}
         {% trans "Actions" %}
         {% body %}
-        <div id="submit-button" class="btn btn-primary">
+        <div id="submit-button" class="{% get_css "sawbutton_save" %}">
             {% trans "Save" %}
         </div>
-        <a href="{% url "menu_settings_select_menu" %}" class="btn btn-primary">
+        <a href="{% url "menu_settings_select_menu" %}" class="{% get_css "sawbutton_sidebar" %}">
             {% trans "Back" %}
         </a>
         {% if menu_item.was_created_by_user %}
             <a href="{% url "menu_settings_delete_menu_item" item_id=menu_item.id %}"
-               class="btn btn-danger">
+               class="{% get_css "sawbutton_delete" %}">
                 {% trans "Delete" %}
             </a>
         {% endif %}

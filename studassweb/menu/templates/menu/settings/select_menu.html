@@ -62,7 +62,7 @@
                     <div class="btn-group-vertical btn-block">
                         {% for menu in menus %}
                             <a href="{% url "menu_settings_edit_menu" menu.id %}"
-                               class="btn btn-primary menu"
+                               class="{% get_css "sawbutton_main" %} menu"
                                id="menu-{{ menu.id }}">
                                 {{ menu.menu_name }}
                             </a>
@@ -78,14 +78,15 @@
     {% sidebarpanel "vertical_buttons" %}
         {% trans "Actions" %}
         {% body %}
-        <a href="{% url "menu_settings_new_menu" %}" class="btn btn-primary">
+        <a href="{% url "menu_settings_new_menu" %}" class="{% get_css "sawbutton_sidebar" %}">
             {% trans "Create a new menu" %}
         </a>
-        <a class="btn btn-primary" href="{% url "menu_settings_new_menu_item" %}">
+        <a class="{% get_css "sawbutton_sidebar" %}" href="{% url "menu_settings_new_menu_item" %}">
             {% trans "Create a new menu item" %}
         </a>
     {% endsidebarpanel %}
 {% endblock %}
+
 {% block sidebar-panel2 %}
     {% sidebarpanel %}
         {% trans "Preview Menu" %}
@@ -102,7 +103,15 @@
         {% endfor %}
     {% endsidebarpanel %}
 {% endblock %}
-{% block sidebar-panel-help %}{% endblock %}
+
+{% block sidebar-panel-help %}
+    {% sidebarpanel "help" %}
+        {% trans "Help" %}
+        {% body %}
+        {% trans "Pick a menu or menu item to edit it" %}.
+        {% trans "Menu items are placed in menus" %}.
+    {% endsidebarpanel %}
+{% endblock %}
 
 {% block scripts %}
     <script>

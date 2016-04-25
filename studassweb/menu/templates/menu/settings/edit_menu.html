@@ -66,15 +66,15 @@
             {% csrf_token %}
             {{ form.render_javascript }}
             <div class="btn-group-vertical btn-block">
-                <button type="submit" value="Submit" class="btn btn-primary">
+                <button type="submit" value="Submit" class="{% get_css "sawbutton_save" %}">
                     {% trans "Save" %}
                 </button>
-                <a href="{% url "menu_settings_select_menu" %}" class="btn btn-primary">
+                <a href="{% url "menu_settings_select_menu" %}" class="{% get_css "sawbutton_sidebar" %}">
                     {% trans "Back" %}
                 </a>
                 {% if menu.created_by == "US" %}
                     <a href="{% url "menu_settings_delete_menu" menu_id=menu.id %}"
-                       class="btn btn-danger">
+                       class="{% get_css "sawbutton_delete" %}">
                         {% trans "Delete" %}
                     </a>
                 {% endif %}
