@@ -4,6 +4,8 @@
 {% load frontpage_items %}
 {% load static %}
 {% load solo_tags %}
+{% load sidemenu %}
+{% load cssmap %}
 {% get_solo 'base.SiteConfiguration' as site_config %}
 
 {% block title %}
@@ -42,28 +44,21 @@
     </div>
     {% has_perm "frontpage" "CAN_EDIT_FRONTPAGE" as show_edit_buttons %}
     {% if show_edit_buttons %}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <div class="panel-title">
-                    {% trans "Actions" %}
-                </div>
-            </div>
-            <div class="panel-body">
-                <div class="btn-group-vertical btn-block">
-                    {% if edit_mode %}
-                        <a class="btn btn-primary"
-                           href="{% url "frontpage_home" %}">
-                            {% trans "Back to frontpage" %}
-                        </a>
-                    {% else %}
-                        <a class="btn btn-primary"
-                           href="{% url "frontpage_edit" %}">
-                            {% trans "Enter edit mode" %}
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+        {% sidebarpanel "vertical_buttons" %}
+            {% trans "Actions" %}
+            {% body %}
+            {% if edit_mode %}
+                <a class="{% get_css "sawbutton_sidebar" %}"
+                   href="{% url "frontpage_home" %}">
+                    {% trans "Back to frontpage" %}
+                </a>
+            {% else %}
+                <a class="{% get_css "sawbutton_sidebar" %}"
+                   href="{% url "frontpage_edit" %}">
+                    {% trans "Enter edit mode" %}
+                </a>
+            {% endif %}
+        {% endsidebarpanel %}
     {% endif %}
 {% endblock %}
 
