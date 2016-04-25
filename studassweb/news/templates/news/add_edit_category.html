@@ -1,6 +1,8 @@
 {% extends 'news/base.html' %}
 {% load i18n %}
 {% load bootstrap3 %}
+{% load sidemenu %}
+{% load cssmap %}
 
 {% block breadcrumb2 %}
     <li class="active">
@@ -17,23 +19,21 @@
         {% csrf_token %}
         {% bootstrap_form form %}
 
-        <button type="submit" class="btn btn-primary">
-            {% trans "Submit" %}
+        <button type="submit" class="{% get_css "sawbutton_save" %}">
+            {% trans "Save" %}
         </button>
     </form>
 {% endblock %}
 
-{% block sidebar %}
-    <div class="panel panel-primary">
-        <div class="panel-heading">
+{% block sidebar-panel1 %}
+    {% if category %}
+        {% sidebarpanel "vertical_buttons" %}
             {% trans "Actions" %}
-        </div>
-        <div class="panel-body">
-            {% if category %}
-                <a href="{% url "news_delete_category" category_id=category.id %}" class="btn btn-danger">
-                    {% trans "Delete" %}
-                </a>
-            {% endif %}
-        </div>
-    </div>
+            {% body %}
+            <a href="{% url "news_delete_category" category_id=category.id %}"
+               class="{% get_css "sawbutton_delete" %}">
+                {% trans "Delete" %}
+            </a>
+        {% endsidebarpanel %}
+    {% endif %}
 {% endblock %}
