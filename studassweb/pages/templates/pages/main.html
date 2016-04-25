@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load sawp %}
 {% load sidemenu %}
+{% load cssmap %}
 
 {% block breadcrumb %}{% endblock %}
 
@@ -52,10 +53,10 @@
 
             {% trans "Actions" %}
             {% body %}
-            <a href="{% url "pages_new_category" %}" class="btn btn-primary">
+            <a href="{% url "pages_new_category" %}" class="{% get_css "sawbutton_sidebar" %}">
                 {% trans "Create a new category" %}
             </a>
-            <a href="{% url "pages_new_page" %}" class="btn btn-primary">
+            <a href="{% url "pages_new_page" %}" class="{% get_css "sawbutton_sidebar" %}">
                 {% trans "Create a new page" %}
             </a>
         {% endsidebarpanel %}

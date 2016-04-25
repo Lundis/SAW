@@ -1,14 +1,16 @@
 {% extends "pages/base.html" %}
 {% load i18n %}
 {% load bootstrap3 %}
+{% load cssmap %}
+{% load sidemenu %}
 
 {% block breadcrumb2 %}
     <li class="active">
-    {% if category %}
-        {% trans "Editing" %} {{ category.name }}
-    {% else %}
-        {% trans "New Category" %}
-    {% endif %}
+        {% if category %}
+            {% trans "Editing" %} {{ category.name }}
+        {% else %}
+            {% trans "New Category" %}
+        {% endif %}
     </li>
 {% endblock %}
 
@@ -16,13 +18,20 @@
     <form action="" method="post">
         {% csrf_token %}
         {% bootstrap_form form %}
-        <button type="submit" class="btn btn-primary">
-            {% trans "Submit" %}
+        <button type="submit" class="{% get_css "sawbutton_save" %}">
+            {% trans "Save" %}
         </button>
-        {% if category %}
-            <a href="{% url "pages_delete_category" category_id=category.id %}" class="btn btn-danger">
+    </form>
+{% endblock %}
+
+{% block sidebar-panel1 %}
+    {% if category %}
+        {% sidebarpanel "vertical_buttons" %}
+            {% trans "Actions" %}
+            {% body %}
+            <a href="{% url "pages_delete_category" category_id=category.id %}" class="{% get_css "sawbutton_delete" %}">
                 {% trans "Delete" %}
             </a>
-        {% endif %}
-    </form>
+        {% endsidebarpanel %}
+    {% endif %}
 {% endblock %}

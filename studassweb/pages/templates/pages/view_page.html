@@ -42,12 +42,12 @@
 {% block sidebar-panel1 %}
     {% if category.pages %}
         {% sidebarpanel "vertical_buttons" %}
-            {{ category.name }}
+            {% trans "More in this category" %}
             {% body %}
             {% for page_ in category.pages %}
                 {% can_view_object page_ as show_page %}
                 {% if show_page %}
-                    <a href="{{ page_.get_absolute_url}}" class="btn btn-primary">
+                    <a href="{{ page_.get_absolute_url}}" class="list-group-item">
                         {{ page_.title }}
                     </a>
                 {% endif %}
@@ -63,16 +63,17 @@
             {% trans "Actions" %}
             {% body %}
             {% if  current_revision.is_latest %}
-                <a href="{% url "pages_edit_page" page.id %}" class="btn btn-primary">
+                <a href="{% url "pages_edit_page" page.id %}" class="{% get_css "sawbutton_sidebar" %}">
                     {% trans "Edit this page" %}
                 </a>
             {% else %}
-                <a href="{% url "pages_edit_page" page.id current_revision.id %}" class="btn btn-primary">
+                <a href="{% url "pages_edit_page" page.id current_revision.id %}"
+                   class="{% get_css "sawbutton_sidebar" %}">
                     {% trans "Edit from this revision" %}
                 </a>
                 <form action="{% url "pages_revert_page" current_revision.id %}" method="post">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-primary btn-block">
+                    <button type="submit" class="{% get_css "sawbutton_sidebar" %} btn-block">
                         {% trans "Revert to this revision" %}
                     </button>
                 </form>
@@ -90,16 +91,16 @@
                 {% body %}
                 <div class="btn-group-vertical btn-block" style="height: auto; max-height: 200px; overflow-x: hidden; padding:0;">
                     {% for revision in revisions %}
-                            <a {% if revision == current_revision %}
-                                    href="#" class="btn btn-primary btn-block active"
-                               {% else %}
-                                    href="{{ revision.get_absolute_url}}" class="btn btn-primary btn-block"
-                               {% endif %}
-                                >
-                                {{ revision.date | date:"d M Y" }}
-                                {% trans "by" %}
-                                {{ current_revision.author }}
-                            </a>
+                        <a {% if revision == current_revision %}
+                            href="#" class="{% get_css "sawbutton_sidebar" %} btn-block active"
+                        {% else %}
+                            href="{{ revision.get_absolute_url}}" class="{% get_css "sawbutton_sidebar" %} btn-block"
+                        {% endif %}
+                        >
+                            {{ revision.date | date:"d M Y" }}
+                            {% trans "by" %}
+                            {{ current_revision.author }}
+                        </a>
                     {% endfor %}
                 </div>
             {% endsidebarpanel %}

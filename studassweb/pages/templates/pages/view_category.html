@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load sawp %}
 {% load sidemenu %}
+{% load cssmap %}
 
 {% block breadcrumb2 %}
     {% has_perm "pages" "EDIT" as can_edit %}
@@ -36,10 +37,10 @@
         {% sidebarpanel "vertical_buttons" %}
             {% trans "Actions" %}
             {% body %}
-            <a class="btn btn-primary" href="{% url "pages_new_page" category_id=category.id %}">
+            <a class="{% get_css "sawbutton_sidebar" %}" href="{% url "pages_new_page" category_id=category.id %}">
                 {% trans "Create a new page" %}
             </a>
-            <a class="btn btn-primary" href="{% url "pages_edit_category" category.id %}">
+            <a class="{% get_css "sawbutton_sidebar" %}" href="{% url "pages_edit_category" category.id %}">
                 {% trans "Edit this category" %}
             </a>
         {% endsidebarpanel %}

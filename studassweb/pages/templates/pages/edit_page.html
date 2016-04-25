@@ -1,6 +1,8 @@
 {% extends "pages/base.html" %}
 {% load i18n %}
 {% load bootstrap3 %}
+{% load cssmap %}
+{% load sidemenu %}
 
 {% block breadcrumb2 %}
     {% if page and page.category %}
@@ -29,25 +31,20 @@
         {{ form.media }}
         {% bootstrap_form form %}
 
-        <button type="submit" class="btn btn-primary">
-            {% trans "Submit" %}
+        <button type="submit" class="{% get_css "sawbutton_save" %}">
+            {% trans "Save" %}
         </button>
     </form>
 {% endblock %}
 
-{% block sidebar %}
+{% block sidebar-panel1 %}
     {% if page %}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <div class="panel-title">{% trans "Actions" %}</div>
-            </div>
-            <div class="panel-body">
-                <div class="btn-group-vertical btn-block">
-                    <a href="{% url "pages_delete_page" page.id %}" class="btn btn-danger">
-                        {% trans "Delete this page" %}
-                    </a>
-                </div>
-            </div>
-        </div>
+        {% sidebarpanel "vertical_buttons" %}
+            {% trans "Actions" %}
+            {% body %}
+            <a href="{% url "pages_delete_page" page.id %}" class="{% get_css "sawbutton_delete" %}">
+                {% trans "Delete this page" %}
+            </a>
+        {% endsidebarpanel %}
     {% endif %}
 {% endblock %}
