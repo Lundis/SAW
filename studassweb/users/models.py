@@ -107,7 +107,7 @@ class KerberosLink(models.Model):
         unique_together = ("server", "username")
 
     def __str__(self):
-        return self.user.username + ": " + self.username + "@" + self.server.hostname
+        return self.user.user.username + ": " + self.username + "@" + self.server.hostname
 
 
 class SAWPermission(models.Model):
