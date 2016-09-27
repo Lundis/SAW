@@ -59,7 +59,8 @@ class Migration(migrations.Migration):
                 ('url', models.CharField(max_length=300)),
                 ('ip_address', models.IPAddressField()),
                 ('type', models.CharField(choices=[('HELPTEXT', 'Help text feedback')], max_length=10)),
-                ('response', models.CharField(choices=[('GOOD', 'Good'), ('BAD', 'Bad'), ('UNNE', 'Unnecessary')], max_length=10)),
+                ('response', models.CharField(choices=[('GOOD', 'Good'), ('BAD', 'Bad'), ('UNNE', 'Unnecessary')],
+                                              max_length=10)),
                 ('date', models.DateTimeField(auto_now_add=True)),
                 ('user', models.ForeignKey(blank=True, null=True, to=settings.AUTH_USER_MODEL)),
             ],
@@ -76,7 +77,8 @@ class Migration(migrations.Migration):
                 ('association_contact_email', models.EmailField(default='example@example.com', max_length=254)),
                 ('association_founded', models.IntegerField(default=1900)),
                 ('bootstrap_theme_url', models.CharField(default='css/themes/bootstrap.min.css', max_length=200)),
-                ('bootstrap_theme_mod_url', models.CharField(blank=True, default='css/themes/bootstrap-theme.min.css', max_length=200, null=True)),
+                ('bootstrap_theme_mod_url', models.CharField(blank=True, default='css/themes/bootstrap-theme.min.css',
+                                                             max_length=200, null=True)),
                 ('bootswatch_version', models.CharField(default=None, max_length=50, null=True)),
                 ('bootswatch_last_checked', models.DateTimeField(default=datetime.datetime(2000, 1, 1, 0, 0))),
                 ('show_feedback_helptext', models.BooleanField(default=True)),
@@ -88,6 +90,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='feedback',
-            unique_together=set([('type', 'user', 'url', 'ip_address'), ('type', 'user', 'url')]),
+            unique_together={('type', 'user', 'url', 'ip_address'), ('type', 'user', 'url')},
         ),
     ]

@@ -1,6 +1,6 @@
+# coding=utf-8
 from django.db import models
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext as _
 from solo.models import SingletonModel
 from members.models import Member
 

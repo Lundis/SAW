@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -16,44 +17,44 @@ ASSOCIATION_FOUNDED = "1990"
 class InstallHttpTests(TestCase):
 
     def setUp(self):
-        #Setup test members/users
+        # Setup test members/users
         self.superuser = User.objects.create_superuser(SUPERUSER_USERNAME, '', SUPERUSER_PASSWORD)
         self.factory = RequestFactory()
 
     def test_run_through_whole_install_process(self):
-        #GET Welcome page
+        # GET Welcome page
         request = self.factory.get(reverse("install.views.welcome"))
         request.user = self.superuser
         response = welcome(request)
         self.assertEqual(response.status_code, 200)
 
-        #GET Association page
+        # GET Association page
         request = self.factory.get(reverse("install.views.association"))
         request.user = self.superuser
         response = association(request)
         self.assertEqual(response.status_code, 200)
 
-        #POST Association page
+        # POST Association page
         request = self.factory.post(reverse("install.views.association"),
                                     {'name': ASSOCIATION_NAME, 'founded': ASSOCIATION_FOUNDED, })
         request.user = self.superuser
         response = association(request)
-        #we should _maybe_ check that it redirects to the right page but it doesn't really work.
-        #self.assertRedirects(response, reverse("install.views.modules"), fetch_redirect_response=False)
+        # we should _maybe_ check that it redirects to the right page but it doesn't really work.
+        # self.assertRedirects(response, reverse("install.views.modules"), fetch_redirect_response=False)
         self.assertEqual(response.status_code, 302)
-        #Check that it's actually saved in DB
+        # Check that it's actually saved in DB
         site_config = SiteConfiguration.instance()
         self.assertEqual(site_config.association_name, ASSOCIATION_NAME)
         self.assertEqual(str(site_config.association_founded), ASSOCIATION_FOUNDED)
 
-        #GET Modules page
+        # GET Modules page
         request = self.factory.get(reverse("install.views.modules"))
         request.user = self.superuser
         response = modules(request)
         self.assertEqual(response.status_code, 200)
 
-        #POST Modules page
-        #association=on&contact=on&events=on&exams=on&frontpage=on&gallery=on&info=on&news=on&polls=on
+        # POST Modules page
+        # association=on&contact=on&events=on&exams=on&frontpage=on&gallery=on&info=on&news=on&polls=on
         all_modules = settings.OPTIONAL_APPS
         postdata = {}
         for module in all_modules:
@@ -62,15 +63,15 @@ class InstallHttpTests(TestCase):
         request.user = self.superuser
         response = modules(request)
         self.assertEqual(response.status_code, 302)
-        #TODO check that all modules are actually enabled
+        # TODO check that all modules are actually enabled
 
-        #GET Menu page
+        # GET Menu page
         request = self.factory.get(reverse("install.views.menu"))
         request.user = self.superuser
         response = modules(request)
         self.assertEqual(response.status_code, 200)
 
-        #POST Menu page
+        # POST Menu page
         # login_menu-menu-item-14=0&login_menu-menu-item-15=1&login_menu-menu-item-18=2&main_menu-menu-item-7=0&
         # main_menu-menu-item-8=1&main_menu-menu-item-9=2&main_menu-menu-item-10=3&main_menu-menu-item-11=4&
         # main_menu-menu-item-12=5&main_menu-menu-item-13=6&main_menu-menu-item-16=7&main_menu-menu-item-17=8
@@ -95,9 +96,9 @@ class InstallHttpTests(TestCase):
         request.user = self.superuser
         response = menu(request)
         self.assertEqual(response.status_code, 302)
-        #TODO check that the menu is saved correctly. This one might be hard(?)
+        # TODO check that the menu is saved correctly. This one might be hard(?)
 
-        #GET Finished page
+        # GET Finished page
         request = self.factory.get(reverse("install.views.finished"))
         request.user = self.superuser
         response = finished(request)

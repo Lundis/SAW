@@ -1,3 +1,4 @@
+# coding=utf-8
 from .models import BoardSettings, Board, MemberInBoard, BoardType, Role
 from members.models import Member
 
@@ -20,7 +21,7 @@ def setup():
         # Create a board
         board = Board(year=2015,
                       photo=None,
-                      boardtype= board_type)
+                      boardtype=board_type)
         board.save()
 
         # Create some members
@@ -35,18 +36,18 @@ def setup():
         member3.save()
         # Add Xavier to the board
         chairman = MemberInBoard(board=board,
-                               role=role_chairman,
-                               member=member2)
+                                 role=role_chairman,
+                                 member=member2)
         chairman.save()
         # Add Scrooge to the board
         chairman = MemberInBoard(board=board,
-                               role=role_treasurer,
-                               member=member3)
+                                 role=role_treasurer,
+                                 member=member3)
         chairman.save()
         # Add Kent to the board
         chairman = MemberInBoard(board=board,
-                               role=role_random_dude,
-                               member=member1)
+                                 role=role_random_dude,
+                                 member=member1)
         chairman.save()
 
         settings.is_setup = True

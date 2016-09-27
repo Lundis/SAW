@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.test import TestCase, RequestFactory
 from django.core.urlresolvers import reverse
 from .views import add_edit_exam
@@ -20,7 +21,8 @@ class ExamsHttpTests(TestCase):
         # Here we should run the whole install process...
         # TODO we need to be able to run install from code
         setup_default_groups_and_permissions()  # Create default user groups
-        # get_menu_items()  # Create default menu items... No we don't want to do this for every single application.fuck.
+        # get_menu_items()
+        #  Create default menu items... No we don't want to do this for every single application.fuck.
 
         # Setup test members/users
         self.superuser = User.objects.create_superuser(SUPERUSER_USERNAME, '', SUPERUSER_PASSWORD)

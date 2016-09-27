@@ -1,3 +1,4 @@
+# coding=utf-8
 import events.models as emodels
 from frontpage.models import FrontPageItem
 from django.utils.translation import ugettext as _

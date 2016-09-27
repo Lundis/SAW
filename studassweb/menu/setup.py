@@ -1,3 +1,4 @@
+# coding=utf-8
 import menu.models
 
 SIMPLE_MENU_LAYOUT = "simple menu"
@@ -19,11 +20,11 @@ def setup_menu_module():
     Creates menus and menu templates
     :return:
     """
-    simple_template, created = menu.models.MenuTemplate.create(SIMPLE_MENU_LAYOUT,
-                                                               SIMPLE_MENU_PATH,
-                                                               "A simple menu without a logo",
-                                                               False,
-                                                               for_main_menu=True)
+    menu.models.MenuTemplate.create(SIMPLE_MENU_LAYOUT,
+                                    SIMPLE_MENU_PATH,
+                                    "A simple menu without a logo",
+                                    False,
+                                    for_main_menu=True)
 
     standard_template, created = menu.models.MenuTemplate.create(STANDARD_MENU_LAYOUT,
                                                                  STANDARD_MENU_PATH,
@@ -31,8 +32,8 @@ def setup_menu_module():
                                                                  True,
                                                                  for_main_menu=True)
 
-    main_menu, created = menu.models.Menu.get_or_create("main_menu", standard_template)
-    login_menu, created = menu.models.Menu.get_or_create("login_menu")
+    menu.models.Menu.get_or_create("main_menu", standard_template)
+    menu.models.Menu.get_or_create("login_menu")
 
 
 def setup():

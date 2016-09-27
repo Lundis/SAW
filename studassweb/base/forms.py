@@ -1,9 +1,9 @@
+# coding=utf-8
 from django import forms
 from django.forms import ValidationError
 from django.forms.widgets import Textarea
 from django.template.loader import get_template
 from django.template import Context
-from django.core.exceptions import SuspiciousOperation
 from .models import SiteConfiguration, BootswatchTheme, Feedback, \
     CSSOverrideFile, CSSOverrideContent, CSSMap2
 from .fields import HiddenModelField, HiddenComponentClassField
@@ -19,14 +19,20 @@ class DummyForm(forms.Form):
 
 
 class BootswatchThemeSelectForm(forms.Form):
+    """
+    A form to select bootswatch theme.
+    """
     theme = forms.CharField(required=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def clean(self):
+        """
+        Verify that a correct theme was picked.
+        """
         super().clean()
-        if not 'theme' in self.cleaned_data:
+        if 'theme' not in self.cleaned_data:
             raise ValidationError("No theme was specified")
         theme_name = self.cleaned_data['theme']
         try:
@@ -35,6 +41,9 @@ class BootswatchThemeSelectForm(forms.Form):
             raise ValidationError("Theme " + theme_name + " does not exist")
 
     def save(self):
+        """
+        Set the current theme to the one selected.
+        """
         settings = SiteConfiguration.instance()
         theme = BootswatchTheme.objects.get(name=self.cleaned_data['theme'])
         settings.bootstrap_theme_url = theme.bs_css_url
@@ -43,6 +52,10 @@ class BootswatchThemeSelectForm(forms.Form):
 
 
 class FeedbackForm(forms.ModelForm):
+
+    """
+    A simple feedback form.
+    """
 
     class Meta:
         model = Feedback
@@ -54,6 +67,10 @@ class FeedbackForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
     def is_valid(self):
+        """
+
+        :return:
+        """
         super().is_valid()
         if Feedback.can_user_give_feedback(user=self.request.user,
                                            ip=self.request.META.get('REMOTE_ADDR'),
@@ -65,6 +82,11 @@ class FeedbackForm(forms.ModelForm):
             raise ValidationError("You cannot give feedback on this element")
 
     def save(self, commit=True):
+        """
+
+        :param commit:
+        :return:
+        """
         feedback = super().save(commit=False)
         feedback.type = self.type
         if self.request.user.is_authenticated:
@@ -89,7 +111,8 @@ class SortingForm(forms.Form):
                            and actual container objects (container_model)
         :param initial_items: a dict of an item sequence {"container_string": (item1, item2, ...)}
                               that will be
-        :param available_items: an iterable of the items that will be rendered as not belonging to any specific container
+        :param available_items: an iterable of the items that will be rendered as not belonging to any specific
+                                container
         :return:
         """
         if len(args) > 0:
@@ -199,7 +222,9 @@ class SortingForm(forms.Form):
         return False
 
     def clean(self):
-        # Super cleans the individual fields using HiddenModelField's validation
+        """
+        Super cleans the individual fields using HiddenModelField's validation
+        """
         super().clean()
         # We organize the resulting data into self.items
         containers_strings = self.containers.keys()
@@ -235,6 +260,9 @@ class SortingForm(forms.Form):
         self._update_available_items()
 
     def save(self):
+        """
+        Abstract save() method
+        """
         raise NotImplementedError("You need to subclass to use save()." +
                                   "Alternatively just read form.items and save it accordingly!")
 
@@ -286,14 +314,26 @@ class SortingForm(forms.Form):
 
     @staticmethod
     def get_form_id():
+        """
+
+        :return:
+        """
         return "sorting-form"
 
     @staticmethod
     def get_submit_js():
+        """
+
+        :return:
+        """
         return "updateSortingFields();"
 
 
 class CSSOverrideFileForm(forms.ModelForm):
+
+    """
+    Form to manage CSS override files.
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -304,6 +344,10 @@ class CSSOverrideFileForm(forms.ModelForm):
         fields = ("name", "description")
 
     def clean_name(self):
+        """
+
+        :return:
+        """
         name = self.cleaned_data['name']
         if len(name) < 5:
             raise ValidationError("Name must be atleast 5 letters")
@@ -317,6 +361,10 @@ class CSSOverrideFileForm(forms.ModelForm):
 
 class CSSOverrideContentForm(forms.ModelForm):
 
+    """
+    Form to manage the content of the CSS override files
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['css'].widget = Textarea(attrs={'cols': '80', 'rows': '30'})
@@ -326,6 +374,13 @@ class CSSOverrideContentForm(forms.ModelForm):
         fields = ("css",)
 
     def save(self, user=None, file=None, commit=True):
+        """
+
+        :param user:
+        :param file:
+        :param commit:
+        :return:
+        """
         instance = super().save(commit=False)
         instance.file = file
         instance.author = user
@@ -335,6 +390,10 @@ class CSSOverrideContentForm(forms.ModelForm):
 
 
 class ComponentCSSClassForm(forms.Form):
+
+    """
+    Form to manage the CSS components.
+    """
 
     def __init__(self, *args, **kwargs):
         if len(args) > 0:

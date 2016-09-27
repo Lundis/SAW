@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.db import models
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
@@ -48,7 +49,8 @@ class Exam(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return self.exam_date.strftime("%Y-%m-%d") + " : " + str(self.examinator_with_default_values) + " : " + str(self.course_id)
+        return self.exam_date.strftime("%Y-%m-%d") + " : " + str(self.examinator_with_default_values) + " : " + \
+               str(self.course_id)
 
     def get_absolute_url(self):
         return reverse("exams.views.view_exam", kwargs={'exam_id': self.id})
@@ -60,6 +62,7 @@ class Exam(models.Model):
         else:
             return Examinator(name="Unknown examinator")
 
+    @staticmethod
     def user_can_edit(self, user):
         return permissions.has_user_perm(user, eregister.CAN_UPLOAD_EXAMS)
 

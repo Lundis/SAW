@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.conf.urls import include, url
 from django.contrib import admin
 from base.utils import get_modules_with
@@ -21,9 +22,6 @@ if settings.MEDIA_DJANGO:
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/1.10/howto/static-files/
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-#if settings.STATIC_DJANGO:
-#    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_DIR)
 
 # Add the urlpatterns of all modules
 for mod, url_func in get_modules_with("register", "get_urls"):

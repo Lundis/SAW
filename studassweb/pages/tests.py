@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.test import TestCase
 from .models import InfoPage, InfoCategory
 from menu.models import MenuItem, Menu
@@ -32,14 +33,14 @@ class InfoCategoryTest(TestCase):
 
         # Was the submenu and the menu item deleted as well?
         try:
-            menu = Menu.objects.get(menu_name=__package__ + "_category_" + cat.name)
+            Menu.objects.get(menu_name=__package__ + "_category_" + cat.name)
             self.fail("Submenu exists after deletion")
         except Menu.DoesNotExist:
             pass
 
         try:
-            menu_item = MenuItem.objects.get(app_name=__package__,
-                                             display_name=cat.name)
+            MenuItem.objects.get(app_name=__package__,
+                                 display_name=cat.name)
             self.fail("Menu item exists after deletion")
         except MenuItem.DoesNotExist:
             pass

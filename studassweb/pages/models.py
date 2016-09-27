@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -105,16 +106,6 @@ class InfoPage(models.Model):
     def get_absolute_url(self):
         return reverse("pages_view_page", kwargs={'slug': self.slug})
 
-    def save(self, *args, **kwargs):
-        if self.pk:
-            # This is an update, so we want to save the old text
-            old_page = InfoPage.objects.get(pk=self.pk)
-        else:
-            old_page = None
-            # Create a slug for new pages
-            self.slug = self.slugify()
-        super().save(*args, **kwargs)
-
     def can_view(self, user):
         return has_user_perm(user, self.permission)
 
@@ -209,6 +200,14 @@ def page_post_save(**kwargs):
             menu.add_item(menu_item, menu.count())
 
     instance.update_frontpage_item()
+
+
+@receiver(pre_save, sender=InfoPage, dispatch_uid="page_pre_save")
+def page_pre_save(**kwargs):
+    instance = kwargs.pop("instance")
+    if not instance.pk:
+        # Create a slug for new pages
+        instance.slug = instance.slugify()
 
 
 class InfoPageEdit(models.Model):

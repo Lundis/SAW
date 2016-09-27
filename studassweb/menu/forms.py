@@ -1,3 +1,4 @@
+# coding=utf-8
 from django import forms
 from django.template.loader import get_template
 from django.template import Context
@@ -52,7 +53,7 @@ class MenuForm(forms.Form):
         if not self.menus:
             raise ValueError("required keyword argument 'menus' missing")
         menus_type = type(self.menus)
-        if not menus_type is list and not menus_type is tuple:
+        if menus_type is not list and menus_type is not tuple:
             raise ValueError("menus must be a list or a tuple")
         for menu in self.menus:
             if not isinstance(menu, Menu):
@@ -149,7 +150,7 @@ class MenuForm(forms.Form):
 
 
 class MenuCreationForm(forms.ModelForm):
-    class Meta():
+    class Meta:
         model = Menu
         fields = ('menu_name',)
 
@@ -171,7 +172,7 @@ class UserMenuItemForm(forms.ModelForm):
     """
     A form for creating and editing user-created menu items
     """
-    class Meta():
+    class Meta:
         model = MenuItem
         fields = ('display_name',
                   'external_url',
@@ -210,7 +211,7 @@ class AppMenuItemForm(forms.ModelForm):
     """
     A form to edit menu items created by apps. Only the display_name can be edited
     """
-    class Meta():
+    class Meta:
         model = MenuItem
         fields = ('display_name',)
 
@@ -219,7 +220,7 @@ class MainMenuForm(forms.ModelForm):
     template = forms.ModelChoiceField(MenuTemplate.objects.filter(for_main_menu=True),
                                       required=True)
 
-    class Meta():
+    class Meta:
         model = MainMenuSettings
         fields = ('image', 'inverted_style')
         labels = {

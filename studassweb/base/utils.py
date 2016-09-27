@@ -1,3 +1,4 @@
+# coding=utf-8
 import os
 from django.conf import settings
 from inspect import isfunction
@@ -57,18 +58,42 @@ def get_attr_from_module(app, module, attribute, validator=None):
 
 
 def get_function_from_module(app, module, function_name):
+    """
+
+    :param app:
+    :param module:
+    :param function_name:
+    :return:
+    """
     return get_attr_from_module(app, module, function_name, isfunction)
 
 
 def get_str_from_module(app, module, var_name):
+    """
+
+    :param app:
+    :param module:
+    :param var_name:
+    :return:
+    """
     return get_attr_from_module(app, module, var_name, lambda s: isinstance(s, str))
 
 
 def get_all_modules():
+    """
+
+    :return:
+    """
     return [mod for mod, f in get_modules_with(None, None)]
 
 
 def generate_random_sentence(alphabet, length):
+    """
+
+    :param alphabet:
+    :param length:
+    :return:
+    """
     seq = ""
     for i in range(length):
         seq += alphabet[random.randint(0, len(alphabet)-1)]
@@ -76,10 +101,18 @@ def generate_random_sentence(alphabet, length):
 
 
 def generate_email_ver_code():
+    """
+
+    :return:
+    """
     alphabet = "qwertyuiopasdfghjklzxcvbnm1234567890"
     return generate_random_sentence(alphabet, 32)
 
 
 def generate_random_password():
+    """
+
+    :return:
+    """
     alphabet = "qwertyuiopasdfghjklzxcvbnm1234567890!#¤%&/()=?`¨',.-;:_><|@£$€{[]}\\\W"
     return generate_random_sentence(alphabet, 15)

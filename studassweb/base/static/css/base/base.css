@@ -26,16 +26,16 @@ body {
 }
 
 .no-margin {
-    margin: 0px;
+    margin: 0;
 }
 
 .no-bottom-border {
-    border-bottom: 0px;
+    border-bottom: 0;
 }
 
 .noscript-warning {
     position:fixed;
-    top: 0px;
+    top: 0;
     background-color: rgb(200, 50, 50);
     color: black;
     display:block;

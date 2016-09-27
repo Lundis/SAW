@@ -22,7 +22,8 @@ class Migration(migrations.Migration):
                 ('description', models.TextField()),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
-                ('author', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.SET_NULL, null=True, to=settings.AUTH_USER_MODEL)),
+                ('author', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.SET_NULL, null=True,
+                                             to=settings.AUTH_USER_MODEL)),
             ],
             options={
             },
@@ -36,7 +37,8 @@ class Migration(migrations.Migration):
                 ('uploaded', models.DateTimeField(auto_now_add=True)),
                 ('image', models.ImageField(upload_to='gallery_files')),
                 ('album', models.ForeignKey(to='gallery.Album')),
-                ('author', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.SET_NULL, null=True, to=settings.AUTH_USER_MODEL)),
+                ('author', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.SET_NULL, null=True,
+                                             to=settings.AUTH_USER_MODEL)),
             ],
             options={
             },

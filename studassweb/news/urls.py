@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.conf.urls import url
 from . import views
 slug_pattern = '(?P<slug>[-\w\d]+)'

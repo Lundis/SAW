@@ -1,3 +1,4 @@
+# coding=utf-8
 from django import forms
 from django.utils.translation import ugettext as _
 from django.contrib.auth import authenticate, login
@@ -27,10 +28,12 @@ class LoginForm(forms.Form):
             pw = self.cleaned_data['password']
             if username and pw:
                 user = authenticate(username=username, password=pw)
-            if not user:
-                self.add_error(None, _("Wrong username/password"))
-            elif not user.is_active:
-                self.add_error(None, _("Your account is disabled"))
+                if not user:
+                    self.add_error(None, _("Wrong username/password"))
+                elif not user.is_active:
+                    self.add_error(None, _("Your account is disabled"))
+            else:
+                self.add_error(None, _("Username or pw missing"))
 
     def login_user(self, request):
         user = authenticate(username=self.cleaned_data['user_name'], password=self.cleaned_data['password'])
@@ -92,7 +95,7 @@ class UserBaseForm(forms.ModelForm):
         self.fields['first_name'].required = True
         self.fields['last_name'].required = True
 
-    class Meta():
+    class Meta:
         model = User
         fields = ('first_name', 'last_name', 'email',)
 
@@ -111,13 +114,13 @@ class UserBaseForm(forms.ModelForm):
 
 
 class ProfileForm(forms.ModelForm):
-    class Meta():
+    class Meta:
         model = UserExtension
         fields = ('avatar', 'description', 'link_to_homepage')
 
 
 class CustomGroupForm(forms.ModelForm):
-    class Meta():
+    class Meta:
         model = Group
         fields = ("name",)
 

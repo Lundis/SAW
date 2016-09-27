@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.shortcuts import render
 from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseRedirect, HttpResponseNotAllowed
 from django.forms.models import inlineformset_factory
@@ -19,7 +20,12 @@ logger = logging.getLogger(__name__)
 def home(request):
     all_polls = Poll.objects.filter().order_by('-publication')
     return render(request, "polls/view_main.html",
-                  {'all_polls': all_polls},)
+                  {
+                      'all_polls': all_polls,
+                      'ip_address': request.META['REMOTE_ADDR'],
+                      'user': request.user
+                   },
+                  )
 
 
 def view_poll(request, poll_id):
@@ -32,7 +38,7 @@ def view_poll(request, poll_id):
         return HttpResponseForbidden("You do not have access to view this poll")
     choices = Choice.objects.filter(id_to_poll=poll_id)
 
-    if poll.can_user_vote(request):
+    if poll.can_user_vote(request.user, request.META['REMOTE_ADDR']):
         if poll.can_vote_on_many:
             form = ChoiceFormMultiple(request.POST or None, poll_choices=choices, poll=poll)
 

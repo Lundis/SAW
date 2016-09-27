@@ -16,12 +16,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='member',
             name='user_ext',
-            field=models.ForeignKey(blank=True, to='users.UserExtension', on_delete=django.db.models.deletion.SET_NULL, null=True, unique=True),
+            field=models.ForeignKey(blank=True, to='users.UserExtension',
+                                    on_delete=django.db.models.deletion.SET_NULL, null=True, unique=True),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(
             name='member',
-            unique_together=set([('first_name', 'last_name', 'email')]),
+            unique_together={('first_name', 'last_name', 'email')},
         ),
         migrations.AddField(
             model_name='customentry',
@@ -37,6 +38,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='customentry',
-            unique_together=set([('field', 'member')]),
+            unique_together={('field', 'member')},
         ),
     ]

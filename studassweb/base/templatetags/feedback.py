@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.template import Library
 from base.models import SiteConfiguration, Feedback
 import random
@@ -10,6 +11,11 @@ logger = logging.getLogger(__name__)
 
 @register.inclusion_tag('base/tags/helptext_feedback.html', takes_context=True)
 def helptext_feedback(context):
+    """
+
+    :param context:
+    :return:
+    """
     config = SiteConfiguration.instance()
     template_context = {}
     request = context['request']

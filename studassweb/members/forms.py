@@ -1,3 +1,4 @@
+# coding=utf-8
 from django import forms
 from .models import Member, PaymentPurpose, CustomField, Payment, CustomEntry
 from users.groups import GROUP_CHOICES, get_user_group, put_user_in_standard_group, MEMBER, pick_most_powerful_group
@@ -8,13 +9,13 @@ from django.utils import timezone
 class MemberApplicationForm(forms.ModelForm):
     member = forms.BooleanField(label=_("I am a member of this association"), initial=False, required=True)
 
-    class Meta():
+    class Meta:
         model = Member
         fields = ('enrollment_year', 'graduation_year')
 
 
 class PaymentPurposeForm(forms.ModelForm):
-    class Meta():
+    class Meta:
         model = PaymentPurpose
         fields = ('purpose', 'description')
 

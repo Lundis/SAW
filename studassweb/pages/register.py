@@ -1,4 +1,5 @@
-from menu.models import MenuItem, Menu
+# coding=utf-8
+from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, MEMBER, BOARD_MEMBER
 import pages.models

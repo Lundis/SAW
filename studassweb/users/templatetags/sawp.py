@@ -1,7 +1,7 @@
+# coding=utf-8
 from django.template import Library
 from users.permissions import has_user_perm
 from base.utils import get_str_from_module
-from base.register import FORCE_COMMENT
 import logging
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ def has_perm(context, app, perm_constant):
     """
     Checks for perm_constant in app.register, and then checks if the current user has the permission.
     :param context:
-    :param module:
+    :param app:
     :param perm_constant:
     :return:
     """

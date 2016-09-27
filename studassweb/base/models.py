@@ -1,10 +1,10 @@
+# coding=utf-8
 from django.contrib.auth.models import User
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.utils.translation import ugettext as _
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 import json
@@ -35,12 +35,20 @@ class CSSOverrideFile(models.Model):
     description = models.TextField(max_length=200, default="")
 
     def get_latest_content(self):
+        """
+
+        :return:
+        """
         try:
             return CSSOverrideContent.objects.filter(file=self).first()
         except CSSOverrideContent.DoesNotExist:
             return None
 
     def get_absolute_url(self):
+        """
+
+        :return:
+        """
         return reverse("base_settings_edit_css_file",
                        kwargs={'file_id': self.id})
 
@@ -116,6 +124,10 @@ class SiteConfiguration(SingletonModel):
 
     @classmethod
     def instance(cls):
+        """
+
+        :return:
+        """
         obj, created = cls.objects.get_or_create()
         return obj
 
@@ -183,6 +195,10 @@ class SiteConfiguration(SingletonModel):
 
     @classmethod
     def get_css_override(cls):
+        """
+
+        :return:
+        """
         return cls.instance().current_css_override
 
 
@@ -191,16 +207,30 @@ class DisabledModule(models.Model):
 
     @classmethod
     def is_disabled(cls, name):
+        """
+
+        :param name:
+        :return:
+        """
         return cls.objects.filter(app_name=name).exists()
 
     @classmethod
     def is_enabled(cls, name):
+        """
+
+        :param name:
+        :return:
+        """
         return not cls.is_disabled(name)
 
     @classmethod
     def disable(cls, name):
+        """
+
+        :param name:
+        """
         try:
-            mod = cls.objects.get(app_name=name)
+            cls.objects.get(app_name=name)
             # if it exists do nothing
         except cls.DoesNotExist:
             # if it doesn't, add it
@@ -209,6 +239,10 @@ class DisabledModule(models.Model):
 
     @classmethod
     def enable(cls, name):
+        """
+
+        :param name:
+        """
         try:
             mod = cls.objects.get(app_name=name)
             mod.delete()
@@ -218,6 +252,10 @@ class DisabledModule(models.Model):
 
     @classmethod
     def get_all_enabled_modules(cls):
+        """
+
+        :return:
+        """
         all_modules = get_all_modules()
         return [mod for mod in all_modules if cls.is_enabled(mod)]
 
@@ -257,6 +295,11 @@ class Comment(models.Model):
 
     @classmethod
     def get_comments_for_object(cls, obj):
+        """
+
+        :param obj:
+        :return:
+        """
         content_type = ContentType.objects.get_for_model(obj)
         return cls.objects.filter(_content_type=content_type, _object_id=obj.id)
 
@@ -293,6 +336,14 @@ class Feedback(models.Model):
 
     @classmethod
     def can_user_give_feedback(cls, user, ip, type, url):
+        """
+
+        :param user:
+        :param ip:
+        :param type:
+        :param url:
+        :return:
+        """
         url = cls.strip_url(url)
         if user.is_authenticated():
             object = cls.objects.filter(type=type, user=user, url=url)
@@ -338,23 +389,43 @@ class CSSMap2(models.Model):
         return self.key
 
     def clean(self):
+        """
+        Verify that the keys don't contain weird characters
+        """
         self.key = self.key.lower()
         if not all(c in ascii_letters + digits + '-' + '_' for c in self.key):
             raise ValidationError("CSS map key must be alphanumeric or - or _")
+        # TODO: verify value too!?
 
     @classmethod
     def get(cls, key):
+        """
+
+        :param key:
+        :return:
+        """
         pair = cls.objects.get(key=key)
         return pair.value
 
     @classmethod
     def put(cls, key, value):
+        """
+
+        :param key:
+        :param value:
+        """
         pair, created = cls.objects.get_or_create(key=key)
         pair.value = value
         pair.save()
 
     @classmethod
     def register(cls, key, default, description):
+        """
+
+        :param key:
+        :param default:
+        :param description:
+        """
         pair, created = cls.objects.get_or_create(key=key)
         if created:
             pair.value = default

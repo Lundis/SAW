@@ -1,4 +1,5 @@
-from django.contrib.auth.models import Group, User
+# coding=utf-8
+from django.contrib.auth.models import Group
 from django.utils.translation import ugettext as _
 from base.utils import get_modules_with
 from .models import SAWPermission
@@ -58,16 +59,14 @@ def setup_default_groups_and_permissions():
             # ignore permissions that already are in a group.
             # we don't want duplicates and we don't want to ruin changes made by the user.
             if not is_perm_in_groups(perm, groups):
-                group_index = -1
                 try:
                     group_index = group_names.index(group)
+                    put_perm_in_standard_group(perm, groups[group_index])
                 except ValueError:
                     raise ValueError("Permission \"" +
                                      perm +
                                      "\" wants to join a non-existing default group \"" +
                                      group + "\"")
-                if group_index != -1:
-                    put_perm_in_standard_group(perm, groups[group_index])
 
 
 def is_perm_in_groups(perm, groups):

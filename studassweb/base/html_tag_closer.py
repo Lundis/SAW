@@ -1,3 +1,4 @@
+# coding=utf-8
 from html.parser import HTMLParser
 import re
 import logging
@@ -11,10 +12,19 @@ class HTMLTagCloser(HTMLParser):
     active_tags = []
 
     def handle_starttag(self, tag, attrs):
+        """
+
+        :param tag:
+        :param attrs:
+        """
         if tag not in IGNORED_TAGS:
             self.active_tags.append(tag)
 
     def handle_endtag(self, tag):
+        """
+
+        :param tag:
+        """
         if tag not in IGNORED_TAGS:
             # remove the top-most tag from active_tags if it matches
             if self.active_tags[-1] == tag:
@@ -24,9 +34,18 @@ class HTMLTagCloser(HTMLParser):
                 logger.debug("invalid html detected. tag: " + tag)
 
     def handle_startendtag(self, tag, attrs):
+        """
+
+        :param tag:
+        :param attrs:
+        """
         pass
 
     def get_end_of_string(self):
+        """
+
+        :return:
+        """
         end = ""
         for tag in reversed(self.active_tags):
             end += "</%s>" % tag

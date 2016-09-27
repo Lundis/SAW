@@ -1,7 +1,8 @@
+# coding=utf-8
 from django.shortcuts import render
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseServerError
 from .models import Event, EventSignup, EventItem
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect
 from users import permissions
 from users.decorators import has_permission
 import events.register as eregister

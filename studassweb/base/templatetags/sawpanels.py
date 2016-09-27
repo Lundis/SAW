@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.template.base import Context, Node
 from django import template
 from django.template.loader import get_template
@@ -15,6 +16,9 @@ PANEL_TEMPLATE_POST = ".html"
 
 
 class PanelNode(Node):
+    """
+    This node represents a panel with header, body and footer
+    """
     child_nodelists = ('nodelist_header', 'nodelist_body', 'nodelist_footer')
 
     def __init__(self, template_name, nodelist_header, nodelist_body, nodelist_footer, kwargs, args):
@@ -29,6 +33,11 @@ class PanelNode(Node):
         return "<PanelNode>"
 
     def render(self, context):
+        """
+
+        :param context:
+        :return:
+        """
         panel_attrs = ""
         for name, value in self.kwargs:
             panel_attrs += " " + name + "=" + template.Variable(value).render(context)

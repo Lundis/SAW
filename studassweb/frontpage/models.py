@@ -1,9 +1,10 @@
+# coding=utf-8
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.dispatch import receiver
-from django.db.models.signals import pre_delete, post_delete, post_save, pre_save
+from django.db.models.signals import pre_save
 from base.utils import get_function_from_module
 import logging
 
@@ -25,7 +26,6 @@ class FrontPageItem(models.Model):
     # an optional content rendering function (def func(front_page_item)),
     # which resides in module.frontpage
     render_function = models.CharField(max_length=50, blank=True, default="")
-
 
     MAINBAR = "MB"
     SIDEBAR = "SB"
@@ -114,8 +114,3 @@ def frontpage_item_pre_save(**kwargs):
             other.save()
     except FrontPageItem.DoesNotExist:
         pass
-
-
-@receiver(post_save, sender=FrontPageItem, dispatch_uid="frontpage_item_post_save")
-def frontpage_item_post_save(**kwargs):
-    instance = kwargs.pop("instance")

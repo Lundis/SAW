@@ -1,9 +1,9 @@
+# coding=utf-8
 from django.shortcuts import render
 from gallery.forms import *
 from django.http import HttpResponseNotFound, HttpResponseRedirect, HttpResponseNotAllowed
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from django.forms.models import inlineformset_factory
 from django.utils.translation import ugettext as _
 from multiuploader.forms import MultiUploadForm
 import logging
@@ -35,9 +35,9 @@ def add_edit_album(request, slug=None):
         album = None
     form = AlbumForm(instance=album)
     if request.method == 'POST':
-        form = AlbumForm(request.POST, instance=album)
+        form = AlbumForm(request.POST, instance=album, user=request.user)
         if form.is_valid():
-            album = form.save(user=request.user)
+            album = form.save()
             return HttpResponseRedirect(album.get_absolute_url())
     context = {'form': form, }
     return render(request, 'gallery/add_edit_album.html', context)

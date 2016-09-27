@@ -1,4 +1,4 @@
-
+# coding=utf-8
 
 try:
     # Linux
@@ -13,7 +13,6 @@ except ImportError:
 
 import logging
 
-from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 
 from base.utils import generate_random_password
@@ -41,7 +40,7 @@ class KrbBackend(ModelBackend):
         :return:
         """
         logger.debug("calling kerberos authenticate")
-        if not "@" in username:
+        if "@" not in username:
             return None
         username, hostname = username.split("@")
         logger.info(username + " attempts to login via" + hostname)

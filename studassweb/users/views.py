@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, Http404, HttpResponseServerError
@@ -71,9 +72,9 @@ def register_thanks(request):
         raise Http404
     context = {}
 
+    from_email = settings.NO_REPLY_EMAIL
+    to_emails = [request.user.email]
     try:
-        from_email = settings.NO_REPLY_EMAIL
-        to_emails = [request.user.email]
         title = _("Confirmation email from ") + SiteConfiguration.instance().association_name
         logger.info("sending verification email from %s to %s" % (from_email, to_emails[0]))
         send_mail(

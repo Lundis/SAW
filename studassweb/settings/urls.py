@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.conf.urls import url, include
 from base.utils import get_modules_with
 

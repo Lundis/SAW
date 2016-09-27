@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.db import models
 from django.db.models import Q
 from django.core.urlresolvers import reverse
@@ -144,6 +145,7 @@ class Menu(models.Model):
     def get_or_create(cls, name, template=None, created_by=TYPE_APP):
         """
         returns the menu, and updates it with the specified values
+        :param created_by:
         :param name: unique identifier for the menu
         :param template: optional template used by the display_menu tag
         :return: requested menu, boolean (if it was created)
@@ -197,6 +199,8 @@ class MenuItem(models.Model):
                       linked_object=None, url=None, permission=None, submenu=None):
         """
         Convenience wrapper to create or get valid menu items
+        :param identifier:
+        :param submenu:
         :param app_name: Which app created this item (if any)
         :param display_name:  The string that is shown to the user
         :param reverse_string: a string that can be called by Django's reverse() function to get a URL

@@ -37,7 +37,8 @@ class Migration(migrations.Migration):
             name='KerberosServer',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
-                ('hostname', models.CharField(max_length=255, help_text='Example: domain.com, as in user@domain.com', unique=True)),
+                ('hostname', models.CharField(max_length=255, help_text='Example: domain.com, as in user@domain.com',
+                                              unique=True)),
                 ('realm', models.CharField(max_length=255, help_text='Example: SRV.DOMAIN.COM')),
                 ('service', models.CharField(max_length=255, help_text='Example: krbtgt@SRV.DOMAIN.COM')),
             ],
@@ -88,6 +89,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='kerberoslink',
-            unique_together=set([('server', 'username')]),
+            unique_together={('server', 'username')},
         ),
     ]

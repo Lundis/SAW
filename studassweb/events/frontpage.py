@@ -1,3 +1,4 @@
+# coding=utf-8
 from .models import Event
 from django.template import Context
 from django.template.loader import get_template

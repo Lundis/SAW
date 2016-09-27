@@ -1,3 +1,4 @@
+# coding=utf-8
 from menu.models import MenuItem
 from users.models import SAWPermission
 from users.groups import GUEST, MEMBER, BOARD_MEMBER
@@ -37,6 +38,6 @@ def get_permissions():
     return (
         (CAN_VIEW_EXAM_ARCHIVE, GUEST, "Can view the exam archive"),
         (CAN_UPLOAD_EXAMS, MEMBER, "Can upload exams, add courses and examinators"),
-        (CAN_EDIT_EXAMS, BOARD_MEMBER, "Can edit and delete all exams, courses and examinators. " \
+        (CAN_EDIT_EXAMS, BOARD_MEMBER, "Can edit and delete all exams, courses and examinators. "
                                        "A user can always edit and delete stuff created by themselves"),
     )

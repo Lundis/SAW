@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.http import HttpResponseNotAllowed
 from django_ajax.decorators import ajax
 from .forms import PlacementForm

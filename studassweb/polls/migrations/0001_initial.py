@@ -32,8 +32,16 @@ class Migration(migrations.Migration):
                 ('publication', models.DateTimeField(verbose_name='Date published', auto_now_add=True)),
                 ('expiration', models.DateTimeField(verbose_name='Poll closes')),
                 ('can_vote_on_many', models.BooleanField(default=False)),
-                ('permission_choice_view', models.CharField(choices=[('can_view_public_polls', 'Everyone'), ('can_view_member_polls', 'Members'), ('can_view_board_polls', 'The board')], verbose_name='Who can view this poll?', default='CAN_VIEW_PUBLIC_POLLS', max_length=100)),
-                ('permission_choice_vote', models.CharField(choices=[('can_vote_public_polls', 'Everyone'), ('can_vote_member_polls', 'Members'), ('can_vote_board_polls', 'The board')], verbose_name='Who can vote on this poll?', default='CAN_VOTE_PUBLIC_POLLS', max_length=100)),
+                ('permission_choice_view', models.CharField(
+                    choices=[('can_view_public_polls', 'Everyone'),
+                             ('can_view_member_polls', 'Members'),
+                             ('can_view_board_polls', 'The board')],
+                    verbose_name='Who can view this poll?', default='CAN_VIEW_PUBLIC_POLLS', max_length=100)),
+                ('permission_choice_vote', models.CharField(
+                    choices=[('can_vote_public_polls', 'Everyone'),
+                             ('can_vote_member_polls', 'Members'),
+                             ('can_vote_board_polls', 'The board')],
+                    verbose_name='Who can vote on this poll?', default='CAN_VOTE_PUBLIC_POLLS', max_length=100)),
                 ('created_by', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
             options={

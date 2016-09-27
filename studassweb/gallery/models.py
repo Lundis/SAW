@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -8,8 +9,8 @@ import itertools
 class Album(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
-    description = models.TextField()  ##this has turned out to be a silly field(?) maybe only for individual pictures
-    created = models.DateTimeField(auto_now_add=True) ##same thing, might want for pictures though
+    description = models.TextField()  # this has turned out to be a silly field(?) maybe only for individual pictures
+    created = models.DateTimeField(auto_now_add=True)  # same thing, might want for pictures though
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     modified = models.DateTimeField(auto_now=True)
 

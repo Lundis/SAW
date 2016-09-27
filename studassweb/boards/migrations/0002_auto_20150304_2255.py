@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='boardmember',
-            unique_together=set([('board', 'role', 'member')]),
+            unique_together={('board', 'role', 'member')},
         ),
         migrations.AddField(
             model_name='board',

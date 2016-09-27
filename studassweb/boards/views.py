@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.shortcuts import render
 from django.http import HttpResponseNotFound, HttpResponseRedirect, HttpResponseNotAllowed, Http404
 from django.core.exceptions import SuspiciousOperation

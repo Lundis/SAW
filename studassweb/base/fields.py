@@ -1,3 +1,4 @@
+# coding=utf-8
 from ckeditor_uploader.fields import RichTextUploadingField, RichTextUploadingFormField
 from django import forms
 from .html_tag_closer import complete_html
@@ -11,6 +12,11 @@ class ValidatedRichTextField(RichTextUploadingField):
 
     def formfield(self, **kwargs):
         # Change the default form field
+        """
+
+        :param kwargs:
+        :return:
+        """
         if 'form_class' not in kwargs:
             kwargs['form_class'] = ValidatedRichTextFormField
         return super().formfield(**kwargs)
@@ -19,6 +25,7 @@ class ValidatedRichTextField(RichTextUploadingField):
     def get_summary(text, length):
         """
         Returns a summary with valid markup of approximately the requested length.
+        :param text:
         :param length:
         :return:
         """
@@ -42,6 +49,11 @@ class ValidatedRichTextFormField(RichTextUploadingFormField):
 
     @staticmethod
     def remove_trailing_stupid_lines(text):
+        """
+
+        :param text:
+        :return:
+        """
         lines = text.replace("\r", "").split("\n")
         good_line_found = False
         result = ""
@@ -111,4 +123,3 @@ class HiddenComponentClassField(forms.CharField):
             raise forms.ValidationError("Classes string too long")
 
         return cleaned_css_classes
-    

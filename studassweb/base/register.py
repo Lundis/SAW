@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.core.urlresolvers import reverse_lazy
 from users.groups import GUEST, BOARD_MEMBER, LOGGED_ON, WEBMASTER
 from settings.sections import Page, SECTION_APPEARANCE
@@ -17,8 +18,8 @@ def get_permissions():
     return (
         (VIEW_PUBLIC_COMMENTS, GUEST, "Can view comments on items with public comments"),
         (VIEW_MEMBER_COMMENTS, GUEST, "Can view comments on items with member comments"),
-        (CAN_COMMENT, LOGGED_ON,
-         "Can comment on items with comments enabled.  This is further restricted by the view permissions for comments."),
+        (CAN_COMMENT, LOGGED_ON, "Can comment on items with comments enabled. " +
+         "This is further restricted by the view permissions for comments."),
         (FORCE_COMMENT, BOARD_MEMBER, "Can comment to items with comments disabled"),
         (EDIT_THEME, WEBMASTER, "Can change the overall theme of the site"),
         (CAN_GIVE_FEEDBACK, GUEST, "Can use feedback forms")
@@ -33,6 +34,10 @@ def get_urls():
 
 
 def register_settings_pages():
+    """
+
+    :return:
+    """
     theme_editor = Page("Theme editor",
                         "Change the overall looks of the site",
                         SECTION_APPEARANCE,

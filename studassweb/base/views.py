@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from .forms import DummyForm
@@ -5,6 +6,15 @@ from .forms import DummyForm
 
 def delete_confirmation_view(request, item, form_url, redirect_url,
                              template="base/delete_confirmation.html"):
+    """
+
+    :param request:
+    :param item:
+    :param form_url:
+    :param redirect_url:
+    :param template:
+    :return:
+    """
     form = DummyForm(request.POST or None)
     item_name = str(item)
     if form.is_valid():

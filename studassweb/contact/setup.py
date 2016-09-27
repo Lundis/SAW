@@ -1,3 +1,4 @@
+# coding=utf-8
 import contact.models as cmodels
 from base.models import SiteConfiguration
 from django.utils.translation import ugettext as _

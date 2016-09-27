@@ -18,7 +18,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=100)),
-                ('created_by', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.SET_NULL, null=True, to=settings.AUTH_USER_MODEL)),
+                ('created_by', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.SET_NULL,
+                                                 null=True, to=settings.AUTH_USER_MODEL)),
             ],
             options={
             },
@@ -32,7 +33,8 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(blank=True)),
                 ('exam_date', models.DateTimeField()),
                 ('course_id', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='exams.Course')),
-                ('created_by', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.SET_NULL, null=True, to=settings.AUTH_USER_MODEL)),
+                ('created_by', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.SET_NULL,
+                                                 null=True, to=settings.AUTH_USER_MODEL)),
             ],
             options={
             },
@@ -54,7 +56,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=100)),
-                ('created_by', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.SET_NULL, null=True, to=settings.AUTH_USER_MODEL)),
+                ('created_by', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.SET_NULL,
+                                                 null=True, to=settings.AUTH_USER_MODEL)),
             ],
             options={
             },
@@ -63,7 +66,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='exam',
             name='examinator',
-            field=models.ForeignKey(blank=True, on_delete=django.db.models.deletion.PROTECT, null=True, to='exams.Examinator'),
+            field=models.ForeignKey(blank=True, on_delete=django.db.models.deletion.PROTECT, null=True,
+                                    to='exams.Examinator'),
             preserve_default=True,
         ),
     ]

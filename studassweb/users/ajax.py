@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest, HttpResponse
 from .groups import put_user_in_standard_group

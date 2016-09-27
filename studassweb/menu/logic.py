@@ -1,3 +1,4 @@
+# coding=utf-8
 from base.utils import get_modules_with
 from base.models import DisabledModule
 

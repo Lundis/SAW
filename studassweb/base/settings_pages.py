@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.conf.urls import url
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, Http404, HttpResponseNotAllowed
@@ -16,9 +17,13 @@ logger = logging.getLogger(__name__)
 current_module = sys.modules[__name__]
 
 
-
 @has_permission(EDIT_THEME)
 def edit_theme(request):
+    """
+
+    :param request:
+    :return:
+    """
     SiteConfiguration.update_bootswatch()
     section = Section.get_section(SECTION_APPEARANCE)
     context = {'themes': BootswatchTheme.objects.all(),
@@ -28,6 +33,11 @@ def edit_theme(request):
 
 @has_permission(EDIT_THEME)
 def set_bootswatch_theme(request):
+    """
+
+    :param request:
+    :return:
+    """
     if not request.POST:
         raise Http404
     else:
@@ -41,6 +51,11 @@ def set_bootswatch_theme(request):
 
 @has_permission(EDIT_THEME)
 def set_default_theme(request):
+    """
+
+    :param request:
+    :return:
+    """
     if not request.POST:
         raise Http404
     else:
@@ -122,6 +137,7 @@ def edit_css_override(request, file_id=None, copy_id=None):
 def set_css_override(request, override_id):
     """
 
+    :param request:
     :param override_id:
     :return:
     """
@@ -144,6 +160,11 @@ def set_css_override(request, override_id):
 @has_permission(EDIT_THEME)
 def edit_component_classes(request):
 
+    """
+
+    :param request:
+    :return:
+    """
     classes_with_new_default = CSSMap2.objects.filter(default_has_changed=True)
     classes_without_new_default = CSSMap2.objects.filter(default_has_changed=False)
 
@@ -162,7 +183,6 @@ def edit_component_classes(request):
     }
 
     return render(request, "base/settings/view_component_classes.html", context)
-
 
 
 urlpatterns = [

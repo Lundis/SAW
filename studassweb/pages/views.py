@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.shortcuts import render
 from django.http import Http404, HttpResponseRedirect, HttpResponseNotAllowed, HttpResponseForbidden
 from django.core.urlresolvers import reverse
@@ -34,6 +35,8 @@ def view_page(request, slug, revision_id=None):
     """
     view a page
     :param request:
+    :param slug:
+    :param revision_id:
     :return:
     """
     try:
@@ -65,6 +68,9 @@ def edit_page(request, category_id=None, page_id=None, revision_id=None):
     """
     edit or create a page
     :param request:
+    :param category_id:
+    :param page_id:
+    :param revision_id:
     :return:
     """
     page = None
@@ -106,6 +112,7 @@ def edit_page(request, category_id=None, page_id=None, revision_id=None):
 def revert_page(request,  revision_id):
     """
     revert a page to a previous revision by simply changing the date on that revision to now
+    :param revision_id:
     :param request:
     :return:
     """
@@ -126,6 +133,7 @@ def revert_page(request,  revision_id):
 def view_category(request, slug):
     """
     renders a list of the pages in the specified category
+    :param slug:
     :param request:
     :return:
     """
@@ -141,6 +149,7 @@ def view_category(request, slug):
 def edit_category(request, category_id=None):
     """
     edit or create a new category
+    :param category_id:
     :param request:
     :return:
     """

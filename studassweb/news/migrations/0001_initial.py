@@ -24,7 +24,8 @@ class Migration(migrations.Migration):
                 ('created_date', models.DateField(auto_now_add=True)),
                 ('created_time', models.TimeField(auto_now_add=True)),
                 ('updated', models.DateTimeField(auto_now=True)),
-                ('picture', models.ImageField(blank=True, upload_to='news/article_thumbnails', help_text='A small picture used in the news feed', null=True)),
+                ('picture', models.ImageField(blank=True, upload_to='news/article_thumbnails',
+                                              help_text='A small picture used in the news feed', null=True)),
                 ('author', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
             options={
@@ -62,6 +63,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='article',
-            unique_together=set([('slug', 'created_date')]),
+            unique_together={('slug', 'created_date')},
         ),
     ]

@@ -15,6 +15,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='member',
             name='user_ext',
-            field=models.OneToOneField(blank=True, on_delete=django.db.models.deletion.SET_NULL, to='users.UserExtension', null=True),
+            field=models.OneToOneField(blank=True, on_delete=django.db.models.deletion.SET_NULL,
+                                       to='users.UserExtension', null=True),
         ),
     ]

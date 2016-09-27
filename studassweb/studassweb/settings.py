@@ -1,3 +1,4 @@
+# coding=utf-8
 """
 Django settings for studassweb project.
 
@@ -10,6 +11,8 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 import os
 from base.utils import get_all_modules
+
+from django.contrib.messages import constants as message_constants
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -139,7 +142,7 @@ TEMPLATES = [
 # Default no-reply to use.
 NO_REPLY_EMAIL = "noreply@localhost"
 
-#The directory in which log files should be created
+# The directory in which log files should be created
 LOG_DIR = os.path.join(os.path.dirname(SITE_ROOT), 'logs')
 
 # load local settings
@@ -223,7 +226,7 @@ if DEBUG:
             'formatter': 'simple'}
     LOGGING['loggers']['studassweb']['handlers'].append('console')
 
-#This is the logger added to every module
+# This is the logger added to every module
 if DEBUG:
     local_logger_conf = {
         'handlers': ['allwarnings', 'appdebugfile', 'console'],
@@ -237,13 +240,12 @@ else:
         'propagate': True,
     }
 
-#Add to every module
+# Add to every module
 for app in get_all_modules():
     LOGGING['loggers'][app] = local_logger_conf
 
-#This makes django messages compatible with bootstrap3
-#http://ericsaupe.com/tag/bootstrap-messages-fix/
-from django.contrib.messages import constants as message_constants
+# This makes django messages compatible with bootstrap3
+# http://ericsaupe.com/tag/bootstrap-messages-fix/
 MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
                 message_constants.INFO: 'info',
                 message_constants.SUCCESS: 'success',

@@ -24,7 +24,7 @@
                 <div class="row">
 
                     <div class="col-xs-8">
-                        {% has_user_voted p request as show_voted_sign %}
+                        {% has_user_voted p as show_voted_sign %}
                         {% if show_voted_sign %}
                             <span class="glyphicon glyphicon-ok"></span>
                         {% else %}

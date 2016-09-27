@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.conf import settings
@@ -98,10 +99,10 @@ def menu(request):
     return render(request, 'install/menu.html', context)
 
 
-def get_other_items(occupied=[]):
+def get_other_items(occupied=()):
     menu_items, login_items, other_items = get_all_menu_items()
     all_items = menu_items + login_items + other_items
-    return [item for item in all_items if not item in occupied]
+    return [item for item in all_items if item not in occupied]
 
 
 @has_permission(CAN_INSTALL)

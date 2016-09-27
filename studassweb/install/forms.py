@@ -1,3 +1,4 @@
+# coding=utf-8
 from django import forms
 from django.utils.translation import ugettext as _
 from django.conf import settings
@@ -24,8 +25,8 @@ class AssociationForm(forms.Form):
         self.fields['founded'].initial = SiteConfiguration.founded()
 
     def clean(self):
-        #TODO: check that the name is short enough
-        #TODO: check that the year makes sense
+        # TODO: check that the name is short enough
+        # TODO: check that the year makes sense
         pass
 
     def apply(self):
@@ -72,7 +73,6 @@ class ModulesForm(forms.Form):
 
             except ImportError:
                 logger.warning("Module %s doesn't have a register.py", module)
-
 
     def apply(self):
         """

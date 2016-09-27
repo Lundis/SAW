@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.shortcuts import render
 from django.http import HttpResponseBadRequest, Http404, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
@@ -246,4 +247,5 @@ def delete_payment(request, payment_id):
     return delete_confirmation_view(request,
                                     form_url=reverse("members_delete_payment"),
                                     item=payment,
-                                    redirect_url=reverse("members_list_payments", kwargs={"member_id": payment.member_id}))
+                                    redirect_url=reverse("members_list_payments",
+                                                         kwargs={"member_id": payment.member_id}))

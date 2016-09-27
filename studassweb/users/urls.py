@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.conf.urls import url
 
 from . import views
@@ -16,8 +17,8 @@ urlpatterns = [
     url(r'^password_reset/$',
         authviews.password_reset,
         {'post_reset_redirect': '/users/password_reset_done/',  # Note we cannot use reverse, url not defined yet
-        'template_name': 'users/password_reset/form.html',
-        'email_template_name': 'users/password_reset/email.html'},
+         'template_name': 'users/password_reset/form.html',
+         'email_template_name': 'users/password_reset/email.html'},
         name='users_password_reset'),
     url(r'^password_reset_done/$',
         authviews.password_reset_done,

@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.conf.urls import url
 from users.decorators import has_permission
 from django.shortcuts import render
@@ -10,7 +11,6 @@ from .forms import MenuForm, MenuCreationForm, UserMenuItemForm, AppMenuItemForm
 from .models import MainMenuSettings
 from base.views import delete_confirmation_view
 from settings.sections import SECTION_MENU, SECTION_APPEARANCE, Section
-
 
 
 menu_section = Section.get_section(SECTION_MENU)
@@ -120,7 +120,8 @@ def delete_menu_item(request, item_id):
 
     return delete_confirmation_view(request,
                                     item=menu_item,
-                                    form_url=reverse("menu_settings_delete_menu_item", kwargs={'item_id': menu_item.id}),
+                                    form_url=reverse("menu_settings_delete_menu_item",
+                                                     kwargs={'item_id': menu_item.id}),
                                     redirect_url=reverse('menu_settings_select_menu'))
 
 
@@ -140,7 +141,6 @@ def edit_menu_layout(request):
     context = {'form': form,
                'section': section}
     return render(request, 'menu/settings/edit_menu_layout.html', context)
-
 
 
 urlpatterns = [

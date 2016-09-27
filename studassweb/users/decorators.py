@@ -1,3 +1,4 @@
+# coding=utf-8
 from .permissions import has_user_perm
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect

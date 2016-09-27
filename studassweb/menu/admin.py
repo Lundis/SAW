@@ -1,6 +1,6 @@
+# coding=utf-8
 from django.contrib import admin
 from .models import Menu, MenuTemplate, MenuItem, ItemInMenu, MainMenuSettings
-from solo.admin import SingletonModelAdmin
 
 
 admin.site.register(Menu)

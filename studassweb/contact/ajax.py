@@ -1,3 +1,4 @@
+# coding=utf-8
 from django_ajax.decorators import ajax
 from django.http import HttpResponseNotAllowed
 from users.decorators import has_permission

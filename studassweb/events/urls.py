@@ -1,9 +1,11 @@
+# coding=utf-8
 from django.conf.urls import url
-from .views import AddEventItemView, EditEventItemView, DeleteEventItemView, ListEventItemsView, DeleteEventSignupByCodeView
-
-slug_pattern = '(?P<slug>[-\w\d]+)'
+from .views import AddEventItemView, EditEventItemView, DeleteEventItemView, ListEventItemsView, \
+    DeleteEventSignupByCodeView
 
 from . import views
+slug_pattern = '(?P<slug>[-\w\d]+)'
+
 
 urlpatterns = [
     url(r'^$', views.home, name='events_home'),

@@ -1,3 +1,4 @@
+# coding=utf-8
 from django import forms
 from django.core.validators import ValidationError
 from django.utils.translation import ugettext as _
@@ -30,6 +31,7 @@ class MessageForm(forms.ModelForm):
     def save(self, commit=True, contact=None, from_person=None):
         """
         Note: You MUST specify the contact
+        :param from_person:
         :param commit:
         :param contact:
         :return:

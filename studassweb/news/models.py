@@ -1,10 +1,11 @@
+# coding=utf-8
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import slugify
 from solo.models import SingletonModel
 from django.dispatch import receiver
-from django.db.models.signals import pre_delete, post_delete, pre_save, post_save
+from django.db.models.signals import post_delete, pre_save, post_save
 
 from base.models import Comment
 from base.fields import ValidatedRichTextField
@@ -69,6 +70,7 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
+    @staticmethod
     def update_frontpage_items(self):
         """
         Makes sure the N latest items exist as frontpage items

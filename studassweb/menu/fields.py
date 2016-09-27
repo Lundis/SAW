@@ -1,3 +1,4 @@
+# coding=utf-8
 from django import forms
 from menu.models import MenuItem
 
@@ -27,6 +28,6 @@ class HiddenMenuField(forms.IntegerField):
         # so we only check that the last part of the name is a valid menu item id
         menu_item_index = int(self.name.split('-')[-1])
         if MenuItem.objects.filter(id=menu_item_index).count() != 1:
-            raise forms.ValidationError("Menu item " + menu_item_index + " does not exist! You h4x0r!!")
+            raise forms.ValidationError("Menu item " + str(menu_item_index) + " does not exist! You h4x0r!!")
         # else return the cleaned menu index
         return cleaned_num

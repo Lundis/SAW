@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.core.urlresolvers import reverse_lazy
 from users.groups import MEMBER, LOGGED_ON, WEBMASTER
 from settings.sections import Page, SECTION_PERSONAL_SETTINGS, SECTION_USERS

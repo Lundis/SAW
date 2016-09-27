@@ -15,7 +15,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='event',
             name='allow_late_reserve_changes',
-            field=models.BooleanField(default=True, verbose_name='Allow moving someone from reserve to attending when the event is about to start'),
+            field=models.BooleanField(
+                default=True,
+                verbose_name='Allow moving someone from reserve to attending when the event is about to start'),
         ),
         migrations.AddField(
             model_name='eventsettings',

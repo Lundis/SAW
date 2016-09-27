@@ -1,3 +1,4 @@
+# coding=utf-8
 from django import forms
 from gallery.models import *
 from datetime import date
@@ -11,10 +12,15 @@ class AlbumForm(forms.ModelForm):
         model = Album
         fields = ('description', 'name')
 
-    def save(self, user, commit=True,):
+    def __init__(self, *args, **kwargs):
+        self._user = kwargs.pop('user')
+        super().__init__(*args, **kwargs)
+        self.fields['album'].label_from_instance = lambda obj: "%s" % obj.name
+
+    def save(self, commit=True,):
         temp_album = super().save(commit=False)
-        if not user.is_anonymous():
-            temp_album.user = user
+        if not self._user.is_anonymous():
+            temp_album.user = self._user
         if commit:
             temp_album.save()
         return temp_album

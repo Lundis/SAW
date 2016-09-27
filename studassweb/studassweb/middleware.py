@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from base.models import DisabledModule
@@ -5,8 +6,8 @@ from install.models import InstallProgress
 
 
 class VerifyModuleEnabled:
-
-    def process_request(self, request):
+    @staticmethod
+    def process_request(request):
         # The first item in the path is the module name, such as /settings/blabla
         module = request.path[1:].split("/")[0]
         # The frontpage is a special case

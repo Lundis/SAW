@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.template.base import Context,  Node
 from django import template
 from django.template.loader import get_template
@@ -11,6 +12,9 @@ PANEL_TEMPLATE_POST = ".html"
 
 
 class PanelNode(Node):
+    """
+    This node represents a sidemenu panel with header and body
+    """
     child_nodelists = ('nodelist_header', 'nodelist_body')
 
     def __init__(self, template_name, nodelist_header, nodelist_body):
@@ -22,6 +26,11 @@ class PanelNode(Node):
         return "<PanelNode>"
 
     def render(self, context):
+        """
+
+        :param context:
+        :return:
+        """
         context_ = Context({'title': self.nodelist_header.render(context),
                             'body': self.nodelist_body.render(context)})
         template_name = self.template_name.resolve(context)

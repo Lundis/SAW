@@ -1,10 +1,10 @@
+# coding=utf-8
 from django import forms
 from django.core.validators import ValidationError
 # Here you want some form
 # Google for inline formset https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#inline-formsets
 # or look at install/forms.py, maybe easier
 from polls.models import Poll, Choice, Vote
-from django.utils.translation import ugettext_lazy as _
 
 
 class PollForm(forms.ModelForm):

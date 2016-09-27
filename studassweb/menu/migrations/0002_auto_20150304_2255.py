@@ -38,6 +38,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='iteminmenu',
-            unique_together=set([('menu', 'item'), ('menu', 'display_order')]),
+            unique_together={('menu', 'item'), ('menu', 'display_order')},
         ),
     ]

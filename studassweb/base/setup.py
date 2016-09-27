@@ -1,7 +1,9 @@
+# coding=utf-8
 from .utils import get_modules_with
 from .models import CSSMap2
 
 __author__ = 'Lundis'
+
 
 def setup_css_map():
     """

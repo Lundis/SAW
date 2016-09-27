@@ -1,6 +1,6 @@
+# coding=utf-8
 from django.core.urlresolvers import reverse_lazy
 from users.groups import WEBMASTER
-from users.models import SAWPermission
 from settings.sections import Page, SECTION_MENU, SECTION_APPEARANCE
 
 EDIT_MENUS = "can_edit_menu"

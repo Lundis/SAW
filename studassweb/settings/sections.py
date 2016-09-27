@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.core.urlresolvers import reverse
 from base.utils import get_modules_with
 from base.models import DisabledModule

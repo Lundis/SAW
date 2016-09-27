@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.conf.urls import url
 from django.contrib.auth.models import Group
 from django.shortcuts import render
@@ -11,7 +12,6 @@ from .groups import group_names
 from .register import EDIT_LOGIN_SETTINGS, EDIT_PROFILE, EDIT_PERMISSIONS
 from .forms import UserBaseForm, ProfileForm, CustomGroupForm, PermissionEditorForm, KerberosServerForm
 from .models import UserExtension, SAWPermission, KerberosServer
-
 
 
 def get_modules_with_permissions():
@@ -80,6 +80,7 @@ def reset_permissions(request):
 def edit_groups(request, group_id=None, new=False):
     """
     A page for editing custom groups.
+    :param new:
     :param request:
     :param group_id:
     :return:

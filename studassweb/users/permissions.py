@@ -1,5 +1,5 @@
+# coding=utf-8
 from .models import SAWPermission
-from django.contrib.auth.models import Group
 import logging
 
 logger = logging.Logger(__name__)

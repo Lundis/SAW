@@ -1,4 +1,5 @@
-from django.template import RequestContext, Library
+# coding=utf-8
+from django.template import Library
 from ..models import InstallProgress
 
 register = Library()
@@ -8,6 +9,7 @@ register = Library()
 def display_progress_bar(context, active_tab):
     """
     Renders the installation wizard's progress bar
+    :param context:
     :param active_tab: The active installation phase
     :return:
     """

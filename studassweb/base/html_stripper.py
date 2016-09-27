@@ -1,3 +1,4 @@
+# coding=utf-8
 from html.parser import HTMLParser
 
 import logging
@@ -13,9 +14,17 @@ class _HTMLStripper(HTMLParser):
         self.fed = []
 
     def handle_data(self, d):
+        """
+
+        :param d:
+        """
         self.fed.append(d)
 
     def get_data(self):
+        """
+
+        :return:
+        """
         return ''.join(self.fed)
 
 

@@ -1,6 +1,7 @@
-from django.template import RequestContext, Library
+# coding=utf-8
+from django.template import Library
 from django.template.loader import get_template
-from menu.models import MenuTemplate, Menu
+from menu.models import Menu
 
 register = Library()
 

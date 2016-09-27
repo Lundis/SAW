@@ -15,7 +15,8 @@ class Migration(migrations.Migration):
             name='BoardSettings',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', auto_created=True, serialize=False, primary_key=True)),
-                ('is_setup', models.BooleanField(default=False, help_text='Tells us if the first-time setup has been done')),
+                ('is_setup', models.BooleanField(default=False,
+                                                 help_text='Tells us if the first-time setup has been done')),
             ],
             options={
                 'abstract': False,

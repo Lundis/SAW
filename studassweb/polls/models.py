@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -50,17 +51,17 @@ class Poll(models.Model):
     def can_edit(self, user):
         return self.created_by == user or has_user_perm(user, CAN_EDIT_ALL_POLLS)
 
-    def can_user_vote(self, request):
-        if not has_user_perm(request.user, self.permission_choice_vote):
+    def can_user_vote(self, user, ip_address):
+        if not has_user_perm(user, self.permission_choice_vote):
             return False
-        if request.user.is_authenticated():
-            object = Vote.objects.filter(choice_id__id_to_poll=self, user=request.user)
+        if user.is_authenticated():
+            object = Vote.objects.filter(choice_id__id_to_poll=self, user=user)
             return not object.exists()
         else:
-            return not Vote.objects.filter(choice_id__id_to_poll=self, ip_address=request.META['REMOTE_ADDR']).exists()
+            return not Vote.objects.filter(choice_id__id_to_poll=self, ip_address=ip_address).exists()
 
-    def has_user_voted(self, request):
-        return not self.can_user_vote(request) #TODO STUFF ENNU NOGO
+    def has_user_voted(self, user, ip_address):
+        return not self.can_user_vote(user, ip_address)  # TODO STUFF ENNU NOGO
 
 
 class Choice(models.Model):

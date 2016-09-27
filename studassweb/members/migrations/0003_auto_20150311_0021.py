@@ -26,7 +26,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='payment',
             name='date_entered',
-            field=models.DateTimeField(auto_now_add=True, default=datetime.datetime(2015, 3, 10, 22, 21, 4, 530371, tzinfo=utc)),
+            field=models.DateTimeField(auto_now_add=True,
+                                       default=datetime.datetime(2015, 3, 10, 22, 21, 4, 530371, tzinfo=utc)),
             preserve_default=False,
         ),
         migrations.AddField(
