@@ -50,7 +50,8 @@
             {% if boardtype.can_delete %}
                 <form action="{% url 'boards_delete_boardtype' boardtype.id %}" method="post">
                     {% csrf_token %}
-                        <button type="submit" class="btn btn-danger btn-block" onclick="return confirm('{% trans "Are you sure?" %}')">
+                        <button type="submit" class="{% get_css "sawbutton_delete" %} btn-block"
+                                onclick="return confirm('{% trans "Are you sure?" %}')">
                             {% trans "Remove this board type" %}
                         </button>
                 </form>

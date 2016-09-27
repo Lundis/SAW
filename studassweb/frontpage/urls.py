@@ -1,13 +1,14 @@
-from django.conf.urls import patterns, url
-
+from django.conf.urls import url
+from . import views
+from . import ajax
 # / is defined in studassweb.urls
 # These will be prepended by /frontpage/
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^edit$',
-        'frontpage.views.frontpage',
+        views.frontpage,
         {'edit_mode': True},
         name='frontpage_edit'),
 
-    url(r'^move_item$', 'frontpage.ajax.move_item', name='frontpage_move_item')
-)
+    url(r'^move_item$', ajax.move_item, name='frontpage_move_item')
+]

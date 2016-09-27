@@ -44,11 +44,11 @@
         </div>
     </div>
 
-    <form id="{{ form.get_form_id }}" action="{% url "install.views.menu" %}" method="post" onsubmit="{{ form.get_submit_js }}">
+    <form id="{{ form.get_form_id }}" action="{% url "install_menu" %}" method="post" onsubmit="{{ form.get_submit_js }}">
         {% csrf_token %}
         {{ form.render_javascript }}
 
-        <a href="{% url "install.views.modules" %}">
+        <a href="{% url "install_modules" %}">
             <button type="button" class="btn btn-primary">
                 {% trans "Previous" %}
             </button>

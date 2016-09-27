@@ -91,7 +91,8 @@
                 <form action="{% url 'boards_delete_board' board.id %}" method="post">
                     {% csrf_token %}
                     {% buttons %}
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('{% trans "Are you sure?" %}')">
+                        <button type="submit" class="{% get_css "sawbutton_delete" %}"
+                                onclick="return confirm('{% trans "Are you sure?" %}')">
                             {% trans "Remove this board" %}
                         </button>
                     {% endbuttons %}

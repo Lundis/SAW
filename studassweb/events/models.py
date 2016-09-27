@@ -35,7 +35,7 @@ VALUE_DOES_NOT_EXIST = "not_set"
 
 # TODO if the field is a boolean, it should return False / True
 # TODO if the field is a integer or float, it should return appropriate type!
-class MultiInputField(models.CharField, metaclass=models.SubfieldBase):
+class MultiInputField(models.CharField):
     # In an ideal world this field would save different types of values and return the right python object
     # Sadly this seems rather impossible (at least as of Django 1.7)
     # hours_wasted_here = 3

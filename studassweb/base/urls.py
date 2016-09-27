@@ -1,7 +1,9 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-urlpatterns = patterns('',
+from . import ajax
+
+urlpatterns = [
     url('^ajax/give_feedback$',
-        'base.ajax.give_feedback',
+        ajax.give_feedback,
         name='base_ajax_give_feedback'),
-)
+]

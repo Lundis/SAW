@@ -62,6 +62,12 @@ To upgrade from a previous version, run:
     * install instructions:
         > pip install djangoajax
 
+* pytz
+    * Timezone support for python
+    * url:
+    * install instructions:
+        > pip install pytz
+
 ===== Optional dependencies =====
 * pykerberos
     * Kerberos lib for Python

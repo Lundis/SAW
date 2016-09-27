@@ -48,7 +48,7 @@
         </div>
         <div class="panel-body">
             <div class="btn-group-vertical btn-block">
-                <form action="{% url 'gallery.views.delete_album' album.id %}" method="post">
+                <form action="{% url 'gallery_delete_album' album.id %}" method="post">
                 {% csrf_token %}
                         <button type="submit" class="btn-group-vertical btn-danger">
                             {% trans "delete album" %}

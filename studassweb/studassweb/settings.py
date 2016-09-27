@@ -67,11 +67,6 @@ MIDDLEWARE_CLASSES = (
     'studassweb.middleware.VerifyModuleEnabled',
 )
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.contrib.auth.context_processors.auth',
-    'django.contrib.messages.context_processors.messages',
-    'django.core.context_processors.request',
-)
 
 ROOT_URLCONF = 'studassweb.urls'
 
@@ -82,8 +77,6 @@ WSGI_APPLICATION = 'studassweb.wsgi.application'
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -127,6 +120,21 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 )
+
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
 
 # Default no-reply to use.
 NO_REPLY_EMAIL = "noreply@localhost"

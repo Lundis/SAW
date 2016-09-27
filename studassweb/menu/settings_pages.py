@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from users.decorators import has_permission
 from django.shortcuts import render
 from django.http import Http404, HttpResponseRedirect, HttpResponseBadRequest
@@ -12,39 +12,6 @@ from base.views import delete_confirmation_view
 from settings.sections import SECTION_MENU, SECTION_APPEARANCE, Section
 
 
-urlpatterns = patterns('',
-                       url(r'^%s/select_menu$' % SECTION_MENU,
-                           'menu.settings_pages.select_menu',
-                           name='menu_settings_select_menu'),
-
-                       url(r'^%s/edit_menu_item/(?P<item_id>\d+)$' % SECTION_MENU,
-                           'menu.settings_pages.edit_menu_item',
-                           name='menu_settings_edit_menu_item'),
-
-                       url(r'^%s/new_menu_item$' % SECTION_MENU,
-                           'menu.settings_pages.edit_menu_item',
-                           name='menu_settings_new_menu_item'),
-
-                       url(r'^%s/delete_menu_item/(?P<item_id>\d+)$' % SECTION_MENU,
-                           'menu.settings_pages.delete_menu_item',
-                           name='menu_settings_delete_menu_item'),
-
-                       url(r'^%s/new_menu$' % SECTION_MENU,
-                           'menu.settings_pages.new_menu',
-                           name='menu_settings_new_menu'),
-
-                       url(r'^%s/delete_menu/(?P<menu_id>\d+)$' % SECTION_MENU,
-                           'menu.settings_pages.delete_menu',
-                           name='menu_settings_delete_menu'),
-
-                       url(r'^%s/edit_menu/(?P<menu_id>\d+)$' % SECTION_MENU,
-                           'menu.settings_pages.edit_menu',
-                           name='menu_settings_edit_menu'),
-
-                       url(r'^%s/edit_menu_layout$' % SECTION_APPEARANCE,
-                           'menu.settings_pages.edit_menu_layout',
-                           name='menu_settings_edit_menu_layout')
-)
 
 menu_section = Section.get_section(SECTION_MENU)
 
@@ -173,3 +140,39 @@ def edit_menu_layout(request):
     context = {'form': form,
                'section': section}
     return render(request, 'menu/settings/edit_menu_layout.html', context)
+
+
+
+urlpatterns = [
+                       url(r'^%s/select_menu$' % SECTION_MENU,
+                           select_menu,
+                           name='menu_settings_select_menu'),
+
+                       url(r'^%s/edit_menu_item/(?P<item_id>\d+)$' % SECTION_MENU,
+                           edit_menu_item,
+                           name='menu_settings_edit_menu_item'),
+
+                       url(r'^%s/new_menu_item$' % SECTION_MENU,
+                           edit_menu_item,
+                           name='menu_settings_new_menu_item'),
+
+                       url(r'^%s/delete_menu_item/(?P<item_id>\d+)$' % SECTION_MENU,
+                           delete_menu_item,
+                           name='menu_settings_delete_menu_item'),
+
+                       url(r'^%s/new_menu$' % SECTION_MENU,
+                           new_menu,
+                           name='menu_settings_new_menu'),
+
+                       url(r'^%s/delete_menu/(?P<menu_id>\d+)$' % SECTION_MENU,
+                           delete_menu,
+                           name='menu_settings_delete_menu'),
+
+                       url(r'^%s/edit_menu/(?P<menu_id>\d+)$' % SECTION_MENU,
+                           edit_menu,
+                           name='menu_settings_edit_menu'),
+
+                       url(r'^%s/edit_menu_layout$' % SECTION_APPEARANCE,
+                           edit_menu_layout,
+                           name='menu_settings_edit_menu_layout')
+]

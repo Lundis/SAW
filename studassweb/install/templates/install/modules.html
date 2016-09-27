@@ -17,10 +17,10 @@
             {% trans "Most modules have some initial content that you can look at to get a feel for the module" %}.
         
     </div>
-    <form action="{% url "install.views.modules" %}" method="post">
+    <form action="{% url "install_modules" %}" method="post">
         {% csrf_token %}
         {% bootstrap_form form %}
-        <a href="{% url "install.views.association" %}"><button type="button" class="btn btn-primary">
+        <a href="{% url "install_association" %}"><button type="button" class="btn btn-primary">
             {% trans "Previous" %}
         </button></a>
         <button type="submit" value="Submit" class="btn btn-primary" >

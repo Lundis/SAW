@@ -22,6 +22,7 @@ class AlbumForm(forms.ModelForm):
 
 class PictureForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
+        self._user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
         self.fields['album'].label_from_instance = lambda obj: "%s" % obj.name
 
@@ -32,12 +33,12 @@ class PictureForm(forms.ModelForm):
 
     class Meta:
         model = Photo
-        fields = ('album', 'description', 'uploaded')
+        fields = ('album', 'description')
 
-    def save(self, user, commit=True,):
+    def save(self, commit=True):
         temp_photo = super().save(commit=False)
-        if not user.is_anonymous():
-            temp_photo.user = user
+        if not self.user.is_anonymous():
+            temp_photo.user = self.user
         if commit:
             temp_photo.save()
         return temp_photo

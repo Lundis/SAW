@@ -14,7 +14,7 @@
 
     {% if form %}
         <p>{% trans "Please log in to use this feature" %}.</p>
-        <form action="{% url "install.views.welcome" %}" method="post">
+        <form action="{% url "install_welcome" %}" method="post">
             {% csrf_token %}
             {% bootstrap_form form %}
             {% buttons %}
@@ -24,7 +24,7 @@
             {% endbuttons %}
         </form>
     {% else %}
-        <a href="{% url "install.views.association" %}">
+        <a href="{% url "install_association" %}">
             <button type="button" class="btn btn-primary" >
                 {% trans 'Click here to get started' %}
             </button>

@@ -1,9 +1,9 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-urlpatterns =\
-    patterns(
-        '',
-        url(r'^multiuploader/$', 'multiuploader.views.multiuploader', name='multiuploader'),
-        url(r'^multiuploader_noajax/$', 'multiuploader.views.multiuploader', kwargs={"noajax": True},
+from . import views
+
+urlpatterns = [
+        url(r'^multiuploader/$', views.multiuploader, name='multiuploader'),
+        url(r'^multiuploader_noajax/$', views.multiuploader, kwargs={"noajax": True},
             name='multiploader_noajax'),
-    )
+    ]

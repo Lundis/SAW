@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block content %}
-    <form action="{% url "install.views.association" %}" method="post" class=form">
+    <form action="{% url "install_association" %}" method="post" class=form">
         {% csrf_token %}
         {% bootstrap_form form %}
         <a href="{% url "install_welcome" %}"><button type="button" class="btn btn-primary">

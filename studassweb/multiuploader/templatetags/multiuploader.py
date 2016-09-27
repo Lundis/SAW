@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.signing import Signer
 from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 import uuid
 
 from .. import default_settings as DEFAULTS

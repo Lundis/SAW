@@ -49,3 +49,5 @@ STATIC_DIR = os.path.join(os.path.dirname(SITE_ROOT), 'static')
 MEDIA_ROOT = os.path.join(os.path.dirname(SITE_ROOT), 'media')
 
 LOG_DIR = "/var/log/SAW"
+
+TIME_ZONE = 'Europe/Helsinki'

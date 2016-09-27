@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, Http404, HttpResponseNotAllowed
 from django.core.urlresolvers import reverse
@@ -9,54 +9,12 @@ from .register import EDIT_THEME
 from .forms import BootswatchThemeSelectForm, CSSOverrideFileForm, CSSOverrideContentForm, ComponentCSSClassForm
 from settings.sections import SECTION_APPEARANCE, Section
 import logging
+import sys
 
 logger = logging.getLogger(__name__)
 
-urlpatterns = patterns('',
-    url(r'^%s/edit_themes$' % SECTION_APPEARANCE,
-        'base.settings_pages.edit_theme',
-        name='base_settings_edit_theme'),
+current_module = sys.modules[__name__]
 
-    url(r'^%s/set_bootswatch_theme$' % SECTION_APPEARANCE,
-        'base.settings_pages.set_bootswatch_theme',
-        name='base_settings_set_bootswatch_theme'),
-
-    url(r'^%s/set_theme$' % SECTION_APPEARANCE,
-        'base.settings_pages.set_default_theme',
-        name='base_settings_set_default_theme'),
-
-    url(r'^%s/css_overrides$' % SECTION_APPEARANCE,
-        'base.settings_pages.view_css_overrides',
-        name='base_settings_view_css_overrides'),
-
-    url(r'^%s/css_overrides/new/from/(?P<copy_id>\d+)$' % SECTION_APPEARANCE,
-        'base.settings_pages.edit_css_override',
-        name='base_settings_new_css_override'),
-
-    url(r'^%s/css_overrides/new$' % SECTION_APPEARANCE,
-        'base.settings_pages.edit_css_override',
-        name='base_settings_new_css_override'),
-
-    url(r'^%s/css_overrides/(?P<file_id>\d+)$' % SECTION_APPEARANCE,
-        'base.settings_pages.edit_css_override',
-        name='base_settings_edit_css_file'),
-
-    url(r'^%s/css_overrides/save/(?P<file_id>\d+)$' % SECTION_APPEARANCE,
-        'base.settings_pages.edit_css_override',
-        name='base_settings_save_css_override'),
-
-    url(r'^%s/css_overrides/save$' % SECTION_APPEARANCE,
-        'base.settings_pages.edit_css_override',
-        name='base_settings_save_css_override'),
-
-    url(r'^%s/css_overrides/set/(?P<override_id>\d+)$' % SECTION_APPEARANCE,
-        'base.settings_pages.set_css_override',
-        name='base_settings_set_css_override'),
-
-    url(r'^%s/css_classes$' % SECTION_APPEARANCE,
-        'base.settings_pages.edit_component_classes',
-        name='base_settings_edit_component_classes'),
-)
 
 
 @has_permission(EDIT_THEME)
@@ -204,3 +162,51 @@ def edit_component_classes(request):
     }
 
     return render(request, "base/settings/view_component_classes.html", context)
+
+
+
+urlpatterns = [
+    url(r'^%s/edit_themes$' % SECTION_APPEARANCE,
+        current_module.edit_theme,
+        name='base_settings_edit_theme'),
+
+    url(r'^%s/set_bootswatch_theme$' % SECTION_APPEARANCE,
+        current_module.set_bootswatch_theme,
+        name='base_settings_set_bootswatch_theme'),
+
+    url(r'^%s/set_theme$' % SECTION_APPEARANCE,
+        current_module.set_default_theme,
+        name='base_settings_set_default_theme'),
+
+    url(r'^%s/css_overrides$' % SECTION_APPEARANCE,
+        current_module.view_css_overrides,
+        name='base_settings_view_css_overrides'),
+
+    url(r'^%s/css_overrides/new/from/(?P<copy_id>\d+)$' % SECTION_APPEARANCE,
+        current_module.edit_css_override,
+        name='base_settings_new_css_override'),
+
+    url(r'^%s/css_overrides/new$' % SECTION_APPEARANCE,
+        current_module.edit_css_override,
+        name='base_settings_new_css_override'),
+
+    url(r'^%s/css_overrides/(?P<file_id>\d+)$' % SECTION_APPEARANCE,
+        current_module.edit_css_override,
+        name='base_settings_edit_css_file'),
+
+    url(r'^%s/css_overrides/save/(?P<file_id>\d+)$' % SECTION_APPEARANCE,
+        current_module.edit_css_override,
+        name='base_settings_save_css_override'),
+
+    url(r'^%s/css_overrides/save$' % SECTION_APPEARANCE,
+        current_module.edit_css_override,
+        name='base_settings_save_css_override'),
+
+    url(r'^%s/css_overrides/set/(?P<override_id>\d+)$' % SECTION_APPEARANCE,
+        current_module.set_css_override,
+        name='base_settings_set_css_override'),
+
+    url(r'^%s/css_classes$' % SECTION_APPEARANCE,
+        current_module.edit_component_classes,
+        name='base_settings_edit_component_classes'),
+]

@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.contrib.auth.models import Group
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, Http404, HttpResponseNotAllowed
@@ -12,45 +12,6 @@ from .register import EDIT_LOGIN_SETTINGS, EDIT_PROFILE, EDIT_PERMISSIONS
 from .forms import UserBaseForm, ProfileForm, CustomGroupForm, PermissionEditorForm, KerberosServerForm
 from .models import UserExtension, SAWPermission, KerberosServer
 
-
-urlpatterns = patterns('',
-    url(r'^%s/permissions/$' % SECTION_USERS,
-        'users.settings_pages.edit_permissions',
-        name='users_settings_edit_permissions'),
-
-    url(r'^%s/permissions/reset' % SECTION_USERS,
-        'users.settings_pages.reset_permissions',
-        name='users_settings_reset_permissions'),
-
-    url(r'^%s/groups/$' % SECTION_USERS,
-        'users.settings_pages.edit_groups',
-        name='users_settings_edit_groups'),
-
-    url(r'^%s/groups/(?P<group_id>\d+)$' % SECTION_USERS,
-        'users.settings_pages.edit_groups',
-        name='users_settings_edit_group'),
-
-    url(r'^%s/groups/new$' % SECTION_USERS,
-        'users.settings_pages.edit_groups',
-        {'new': True},
-        name='users_settings_new_group'),
-
-    url(r'^%s/user/$' % SECTION_PERSONAL_SETTINGS,
-        'users.settings_pages.edit_user',
-        name='users_settings_edit_user'),
-
-    url(r'^%s/login/$' % SECTION_USERS,
-        'users.settings_pages.edit_login',
-        name='users_settings_edit_login'),
-
-    url(r'^%s/login/edit_kerberos_server/(?P<server_id>\d+)$' % SECTION_USERS,
-        'users.settings_pages.edit_kerberos_server',
-        name='users_settings_edit_kerberos_server'),
-
-    url(r'^%s/login/new_kerberos_server$' % SECTION_USERS,
-        'users.settings_pages.edit_kerberos_server',
-        name='users_settings_new_kerberos_server'),
-)
 
 
 def get_modules_with_permissions():
@@ -197,3 +158,43 @@ def edit_kerberos_server(request, server_id=None):
                'form': form,
                'server': server}
     return render(request, "users/settings/edit_kerberos_server.html", context)
+
+
+urlpatterns = [
+    url(r'^%s/permissions/$' % SECTION_USERS,
+        edit_permissions,
+        name='users_settings_edit_permissions'),
+
+    url(r'^%s/permissions/reset' % SECTION_USERS,
+        reset_permissions,
+        name='users_settings_reset_permissions'),
+
+    url(r'^%s/groups/$' % SECTION_USERS,
+        edit_groups,
+        name='users_settings_edit_groups'),
+
+    url(r'^%s/groups/(?P<group_id>\d+)$' % SECTION_USERS,
+        edit_groups,
+        name='users_settings_edit_group'),
+
+    url(r'^%s/groups/new$' % SECTION_USERS,
+        edit_groups,
+        {'new': True},
+        name='users_settings_new_group'),
+
+    url(r'^%s/user/$' % SECTION_PERSONAL_SETTINGS,
+        edit_user,
+        name='users_settings_edit_user'),
+
+    url(r'^%s/login/$' % SECTION_USERS,
+        edit_login,
+        name='users_settings_edit_login'),
+
+    url(r'^%s/login/edit_kerberos_server/(?P<server_id>\d+)$' % SECTION_USERS,
+        edit_kerberos_server,
+        name='users_settings_edit_kerberos_server'),
+
+    url(r'^%s/login/new_kerberos_server$' % SECTION_USERS,
+        edit_kerberos_server,
+        name='users_settings_new_kerberos_server'),
+]
