@@ -1,9 +1,15 @@
+
+
 try:
     # Linux
     import kerberos
+
+    SUPPORTS_VERIFY = True
 except ImportError:
     # Windows
+    SUPPORTS_VERIFY = False
     import kerberos_sspi as kerberos
+
 
 import logging
 
@@ -38,6 +44,7 @@ class KrbBackend(ModelBackend):
         if not "@" in username:
             return None
         username, hostname = username.split("@")
+        logger.info(username + " attempts to login via" + hostname)
         # Check if a server with the specified hostname exists
         try:
             server = KerberosServer.objects.get(hostname=hostname)
@@ -46,7 +53,8 @@ class KrbBackend(ModelBackend):
             return None
         # Check if the credentials are correct
         if not self.check_password(server, username, password):
-            #authentication failed
+            # authentication failed
+            logger.info(username + " failed to login via" + hostname)
             return None
         logger.debug("Kerberos auth successful")
         # Next check if the user already exists
@@ -71,7 +79,10 @@ class KrbBackend(ModelBackend):
     @staticmethod
     def check_password(server, username, password):
         try:
-            kerberos.checkPassword(username.lower(), password, server.service, server.realm)
+            if SUPPORTS_VERIFY:
+                kerberos.checkPassword(username.lower(), password, server.service, server.realm, False)
+            else:
+                kerberos.checkPassword(username.lower(), password, server.service, server.realm)
             return True
         except kerberos.BasicAuthError as e:
             logger.info("Wrong krb credentials authentication (user %s): %s" % (username, e))
