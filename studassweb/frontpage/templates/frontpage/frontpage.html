@@ -44,6 +44,7 @@
     </div>
     {% has_perm "frontpage" "CAN_EDIT_FRONTPAGE" as show_edit_buttons %}
     {% if show_edit_buttons %}
+        <div class="{% get_css "sawpanel_sidebar" %}">
         {% sidebarpanel "vertical_buttons" %}
             {% trans "Actions" %}
             {% body %}
@@ -59,6 +60,7 @@
                 </a>
             {% endif %}
         {% endsidebarpanel %}
+        </div>
     {% endif %}
 {% endblock %}
 
