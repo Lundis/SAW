@@ -9,6 +9,8 @@ DESCRIPTION = "Spread the news of your ventures to the public"
 
 VIEW_PUBLIC = "can_view_public_news"
 VIEW_MEMBER = "can_view_member_news"
+VIEW_BOARD = "can_view_board_member_news"
+
 EDIT = "can_create_news"
 
 
@@ -39,6 +41,7 @@ def get_permissions():
     """
     return (
         (VIEW_PUBLIC, GUEST, "Access to public news articles"),
-        (VIEW_MEMBER, MEMBER, "Access to all news articles"),
+        (VIEW_MEMBER, MEMBER, "Access to member-only news articles"),
+        (VIEW_BOARD, BOARD_MEMBER, "Access to board-only news articles"),
         (EDIT, BOARD_MEMBER, "Can create news articles"),
     )

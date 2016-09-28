@@ -1,6 +1,7 @@
 # coding=utf-8
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
+from django.core.exceptions import SuspiciousOperation
 from django.http import Http404, HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.core.paginator import Paginator
@@ -34,11 +35,24 @@ def _get_articles_by_category(category_name):
 
 
 def _list_articles(request, articles, page, category):
+    """
+    Render the news main page with specified articles.
+    Filters out articles the user cannot view.
+    :param request:
+    :param articles:
+    :param page:
+    :param category:
+    :return:
+    """
     if not isinstance(page, int):
         try:
             page = int(page)
         except TypeError:
             page = 1
+
+    for article in articles:
+        if not article.can_view(request.user):
+            articles = articles.exclude(id=article.id)
 
     # restrict to chosen category
     paginator = Paginator(articles, ARTICLES_PER_PAGE)
@@ -105,6 +119,10 @@ def view_article(request, year, month, day, slug):
         article = Article.objects.get(created_date=date, slug=slug)
     except Article.DoesNotExist:
         raise Http404(_("The requested article could not be found!"))
+
+    if not article.can_view(request.user):
+        raise SuspiciousOperation('user' + str(request.user) + ' attempted to read article ' + str(article.id))
+
     context = {'article': article,
                'categories': Category.objects.all()}
     return render(request, "news/view_article.html", context)

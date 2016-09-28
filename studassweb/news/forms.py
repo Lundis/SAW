@@ -7,7 +7,7 @@ from .models import Category
 class ArticleForm(forms.ModelForm):
     class Meta:
         model = Article
-        fields = ["title", "text", "picture", "categories", "summary"]
+        fields = ["title", "text", "picture", "categories", "summary", "permission"]
 
     def save(self, commit=True, user=None):
         article = super().save(commit=False)

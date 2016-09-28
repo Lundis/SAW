@@ -213,7 +213,8 @@ class AppMenuItemForm(forms.ModelForm):
     """
     class Meta:
         model = MenuItem
-        fields = ('display_name',)
+        fields = ('display_name',
+                  'view_permission',)
 
 
 class MainMenuForm(forms.ModelForm):

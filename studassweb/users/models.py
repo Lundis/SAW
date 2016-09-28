@@ -151,7 +151,8 @@ class SAWPermission(models.Model):
         permission, created = Permission.objects.get_or_create(name=fancy_name,
                                                                codename=perm_name,
                                                                content_type=DummyPermissionBase.get_content_type())
-        logger.info("Created permission %s", perm_name)
+        if created:
+            logger.info("Created permission %s", perm_name)
         saw_permission, created = cls.objects.get_or_create(permission=permission)
         if module:
             saw_permission.module = module

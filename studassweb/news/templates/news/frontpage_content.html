@@ -1,0 +1,30 @@
+{% load i18n %}
+
+{% if articles.count > 0 %}
+    <ul style="list-style-type:disc; padding-left: 10px;">
+        {% for article in articles.list %}
+            <div class="row">
+                <div class="col-xs-8">
+                    <h2>
+                        <a href="{{ article.get_absolute_url }}">
+                            {{ article.title }}
+                        </a>
+                    </h2>
+                </div>
+                <h2 style="font-size: 0.8em; font-weight: normal">
+                    <div class="col-xs-2 pull-right">
+                        {{ article.created_date }}
+                    </div>
+                </h2>
+            </div>
+            <p>
+                {{ article.get_summary |safe }}
+            </p>
+            {% if forloop.counter != articles.count%}
+                <hr>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% else %}
+    {% trans "There are no news" %}.
+{% endif %}
