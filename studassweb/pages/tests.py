@@ -56,7 +56,7 @@ class InfoPageTest(TestCase):
 
     def test_create_delete_page(self):
         """
-        Tests that a menu item is created and deleted along with the category
+        Tests that a menu item is created and deleted along with the page
         """
         page = InfoPage.objects.create(title="test1",
                                        category=self.category,

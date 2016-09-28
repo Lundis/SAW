@@ -48,3 +48,16 @@
         {% endsidebarpanel %}
     {% endif %}
 {% endblock %}
+
+{% block sidebar-panel-help %}
+    {% sidebarpanel "help" %}
+        {% trans "Help" %}
+        {% body %}
+        <p>
+            {% trans "The category lets you organize your pages, making it easier to navigate the site using menus and sidebars" %}
+        </p>
+        <p>
+            {% trans "The for frontpage option lets you show the page as an item on the frontpage." %}
+        </p>
+    {% endsidebarpanel %}
+{% endblock %}

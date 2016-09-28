@@ -12,9 +12,12 @@
     {% if categories %}
         <div class="list-group">
             {% for category in categories %}
-                <a href="{{ category.get_absolute_url}}" class="list-group-item">
-                    {{ category.name }}
-                </a>
+                {% can_view_object category as show_category %}
+                {% if show_category %}
+                    <a href="{{ category.get_absolute_url }}" class="list-group-item">
+                        {{ category.name }}
+                    </a>
+                {% endif %}
             {% endfor %}
         </div>
     {% else %}
@@ -27,7 +30,7 @@
         <h1>{% trans "Pages without a category" %}</h1>
         <div class="list-group">
             {% for page in orphans %}
-                <a href="{{ page.get_absolute_url}}" class="list-group-item">
+                <a href="{{ page.get_absolute_url }}" class="list-group-item">
                     {{ page.title }}
                 </a>
             {% endfor %}
@@ -37,7 +40,7 @@
         <h1>{% trans "Pages for the frontpage" %}</h1>
         <div class="list-group">
             {% for page in frontpage_pages %}
-                <a href="{{ page.get_absolute_url}}" class="list-group-item">
+                <a href="{{ page.get_absolute_url }}" class="list-group-item">
                     {{ page.title }}
                 </a>
             {% endfor %}

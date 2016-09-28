@@ -8,18 +8,20 @@
 
 
 {% block breadcrumb2 %}
-    {% has_perm "pages" "EDIT" as can_edit %}
-    {% if category and can_edit %}
-        <li>
-            <a href="{{ category.get_absolute_url }}">
-                {{ category.name }}
-            </a>
-        </li>
+    {% if category %}
+        {% can_view_object category as show_category %}
+        {% if show_category %}
+            <li>
+                <a href="{{ category.get_absolute_url }}">
+                    {{ category.name }}
+                </a>
+            </li>
+        {% endif %}
     {% endif %}
 {% endblock %}
 
 {% block breadcrumb3 %}
-    {% has_perm "pages" "EDIT" as can_edit %}
+    {% can_edit_object page as can_edit %}
     {% if can_edit %}
         <li class="active">
             {{ page.title }}
@@ -32,25 +34,22 @@
 
 {% block main_content %}
     <h1>{{ current_revision.title }}</h1>
-    <div  class="{% get_css "sawpanel_secondary" %}">
+    <div class="{% get_css "sawpanel_secondary" %}">
         <div id="page-content" class="panel-body">
-            {{ current_revision.text | safe}}
+            {{ current_revision.text | safe }}
         </div>
     </div>
 {% endblock main_content %}
 
 {% block sidebar-panel1 %}
-    {% if category.pages %}
+    {% if visible_other_pages_in_category %}
         {% sidebarpanel "vertical_buttons" %}
             {% trans "More in this category" %}
             {% body %}
-            {% for page_ in category.pages %}
-                {% can_view_object page_ as show_page %}
-                {% if show_page %}
-                    <a href="{{ page_.get_absolute_url}}" class="list-group-item">
-                        {{ page_.title }}
-                    </a>
-                {% endif %}
+            {% for page_ in visible_other_pages_in_category %}
+                <a href="{{ page_.get_absolute_url }}" class="list-group-item">
+                    {{ page_.title }}
+                </a>
             {% endfor %}
         {% endsidebarpanel %}
     {% endif %}
@@ -89,12 +88,13 @@
             {% sidebarpanel %}
                 {% trans "Revisions" %}
                 {% body %}
-                <div class="btn-group-vertical btn-block" style="height: auto; max-height: 200px; overflow-x: hidden; padding:0;">
+                <div class="btn-group-vertical btn-block"
+                     style="height: auto; max-height: 200px; overflow-x: hidden; padding:0;">
                     {% for revision in revisions %}
                         <a {% if revision == current_revision %}
                             href="#" class="{% get_css "sawbutton_sidebar" %} btn-block active"
                         {% else %}
-                            href="{{ revision.get_absolute_url}}" class="{% get_css "sawbutton_sidebar" %} btn-block"
+                            href="{{ revision.get_absolute_url }}" class="{% get_css "sawbutton_sidebar" %} btn-block"
                         {% endif %}
                         >
                             {{ revision.date | date:"d M Y" }}
@@ -130,7 +130,7 @@
             var content = $("#page-content");
             var free_space = $("#footer-container").offset().top -
                     content.offset().top - $("#page-footer").outerHeight() -
-                    (content.outerHeight() - content.height()) ;
+                    (content.outerHeight() - content.height());
             content.css("min-height", "" + (free_space - 20) + "px");
         }
     </script>

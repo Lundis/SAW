@@ -1,6 +1,7 @@
 # coding=utf-8
 from django.shortcuts import render
 from django.http import Http404, HttpResponseRedirect, HttpResponseNotAllowed, HttpResponseForbidden
+from django.core.exceptions import SuspiciousOperation
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.utils.timezone import datetime
@@ -44,7 +45,7 @@ def view_page(request, slug, revision_id=None):
     except InfoPage.DoesNotExist:
         raise Http404("Page " + slug + " not found")
     if not page.can_view(request.user):
-        return HttpResponseForbidden("User " + str(request.user) + " Does not have access to page" + slug)
+        raise SuspiciousOperation("User " + str(request.user) + " does not have access to page" + slug)
     category = page.category
     revisions = page.revisions()
     if revision_id is None:
@@ -56,11 +57,21 @@ def view_page(request, slug, revision_id=None):
             raise Http404(_("The requested revision could not be found"))
         # Only let users with edit permission see old revisions
         if not has_user_perm(request.user, EDIT):
-            return HttpResponseForbidden("User " + request.user.username + " is not allowed to view old revisions")
+            raise SuspiciousOperation("User " + request.user.username + " is not allowed to view old revisions")
 
-    return render(request, 'pages/view_page.html', {'category': category,
-                                                    'page': page,
-                                                    'current_revision': current_revision})
+    visible_other_pages_in_category = []
+    if category.can_view(request.user):
+        for p in category.pages():
+            if p.can_view(request.user) and p.id != page.id:
+                visible_other_pages_in_category.append(p)
+
+    context = {
+        'category': category,
+        'page': page,
+        'current_revision': current_revision,
+        'visible_other_pages_in_category': visible_other_pages_in_category,
+    }
+    return render(request, 'pages/view_page.html', context)
 
 
 @has_permission(EDIT)
@@ -141,6 +152,9 @@ def view_category(request, slug):
         category = InfoCategory.objects.get(slug=slug)
     except InfoCategory.DoesNotExist:
         raise Http404
+
+    if not category.can_view(request.user):
+        raise SuspiciousOperation("User " + str(request.user) + " does not have access to category " + str(category))
 
     return render(request, 'pages/view_category.html', {'category': category})
 

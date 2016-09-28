@@ -35,3 +35,15 @@
         {% endsidebarpanel %}
     {% endif %}
 {% endblock %}
+
+
+{% block sidebar-panel-help %}
+    {% sidebarpanel "help" %}
+        {% trans "Help" %}
+        {% body %}
+        <p>
+            {% trans "Categories let you organize your pages, making it easier to navigate the site using menus and sidebars" %}.
+            {% trans "Menu items are automatically created for categories." %}
+        </p>
+    {% endsidebarpanel %}
+{% endblock %}
