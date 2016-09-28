@@ -69,13 +69,13 @@
                 <div class="list-group-item" id="edit-component-{{ class.id }}">
 
                     {% if class.default|slice:":4" == "btn " %}
-                        <div class="{{ class.value }}">{% trans class.description %}</div>
+                        <div class="{{ class.value }}" id="preview-{{ class.id }}">{% trans class.description %}</div>
                         {% elif class.default|slice:":6" == "panel " %}
-                        <div class="{{ class.value }}">
+                        <div class="{{ class.value }}" id="preview-{{ class.id }}">
                             <div class="panel-heading">{% trans class.description %}</div>
                         </div>
                     {% else %}
-                        <p class="component-description">{% trans class.description %}</p>
+                        <p class="component-description" id="preview-{{ class.id }}">{% trans class.description %}</p>
                     {% endif %}
                     <input type="text" class="form-control component-value"
                            id="component-input-{{ class.id }}"
@@ -156,6 +156,8 @@
             } else {
                 $(default_holder_id).removeClass("invisible");
             }
+
+            $("#preview-" + id).attr("class", $(this).val());
         });
 
         $(".component-reset-button").click(function() {
@@ -177,6 +179,7 @@
             // submit
             $("#component-form").submit();
         });
+
 
     </script>
 {% endblock %}
