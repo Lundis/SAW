@@ -103,7 +103,8 @@
                 <div class="col-xs-12 footer text-center navbar-brand">
                     <span class="glyphicon glyphicon-copyright-mark"></span>
                     {% now "Y" %} {{ site_config.association_name }}
-                    - Powered by SAW (beta)
+                    - Powered by <a href="https://bitbucket.org/Lundis/saw">SAW</a>
+                    <a href="{% url "base_changelog" %}">{{ SAW_VERSION }}</a>
                 </div>
             </div>
         </div>

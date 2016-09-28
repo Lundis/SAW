@@ -61,7 +61,8 @@ class Poll(models.Model):
             return not Vote.objects.filter(choice_id__id_to_poll=self, ip_address=ip_address).exists()
 
     def has_user_voted(self, user, ip_address):
-        return not self.can_user_vote(user, ip_address)  # TODO STUFF ENNU NOGO
+        # TODO: check if the user has actually voted, not just if he's unable to
+        return not self.can_user_vote(user, ip_address)
 
 
 class Choice(models.Model):

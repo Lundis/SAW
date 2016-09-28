@@ -2,7 +2,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from .forms import DummyForm
-
+from django.conf import settings
 
 def delete_confirmation_view(request, item, form_url, redirect_url,
                              template="base/delete_confirmation.html"):
@@ -28,3 +28,13 @@ def delete_confirmation_view(request, item, form_url, redirect_url,
                'form_url': form_url,
                'item_name': item_name}
     return render(request, template, context)
+
+
+def view_change_log(request):
+    """
+    Show the change log
+    :param request:
+    :return:
+    """
+    context = {'saw_version'}
+    return render(request, "base/changelog.html")

@@ -1,0 +1,21 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load sawp %}
+
+{% block breadcrumb %}
+{% endblock %}
+
+{% block main_content %}
+    <h1>Change Log</h1>
+    <h2>{{ SAW_VERSION }}</h2>
+    <p>
+    <ul>
+        <li>
+            Added changelog.
+        </li>
+    </ul>
+    </p>
+    <h2>1.0</h2>
+    <p>Released 2016-09-28.</p>
+    <p>Changes weren't tracked until this point.</p>
+{% endblock %}
