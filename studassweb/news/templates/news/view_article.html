@@ -64,7 +64,7 @@
 
 
 {% block sidebar-panel2 %}
-    {% can_view_object article as show_edit_buttons %}
+    {% can_edit_object article as show_edit_buttons %}
     {% if show_edit_buttons %}
         {% sidebarpanel "vertical_buttons" %}
             {% trans "Actions" %}
