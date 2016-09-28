@@ -13,8 +13,35 @@
 {% endblock %}
 
 {% block main_content %}
-    <h2>{{ article.title }}</h2>
-    <div>{{ article.text | safe }}</div>
+    <div class="{% get_css "sawpanel_main" %}">
+        <div class="panel-heading">
+            <h2>{{ article.title }}</h2>
+        </div>
+        <div class="panel-body">
+            {{ article.text | safe }}
+        </div>
+        <div class="panel-footer">
+            <div class="row inherit-padding-left-right">
+                <div class="pull-left">
+                    {% if article.comments.count > 0 %}
+                        {{ article.comments.count }}
+                    {% else %}
+                        {% trans "No" %}
+                    {% endif %}
+                    {% if article.comments.count == 1 %}
+                        {% trans "comment" %}
+                    {% else %}
+                        {% trans "comments" %}
+                    {% endif %}
+                </div>
+                <div class="pull-right text-right">
+                    {% trans "By" %} {{ article.author }}
+                    {{ article.created_date }}
+                    {{ article.created_time }}
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block sidebar-panel1 %}
