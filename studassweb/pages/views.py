@@ -60,7 +60,7 @@ def view_page(request, slug, revision_id=None):
             raise SuspiciousOperation("User " + request.user.username + " is not allowed to view old revisions")
 
     visible_other_pages_in_category = []
-    if category.can_view(request.user):
+    if category and category.can_view(request.user):
         for p in category.pages():
             if p.can_view(request.user) and p.id != page.id:
                 visible_other_pages_in_category.append(p)
