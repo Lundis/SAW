@@ -14,7 +14,7 @@ from base.utils import get_all_modules
 
 from django.contrib.messages import constants as message_constants
 
-SAW_VERSION = "1.0.2"
+SAW_VERSION = "1.0.3"
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))

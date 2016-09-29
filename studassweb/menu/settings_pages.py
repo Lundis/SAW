@@ -5,6 +5,8 @@ from django.shortcuts import render
 from django.http import Http404, HttpResponseRedirect, HttpResponseBadRequest
 from django.core.urlresolvers import reverse
 from django.core.exceptions import SuspiciousOperation
+from django.contrib import messages
+from django.utils.translation import ugettext_lazy as _
 from .models import Menu, MenuItem, TYPE_USER
 from .register import EDIT_MENUS
 from .forms import MenuForm, MenuCreationForm, UserMenuItemForm, AppMenuItemForm, MainMenuForm
@@ -74,6 +76,7 @@ def edit_menu(request, menu_id):
                     available_items=available_items)
     if form.is_valid():
         form.put_items_in_menus()
+        messages.success(request, _("Menu updated"))
         return HttpResponseRedirect(reverse("menu_settings_select_menu"))
     context = {'menu': menu,
                'form': form,
@@ -101,6 +104,7 @@ def edit_menu_item(request, item_id=None):
 
     if form.is_valid():
         form.save()
+        messages.success(request, _("Menu item updated"))
         return HttpResponseRedirect(reverse("menu_settings_select_menu"))
     context = {'menu_item': menu_item,
                'form': form,

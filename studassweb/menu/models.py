@@ -181,9 +181,6 @@ class MenuItem(models.Model):
     created_by = models.CharField(max_length=2, choices=TYPE_CHOICES, default=TYPE_APP)
 
     def __str__(self):
-        url = self.url()
-        if url is None:
-            logger.error("Menu Item (%s) has no URL!", self.id)
         return self.identifier
 
     def clean(self):

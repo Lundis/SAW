@@ -15,10 +15,23 @@ logger = logging.getLogger(__name__)
 
 
 class LoginForm(forms.Form):
+    """
+    Simple form for logging in.
+    """
     user_name = forms.CharField(label=_('User name'))
     password = forms.CharField(label=_('Password'), widget=forms.PasswordInput())
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['user_name'].widget.attrs.update(autofocus='autofocus')
+        self.fields['user_name'].widget.attrs.update(placeholder='Username')
+        self.fields['password'].widget.attrs.update(placeholder='Password')
+
     def clean(self):
+        """
+        Verify that the username/password combination is correct
+        :return:
+        """
         super().clean()
         # https://docs.djangoproject.com/en/1.7/topics/auth/default/#auth-web-requests
 
@@ -36,6 +49,11 @@ class LoginForm(forms.Form):
                 self.add_error(None, _("Username or pw missing"))
 
     def login_user(self, request):
+        """
+        Actually log in the user.
+        :param request:
+        :return:
+        """
         user = authenticate(username=self.cleaned_data['user_name'], password=self.cleaned_data['password'])
         # UserExtension is normally created when creating user, except for SuperUsers.
         try:
